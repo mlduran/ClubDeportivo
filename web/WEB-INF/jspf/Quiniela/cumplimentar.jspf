@@ -1,0 +1,51 @@
+<%-- any content can be specified here e.g.: --%>
+<%@ page pageEncoding="UTF-8" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml"%>
+<%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<c:set var="root" value="${pageContext.servletContext.contextPath}"/>
+<c:set var="idclub" value="${sessionScope.idClub}"/>
+<c:set var="deporte" value="${sessionScope.deporte}"/>
+<c:set var="idequipo" value="${sessionScope.idEquipo}"/>
+<c:set var="error" value="${requestScope.error}"/>
+
+<br/><br/>
+
+<c:if test="${comp == null}">
+    <br/>
+    <b>NO HAY NINGUNA COMPETICION ACTIVA EN ESTE MOMENTO</b>
+    <br/>
+    <br/>
+</c:if>
+
+<c:if test="${comp != null}">
+              
+Solo se puede cumplimentar en ${diasParaCumplimentar}<br/><br/>
+
+<c:if test="${apuestas != null}">
+    
+
+<form action="${root}/panelControl/Quiniela/cumplimentar" method="post">
+  
+    <c:import url="/WEB-INF/jspf/Quiniela/tablaQuiniela.jspf"/>
+
+    <input type="submit" value="Grabar" name="operacion" />
+
+    <c:if test="${error != null}">
+        ${error}
+    </c:if>
+
+
+</form>
+    
+</c:if>
+
+</c:if>
+
+    
+    </br>
+    <c:import url="/WEB-INF/jspf/Quiniela/faqPuntuacion.jspf"/>
+

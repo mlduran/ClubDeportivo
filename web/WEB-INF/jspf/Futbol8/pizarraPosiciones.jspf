@@ -1,0 +1,633 @@
+<%-- any content can be specified here e.g.: --%>
+<%@ page pageEncoding="UTF-8" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml"%>
+<%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<c:set var="root" value="${pageContext.servletContext.contextPath}"/>
+
+<table class="tablaPizarra" with="100%">
+    <tr>
+        <td colspan="3" with="43%"></td>
+        <td bgcolor="turquoise" with="14%" id="">
+            <div id="LGO"></div>
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'P0'}">  
+                    <div id="LP0">
+                        <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                    </div>
+                    ${jug.nombre}</br>(${jug.valoracionPartido})
+                </c:if>
+            </c:forEach> 
+        </td>
+        <td colspan="3" with="43%"></td>
+    </tr>
+    
+    <tr>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'A1'}">
+                      
+                        <div id="LA1">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'B1'}">
+                       
+                        <div id="LB1">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'C1'}">
+                     
+                        <div id="LC1">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'D1'}">
+                     
+                        <div id="LD1">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'E1'}">
+                     
+                        <div id="LE1">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'F1'}">
+                      
+                        <div id="LF1">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'G1'}">
+                     
+                        <div id="LG1">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+    </tr>
+    
+    <tr>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'A3'}">
+                    <p class="jugadorVisitante">  
+                        <div id="VA3">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'B3'}">
+                    <p class="jugadorVisitante">
+                        <div id="VB3">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'C3'}">
+                    <p class="jugadorVisitante"> 
+                        <div id="VC3">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'D3'}">
+                    <p class="jugadorVisitante"> 
+                        <div id="VD3">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'E3'}">
+                    <p class="jugadorVisitante"> 
+                        <div id="VE3">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'F3'}">
+                    <p class="jugadorVisitante"> 
+                        <div id="VF3">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'G3'}">
+                    <p class="jugadorVisitante"> 
+                        <div id="VG3">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+    </tr>
+    
+    <tr>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'A2'}">
+                        
+                        <div id="LA2">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'B2'}">
+                     
+                        <div id="LB2">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'C2'}">
+                      
+                        <div id="LC2">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'D2'}">
+                      
+                        <div id="LD2">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'E2'}">
+                       
+                        <div id="LE2">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'F2'}">
+                      
+                        <div id="LF2">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'G2'}">
+                        
+                        <div id="LG2">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+    </tr>
+    
+    <tr style="height:3px">
+        <td colspan="7" height="1px" bgcolor="black">           
+        <%--centro del campo--%>
+        </td>
+    </tr>
+    
+    <tr>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'A2'}">
+                    <p class="jugadorVisitante"> 
+                        <div id="VA2">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'B2'}">
+                    <p class="jugadorVisitante"> 
+                        <div id="VB2">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'C2'}">
+                    <p class="jugadorVisitante"> 
+                        <div id="VC2">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'D2'}">
+                    <p class="jugadorVisitante"> 
+                        <div id="VD2">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'E2'}">
+                    <p class="jugadorVisitante"> 
+                        <div id="VE2">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'F2'}">
+                    <p class="jugadorVisitante"> 
+                        <div id="VF2">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'G2'}">
+                    <p class="jugadorVisitante"> 
+                        <div id="VG2">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+    </tr>
+    
+        <tr>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'A3'}">
+                      
+                        <div id="LA3">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'B3'}">
+                      
+                        <div id="LB3">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'C3'}">
+                        
+                        <div id="LC3">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'D3'}">
+                      
+                        <div id="LD3">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'E3'}">
+                      
+                        <div id="LE3">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'F3'}">
+                     
+                        <div id="LF3">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqLocal}">
+                <c:if test="${jug.cuadrante eq 'G3'}">
+                      
+                        <div id="LG3">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqLocal.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+    </tr>
+    
+    <tr>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'A1'}">
+                    <p class="jugadorVisitante"> 
+                        <div id="VA1">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'B1'}">
+                    <p class="jugadorVisitante"> 
+                        <div id="VB1">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'C1'}">
+                    <p class="jugadorVisitante"> 
+                        <div id="VC1">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'D1'}">
+                    <p class="jugadorVisitante"> 
+                        <div id="VD1">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'E1'}">
+                    <p class="jugadorVisitante"> 
+                        <div id="VE1">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'F1'}">
+                    <p class="jugadorVisitante"> 
+                        <div id="VF1">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+        <td width="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'G1'}">
+                    <p class="jugadorVisitante"> 
+                        <div id="VG1">
+                            <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                        </div>
+                        ${jug.textoPizarra}
+                   
+                </c:if>
+            </c:forEach>            
+        </td>
+        
+    </tr>
+      
+    <tr>
+        <td colspan="3" with="43%"></td>
+        <td bgcolor="orange" with="14%">
+            <c:forEach var="jug" items="${jugsEqVisitante}">
+                <c:if test="${jug.cuadrante eq 'P0'}">
+                    <div id="VP0">
+                        <img id="${jug.id}" alt="*" src="${root}/images/jugadores/jugador${partido.eqVisitante.equipacion}ico.png"/><br/>
+                    </div>
+                    ${jug.nombre}</br>(${jug.valoracionPartido})
+                </c:if>
+            </c:forEach> 
+            <div id="VGO"></div>    
+                
+        </td>
+        <td colspan="3" with="43%"></td>
+    </tr>
+    
+    
+</table>
+
+        <div id="entrada">
+            <img id="pelota" alt="*" src="${root}/images/pelotaFutbolMini.png"/>        
+        </div>
+<script type="text/javascript" src="${root}/JavaScript/Lib/jquery/1.7.2/jquery.js"></script>        
+<script type="text/javascript" src="${root}/JavaScript/Partido.js"></script>
+
+
+
+
+

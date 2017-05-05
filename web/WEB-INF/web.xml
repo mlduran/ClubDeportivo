@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+    <display-name>Club Deportivo</display-name>
+
+   <!-- Parametros de configuracion -->
+    <context-param>
+        <description>Entorno aplicacion</description>
+        <param-name>entornoapp</param-name>
+        <param-value>desarrollo</param-value>
+    </context-param>
+    
+    <context-param>
+        <description>Titulo de la aplicacion</description>
+        <param-name>tituloapp</param-name>
+        <param-value>Club Deportivo</param-value>
+    </context-param>
+    
+    <context-param>
+        <description>Texto para el banner de entrada</description>
+        <param-name>bannerEntrada</param-name>
+        <param-value></param-value>
+    </context-param> 
+    
+    <context-param>
+        <description>Juegos a mostrar en pagina de inicio</description>
+        <param-name>juegos</param-name>
+        <param-value></param-value>
+    </context-param>
+
+    <context-param>
+        <description>Email de contacto</description>
+        <param-name>mailcontacto</param-name>
+        <param-value>ml_duran@live.com</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Ruta del archivo de configuracion de Mysql</description>
+        <param-name>configmysql</param-name>
+        <param-value>/WEB-INF/mysql.properties</param-value>
+    </context-param>
+    
+    <context-param>
+        <description>Ruta del archivo de configuracion de Correo</description>
+        <param-name>configcorreo</param-name>
+        <param-value>/WEB-INF/mail.properties</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Ruta del archivo de configuracion de log4j</description>
+        <param-name>log4jcfg</param-name>
+        <param-value>/WEB-INF/log4j.cfg.xml</param-value>
+    </context-param>
+    
+    <context-param>
+            <description>Ruta de ficheros de carga</description>
+            <param-name>rutaficheroscarga</param-name>
+            <param-value>d:/proyectos_web/FicherosCarga</param-value>
+   </context-param>
+    
+    <context-param>
+        <description>Deportes activos</description>
+        <param-name>deportesactivos</param-name>
+        <param-value>Quiniela,Futbol8</param-value>
+    </context-param>
+    
+    <context-param>
+        <description>Dias de Liga Futbol8(1 Domingo, 2 Lunes, etc.)</description>
+        <param-name>diasligafutbol8</param-name>
+        <param-value>2,3,5,6</param-value>
+    </context-param>
+                
+    <context-param>
+        <description>Dias de Copa Futbol8(1 Domingo, 2 Lunes, etc.)</description>
+        <param-name>diascopafutbol8</param-name>
+        <param-value>4,7</param-value>
+    </context-param>
+
+    <listener>
+        <description>Escucha los eventos de la aplicacion y de la sesion</description>
+        <listener-class>mld.clubdeportivo.listeners.WebAppListener</listener-class>
+    </listener>
+
+    <servlet>
+        <description>Ventana para imprimir</description>
+        <servlet-name>ImpresionHttpServlet</servlet-name>
+        <servlet-class>mld.clubdeportivo.controladores.ImpresionHttpServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ImpresionHttpServlet</servlet-name>
+        <url-pattern>/imprimir</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <description>Ventana para ayuda</description>
+        <servlet-name>AyudaHttpServlet</servlet-name>
+        <servlet-class>mld.clubdeportivo.controladores.AyudaHttpServlet</servlet-class>
+        <init-param>
+            <description>Ruta de ficheros de Ayuda</description>
+            <param-name>rutaficherosayuda</param-name>
+            <param-value>/Ayuda/</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AyudaHttpServlet</servlet-name>
+        <url-pattern>/ayuda</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <description>Ventana para carga de Ficheros</description>
+        <servlet-name>FileHttpServlet</servlet-name>
+        <servlet-class>mld.clubdeportivo.controladores.FileHttpServlet</servlet-class>        
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>FileHttpServlet</servlet-name>
+        <url-pattern>/cargaFichero</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <description>Muestra registro de entradas</description>
+        <servlet-name>RegistroHttpServlet</servlet-name>
+        <servlet-class>mld.clubdeportivo.controladores.RegistroHttpServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>RegistroHttpServlet</servlet-name>
+        <url-pattern>/registro</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <description>Pagina Administracion</description>
+        <servlet-name>AdminHttpServlet</servlet-name>
+        <servlet-class>mld.clubdeportivo.controladores.AdminHttpServlet</servlet-class>        
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+
+    <servlet-mapping>
+        <servlet-name>AdminHttpServlet</servlet-name>
+        <url-pattern>/admin</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <description>Pagina de Login</description>
+        <servlet-name>LoginHttpServlet</servlet-name>
+        <servlet-class>mld.clubdeportivo.controladores.LoginHttpServlet</servlet-class>
+        <init-param>
+            <description>Usuario admin</description>
+            <param-name>usuarioAdmin</param-name>
+            <param-value>admin</param-value>
+        </init-param>
+        <init-param>
+            <description>Password admin</description>
+            <param-name>passwordAdmin</param-name>
+            <param-value>admin</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>LoginHttpServlet</servlet-name>
+        <url-pattern>/login</url-pattern>        
+    </servlet-mapping>
+
+    <servlet>
+        <description>Paginas de alta</description>
+        <servlet-name>AltasHttpServlet</servlet-name>
+        <servlet-class>mld.clubdeportivo.controladores.AltasHttpServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+     <servlet-mapping>
+        <servlet-name>AltasHttpServlet</servlet-name>
+        <url-pattern>/alta/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <description>Panel de Control</description>
+        <servlet-name>PanelControlHttpServlet</servlet-name>
+        <servlet-class>mld.clubdeportivo.controladores.PanelControlHttpServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>PanelControlHttpServlet</servlet-name>
+        <url-pattern>/panelControl/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <description>Panel de Control Futbol8</description>
+        <servlet-name>PanelControlFutbol8HttpServlet</servlet-name>
+        <servlet-class>mld.clubdeportivo.controladores.PanelControlFutbol8HttpServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>PanelControlFutbol8HttpServlet</servlet-name>
+        <url-pattern>/panelControl/Futbol8/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <description>Lanza Jornada</description>
+        <servlet-name>LanzarJornadaHttpServlet</servlet-name>
+        <servlet-class>mld.clubdeportivo.controladores.LanzarJornadaHttpServlet</servlet-class> 
+        <init-param>
+            <description>Ip que puede lanzar la ejecucion</description>
+            <param-name>codigoLanzamiento</param-name>
+            <param-value>12345</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>LanzarJornadaHttpServlet</servlet-name>
+        <url-pattern>/lanzarJornada</url-pattern>
+    </servlet-mapping>
+
+     <servlet>
+        <description>Panel de Control Quiniela</description>
+        <servlet-name>PanelControlQuinielaHttpServlet</servlet-name>
+        <servlet-class>mld.clubdeportivo.controladores.PanelControlQuinielaHttpServlet</servlet-class>
+        <init-param>
+            <description>Dias que se puede cumplimentar (1 Domingo, 2 Lunes, etc.)</description>
+            <param-name>diascumplimentacion</param-name>
+            <param-value>2,3,4,5</param-value>
+        </init-param>
+        <init-param>
+            <description>Modos de cumplimentacion</description>
+            <param-name>tiposapuesta</param-name>
+            <param-value>3 Dobles</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>PanelControlQuinielaHttpServlet</servlet-name>
+        <url-pattern>/panelControl/Quiniela/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <description>Servicios JSON</description>
+        <servlet-name>JsonServlet</servlet-name>
+        <servlet-class>mld.clubdeportivo.controladores.JsonServlet</servlet-class>
+        <load-on-startup>9</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>JsonServlet</servlet-name>
+        <url-pattern>/json/*</url-pattern>
+    </servlet-mapping>
+    
+    <session-config>
+        <session-timeout>
+            10
+        </session-timeout>
+    </session-config>
+    
+    <welcome-file-list>
+        <welcome-file>login</welcome-file>
+    </welcome-file-list>
+
+    <jsp-config>
+        <jsp-property-group>
+            <url-pattern>*.jsp</url-pattern>
+            <el-ignored>false</el-ignored>
+            <scripting-invalid>true</scripting-invalid>
+        </jsp-property-group>
+        <jsp-property-group>
+            <url-pattern>*.jspf</url-pattern>
+            <el-ignored>false</el-ignored>
+            <scripting-invalid>true</scripting-invalid>
+        </jsp-property-group>
+    </jsp-config>
+
+</web-app>
