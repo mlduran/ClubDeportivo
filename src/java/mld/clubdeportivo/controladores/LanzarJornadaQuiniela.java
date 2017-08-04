@@ -50,10 +50,11 @@ public class LanzarJornadaQuiniela {
         }
         else{
             
-            UtilesQuiniela.cargarJornadasQuiniela(ruta); 
-            UtilesQuiniela.validarJornada(comp, ruta);
+            //UtilesQuiniela.cargarJornadasQuiniela(ruta); 
+            //UtilesQuiniela.validarJornada(comp);
         }
         
+        /*
         if(UtilGenericas.isMartes()){
             try {
                 UtilesQuiniela.crearJornadaQuiniela(comp, ruta);
@@ -61,6 +62,7 @@ public class LanzarJornadaQuiniela {
                 logger.error("Error al crear jornada quiniela ".concat(ex.getMessage()));
             }
         }   
+        */
                 
     }
 

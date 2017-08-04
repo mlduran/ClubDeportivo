@@ -54,6 +54,8 @@ public class PanelControlQuinielaHttpServlet extends HttpServlet {
             long id = (Long) req.getSession().getAttribute("idEquipo");
             EquipoQuiniela eq = JDBCDAOQuiniela.obtenerSimpleEquipoQuiniela(id);
 
+            req.setAttribute("esAdmin", eq.isAdmin());
+            
             obtenerListaEquipos(req, eq.getClub().getGrupo());
 
             String accion = req.getPathInfo();           
@@ -70,12 +72,15 @@ public class PanelControlQuinielaHttpServlet extends HttpServlet {
                 jornadasDisputadas(req, eq);
             else if (accion.equals("/competiciones"))
                 competiciones(req);
+            else if (accion.equals("/jornadaAdmin") && eq.isAdmin()) 
+                cumplimentarAdmin(req, eq);
                       
 
         } catch (Exception ex) {
             logger.error(ex.getMessage());
             req.setAttribute("error", ex.getMessage());
         }
+            
      
         RequestDispatcher view =
                 req.getRequestDispatcher("/PanelControl/panelControlQuiniela.jsp");
@@ -456,6 +461,104 @@ public class PanelControlQuinielaHttpServlet extends HttpServlet {
 
 
     }
+    
+    private void cumplimentarAdmin(HttpServletRequest req, EquipoQuiniela eq) 
+            throws DAOException, IllegalArgumentException {
+        
+        req.setAttribute("op", "cumplimentarAdmin");
+        req.setAttribute("titulo", "ADMINISTRAR JORNADA");
+        
+        CompeticionQuiniela comp = JDBCDAOQuiniela.competicionActiva();
+        req.setAttribute("comp", comp);
+        if (comp == null) return;
+
+        // Aqui verificar si se puede administrar
+        //if (!sePuedeCumplimentar())
+        //    throw new UnsupportedOperationException("No se puede cumplimentar este dia");
+
+        String op = (String) req.getParameter("operacion");
+              
+        JornadaQuiniela jornada = JDBCDAOQuiniela.obtenerProximaJornada(comp);
+        
+        ArrayList<ApuestaMix> datos = new ArrayList<ApuestaMix>();  
+        String numJornada = "";
+              
+        String[] partidos = new String[15];
+        String[] resultados = new String[15];
+        
+        if (op == null){
+            
+        }
+        else if (op.equals("Crear Jornada")) {
+             String nj = (String) req.getParameter("numeroJornada");             
+             try {
+                 if (nj == null || nj == "") throw 
+                         new UnsupportedOperationException("Se ha de informar numero de jornada");
+                 for(int i = 1; i < 16; i++){
+                     String np = String.valueOf(i);
+                     if (np.length() == 1) np = "0" + np;
+                     partidos[i - 1] = req.getParameter("partido" + np);
+                 }                 
+                jornada = UtilesQuiniela.crearJornadaQuiniela(nj, partidos);
+            } catch (Exception ex){
+                req.setAttribute("error", "Error al crear jornada quiniela ".concat(ex.getMessage()));
+            }
+        }
+        else if (op.equals("Grabar")) { 
+            
+            for(int i = 1; i < 16; i++){
+                String np = String.valueOf(i);
+                if (np.length() == 1) np = "0" + np;
+                partidos[i - 1] = req.getParameter("partido" + np);
+                resultados[i - 1] = req.getParameter("resultado" + String.valueOf(i));
+            }       
+            
+            UtilesQuiniela.actualizarJornadaQuiniela(jornada, partidos, resultados);             
+          
+        }
+        else if (op.equals("Validar")){
+            UtilesQuiniela.validarJornada(comp);
+            jornada = null;
+        }
+        
+        if (jornada == null || jornada.isValidada() || jornada.isBloqueada()) {
+            for (int i = 1; i < 16; i++){
+                 ApuestaMix ap = new ApuestaMix();
+                 ap.setNumero(i);
+                 ap.setPartido("");
+                 ap.setCol1(false);
+                 ap.setColX(false);
+                 ap.setCol2(false);
+                 datos.add(ap);
+             }           
+        }
+        else{
+            numJornada = String.valueOf(jornada.getNumero());
+            String r;
+            for (int i = 1; i < 16; i++){
+                ApuestaMix ap = new ApuestaMix();
+                ap.setNumero(i);
+                ap.setPartido(jornada.getPartido()[i-1]);
+                r = jornada.getResultado()[i-1];
+                if ("1".equals(r)) ap.setCol1(true);
+                else if ("X".equals(r)) ap.setColX(true);
+                else if ("2".equals(r)) ap.setCol2(true);
+                datos.add(ap);
+                }
+         }
+        
+        boolean resultadosCompletos;
+        if (jornada != null)
+            resultadosCompletos = jornada.resultadosCompletos();
+        else
+            resultadosCompletos = false;
+         
+        req.setAttribute("datos", datos);
+        req.setAttribute("numJornada", numJornada);
+        req.setAttribute("jornadaActiva", jornada != null);  
+        req.setAttribute("resultadosCompletos", resultadosCompletos); 
+         
+    }
 
     private void jornada(HttpServletRequest req, EquipoQuiniela eqActual)
             throws DAOException {
@@ -492,7 +595,7 @@ public class PanelControlQuinielaHttpServlet extends HttpServlet {
         if (tipoApuesta.equals("Sencilla")) {
             ApuestaQuiniela apuesta1 = (ApuestaQuiniela) apuestas.get(0);
             ApuestaQuiniela apuesta2 = (ApuestaQuiniela) apuestas.get(1);
-            obtenerApuestas(req, jornada, apuesta1, apuesta2, true);
+            obtenerApuestas(req, jornada, apuesta1, apuesta2, false);
         } else
             obtenerApuestaMultiple(req, jornada, tipoApuesta);
         

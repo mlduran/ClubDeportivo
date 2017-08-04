@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import mld.clubdeportivo.base.Club;
-import mld.clubdeportivo.base.Grupo;
 import mld.clubdeportivo.base.quinielas.EquipoQuiniela;
 import mld.clubdeportivo.bd.*;
 
@@ -22,7 +21,9 @@ public class EquipoQuinielaDAO extends ObjetoDAO {
     protected String[] camposTabla(){
         String[] campos = {
             "club",
-            "activo"};
+            "activo",
+            "admin"
+        };
         return campos;
         }
 
@@ -62,9 +63,10 @@ public class EquipoQuinielaDAO extends ObjetoDAO {
 
         sql.setLong(1, objeq.obtenerIdClub());
         sql.setBoolean(2, objeq.isActivo());
+        sql.setBoolean(3, objeq.isAdmin());
 
         // Si es un update asignamos el parametro del id
-        if (tipo == TipoSaveDAO.update) sql.setLong(3, objeq.getId());
+        if (tipo == TipoSaveDAO.update) sql.setLong(4, objeq.getId());
 
         return sql;
     }
@@ -80,6 +82,7 @@ public class EquipoQuinielaDAO extends ObjetoDAO {
                 
         obj.setId(retorno.getLong("id"));
         obj.setActivo(retorno.getBoolean("activo"));
+        obj.setAdmin(retorno.getBoolean("admin"));
 
         return obj;
     }

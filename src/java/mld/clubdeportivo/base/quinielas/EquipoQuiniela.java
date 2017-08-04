@@ -21,6 +21,7 @@ public class EquipoQuiniela extends Seccion {
     private PuntuacionQuiniela puntuacion;
     private EstadisticaQuiniela estadisitica;
     private String resultadoProvisional;
+    private boolean admin;
 
     public Grupo getGrupo(){
 
@@ -81,6 +82,16 @@ public class EquipoQuiniela extends Seccion {
 
     public void setResultadoProvisional(String resultadoProvisional) {
         this.resultadoProvisional = resultadoProvisional;
+    }
+
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
     }
     
    

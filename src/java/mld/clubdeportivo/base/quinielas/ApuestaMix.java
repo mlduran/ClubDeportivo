@@ -67,4 +67,8 @@ public final class ApuestaMix {
         this.col2 = col2;
     }
 
+    public void setNumero(int i) {
+        this.numero = String.valueOf(i);
+    }
+
 }

@@ -61,6 +61,13 @@
 
         </tr>     
 
+        <c:if test="${esAdmin}">
+            <tr align="center">
+                <td>
+                    <a  href="${root}/panelControl/Quiniela/jornadaAdmin">Administrar Jornada</a>
+                </td>
+            </tr> 
+        </c:if>        
 
     </c:if>
 

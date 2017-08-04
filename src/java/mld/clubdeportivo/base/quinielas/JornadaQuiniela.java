@@ -57,5 +57,18 @@ public class JornadaQuiniela extends Jornada{
         this.bloqueada = bloqueada;
     }
 
+    public boolean resultadosCompletos(){
+        
+        boolean completo = true;
+        
+        for (String result : this.getResultado()) {
+            if (result == null || (!result.equals("1") && !result.equals("X") && !result.equals("2"))) {
+                completo = false;
+                break;
+            }
+        }
+        
+        return completo;
+    }
 
 }

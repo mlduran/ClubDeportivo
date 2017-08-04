@@ -66,6 +66,10 @@
                 <c:when test="${requestScope.op eq 'competiciones'}">
                     <c:import url="/WEB-INF/jspf/Quiniela/competiciones.jspf"/>
                 </c:when>
+                
+                <c:when test="${requestScope.op eq 'cumplimentarAdmin'}">
+                    <c:import url="/WEB-INF/jspf/Quiniela/cumplimentarAdmin.jspf"/>
+                </c:when>
 
             </c:choose>
             </div>

@@ -51,15 +51,21 @@ public class UtilesQuiniela {
         
       }
     
-      static void enviaCorreoNuevaJornada() throws DAOException, IOException, MessagingException {
+      static void enviaCorreoNuevaJornada(String numJornada) throws DAOException, IOException, MessagingException {
         
         ArrayList<String> correos = JDBCDAOClub.mailsClubs(Deporte.Quiniela);
         
-        String txt = "Se ha creado la nueva jornada para la quiniela ,ya puedes cumplimentar tus columnas";          
+        String txt = "Se ha creado la jornada " + numJornada + " para la quiniela ,ya puedes cumplimentar tus columnas";          
 
-        Correo.getCorreo().enviarMailMasivo("ClubDeportivo Nueva Jornada Quiniela", 
+        Correo.getCorreo().enviarMailMasivo("ClubDeportivo Nueva Jornada Quiniela " + numJornada, 
                 txt, true, correos);
     
+        
+      }
+      
+      static void enviaCorreoNuevaJornada() throws DAOException, IOException, MessagingException {
+        
+          enviaCorreoNuevaJornada("");
         
       }
       
@@ -262,7 +268,94 @@ public class UtilesQuiniela {
         
 
     }
+     
+    public static JornadaQuiniela crearJornadaQuiniela(String numJornada, String[] partidos) throws DAOException{
 
+        // Crea una nueva jornada
+        
+        CompeticionQuinielaDAO dao = new CompeticionQuinielaDAO();
+        JornadaQuinielaDAO daoj = new JornadaQuinielaDAO();
+        ApuestaQuinielaDAO daoap = new ApuestaQuinielaDAO();
+        EquipoQuinielaDAO daoeq = new EquipoQuinielaDAO();
+        EstadisticaQuinielaDAO daoest = new EstadisticaQuinielaDAO();
+        CompeticionQuiniela comp = JDBCDAOQuiniela.competicionActiva();
+        ArrayList<EquipoQuiniela> eqs = JDBCDAOQuiniela.obtenerEquiposActivos();
+
+        if (comp == null){
+            throw new UnsupportedOperationException("Error no existe competicion activa");
+         }
+        
+        int numJor = Integer.parseInt(numJornada.trim());
+
+        JornadaQuiniela jorQuini = JDBCDAOQuiniela.obtenerJornadaPorNumero(comp, numJor);
+        
+        if (jorQuini != null)
+            throw new UnsupportedOperationException("Este numero de jornada ya existe");
+        
+        jorQuini = new JornadaQuiniela();
+        jorQuini.setCompeticion(comp);   
+        jorQuini.setDescripcion("Jornada " + numJornada);
+        jorQuini.setNumero(numJor);
+        jorQuini.setPartido(partidos);
+        jorQuini.setResultado(new String[15]);
+        jorQuini.setBloqueada(false);
+ 
+        jorQuini.setValidada(false);
+        daoj.save(jorQuini);
+            
+        for (EquipoQuiniela eq : eqs){
+                    
+            long idclub = daoeq.idClub(eq);
+            Club club = JDBCDAOClub.obtenerSimpleClub(idclub);
+            eq.setClub(club);
+            // Creamos 2 columnas
+            for (int i = 1; i < 3; i++){
+                ApuestaQuiniela apuesta = new ApuestaQuiniela();
+                apuesta.setEquipo(eq);
+                apuesta.setJornada(jorQuini);
+                daoap.save(apuesta);
+            }
+            EstadisticaQuiniela est = new EstadisticaQuiniela();
+            est.setEquipo(eq.getNombre());
+            est.setCompeticion(comp.getNombre());
+            est.setJornada(jorQuini.getDescripcion());
+            est.setPuntos(0);
+            est.setAciertos("");
+            daoest.save(est);
+        }
+    
+        comp.setProximaJornada(numJor);        
+        dao.save(comp);
+
+        try {
+            enviaCorreoNuevaJornada(numJornada);
+        } catch (IOException ex) {
+            logApp.error("Error envio mail: " + ex.getMessage());
+        } catch (MessagingException ex) {
+            logApp.error("Error envio mail: " + ex.getMessage());
+        }       
+        
+        return jorQuini;
+     
+    }
+    
+        public static void actualizarJornadaQuiniela(JornadaQuiniela jorQuini, 
+                String[] partidos, String[] resultados) throws DAOException{
+
+        // Actualiza partidos y resultados jornada
+        
+        JornadaQuinielaDAO daoj = new JornadaQuinielaDAO();
+         
+        if (jorQuini == null)
+            throw new UnsupportedOperationException("La jornada no existe");
+    
+        jorQuini.setPartido(partidos);
+        jorQuini.setResultado(resultados);
+        daoj.save(jorQuini);    
+        
+     
+    }
+        
     public static void cargarJornadasQuiniela(String ruta) throws DAOException{
 
         // si se ha creado una nueva jornada devuelve true si no
@@ -435,7 +528,80 @@ public class UtilesQuiniela {
         }
     }
     
+        public static void validarJornada(CompeticionQuiniela comp) throws DAOException{
+        
+        ArrayList<JornadaQuiniela> jornadas = 
+                (ArrayList<JornadaQuiniela>) JDBCDAOQuiniela.obtenerJornadasNoValidadas(comp);
+        
+        if (jornadas.size() > 0){
+            JornadaQuiniela jor = jornadas.get(0);
+            try {               
+                    validarJornada(jor.getNumero());                
+            }catch (Exception ex){
+                logApp.error("Error al validar jornada: " + ex.getMessage());
+            }
+        } 
+    }
+
+public static void validarJornada(int numero) throws DAOException{
+
+
+        PuntuacionQuinielaDAO daopunt = new PuntuacionQuinielaDAO();
+        EstadisticaQuinielaDAO daoest= new EstadisticaQuinielaDAO();
+        CompeticionQuinielaDAO daocomp = new CompeticionQuinielaDAO();
+
+        CompeticionQuiniela comp = JDBCDAOQuiniela.competicionActiva();
+        if (comp == null)
+            throw new UnsupportedOperationException("No hay competicion activa");
+
+        JornadaQuinielaDAO daojor = new JornadaQuinielaDAO();
+
+        JornadaQuiniela jornada = JDBCDAOQuiniela.obtenerJornadaPorNumero(comp, numero);
+        jornada.setCompeticion(comp);
+
+        if (!jornada.resultadosCompletos())
+            throw new UnsupportedOperationException("Faltan resultados en jornada " + numero);
+        
+        String[] resultados = jornada.getResultado();
+        
+        ArrayList<EquipoQuiniela> eqs = obtenerDatosLanzamiento(comp, jornada);
+        
+        HashMap<Long,ArrayList<EquipoQuiniela>> listaEqs = 
+                new HashMap<Long,ArrayList<EquipoQuiniela>>();
+        
+        for (EquipoQuiniela eq : eqs) {
+            Long grp = eq.getClub().getGrupo().getId();
+            if (listaEqs.get(grp) == null )
+                listaEqs.put(grp, new ArrayList<EquipoQuiniela>());
+            listaEqs.get(grp).add(eq);
+        }
+        
+        Iterator itr = listaEqs.entrySet().iterator();
+	while (itr.hasNext()) {
+		Map.Entry e = (Map.Entry)itr.next();
+                ArrayList<EquipoQuiniela> eqsGrp = (ArrayList<EquipoQuiniela>) e.getValue();
+                CalculosQuiniela.calculoResultadosQuiniela(eqsGrp, resultados, false);
+	}
+
+        CalculosQuiniela.calculoResultadosQuiniela(eqs, resultados, true);
+
+        for (EquipoQuiniela eq : eqs) {
+            daopunt.save(eq.getPuntuaciones().get(0));
+            daoest.save(eq.getEstadisiticas().get(0));
+            JDBCDAOClub.grabarClub(eq.getClub());
+        }
+
+        jornada.setValidada(true);
+        daojor.save(jornada);
+        
+
+        comp.setUltimaJornada(numero);
+        comp.setProximaJornada(0);
+        daocomp.save(comp);
+        
+        enviaCorreoJornadaValidada(numero);
     
+    }
 
     public static void validarJornada(int numero, String ruta) throws DAOException{
 

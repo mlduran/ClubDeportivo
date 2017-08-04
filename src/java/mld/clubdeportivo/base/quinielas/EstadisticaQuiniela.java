@@ -93,6 +93,40 @@ public class EstadisticaQuiniela extends Estadistica {
     
    // Collections.sort(eqs, new ClasificacionComparator());
     
+    private static void cambiar(int a, int b)
+{
+     int temp = a;
+     a = b;
+     b = temp;
+}
+    
+    private static int casoEmpatePuntos(EstadisticaQuiniela o1, EstadisticaQuiniela o2)
+    {
+        int result = 1;
+        
+        String[] sAciertosO1;
+        String[] sAciertosO2;
+        sAciertosO1 = o1.getAciertos().split(" - ");
+        sAciertosO2 = o2.getAciertos().split(" - ");
+        
+        int[] aciertosO1 = new int[2];
+        int[] aciertosO2 = new int[2];
+        
+        aciertosO1[0] = Integer.parseInt(sAciertosO1[0]);
+        aciertosO1[1] = Integer.parseInt(sAciertosO1[1]);        
+        if (aciertosO1[1] > aciertosO1[0]) cambiar(aciertosO1[0],aciertosO1[1]);        
+                        
+        aciertosO2[0] = Integer.parseInt(sAciertosO2[0]);
+        aciertosO2[1] = Integer.parseInt(sAciertosO2[1]);
+        if (aciertosO2[1] > aciertosO2[0]) cambiar(aciertosO2[0],aciertosO2[1]);
+        
+        if (aciertosO1[0] > aciertosO2[0]) result = -1;
+        else if (aciertosO1[1] > aciertosO2[1]) result = -1;
+                
+        return result;
+        
+    }
+    
      private static class ClasificacionComparatorGrupo
             implements Comparator<EstadisticaQuiniela> {
 
@@ -103,7 +137,11 @@ public class EstadisticaQuiniela extends Estadistica {
             
             int result;
             
-            if  (o1.getPuntos() > o2.getPuntos()) result = -1;
+            if  (o1.getPuntos() == o2.getPuntos())
+            {
+                result = casoEmpatePuntos(o1, o2);
+            }
+            else if (o1.getPuntos() > o2.getPuntos()) result = -1;
             else result = 1;
             
             return result;
