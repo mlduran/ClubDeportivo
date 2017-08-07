@@ -1016,7 +1016,7 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${libs.ManageFiles.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${libs.Json.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${libs.jstl.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copyfiles files="${libs.JavaMail.classpath}" todir="${build.web.dir}/WEB-INF/classes"/>
+        <copyfiles files="${libs.JavaMail.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
     </target>
     <target depends="init" if="dist.ear.dir" name="-clean-webinf-lib">
         <delete dir="${build.web.dir}/WEB-INF/lib"/>

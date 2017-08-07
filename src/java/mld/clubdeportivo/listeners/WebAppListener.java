@@ -37,6 +37,7 @@ public class WebAppListener implements ServletContextListener,
     
     private void initConfigCorreo(String config) {
 
+        
         try {
             Correo configCorreo = Correo.getCorreo();
             configCorreo.initCorreo(config);

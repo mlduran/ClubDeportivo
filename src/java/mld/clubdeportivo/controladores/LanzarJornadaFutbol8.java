@@ -1323,6 +1323,8 @@ public class LanzarJornadaFutbol8 {
         
         // Si ya hemos disputado jornada en el dia ya no lanzamos
         Date ultimoLanzamiento = JDBCDAOFutbol8.obtenerFechaUltimaJornada();
+        
+        if (ultimoLanzamiento == null) return true;
 
         Date hoy = new Date();
         GregorianCalendar calHoy = new GregorianCalendar();
@@ -1330,13 +1332,9 @@ public class LanzarJornadaFutbol8 {
         GregorianCalendar calUtimJor = new GregorianCalendar(); 
         calUtimJor.setTime(ultimoLanzamiento); 
         
-        if (calHoy.get(Calendar.DAY_OF_MONTH) ==  calUtimJor.get(Calendar.DAY_OF_MONTH) &&
+        return !(calHoy.get(Calendar.DAY_OF_MONTH) ==  calUtimJor.get(Calendar.DAY_OF_MONTH) &&
                 calHoy.get(Calendar.MONTH) ==  calUtimJor.get(Calendar.MONTH) &&
-                calHoy.get(Calendar.YEAR) ==  calUtimJor.get(Calendar.YEAR)
-                )
-            return false;
-        else 
-            return true;
+                calHoy.get(Calendar.YEAR) ==  calUtimJor.get(Calendar.YEAR));
         
     }
        
