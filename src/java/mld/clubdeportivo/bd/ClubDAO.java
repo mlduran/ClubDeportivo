@@ -27,7 +27,9 @@ public class ClubDAO extends ObjetoDAO {
             "fundacion",
             "ultimoAcceso",
             "ranking",
-            "grupo"};
+            "grupo",
+            "auto"
+        };
         return campos;
         }
    
@@ -80,6 +82,15 @@ public class ClubDAO extends ObjetoDAO {
 
         return listaObjs;
     }
+    
+     protected List<Club> getClubsNoAuto() throws DAOException {
+
+        String txtsql = "SELECT * FROM " + nombreTabla() + " WHERE auto = false";
+        
+        ArrayList<Club> listaObjs = (ArrayList) getDataObjects(txtsql);
+
+        return listaObjs;
+    }
 
     protected List<Club> getClubsByRanking(int max) throws DAOException {
 
@@ -124,7 +135,8 @@ public class ClubDAO extends ObjetoDAO {
         obj.setUltimoAcceso(retorno.getTimestamp("ultimoacceso"));
         obj.setRanking(retorno.getInt("ranking"));
         obj.setActivo(retorno.getBoolean("activo"));
-            
+        obj.setAuto(retorno.getBoolean("auto"));
+        
         asignarDeportes(obj);
 
         return obj;
@@ -147,8 +159,9 @@ public class ClubDAO extends ObjetoDAO {
                 new Timestamp(objClub.getUltimoAcceso().getTime()));
         sql.setInt(8, objClub.getRanking());
         sql.setLong(9, objClub.getGrupo().getId());
+        sql.setBoolean(10, objClub.isAuto());
         // Si es un update asignamos el parametro del id
-        if (tipo == TipoSaveDAO.update) sql.setLong(10, objClub.getId());
+        if (tipo == TipoSaveDAO.update) sql.setLong(11, objClub.getId());
 
         return sql;
     }

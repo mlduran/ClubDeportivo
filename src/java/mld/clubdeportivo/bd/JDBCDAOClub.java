@@ -109,6 +109,17 @@ public class JDBCDAOClub {
         return lista;
 
     }
+    
+    public static ArrayList<Club> listaClubsNoAuto() throws DAOException{
+        // Devuelve lista de clubs sin relaciones
+
+        ClubDAO dao = new ClubDAO();
+
+        ArrayList<Club> lista  = (ArrayList<Club>) dao.getClubsNoAuto();
+
+        return lista;
+
+    }
 
     public static ArrayList<Club> listaClubsGrupo(Grupo grp) throws DAOException{
         // Devuelve lista de clubs sin relaciones

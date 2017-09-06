@@ -23,6 +23,7 @@ public final class Club extends Objeto implements Comparable<Club>{
     private Date ultimoAcceso;
     private Grupo grupo;
     private long idGrupo;
+    private boolean auto;
     private ArrayList<Deporte> deportes;
     private int titulosLigaFutbol8;
     private int titulosCopaFutbol8;
@@ -39,6 +40,7 @@ public final class Club extends Objeto implements Comparable<Club>{
         this.setFundacion(new Date());
         this.setUltimoAcceso(new Date());
         this.setActivo(true);
+        this.setAuto(false);
         this.setRanking(0);
         this.setGrupo(grupo);
         this.setDeportes(new ArrayList());
@@ -277,6 +279,15 @@ public final class Club extends Objeto implements Comparable<Club>{
 
     public void setIdGrupo(long idGrupo) {
         this.idGrupo = idGrupo;
+    }
+
+  
+    public boolean isAuto() {
+        return auto;
+    }
+
+      public void setAuto(boolean auto) {
+        this.auto = auto;
     }
 
   

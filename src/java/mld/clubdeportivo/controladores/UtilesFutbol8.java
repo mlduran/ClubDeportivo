@@ -206,6 +206,7 @@ public class UtilesFutbol8 {
         int contr = Calculos.valorAleatorio(100000, 999999);
         
         Club club = new Club(grp, nomEq, "Automatico", String.valueOf(contr), "");
+        club.setAuto(true);
         JDBCDAOClub.grabarClub(club);
 
         return altaEquipoFutbol8(club, true);

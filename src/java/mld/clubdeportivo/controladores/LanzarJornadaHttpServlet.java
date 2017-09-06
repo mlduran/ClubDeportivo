@@ -176,7 +176,7 @@ public class LanzarJornadaHttpServlet extends HttpServlet{
     
     private void operacionesMantenimiento() throws DAOException {              
         
-        ArrayList<Club> listaClubs = JDBCDAOClub.listaClubs();
+        ArrayList<Club> listaClubs = JDBCDAOClub.listaClubsNoAuto();
           
         
         // Avisos y desactivacion de equipos
