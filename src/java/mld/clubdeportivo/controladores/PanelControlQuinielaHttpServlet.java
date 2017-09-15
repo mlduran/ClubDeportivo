@@ -197,7 +197,7 @@ public class PanelControlQuinielaHttpServlet extends HttpServlet {
         try{
             // Intentamos obtner los resultados hasta el momento
             String jor = String.valueOf(jornada.getNumero());
-            apuestas = UtilesQuiniela.obtenerResultados(jor); 
+            apuestas = UtilesQuiniela.obtenerResultados(jor, false); 
         }catch(Exception ex){
             return apuestas;
         }
@@ -521,7 +521,7 @@ public class PanelControlQuinielaHttpServlet extends HttpServlet {
             jornada = null;
         }
         
-        if (jornada == null || jornada.isValidada() || jornada.isBloqueada()) {
+        if (jornada == null || jornada.isValidada()) {
             for (int i = 1; i < 16; i++){
                  ApuestaMix ap = new ApuestaMix();
                  ap.setNumero(i);
@@ -595,7 +595,7 @@ public class PanelControlQuinielaHttpServlet extends HttpServlet {
         if (tipoApuesta.equals("Sencilla")) {
             ApuestaQuiniela apuesta1 = (ApuestaQuiniela) apuestas.get(0);
             ApuestaQuiniela apuesta2 = (ApuestaQuiniela) apuestas.get(1);
-            obtenerApuestas(req, jornada, apuesta1, apuesta2, false);
+            obtenerApuestas(req, jornada, apuesta1, apuesta2, true);
         } else
             obtenerApuestaMultiple(req, jornada, tipoApuesta);
         

@@ -695,11 +695,33 @@ public static void validarJornada(int numero) throws DAOException{
         
     }
     
+    public static ArrayList<String> obtenerDatosBD(String numJornada) throws DAOException 
+    {
+          
+         ArrayList<String> results = new ArrayList<String>();
+         
+         CompeticionQuiniela comp = JDBCDAOQuiniela.competicionActiva();
+        if (comp == null)
+            throw new UnsupportedOperationException("No hay competicion activa");
+         
+         JornadaQuiniela jornada = JDBCDAOQuiniela.obtenerJornadaPorNumero(comp, Integer.parseInt(numJornada));
+         
+         for (String r : jornada.getResultado()){
+             results.add(r);
+         }
+        
+        return results;
+        
+    }
+    
    
-     public static ArrayList<String> obtenerResultados(String jornada) 
-             throws MalformedURLException, IOException, ParseException, net.minidev.json.parser.ParseException {
+     public static ArrayList<String> obtenerResultados(String jornada, boolean url) 
+             throws MalformedURLException, IOException, ParseException, net.minidev.json.parser.ParseException, DAOException {
    
-        return obtenerDatosURL(jornada, "result");
+         if (url)
+             return obtenerDatosURL(jornada, "result");
+         else
+             return obtenerDatosBD(jornada);
         
     }
      
@@ -835,7 +857,7 @@ public static void validarJornada(int numero) throws DAOException{
         
         try {
             
-           ArrayList<String> results = obtenerResultados(jornada);
+           ArrayList<String> results = obtenerResultados(jornada, true);
            
            boolean completo = true;
             for (String r : results) {
