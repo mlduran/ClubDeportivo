@@ -2,6 +2,7 @@
 package mld.clubdeportivo.controladores;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -18,8 +19,7 @@ import mld.clubdeportivo.bd.DAOException;
 import mld.clubdeportivo.bd.JDBCDAOClub;
 import mld.clubdeportivo.utilidades.Calculos;
 import mld.clubdeportivo.utilidades.Correo;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import java.util.logging.*;
 
 /**
  *
@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
  */
 public class LoginHttpServlet extends HttpServlet {
 
-    private static Logger logger = LogManager.getLogger(LoginHttpServlet.class);
+    private static Logger logger = Logger.getLogger(LoginHttpServlet.class.getName());
    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -35,7 +35,7 @@ public class LoginHttpServlet extends HttpServlet {
         try {
             UtilesHttpServlet.registrarEntrada(req);
         } catch (DAOException ex) {
-            logger.error(ex.getMessage());
+            logger.log(Level.SEVERE, ex.getMessage());
         }
         processRequest(req, resp);
     }
@@ -127,7 +127,7 @@ public class LoginHttpServlet extends HttpServlet {
             }
             
         } catch (DAOException ex) {
-            logger.error("Error acceso a BD: ".concat(ex.getMessage()));
+            logger.log(Level.SEVERE, "Error acceso a BD: ".concat(ex.getMessage()));
             req.setAttribute("error", ex.getMessage());
         }
                
@@ -151,18 +151,17 @@ public class LoginHttpServlet extends HttpServlet {
 
     private String fechaServidor() {
         
-        Calendar calendario = new GregorianCalendar();
-        calendario.setTime(new Date());
+        LocalDateTime locaDate = LocalDateTime.now();
         
         StringBuilder txt = new StringBuilder();
         
-        txt.append(calendario.get(Calendar.DAY_OF_MONTH)).append('-');
-        txt.append(calendario.get(Calendar.MONTH)).append('-');
-        txt.append(calendario.get(Calendar.YEAR)).append('-');
+        txt.append(locaDate.getDayOfMonth()).append('-');
+        txt.append(locaDate.getMonthValue()).append('-');
+        txt.append(locaDate.getYear()).append('-');
         
-        txt.append(calendario.get(Calendar.HOUR_OF_DAY)).append('-');
-        txt.append(calendario.get(Calendar.MINUTE)).append('-');
-        txt.append(calendario.get(Calendar.SECOND));        
+        txt.append(locaDate.getHour()).append('-');
+        txt.append(locaDate.getMinute()).append('-');
+        txt.append(locaDate.getSecond());        
         
         return txt.toString();
         

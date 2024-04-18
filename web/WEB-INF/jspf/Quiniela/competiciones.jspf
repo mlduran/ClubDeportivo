@@ -30,7 +30,7 @@
         <tr>
             <td>
                 <c:forEach var="jornada" items="${requestScope.jornadasCol1}">
-                    ${jornada.descripcion}<br/>
+                    ${jornada.descripcionPuntos}<br/>
                     <table class="tabla" >
                         <tr>
                             <th width="50%">Equipo</th>
@@ -51,7 +51,7 @@
             </td>
             <td>
                  <c:forEach var="jornada" items="${requestScope.jornadasCol2}">
-                    ${jornada.descripcion}<br/>
+                    ${jornada.descripcionPuntos}<br/>
                     <table class="tabla">
                         <tr>
                             <th width="50%">Equipo</th>
@@ -72,7 +72,7 @@
             </td>
             <td>
                  <c:forEach var="jornada" items="${requestScope.jornadasCol3}">
-                    ${jornada.descripcion}<br/>
+                    ${jornada.descripcionPuntos}<br/>
                     <table class="tabla">
                         <tr>
                             <th width="50%">Equipo</th>

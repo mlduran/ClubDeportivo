@@ -8,7 +8,6 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import mld.clubdeportivo.base.quinielas.*;
 import mld.clubdeportivo.bd.*;
-import org.apache.log4j.*;
 
 /**
  *
@@ -16,7 +15,6 @@ import org.apache.log4j.*;
  */
 public class ImpresionHttpServlet extends HttpServlet {
 
-    private static Logger logger = LogManager.getLogger(LoginHttpServlet.class);
    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -34,6 +32,8 @@ public class ImpresionHttpServlet extends HttpServlet {
 
     private void processRequest(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        
+        if (!UtilesHttpServlet.comprobarEstado(req, resp)) return;
 
         String op = req.getParameter("operacion");
 

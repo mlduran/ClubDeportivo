@@ -3,12 +3,15 @@ package mld.clubdeportivo.listeners;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import javax.servlet.*;
-import javax.servlet.http.*;
+
 import mld.clubdeportivo.bd.ConexionConfigDAO;
 import mld.clubdeportivo.utilidades.Correo;
-import org.apache.log4j.*;
-import org.apache.log4j.xml.DOMConfigurator;
+import java.util.logging.*;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
 
 /**
  *
@@ -20,7 +23,7 @@ public class WebAppListener implements ServletContextListener,
 
 
     private static Logger logApp
-            = LogManager.getLogger(WebAppListener.class);
+            = Logger.getLogger(WebAppListener.class.getName());
 
     private void initConfigBD(String config) {
 
@@ -28,9 +31,9 @@ public class WebAppListener implements ServletContextListener,
             ConexionConfigDAO configBD = ConexionConfigDAO.getConexionConfigDAO();
             configBD.initConfigConexion(config);
         } catch (IOException ex) {
-            logApp.error("Error al crear configuracion conexion: ".concat(ex.getMessage()));
+            logApp.log(Level.SEVERE, "Error al crear configuracion conexion: ".concat(ex.getMessage()));
         } catch (SQLException ex) {
-            logApp.error("Error al crear configuracion conexion: ".concat(ex.getMessage()));
+            logApp.log(Level.SEVERE, "Error al crear configuracion conexion: ".concat(ex.getMessage()));
         }
 
     }
@@ -42,7 +45,7 @@ public class WebAppListener implements ServletContextListener,
             Correo configCorreo = Correo.getCorreo();
             configCorreo.initCorreo(config);
         } catch (IOException ex) {
-            logApp.error("Error al crear configuracion conexion: ".concat(ex.getMessage()));       
+            logApp.log(Level.SEVERE, "Error al crear configuracion conexion: ".concat(ex.getMessage()));       
         }
 
     }
@@ -53,7 +56,7 @@ public class WebAppListener implements ServletContextListener,
         ServletContext appManager = sce.getServletContext();
 
         String fichConfLlog = appManager.getInitParameter("log4jcfg");
-        DOMConfigurator.configure(appManager.getRealPath(fichConfLlog));
+        //DOMConfigurator.configure(appManager.getRealPath(fichConfLlog));
         
         String fichConf, config;
 

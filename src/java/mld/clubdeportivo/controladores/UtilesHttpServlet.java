@@ -4,7 +4,6 @@ package mld.clubdeportivo.controladores;
 import java.io.FileReader;
 import java.util.ArrayList;
 import javax.servlet.*;
-import org.apache.log4j.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
@@ -16,13 +15,16 @@ import mld.clubdeportivo.base.*;
 import mld.clubdeportivo.bd.DAOException;
 import mld.clubdeportivo.bd.JDBCDAOComentario;
 import mld.clubdeportivo.bd.JDBCDAORegistro;
+import java.util.logging.*;
+import mld.clubdeportivo.utilidades.Correo;
+
 /**
  *
  * @author Miguel
  */
 public class UtilesHttpServlet extends HttpServlet {
 
-    private static Logger logger = LogManager.getLogger(LoginHttpServlet.class);
+    private static Logger logger = Logger.getLogger(LoginHttpServlet.class.getName());
     
    
     @Override
@@ -154,13 +156,13 @@ public class UtilesHttpServlet extends HttpServlet {
         
 
         if (coment != null && !coment.isEmpty()){
-            try {
-                coment = new String(coment.getBytes(), "UTF-8");
+            //try {
+                //coment = new String(coment.getBytes(), "UTF-8");
                 Comentario newComent = new Comentario(club.getGrupo(), club.getNombre(), coment, general);
                 JDBCDAOComentario.grabarComentario(newComent);
-            } catch (UnsupportedEncodingException ex) {
-                java.util.logging.Logger.getLogger(UtilesHttpServlet.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-            }
+            //} catch (UnsupportedEncodingException ex) {
+             //   java.util.logging.Logger.getLogger(UtilesHttpServlet.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            //}
         }
         
         ArrayList<Comentario> coments;
@@ -219,10 +221,10 @@ public class UtilesHttpServlet extends HttpServlet {
                     try {
                         proc.waitFor();
                     } catch (InterruptedException ex) {
-                        logger.error("Error en Interrupcion Backup: ".concat(ex.getMessage()));
+                        logger.log(Level.SEVERE, "Error en Interrupcion Backup: ".concat(ex.getMessage()));
                     }
                     if (proc.exitValue() != 0) 
-                        logger.error("Error en Backup, el procedimiento ha devuelto error: " + proc.exitValue()); 
+                        logger.log(Level.SEVERE, "Error en Backup, el procedimiento ha devuelto error: " + proc.exitValue()); 
                 }
             }
             if (sistemaOperativo.equals("linux")){
@@ -230,12 +232,18 @@ public class UtilesHttpServlet extends HttpServlet {
             }
             
         } catch (IOException ex) {
-            logger.error("Error en Backup: ".concat(ex.getMessage()));
+            logger.log(Level.SEVERE, "Error en Backup: ".concat(ex.getMessage()));
         }
 
 
     }
+    
+     public static void pruebaCorreo(ServletContext appManager, String correo){
+    
+      Correo.getCorreo().enviarMail("Test correo ClubDeportivo", 
+                             "Prueba Correo", true, correo);
   
+     }
 
 }
 

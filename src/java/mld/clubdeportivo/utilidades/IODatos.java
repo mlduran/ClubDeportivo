@@ -8,8 +8,7 @@ import mld.clubdeportivo.base.futbol8.EntrenadorMaestroFutbol8;
 import mld.clubdeportivo.base.futbol8.JugadorMaestroFutbol8;
 import mld.clubdeportivo.bd.DAOException;
 import mld.clubdeportivo.bd.futbol8.JDBCDAOFutbol8;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import java.util.logging.*;
 
 /**
  *
@@ -18,7 +17,7 @@ import org.apache.log4j.Logger;
 public class IODatos {
 
      private static Logger logApp
-            = LogManager.getLogger(IODatos.class);
+            = Logger.getLogger(IODatos.class.getName());
      
      
      private static void copiarFichero(File f1, File f2){
@@ -179,12 +178,12 @@ public class IODatos {
                     JDBCDAOFutbol8.grabarEquipoMaestroFutbol8(eq);
                 }
                 catch (Exception ex){
-                    logApp.error("Error alta nombre equipo maestro : ".concat(ex.getMessage()));
+                    logApp.log(Level.SEVERE, "Error alta nombre equipo maestro : ".concat(ex.getMessage()));
                 }
             }
         }
         catch (Exception ex){
-            logApp.error("Error alta nombre equipo maestro : ".concat(ex.getMessage()));
+            logApp.log(Level.SEVERE, "Error alta nombre equipo maestro : ".concat(ex.getMessage()));
         }
         
     }
@@ -227,7 +226,7 @@ public class IODatos {
             String[] info = nomFile.split("_");
 
             if (info.length != 5) {
-                logApp.error("Nombre de formato fichero quiniela incorrecto ".concat(nomFile));
+                logApp.log(Level.SEVERE, "Nombre de formato fichero quiniela incorrecto ".concat(nomFile));
                 throw new IllegalArgumentException(
                         "Nombre de formato fichero quiniela incorrecto ".concat(nomFile));
             }
@@ -262,7 +261,7 @@ public class IODatos {
                 datos.put("resultados", resultados);
 
             } catch (Exception ex) {
-                logApp.error(ex.getMessage());
+                logApp.log(Level.SEVERE, ex.getMessage());
            
             } 
 

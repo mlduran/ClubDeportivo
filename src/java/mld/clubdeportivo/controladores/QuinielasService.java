@@ -26,8 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import mld.clubdeportivo.controladores.AdminHttpServlet;
 import mld.clubdeportivo.utilidades.CalendarFunctions;
 import mld.clubdeportivo.utilidades.WebDataHTML;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import java.util.logging.*;
 
 
 public class QuinielasService

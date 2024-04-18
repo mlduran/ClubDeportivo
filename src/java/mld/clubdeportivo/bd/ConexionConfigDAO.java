@@ -3,7 +3,7 @@ package mld.clubdeportivo.bd;
 import java.sql.*;
 import java.io.*;
 import java.util.*;
-import org.apache.log4j.*;
+import java.util.logging.*;
 
 /**
  *
@@ -16,18 +16,11 @@ public class ConexionConfigDAO {
     private String password;
     private String entorno;
     
-    static {
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-        } catch (ClassNotFoundException ex) {
-            System.exit(-1);
-        }
-    }
-
+  
     static private ConexionConfigDAO INSTANCE = new ConexionConfigDAO();
 
     private static Logger logApp
-            = LogManager.getLogger(ConexionConfigDAO.class);
+            = Logger.getLogger(ConexionConfigDAO.class.getName());
 
     static public ConexionConfigDAO getConexionConfigDAO() {
 
@@ -41,7 +34,7 @@ public class ConexionConfigDAO {
 
         // Si por ejemplo tenemos la url es que ya hemos inicializado
         if (url != null) {
-            logApp.warn("Los parametros de conexion ya se han inicializado");
+            logApp.log(Level.WARNING, "Los parametros de conexion ya se han inicializado");
             return;
         }
 
@@ -57,6 +50,7 @@ public class ConexionConfigDAO {
         this.setEntorno(config.getProperty("mysql.entorno"));
 
         logApp.info("Parametros Conexion inicializados");
+        logApp.info(config.toString());
 
     }
 

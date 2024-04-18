@@ -17,8 +17,7 @@ import mld.clubdeportivo.bd.futbol8.JDBCDAOFutbol8;
 import mld.clubdeportivo.utilidades.Correo;
 import mld.clubdeportivo.utilidades.StringUtil;
 import mld.clubdeportivo.utilidades.UtilGenericas;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import java.util.logging.*;
 
 /**
  *
@@ -27,7 +26,7 @@ import org.apache.log4j.Logger;
 public class PanelControlFutbol8HttpServlet extends HttpServlet {
 
     private static Logger logger = 
-            LogManager.getLogger(PanelControlFutbol8HttpServlet.class);
+            Logger.getLogger(PanelControlFutbol8HttpServlet.class.getName());
    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -109,7 +108,7 @@ public class PanelControlFutbol8HttpServlet extends HttpServlet {
 
 
         } catch (DAOException ex) {
-            logger.error(ex.getMessage());
+            logger.log(Level.SEVERE, ex.getMessage());
             req.setAttribute("error", ex.getMessage());
             req.setAttribute("errorDes", UtilGenericas.pilaError(ex));
             dir = "/Utiles/error.jsp";
@@ -141,18 +140,27 @@ public class PanelControlFutbol8HttpServlet extends HttpServlet {
                 JDBCDAONoticia.obtenerNoticias(eq.getClub().getGrupo(), Deporte.Futbol8, 10);
         
         long idJornada = 0;
-                
+                 
         PartidoFutbol8 ultimoPartido = JDBCDAOFutbol8.obtenerUltimoPartido(eq);
         if (ultimoPartido != null){
             idJornada = JDBCDAOFutbol8.idJornada(ultimoPartido);
         }        
            
         String proximoTipoComp = "";
+        CompeticionFutbol8 comp = null;
+        PartidoFutbol8 proximoPartido = null;
         
-        ArrayList<Object> datos = UtilesFutbol8.datosProximoPartido(eq, req.getServletContext());
-        PartidoFutbol8 proximoPartido = (PartidoFutbol8) datos.get(0);
-        CompeticionFutbol8 comp = (CompeticionFutbol8) datos.get(1);
-        if (comp != null) proximoTipoComp = comp.getClase();
+        try {
+            ArrayList<Object> datos = UtilesFutbol8.datosProximoPartido(eq, req.getServletContext());
+             proximoPartido = (PartidoFutbol8) datos.get(0);
+            comp = (CompeticionFutbol8) datos.get(1);
+        }catch(Exception ex)
+        {               
+                };
+        if (comp != null) {
+            proximoTipoComp = comp.getClase();
+            logger.info("existeComp = " + comp.toString());
+        }
         
         req.setAttribute("ultimoPartido", ultimoPartido);
         req.setAttribute("proximoPartido", proximoPartido);
@@ -161,7 +169,6 @@ public class PanelControlFutbol8HttpServlet extends HttpServlet {
         req.setAttribute("noticias", noticias);
         req.setAttribute("existeComp", comp != null);
         
-        logger.info("existeComp = " + comp);
         
         UtilesHttpServlet.tratarComentarios(req, eq.getClub(), false);   
                
@@ -400,25 +407,7 @@ public class PanelControlFutbol8HttpServlet extends HttpServlet {
                 vac.setActivo(false);
                 JDBCDAOFutbol8.grabarVacacionFutbol8(vac);
             }            
-            else if (op.equals("Grabar Ajustes")) {
-                op = null;
-                boolean activarRenovacion,fijarTactica,entrenoAuto;
-                if (req.getParameter("activarRenovacion") != null && 
-                        req.getParameter("activarRenovacion").equals("on")) activarRenovacion = true;
-                else activarRenovacion = false;
-                vac.setRenovacion(activarRenovacion);
-                if (req.getParameter("fijarTactica") != null && 
-                        req.getParameter("fijarTactica").equals("on")) fijarTactica = true;
-                else fijarTactica = false;
-                vac.setActivarTactica(fijarTactica);
-                if (req.getParameter("entrenoAuto") != null && 
-                        req.getParameter("entrenoAuto").equals("on")) entrenoAuto = true;
-                else entrenoAuto = false;
-                vac.setActivarEntreno(entrenoAuto); 
-                vac.setTactica(TacticaFutbol8.tacticaFutbol8(Integer.parseInt(req.getParameter("tactica"))));
-                vac.setPosicionEntreno(PosicionElegidaFutbol8.valueOf(req.getParameter("posicionEntreno")));
-                JDBCDAOFutbol8.grabarVacacionFutbol8(vac);
-            }
+            else if (op.equals("Grabar Ajustes")) 
 
             if (op != null){
                 JDBCDAOFutbol8.grabarEquipoFutbol8((EquipoFutbol8) eq);
@@ -1240,7 +1229,7 @@ public class PanelControlFutbol8HttpServlet extends HttpServlet {
              jug.setGrupo(eq.getClub().getGrupo());
              jug.setEquipo(eq);
              String nombre = (String) req.getParameter("nombre");
-             nombre = new String(nombre.getBytes(), "UTF-8"); 
+             //nombre = new String(nombre.getBytes(), "UTF-8"); 
              if (nombre != null && !nombre.isEmpty()){
                  nombre = StringUtil.removeCharsEspeciales(nombre);
                  nombre = StringUtil.truncate(nombre, 40);

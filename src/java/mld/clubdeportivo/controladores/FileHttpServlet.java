@@ -5,9 +5,7 @@ package mld.clubdeportivo.controladores;
  * @author Miguel
  */
 
-import com.oreilly.servlet.multipart.FilePart;
-import com.oreilly.servlet.multipart.MultipartParser;
-import com.oreilly.servlet.multipart.Part;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -17,12 +15,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import java.util.logging.*;
 
 public class FileHttpServlet extends HttpServlet{
     
-     private static Logger logger = LogManager.getLogger(AdminHttpServlet.class);
+     private static Logger logger = Logger.getLogger(AdminHttpServlet.class.getName());
    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -40,7 +37,7 @@ public class FileHttpServlet extends HttpServlet{
                     req.getRequestDispatcher("/Utiles/cargaFichero.jsp");
             view.forward(req, resp);
         } catch (Exception ex) {
-            logger.error(ex.getMessage());
+            logger.log(Level.SEVERE, ex.getMessage());
             req.setAttribute("error", ex.getMessage());
         }
     }
@@ -63,6 +60,7 @@ public class FileHttpServlet extends HttpServlet{
 
         PrintWriter out = null;
 
+        /*
         try {
             out = resp.getWriter();
             File dir = new File(ruta);
@@ -83,13 +81,13 @@ public class FileHttpServlet extends HttpServlet{
             try {
                 view.forward(req, resp);
             } catch (IOException ex1) {
-                logger.error(ex1.getMessage());
+                logger.log(Level.SEVERE, ex1.getMessage());
             }
         }finally{
             if (out != null) out.close();
         }
 
-       
+       */
 
     }
 

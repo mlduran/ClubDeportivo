@@ -21,8 +21,7 @@ import mld.clubdeportivo.bd.JDBCDAOBolsa;
 import mld.clubdeportivo.bd.JDBCDAOMovimiento;
 import mld.clubdeportivo.bd.futbol8.JDBCDAOFutbol8;
 import mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 
 /**
  *
@@ -30,7 +29,6 @@ import org.apache.log4j.Logger;
  */
 public class JsonServlet extends HttpServlet {
 
-    private static Logger logger = LogManager.getLogger(JsonServlet.class);
    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)

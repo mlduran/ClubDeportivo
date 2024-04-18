@@ -16,8 +16,7 @@ import mld.clubdeportivo.bd.DAOException;
 import mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela;
 import mld.clubdeportivo.utilidades.Correo;
 import mld.clubdeportivo.utilidades.UtilGenericas;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import java.util.logging.*;
 
 /**
  *
@@ -26,7 +25,7 @@ import org.apache.log4j.Logger;
 public class LanzarJornadaQuiniela {
     
     private ServletContext aplicacion;
-    private static Logger logger = LogManager.getLogger(LanzarJornadaQuiniela.class);
+    private static Logger logger = Logger.getLogger(LanzarJornadaQuiniela.class.getName());
     
     protected void lanzarJornadaQuiniela(HttpServletRequest req, HttpServletResponse resp,
             ServletContext appManager) throws DAOException {

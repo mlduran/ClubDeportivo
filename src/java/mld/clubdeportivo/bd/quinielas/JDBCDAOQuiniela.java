@@ -8,7 +8,7 @@ import mld.clubdeportivo.bd.ClubDAO;
 import mld.clubdeportivo.bd.DAOException;
 import mld.clubdeportivo.bd.JDBCDAOClub;
 import mld.clubdeportivo.bd.JDBCDAOGrupo;
-import org.apache.log4j.*;
+import java.util.logging.*;
 
 /**
  *
@@ -17,7 +17,7 @@ import org.apache.log4j.*;
 public class JDBCDAOQuiniela {
 
     private static Logger logApp
-            = LogManager.getLogger(JDBCDAOQuiniela.class);
+            = Logger.getLogger(JDBCDAOQuiniela.class.getName());
 
    
     private JDBCDAOQuiniela(){}

@@ -65,7 +65,8 @@ public final class Comentario extends Objeto{
     }
 
     public void setComentario(String comentario) {
-        this.comentario = StringUtil.removeCharsEspeciales(comentario);
+        this.comentario = comentario;
+        //this.comentario = StringUtil.removeCharsEspeciales(comentario);
     }
 
     public boolean isGeneral() {

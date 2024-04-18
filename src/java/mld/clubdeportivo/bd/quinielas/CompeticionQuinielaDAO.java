@@ -81,7 +81,8 @@ public class CompeticionQuinielaDAO extends ObjetoDAO {
         obj.setProximaJornada(retorno.getInt("proximajornada"));
         obj.setUltimaJornada(retorno.getInt("ultimajornada"));
         obj.setFecha(retorno.getDate("fecha"));
-
+        obj.setCampeon(retorno.getString("campeon")); 
+        obj.setSubcampeon(retorno.getString("subcampeon")); 
 
         return obj;
     }

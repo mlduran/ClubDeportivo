@@ -6,7 +6,7 @@ import java.util.HashMap;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import mld.clubdeportivo.utilidades.IODatos;
-import org.apache.log4j.*;
+
 
 /**
  *
@@ -14,7 +14,6 @@ import org.apache.log4j.*;
  */
 public class AyudaHttpServlet extends HttpServlet {
 
-    private static Logger logger = LogManager.getLogger(LoginHttpServlet.class);
    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)

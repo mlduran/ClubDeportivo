@@ -12,8 +12,10 @@ import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import java.util.logging.*;
+import javax.mail.Authenticator;
+import javax.mail.PasswordAuthentication;
+
 
 /**
  *
@@ -25,10 +27,11 @@ import org.apache.log4j.Logger;
 public final class Correo {
     
     private static Logger logApp
-            = LogManager.getLogger(Correo.class);
+            = Logger.getLogger(Correo.class.getName());
 
     static private Correo INSTANCE = new Correo();
     private String rutaFichConf; 
+    private Properties config; 
     
     static public Correo getCorreo() {
 
@@ -40,7 +43,7 @@ public final class Correo {
 
        
         // Obtenermos parametros
-        Properties config = new Properties();
+        config = new Properties();
 
         logApp.info("Leyendo fichero configuracion de: ".concat(configCorreo));
         config.load(new FileReader(configCorreo));
@@ -65,6 +68,22 @@ public final class Correo {
                 
         
     }
+    
+    private Session connectServer() {
+        
+        return Session.getInstance(config, new Authenticator() {
+	
+		@Override
+		protected PasswordAuthentication getPasswordAuthentication() {
+			return new PasswordAuthentication(
+                                config.getProperty("mail.usuario"), 
+                                config.getProperty("mail.password"));
+		}
+	});
+        
+    }
+    
+    
 
     public void enviarMail(String asunto, String contenido,
             boolean esHTML, String[] destinatarios, String[] cc, 
@@ -73,28 +92,22 @@ public final class Correo {
         if (asunto == null || contenido == null || 
                 (destinatarios == null || destinatarios.length == 0) &&
                 (cco == null || cco.length == 0)){
-            logApp.debug("No se envia mail, valores incorrectos");
+            logApp.log(Level.INFO, "No se envia mail, valores incorrectos");
             return;
         }           
 
-        Session sesion;
-        Transport canal = null;
+        Session sesion = connectServer();
         MimeMessage mail;
-
 
         try {  
             
-            // Esto es para cargar el archivo mail.properties
-            Properties config = new Properties();            
-
-            config.load(new FileReader(rutaFichConf));
-            
+            // Esto es para cargar el archivo mail.properties            
             String entorno = config.getProperty("mail.entorno");
             if (entorno != null && entorno.equals("desarrollo")){
-                logApp.debug("Mail desactivado para:");
-                logApp.debug("TO:" + destinatarios);
-                logApp.debug("CC:" + cc);
-                logApp.debug("CCO:" + cco);
+                logApp.log(Level.INFO, "Mail desactivado para:");
+                logApp.log(Level.INFO, "TO:" + destinatarios);
+                logApp.log(Level.INFO, "CC:" + cc);
+                logApp.log(Level.INFO, "CCO:" + cco);
                 return;
             }
             else if (entorno != null && entorno.equals("debug")){                
@@ -114,11 +127,9 @@ public final class Correo {
             
             String firma = firma(config, esHTML);
 
-            sesion = Session.getDefaultInstance(config);
-            canal = sesion.getTransport();
-            mail = new MimeMessage(sesion);
+            mail = new MimeMessage(sesion);            
 
-            mail.setSubject(asunto);
+            mail.setSubject(asunto, "UTF-8");
             if (esHTML){
                 mail.setText(contenido + firma, "UTF-8", "html");
             }
@@ -167,35 +178,22 @@ public final class Correo {
                     }
                 }
             }
-           
-            canal.connect(config.getProperty("mail.usuario"),
-                    config.getProperty("mail.password"));
-
-            canal.sendMessage(mail, mail.getAllRecipients());
-        } catch (IOException iOException) {
-            // Fallo al recuperar configuracion
-             // por ejemplo hacer un log
-            logApp.info("Error envio Correo: ".concat(iOException.getMessage()));
-
-        } catch (MessagingException messagingException) {
+ 
+            Transport.send(mail, mail.getAllRecipients());
+            
+        }catch (MessagingException messagingException) {
             // Fallo envio mail
             // por ejemplo hacer un log
             logApp.info("Error envio Correo: ".concat(messagingException.getMessage()));        
-        } catch (Exception ex) {
+        }
+        // Fallo al recuperar configuracion
+        // por ejemplo hacer un log
+         catch (Exception ex) {
             // Fallo envio mail
             // por ejemplo hacer un log
             if (ex.getMessage() != null)
                 logApp.info("Error envio Correo: ".concat(ex.getMessage()));
-        }
-        finally {
-            if (canal != null){
-                try {
-                    canal.close();
-                } catch (MessagingException ex) {
-                    logApp.info("Error envio Correo: ".concat(ex.getMessage()));
-                }
-            }
-        }
+        }   
 
     }
     
@@ -240,3 +238,4 @@ public final class Correo {
 
 
 }
+

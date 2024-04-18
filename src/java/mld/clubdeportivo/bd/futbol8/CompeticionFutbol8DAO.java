@@ -13,8 +13,8 @@ import mld.clubdeportivo.bd.ObjetoDAO;
 import mld.clubdeportivo.bd.TablasDAO;
 import mld.clubdeportivo.bd.TipoRetornoDAO;
 import mld.clubdeportivo.bd.TipoSaveDAO;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import java.util.logging.*;
+
 
 
 /**
@@ -23,8 +23,8 @@ import org.apache.log4j.Logger;
  */
 public class CompeticionFutbol8DAO extends ObjetoDAO {
     
-    private static Logger logger = 
-            LogManager.getLogger(CompeticionFutbol8DAO.class);
+    private static final Logger logger = 
+            Logger.getLogger(CompeticionFutbol8DAO.class.getName());
 
     protected String schema(){return "futbol8" + CompeticionFutbol8DAO.getEntorno();}
     protected String nombreTabla(){return TablasDAO.competicionesfutbol8.name();}
@@ -195,11 +195,10 @@ public class CompeticionFutbol8DAO extends ObjetoDAO {
                 (CompeticionFutbol8) getDataObject(txtsql, params);
          
          if (obj == null){
-             logger.error("No se encuentra competicion activa con " + txtsql);
-             logger.error(params);
-         }
-         
-         logger.info(obj);
+             logger.log(Level.SEVERE, "No se encuentra competicion activa con " + txtsql);
+             logger.log(Level.SEVERE, params.toString());
+         }else
+                  logger.log(Level.INFO, (obj.toString()));
 
         return obj;
 

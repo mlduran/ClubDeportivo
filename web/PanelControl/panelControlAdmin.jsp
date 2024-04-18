@@ -27,10 +27,10 @@
  
     <form action="${root}/admin" method="post" id="general">
         
-        APLICACION
+        <p>APLICACION</p>
          <br/>
          <c:if test="${mantenimient == null}">
-             hola
+             <p>hola</p>
          </c:if>
          <c:if test="${mantenimient eq 'false'}">
              <input type="submit" value="Iniciar Mantenimiento"  name="operacion" />
@@ -41,9 +41,13 @@
         <br/>  
         <input type="submit" value="Hacer Backup BD"  name="operacion" />
         <br/>  
+        <br/>  
+        <input type="submit" value="Prueba Correo"  name="operacion" />
+         <input type="text" name="correoPrueba" value="ml_duran@live.com" />
+        <br/>  
         
         
-         QUINIELAS <br/>
+        <p>QUINIELAS</p><br/>
          <c:if test="${compQuini == null}">
              <input type="submit" value="Crear Competicion Quiniela"  name="operacion" />
          </c:if>
@@ -51,41 +55,24 @@
         <input type="text" name="nombrecompeticion" value="${compQuini.nombre}" />
         
         <br/>
-        <input type="submit" value="Crear Fichero Partidos Quiniela"  name="operacion" />
-        JORNADA<input type="text" name="jornadapartidos" value="" size="2"/>
-       
-        <br/>
-        <input type="submit" value="Carga ficheros Quiniela"  name="operacion" />
-        <br/>  
-        <input type="submit" value="Eliminar Ficheros Quiniela"  name="operacion" />
-        <br/>
-        <input type="submit" value="Lanzar Jornada Quiniela"  name="operacion"/>
-        <input type="submit" value="Lanzar Jornada Quiniela Obteniendo Resultados"  name="operacion"/>
-        JORNADA
-        <SELECT NAME="jornadaquiniela">
-            <c:forEach var="jornada" items="${requestScope.jornadasq}" step="1">
-                <OPTION VALUE="${jornada.numero}"> ${jornada.numero}
-                </c:forEach>
-        </SELECT>
-        <br/>
         <c:if test="${compQuini != null}">
             <input type="submit" value="Finalizar Competicion Quiniela"  name="operacion" />  
         </c:if>
         <br/>
         <br/>  
         <input type="submit" value="Resultados Generales"  name="operacion" />
-        JORNADA<input type="text" name="jornadaresult" value="" size="2"/>
+        <p>JORNADA</p><input type="text" name="jornadaresult" value="" size="2"/>
          
         <c:if test="${mostrarjornadaresult != null}">
-            Resultados : ${mostrarjornadaresult}
+            <p>Resultados : ${mostrarjornadaresult}</p>
         </c:if>
             
               
         <br/>
-        FUTBOL8 <br/>
+        <p>FUTBOL8</p> <br/>
         <table>
             <th>
-                Colores
+                <p>Colores</p>
             </th>
             <tr>
                 <c:forEach var="obj" items="${jugsF8}">
@@ -103,7 +90,7 @@
         <input type="submit" value="Limpiar Tablas" name="operacion"/>
         <br/>
         <br/>
-        Grupos
+        <p>Grupos</p>
         <SELECT NAME="grupo">
             <c:forEach var="grp" items="${requestScope.grupos}" step="1">
                 <OPTION VALUE="${grp.id}"> ${grp.nombre}
@@ -112,7 +99,7 @@
         <input type="submit" value="Eliminar Grupo" name="operacion"/>
         <br/>
         <br/>
-        Clubs
+        <p>Clubs</p>
         <SELECT NAME="club">
             <c:forEach var="clb" items="${requestScope.clubs}" step="1">
                 <OPTION VALUE="${clb.id}"> ${clb.nombre}
@@ -121,7 +108,7 @@
         <input type="submit" value="Eliminar Club" name="operacion"/>
         <br/>
         <br/>
-        CompeticionesFutbol8
+        <p>CompeticionesFutbol8</p>
         <SELECT NAME="competicionFutbol8">
             <c:forEach var="comp" items="${requestScope.competiciones}" step="1">
                 <OPTION VALUE="${comp.id}"> ${comp.nombre}
@@ -138,7 +125,7 @@
     <br/>
     <br/>
     
-    <form action="${root}/admin" method="post" id="general">
+    <form action="${root}/admin" method="post" id="comunicados">
     <table class="tabla" >
         <th align="left">COMUNICADOS</th>
         <tr align="left">        
@@ -165,7 +152,7 @@
     <br/>
     <br/>
     
-    PREGUNTAS PENDIENTES
+    <p>PREGUNTAS PENDIENTES</p>
     <table class="tabla" >
         <tr>
             <th>Fecha</th>

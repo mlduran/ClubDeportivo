@@ -16,8 +16,7 @@ import mld.clubdeportivo.base.quinielas.*;
 import mld.clubdeportivo.bd.DAOException;
 import mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela;
 import mld.clubdeportivo.utilidades.Correo;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import java.util.logging.*;
 
 /**
  *
@@ -26,7 +25,7 @@ import org.apache.log4j.Logger;
 public class PanelControlQuinielaHttpServlet extends HttpServlet {
 
     private static Logger logger = 
-            LogManager.getLogger(PanelControlQuinielaHttpServlet.class);
+            Logger.getLogger(PanelControlQuinielaHttpServlet.class.getName());
    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -72,12 +71,16 @@ public class PanelControlQuinielaHttpServlet extends HttpServlet {
                 jornadasDisputadas(req, eq);
             else if (accion.equals("/competiciones"))
                 competiciones(req);
+            else if (accion.equals("/competicion"))
+                verCompeticion(req);
+            else if (accion.equals("/historico"))
+                verHistorico(req);
             else if (accion.equals("/jornadaAdmin") && eq.isAdmin()) 
                 cumplimentarAdmin(req, eq);
                       
 
         } catch (Exception ex) {
-            logger.error(ex.getMessage());
+            logger.log(Level.SEVERE, ex.getMessage());
             req.setAttribute("error", ex.getMessage());
         }
             
@@ -142,15 +145,7 @@ public class PanelControlQuinielaHttpServlet extends HttpServlet {
         if (isTemporal){
            apuestas = obtenerApuestasTemporalGrupo(req, jornada, apuesta1.getEquipo());
         }
-        
-        ArrayList<String> urls = null;
-        
-        try {
-             urls= UtilesQuiniela.obtenerEnlacesPartidos(String.valueOf(jornada.getNumero()));
-        } catch (Exception ex) {
-           // No hacemos nada
-        }
-        
+                
         int col1 = 0; 
         int col2 = 0;
 
@@ -173,12 +168,7 @@ public class PanelControlQuinielaHttpServlet extends HttpServlet {
                         col2++;
                 }
             }
-            
-            if (urls != null && urls.size() >= i) 
-                ap.setUrl(urls.get(i));
-            else 
-                ap.setUrl("");
-            
+                        
             datosQuiniela.add(ap);
         }
 
@@ -211,13 +201,17 @@ public class PanelControlQuinielaHttpServlet extends HttpServlet {
                 listaGrp.add(equipoQuiniela);
             }
         }
-        ArrayList<ApuestaQuiniela> apuestasEq;
+        ArrayList<ApuestaQuiniela> apuestasEq; 
+            
+        HashMap<EquipoQuiniela,HashMap<Integer,Integer>> col1 = new HashMap();
+        HashMap<EquipoQuiniela,HashMap<Integer,Integer>> col2 = new HashMap();
+        
         for (EquipoQuiniela equipoQuiniela : listaGrp) { 
         
+            HashMap<Integer,Integer> aciertos_col1 = new HashMap<Integer,Integer>();
+            HashMap<Integer,Integer> aciertos_col2 = new HashMap<Integer,Integer>();
             apuestasEq =  (ArrayList<ApuestaQuiniela>) JDBCDAOQuiniela.obtenerApuestas(equipoQuiniela, jornada);
-            int col1 = 0; 
-            int col2 = 0;
-
+  
             for (int i = 0; i < 15; i++){
 
                 ApuestaQ ap = new ApuestaQ();
@@ -226,19 +220,55 @@ public class PanelControlQuinielaHttpServlet extends HttpServlet {
 
                 ap.setNumero(String.valueOf(i + 1));
                 ap.setPartido(jornada.getPartido()[i]);
-                ap.setColumna1(apuesta1.getResultado()[i]);
+                ap.setColumna1(apuesta1.getResultado()[i]);  
                 ap.setColumna2(apuesta2.getResultado()[i]);
                 ap.setResultado(apuestas.get(i));
                 if (apuesta1.getResultado()[i] == null) 
                         apuesta1.getResultado()[i] = " ";
                 if (apuesta1.getResultado()[i].equals(apuestas.get(i)))
-                    col1++;
+                    aciertos_col1.put(i, 1);
+                else
+                    aciertos_col1.put(i, 0);
+                col1.put(equipoQuiniela, aciertos_col1);
+                
                 if (apuesta2.getResultado()[i] == null) 
                         apuesta2.getResultado()[i] = " ";
                 if (apuesta2.getResultado()[i].equals(apuestas.get(i)))
-                    col2++;
+                    aciertos_col2.put(i, 1);
+                else
+                    aciertos_col2.put(i, 0);
+                col2.put(equipoQuiniela, aciertos_col2);
+                           
             }
-            equipoQuiniela.setResultadoProvisional("(" + col1 + " , " + col2 + ") aciertos");
+        }
+        
+        if (listaGrp.size() > 1){
+            for (int i = 0; i < 15; i++){
+                int totalAcertados = 0;
+                for (EquipoQuiniela equi : listaGrp) {                   
+                    if (col1.get(equi).get(i) == 1 || col2.get(equi).get(i) == 1)
+                         totalAcertados++;     
+                }
+                if (totalAcertados == 1){
+                     for (EquipoQuiniela equi : listaGrp) {                      
+                        if (col1.get(equi).get(i) == 1)
+                            col1.get(equi).put(i, 2);
+                        if (col2.get(equi).get(i) == 1)
+                            col2.get(equi).put(i, 2);
+                    }                    
+                }                
+            }            
+        }
+        
+        for (EquipoQuiniela equipoQuiniela : listaGrp) {  
+            Integer total_col1 = 0;
+            Integer total_col2 = 0;
+            for (int i = 0; i < 15; i++){               
+                    total_col1 = total_col1 + col1.get(equipoQuiniela).get(i);                
+                    total_col2 = total_col2 + col2.get(equipoQuiniela).get(i);
+            }
+            
+            equipoQuiniela.setResultadoProvisional("(" + total_col1 + " , " + total_col2 + ") aciertos");
         }
 
         req.setAttribute("resultadosTemp", listaGrp);
@@ -248,8 +278,7 @@ public class PanelControlQuinielaHttpServlet extends HttpServlet {
 
     }
     
-     
-    
+        
 
     private void obtenerApuestaMultiple(HttpServletRequest req,
             JornadaQuiniela jornada, String tipo) throws DAOException{
@@ -398,6 +427,7 @@ public class PanelControlQuinielaHttpServlet extends HttpServlet {
         ApuestaQuiniela apuesta2 = null; 
         
         JornadaQuiniela jornada = JDBCDAOQuiniela.obtenerProximaJornada(comp);
+        req.setAttribute("jornada", jornada);
 
         if (jornada == null || jornada.isValidada() || jornada.isBloqueada()) 
             op = null;
@@ -490,16 +520,19 @@ public class PanelControlQuinielaHttpServlet extends HttpServlet {
             
         }
         else if (op.equals("Crear Jornada")) {
-             String nj = (String) req.getParameter("numeroJornada");             
+             String nj = (String) req.getParameter("numeroJornada");  
+             String pj = (String) req.getParameter("puntosJornada");  
              try {
                  if (nj == null || nj == "") throw 
                          new UnsupportedOperationException("Se ha de informar numero de jornada");
+                 if (pj == null || nj == "") throw 
+                         new UnsupportedOperationException("Se han de informar los puntos de la jornada");
                  for(int i = 1; i < 16; i++){
                      String np = String.valueOf(i);
                      if (np.length() == 1) np = "0" + np;
                      partidos[i - 1] = req.getParameter("partido" + np);
                  }                 
-                jornada = UtilesQuiniela.crearJornadaQuiniela(nj, partidos);
+                jornada = UtilesQuiniela.crearJornadaQuiniela(nj, pj, partidos);
             } catch (Exception ex){
                 req.setAttribute("error", "Error al crear jornada quiniela ".concat(ex.getMessage()));
             }
@@ -864,7 +897,7 @@ public class PanelControlQuinielaHttpServlet extends HttpServlet {
         
         return jornadas;
     }
-
+    
     private void competiciones(HttpServletRequest req) throws DAOException {
 
         req.setAttribute("op", "competiciones");
@@ -903,4 +936,55 @@ public class PanelControlQuinielaHttpServlet extends HttpServlet {
     }
 
     
+
+
+    private void verCompeticion(HttpServletRequest req) throws DAOException {
+
+        req.setAttribute("op", "competiciones");
+        req.setAttribute("titulo", "COMPETICIONES");
+
+        CompeticionQuiniela comp = selectorCompeticion(req);
+        if (comp == null) {
+            return;
+        }
+
+        ArrayList<JornadaQuiniela> jornadas = jornadasDisputadas(comp);                
+        
+        ArrayList<JornadaQuiniela> jornadasCol1 = new ArrayList<JornadaQuiniela>();
+        ArrayList<JornadaQuiniela> jornadasCol2 = new ArrayList<JornadaQuiniela>();
+        ArrayList<JornadaQuiniela> jornadasCol3 = new ArrayList<JornadaQuiniela>();
+        
+        int i = 1;
+        for (JornadaQuiniela jornada : jornadas) {
+            if (i == 1) {
+                jornadasCol1.add(jornada);
+                i = 2;
+            }
+            else if (i == 2) {
+                jornadasCol2.add(jornada);
+                i = 3;
+            }
+            else if (i == 3) {
+                jornadasCol3.add(jornada);
+                i = 1;
+            }
+        }        
+
+        req.setAttribute("jornadasCol1", jornadasCol1);
+        req.setAttribute("jornadasCol2", jornadasCol2);
+        req.setAttribute("jornadasCol3", jornadasCol3);
+    }
+
+private void verHistorico(HttpServletRequest req) throws DAOException {
+
+        req.setAttribute("op", "historico");
+        req.setAttribute("titulo", "HISTORICO");      
+
+        ArrayList<CompeticionQuiniela> competiciones = 
+                JDBCDAOQuiniela.competicionesNoActivas();      
+      
+        req.setAttribute("competiciones", competiciones);
+         }
 }
+    
+

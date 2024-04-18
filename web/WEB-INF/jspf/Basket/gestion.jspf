@@ -1,0 +1,516 @@
+<%-- any content can be specified here e.g.: --%>
+<%@ page pageEncoding="UTF-8" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml"%>
+<%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+
+<c:set var="root" value="${pageContext.servletContext.contextPath}"/>
+<c:set var="idclub" value="${sessionScope.idClub}"/>
+<c:set var="deporte" value="${sessionScope.deporte}"/>
+<c:set var="idequipo" value="${sessionScope.idEquipo}"/>
+<c:set var="equipo" value="${requestScope.equipo}"/>
+<c:set var="error" value="${requestScope.error}"/>
+
+<form action="${root}/panelControl/Futbol8/gestion" method="post">
+
+    <table class="tabla" width="100%">
+        <tr>
+            <td align="center">
+                Presupuesto Actual<br/>
+                <img alt="Presupuesto"  src="${root}/images/billetes.jpg"/>
+            </td>
+            <td>
+                <fmt:formatNumber value="${equipo.presupuesto}"/> Euros <br/><br/>
+                <a href="${root}/ayuda?grupo=General&codigo=presupuesto" target="_blank"><img src="${root}/images/ayuda.gif"></a> 
+            </td>
+            <td colspan="2">
+                <table class="tabladatos" width="100%">           
+                    <tr>
+                        <td width="75%">Gastos Totales Aproximados por Jornada</td>
+                        <td class="txtNum" width="25%">${equipo.costeTotal}</td>
+                    </tr>
+                    <tr>
+                        <td>Ingresos Totales Aproximados por Jornada</td>
+                        <td class="txtNum">${equipo.ingresosMediosCampo + equipo.ingresosMediosPublicidad}</td>
+                    </tr>
+                    <tr>
+                       <td>Saldo Aproximado por Jornada</td>                       
+                       <c:if test="${equipo.balanceAproximado >= 0}">
+                            <td class="txtNum"><b>${equipo.balanceAproximado}</b></td>
+                        </c:if>
+                        <c:if test="${equipo.balanceAproximado < 0}">
+                            <td class="txtNumRojo">${equipo.balanceAproximado}</td>
+                        </c:if>                  
+                    </tr>
+                   
+                    <tr>
+                        <td colspan="2">
+                            <img src="${root}/images/grafico.png" onclick="abrirGrafico('${root}', 'graficoPresupuesto', ${equipo.id})">                        
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td align="center">
+                Estadio/Pabellón<br/>
+                <img alt="Estadio/Pabellón"  src="${root}/images/campoFutbol.jpg"/>
+            </td>
+            <td><fmt:formatNumber value="${equipo.campo}"/> Espectadores <br/><br/>
+                <a href="${root}/ayuda?grupo=General&codigo=ampliacionCampo" target="_blank"><img src="${root}/images/ayuda.gif"></a> 
+            </td>
+            <td align="center">                
+                <c:if test="${equipo.ampliarCampo == true}">
+                    <input type="submit" value="Ampliar Asientos" id ="operacion" name="operacion" disabled />
+                </c:if>
+                <c:if test="${equipo.ampliarCampo == false}">
+                    <input type="submit" value="Ampliar Asientos" id ="operacion" name="operacion" /> 
+                </c:if>                      
+            </td>
+            <td>
+                <label for="nombre" accesskey="i">Nombre Estadio</label><br/>                
+                <input class="pie" type="text" name="nombreEstadio" id="nombreEstadio" title="Introduce el nombre para tu Estadio" maxlength="50" style="width: 250px" value="${equipo.nombreCampo}"/>                        
+                <br/>
+                <input type="submit" value="Cambiar Nombre" id ="cambioNombre" name="operacion" /> 
+                <br/>
+                Precio Entradas
+                <select name="precioEntrada" size="1">
+                     <c:forEach var="precio" items="${preciosEntrada}">
+                         <c:if test="${equipo.precioEntradas == precio}">
+                             <option selected value="${precio}">${precio}</option>
+                         </c:if>
+                         <c:if test="${equipo.precioEntradas != precio}">
+                             <option value="${precio}">${precio}</option>
+                         </c:if>
+                     </c:forEach>
+                </select>
+                </br>
+                <input type="submit" value="Cambiar Precio" id ="operacion" name="operacion" /> 
+                </br>
+                <p class="comentario">El coste de apliación es de ${equipo.valorPxoximaAmpliacionCampo}</p>                      
+                
+            </td>      
+        </tr>
+
+        <tr>
+            <td align="center">
+                Contratos Publicitarios</br>
+                <img alt="Contratos Publicitarios"  src="${root}/images/contrato.jpg"/>
+            </td>
+            <td>${equipo.publicidad} Contratos</br></br>
+                <a href="${root}/ayuda?grupo=General&codigo=publicidad" target="_blank"><img src="${root}/images/ayuda.gif"></a> 
+            </td>
+            <td td align="center">                
+                <c:if test="${equipo.ampliarPublicidad == true || equipo.publicidadMaxima == true}">
+                    <input type="submit" value="Firmar Contrato" id ="operacion" name="operacion" disabled /> 
+                </c:if>
+                <c:if test="${equipo.ampliarPublicidad == false && equipo.publicidadMaxima == false}">
+                    <input type="submit" value="Firmar Contrato" id ="operacion" name="operacion" />
+                </c:if>
+            </td>
+            <td>
+                <c:if test="${equipo.publicidadMaxima == false}">
+                    <p class="comentario">El coste de un nuevo contrato es de ${equipo.valorPxoximaAmpliacionPublicidad}</p>
+                </c:if>
+                <c:if test="${equipo.publicidadMaxima == true}">
+                    <p class="comentario">Has alcanzado el numero máximo de contratos</p>
+                </c:if>
+            </td> 
+        </tr>
+
+        <tr>
+            <td align="center">
+                Equipo Tecnico</br>
+                <img alt="Equipo Tecnico"  src="${root}/images/eqTecnico.png"/>
+            </td>
+            <td>${equipo.eqTecnico} Personas</br></br>
+                <a href="${root}/ayuda?grupo=General&codigo=equipoTecnico" target="_blank"><img src="${root}/images/ayuda.gif"></a> 
+            </td>            
+            <c:if test="${equipo.ampliarEqTecnico == true}">
+                <td align="center"><input type="submit" value="Nuevo Tecnico" id ="operacion" name="operacion" disabled /> </td>
+            </c:if>
+            <c:if test="${equipo.ampliarEqTecnico == false}">
+                <td align="center"><input type="submit" value="Nuevo Tecnico" id ="operacion" name="operacion" /> </td>
+            </c:if>
+            <td><p class="comentario">El coste para contratar un nuevo tecnico es de ${equipo.valorPxoximaAmpliacionEqTecnico}</p></td> 
+        </tr>
+
+        <tr>
+            <td align="center">
+                Ojeadores</br>
+                <img alt="Ojeadores"  src="${root}/images/ojear.gif"/>
+            </td>
+            <td>${equipo.ojeadores} Personas</br></br>
+                <a href="${root}/ayuda?grupo=General&codigo=ojeadores" target="_blank"><img src="${root}/images/ayuda.gif"></a> 
+            </td>
+            <c:if test="${equipo.ampliarOjeadores == true}">
+                <td align="center"><input type="submit" value="Nuevo Ojeador" id ="operacion" name="operacion" disabled /> </td>
+            </c:if>
+            <c:if test="${equipo.ampliarOjeadores == false}">
+                <td align="center"><input type="submit" value="Nuevo Ojeador" id ="operacion" name="operacion" /> </td>
+            </c:if>
+            <td>
+                <p class="comentario">El coste para contratar un nuevo ojeador es de ${equipo.valorPxoximaAmpliacionOjeadores}</p>
+                <c:if test="${equipo.jugadoresOjeados > 0}">
+                    <p class="comentario">Tienes ${equipo.jugadoresOjeados} ojeados</p>
+                </c:if>
+            </td> 
+        </tr>
+        
+        <tr>
+            <td align="center">
+                Juveniles</br>
+                <img alt="Juvenil"  src="${root}/images/juvenil.png"/>
+            </td>
+            <td>
+                <a href="${root}/ayuda?grupo=General&codigo=juveniles" target="_blank"><img src="${root}/images/ayuda.gif"></a> 
+            </td>
+            <td colspan="2">
+                Posición Próximo Juvenil:
+                <select name="posicion" size="1">
+                    <c:forEach var="pos" items="${posiciones}">
+                        <c:if test="${posicionJuvenil == pos}">
+                            <option selected>${pos}</option>
+                        </c:if>
+                        <c:if test="${posicionJuvenil != pos}">
+                            <option>${pos}</option>
+                        </c:if>
+                    </c:forEach>
+                </select>
+                </br>
+                </br>                                
+                <input type="submit" value="Cambiar Posicion" id ="operacion" name="operacion" /> 
+            </td>           
+        </tr>
+
+        <tr>
+            <td align="center">
+                Inversión en Bolsa</br>
+                <img alt="La Bolsa"  src="${root}/images/laBolsa.jpg"/>
+            </td>      
+            
+            
+            <td><fmt:formatNumber value="${equipo.bolsa}"/> Euros<br/><br/>
+                <a href="${root}/ayuda?grupo=General&codigo=bolsa" target="_blank"><img src="${root}/images/ayuda.gif"></a> 
+            </td>            
+           
+            <td align="center">
+                <input class="txtNum" type="text" name="invBolsa" id="invBolsa" title="Valor a invertir" style="width: 60px" /><br/>
+                <input type="submit" value="Invertir" id ="botonInvBolsa" name="operacion" /> <br/>
+                <c:if test="${equipo.bolsa > 0}">
+                    <input type="submit" value="Rescatar" id ="botonRescatarBolsa" name="operacion" /> 
+                </c:if>
+            </td> 
+             <td>
+                <img src="${root}/images/grafico.png" onclick="abrirGrafico('${root}', 'graficoBolsa')">
+            </td>
+        </tr>
+        
+        <tr>
+            <td align="center">
+                Credito Actual</br>
+                <img alt="Credito"  src="${root}/images/credito.jpg"/>
+            </td>
+            
+            <td><fmt:formatNumber value="${equipo.credito}"/> Euros<br/><br/>
+                <a href="${root}/ayuda?grupo=General&codigo=credito" target="_blank"><img src="${root}/images/ayuda.gif"></a> 
+            </td>
+            <td colspan="2" align="center">  
+                <input class="txtNum" type="text" name="valorCredito" id="valorCredito" title="Valor a pedir" style="width: 60px" /><br/>
+                <c:if test="${equipo.puedePedirCredito == true}">                    
+                    <input type="submit" value="Pedir" id ="operacionCredito" name="operacion" />
+                </c:if>
+                <c:if test="${equipo.puedeDevolverCredito ==  true && equipo.credito > 0}">
+                    <input type="submit" value="Devolver" id ="operacionCredito" name="operacion" /> 
+                </c:if>              
+                
+            </td>            
+        </tr>
+        
+        <tr>
+            <td align="center">
+                Primas a Terceros</br>
+                <img alt="Maletines"  src="${root}/images/maletin.png"/>
+            </td>   
+            
+            <td>
+                <a href="${root}/ayuda?grupo=General&codigo=primasTerceros" target="_blank"><img src="${root}/images/ayuda.gif"></a> 
+            </td>
+           
+            <td colspan="2" align="center">  
+                EQUIPO:
+                <select name="equipoPrima" size="1">
+                     <c:forEach var="eqPrima" items="${equiposPrima}">
+                         <option value="${eqPrima.id}">${eqPrima.nombre}</option>
+                     </c:forEach>
+                </select>
+                <br/>
+                Competición:
+                <select name="tipoCompeticion" size="1">
+                     <c:forEach var="tipocomp" items="${tiposCompeticion}">
+                         <option>${tipocomp}</option>
+                     </c:forEach>
+                </select>
+                <br/>
+                Cantidad:
+                <input class="txtNum" type="text" name="prima" id="prima" title="Prima a dar" style="width: 60px" />                             
+                <input type="submit" value="Primar" id ="botonPrimar" name="operacion" />   
+                <c:if test="${errorPrimas != null}">
+                    <br/>
+                    <p class ="error">ERROR: ${errorPrimas}</p>
+                </c:if>
+            </td>            
+        </tr>
+        
+         <tr>
+            <td align="center">
+                Equipación</br>
+                <img alt="Equipacion"  src="${root}/images/jugadores/jugador${equipo.equipacion}.png"/>
+            </td>
+            
+            <td>
+                <input type="submit" value="Cambiar" id ="operacion" name="operacion" /> 
+            </td>      
+            <td colspan="2">
+                
+               <img id="jugAnterior" alt="Anterior"  src="${root}/images/anterior.png"/>
+               <img id="jugActual" alt="Equipacion"  src="${root}/images/jugadores/jugador${equipo.equipacion}.png"/>
+               <img id="jugSiguiente" alt="Siguiente"  src="${root}/images/siguiente.png"/>
+                
+            </td>            
+        </tr>  
+        
+        <tr>
+            <td align="center">
+                Modo Vacaciones</br>
+                <img alt="Modo Vacaciones"  src="${root}/images/vacaciones.png"/>
+            </td>
+            
+            <td>
+                <c:if test="${vacaciones.activo}">
+                    <input type="submit" value="Desactivar" id ="operacion" name="operacion" /> 
+                </c:if>
+                <c:if test="${!vacaciones.activo}">
+                    <input type="submit" value="Activar" id ="operacion" name="operacion" /> 
+                </c:if>  
+                <br/><br/>
+                <a href="${root}/ayuda?grupo=Futbol8&codigo=vacaciones" target="_blank"><img src="${root}/images/ayuda.gif"></a> 
+            </td>      
+            <td colspan="2">
+                <c:if test="${vacaciones.activo}">
+                Renovación Automática
+                <c:if test="${vacaciones.renovacion}">
+                    <input type="checkbox" id ="activarRenovacion" name="activarRenovacion" checked>
+                </c:if>
+                <c:if test="${!vacaciones.renovacion}">
+                    <input type="checkbox" id ="activarRenovacion" name="activarRenovacion" >
+                </c:if>
+                <br/><br/>
+                Fijar Tactica
+                <c:if test="${vacaciones.activarTactica}">
+                    <input type="checkbox" id ="fijarTactica" name="fijarTactica" checked>                                      
+                </c:if>
+                <c:if test="${!vacaciones.activarTactica}">
+                    <input type="checkbox" id ="fijarTactica" name="fijarTactica">
+                </c:if>                    
+                <br/>                
+                <img id="tacAnterior" alt="Anterior"  src="${root}/images/anterior.png"/>
+                <img id="tacActual" src="${root}/images/tacticas/tacticam${vacaciones.tactica.numero}.jpg" title="Tactica ${vacaciones.tactica.numero}" alt="Tactica"/>
+                <img id="tacSiguiente" alt="Siguiente"  src="${root}/images/siguiente.png"/> 
+                <br/><br/>
+                Entreno Automático
+                <c:if test="${vacaciones.activarEntreno}">
+                    <input type="checkbox" id ="entrenoAuto" name="entrenoAuto" checked>                       
+                </c:if>
+                <c:if test="${!vacaciones.activarEntreno}">
+                    <input type="checkbox" id ="operacion" name="entrenoAuto">
+                </c:if>
+                <br/>
+                Posición:
+                <select name="posicionEntreno" size="1">
+                    <c:forEach var="pos" items="${posiciones}">
+                        <c:if test="${vacaciones.posicionEntreno == pos}">
+                            <option selected>${pos}</option>
+                        </c:if>
+                        <c:if test="${vacaciones.posicionEntreno != pos}">
+                            <option>${pos}</option>
+                        </c:if>
+                    </c:forEach>
+                </select>
+                <br/><br/>                
+                <input type="submit" value="Grabar Ajustes" id ="operacion" name="operacion" />
+            </c:if>
+            </td>            
+        </tr>        
+        
+    </table>
+               
+                <div id="graficoBolsa" class="grafico" style=display:none> 
+        <table width="100%">
+            <tr>
+                <td align="right">
+                     <c:if test="${equipo.fechaBolsaTxt ne ''}">
+                         <img src="${root}/images/cambioLista.png" onclick="ponerDatosBolsa('${equipo.fechaBolsaTxt}')" title="Ver datos desde fecha de inversión"/>
+                     </c:if>
+                    <img src="${root}/images/cerrar.png" onclick="cerrarGrafico('graficoBolsa')"/>
+                </td>                
+            </tr>
+            <tr>
+                <td>
+                    <div id="bolsa"/>
+                </td>            
+            </tr>            
+        </table>
+    </div>
+    
+    <div id="graficoPresupuesto" class="grafico3" style=display:none> 
+        <table width="100%" >
+            <tr>
+                <td align="right">                    
+                    <img src="${root}/images/cerrar.png" onclick="cerrarGrafico('graficoPresupuesto')"/>
+                </td>                
+            </tr>
+            <tr>
+                <td>
+                    <div id="ingresos"/>
+                </td>   
+            </tr> 
+            <tr>
+                <td>
+                    <div id="gastos"/>
+                </td> 
+           </tr> 
+            <tr>
+                <td>
+                    <div id="balance"/>
+                </td> 
+            </tr>              
+        </table>
+    </div>
+
+
+               
+    <script src='${root}/JavaScript/Lib/jquery/1.7.2/jquery.min.js'></script> 
+    <script src='${root}/JavaScript/Lib/Highcharts-2.3.3/js/highcharts.js'></script> 
+    <script type="text/javascript" src="${root}/JavaScript/Graficos.js"></script>
+    <script type="text/javascript" src="${root}/JavaScript/DomDrag.js"></script>
+    
+    <script type="text/javascript">
+        mover.init(document.getElementById('graficoBolsa'));
+        mover.init(document.getElementById('graficoPresupuesto'));
+    </script>
+               
+    <input type="hidden" id="equipacion" name="equipacion" value="${equipo.equipacion}">
+    <input type="hidden" id="tactica" name="tactica" value="${vacaciones.tactica.numero}">
+    <input type="hidden" id="listaTacticas" name="listaTacticas" value="${equipo.entrenador.tacticasString}">
+    
+    <script type="text/javascript">
+        
+        var numActual = parseInt($("#equipacion").val());
+        var numNuevo = numActual;
+        var imagen = document.getElementById('jugActual').src;
+        if (document.getElementById('tacActual') != null){
+            var listaTacticas = document.getElementById('listaTacticas').value.split(',');
+            var numActualTac = parseInt($("#tactica").val());
+            var numNuevoTac = numActualTac;
+            var imagenTac = document.getElementById('tacActual').src;
+        }
+        
+        var actualizarImagen = function() {
+             imagen = imagen.replace("jugador" + numActual, "jugador" + numNuevo);       
+             document.getElementById('jugActual').src = imagen;
+             numActual = numNuevo;
+             document.getElementById('equipacion').value = numNuevo;
+             
+         }  
+         var actualizarTactica = function() {
+             imagenTac = imagenTac.replace("tacticam" + numActualTac, "tacticam" + numNuevoTac);  
+             img = document.getElementById('tacActual');
+             img.title = img.title.replace("Tactica " + numActualTac, "Tactica " + numNuevoTac);
+             img.src = imagenTac;
+             numActualTac = numNuevoTac;
+             document.getElementById('tactica').value = numNuevoTac;
+             
+         }     
+        
+        
+        $(document).ready(function(){
+
+               $("#jugAnterior").click(function(){
+                   numNuevo = numNuevo - 1;
+                   if (numNuevo < 0) numNuevo = 16;
+                   actualizarImagen();
+               });
+               $("#jugSiguiente").click(function(){
+                   numNuevo = numNuevo + 1;
+                   if (numNuevo > 16) numNuevo = 0;
+                   actualizarImagen();
+               });
+               
+               $("#tacAnterior").click(function(){
+                   if (document.getElementById('tacActual') == null) return;
+                   for (var i=0;i<listaTacticas.length;i++){
+                       if (listaTacticas[i] == numNuevoTac){
+                           if (i - 1 >= 0)
+                               numNuevoTac = listaTacticas[i-1];
+                           else
+                               numNuevoTac = listaTacticas[listaTacticas.length-1];
+                           break;
+                       }                       
+                   }
+                   actualizarTactica();
+               });
+               $("#tacSiguiente").click(function(){
+                   if (document.getElementById('tacActual') == null) return;
+                   for (var i=0;i<listaTacticas.length;i++){
+                       if (listaTacticas[i] == numNuevoTac){
+                           if (i + 1 < listaTacticas.length)
+                               numNuevoTac = listaTacticas[i+1];
+                           else
+                               numNuevoTac = listaTacticas[0];
+                           break;
+                       }                       
+                   }
+                   actualizarTactica();
+               });
+               
+               
+               $("#invBolsa").keydown(function(e){
+                    if (e.which == 13) {
+                        $("#botonInvBolsa").focus();
+                    }                   
+                });
+                $("#valorCredito").keydown(function(e){
+                    if (e.which == 13) {
+                        $("#operacionCredito").focus();
+                    }                   
+                });
+                $("#prima").keydown(function(e){
+                    if (e.which == 13) {
+                        $("#botonPrimar").focus();
+                    }                   
+                });
+                
+                $("#nombreEstadio").keydown(function(e){
+                    if (e.which == 13) {
+                        $("#cambioNombre").focus();
+                    }                   
+                });
+            });
+     
+        
+    </script>
+               
+    
+   
+
+        <c:if test="${error != null}">
+            <p class ="error">ERROR: ${error}</p>
+        </c:if>
+
+</form>
+

@@ -26,8 +26,7 @@ import mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela;
 import mld.clubdeportivo.utilidades.Correo;
 import mld.clubdeportivo.utilidades.IODatos;
 import mld.clubdeportivo.utilidades.StringUtil;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 
 
 /**
@@ -36,7 +35,6 @@ import org.apache.log4j.Logger;
  */
 public class AdminHttpServlet extends HttpServlet {
 
-    private static Logger logger = LogManager.getLogger(AdminHttpServlet.class);
    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -101,9 +99,14 @@ public class AdminHttpServlet extends HttpServlet {
                UtilesHttpServlet.ejecutaBackup(appManager, "Backup");
 
             }
+             else if (op.equals("Prueba Correo")) { 
+                String correo = (String) req.getParameter("correoPrueba");
+                UtilesHttpServlet.pruebaCorreo(appManager, correo);
+
+            }
             else if (op.equals("Carga ficheros Quiniela")) { 
                 if (JDBCDAOQuiniela.competicionActiva() != null){
-                    UtilesQuiniela.cargarJornadasQuiniela(ruta);                                        
+                    UtilesQuiniela.cargarJornadasQuiniela_obsoleto(ruta);                                        
                 }
 
             } else if (op.equals("Eliminar Ficheros Quiniela")) {
@@ -117,18 +120,6 @@ public class AdminHttpServlet extends HttpServlet {
                 
             } else if (op.equals("Finalizar Competicion Quiniela")) {
                 UtilesQuiniela.finalizarCompeticion(comp);
-                
-            } else if (op.equals("Crear Fichero Partidos Quiniela")){
-                String jornada = req.getParameter("jornadapartidos");
-                UtilesQuiniela.crearFicheroJornada(jornada, ruta);
-
-            } else if (op.equals("Lanzar Jornada Quiniela")){
-                int numero = Integer.parseInt(req.getParameter("jornadaquiniela"));
-                UtilesQuiniela.validarJornada(numero, ruta);
-                
-            } else if (op.equals("Lanzar Jornada Quiniela Obteniendo Resultados")){
-                CompeticionQuiniela compQ = JDBCDAOQuiniela.competicionActiva();
-                UtilesQuiniela.validarJornada(compQ, ruta);
                 
             } else if (op.equals("Resultados Generales")){
                 CompeticionQuiniela compQ = JDBCDAOQuiniela.competicionActiva();
@@ -167,12 +158,12 @@ public class AdminHttpServlet extends HttpServlet {
                 String tipo = req.getParameter("tipoComunicado");
                 String textComunicado = req.getParameter("txtComunicado");
                 if (textComunicado != null){
-                    textComunicado = new String(textComunicado.getBytes(), "UTF-8");
+                    //textComunicado = new String(textComunicado.getBytes(), "UTF-8");
                     textComunicado = StringUtil.tratarSaltosLineaHTML(textComunicado);
                 }
                 String tituloComunicado = req.getParameter("tituloComunicado");
-                if (tituloComunicado != null)
-                    tituloComunicado = new String(tituloComunicado.getBytes(), "UTF-8");
+                //if (tituloComunicado != null)
+                    //tituloComunicado = new String(tituloComunicado.getBytes(), "UTF-8");
                 if (tituloComunicado == null) tituloComunicado = "";
                 ArrayList<String> correos = new ArrayList<String>();
                 if (tipo != null && textComunicado != null && !textComunicado.isEmpty()){
@@ -182,8 +173,8 @@ public class AdminHttpServlet extends HttpServlet {
                         correos.addAll(JDBCDAOClub.mailsClubs(Deporte.Futbol8));
                     else if (tipo.equals("Quiniela"))
                         correos.addAll(JDBCDAOClub.mailsClubs(Deporte.Quiniela));
-                    else if (tipo.equals("Basket"))
-                        correos.addAll(JDBCDAOClub.mailsClubs(Deporte.Basket));
+                    else if (tipo.equals("Futbol8"))
+                        correos.addAll(JDBCDAOClub.mailsClubs(Deporte.Futbol8));
                     
                     if (!correos.isEmpty())
                         Correo.getCorreo().enviarMailMasivo("ClubDeportivo Aviso " + tipo + " " + tituloComunicado, 

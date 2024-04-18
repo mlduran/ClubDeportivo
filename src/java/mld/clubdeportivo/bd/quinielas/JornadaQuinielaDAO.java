@@ -31,6 +31,7 @@ public class JornadaQuinielaDAO extends ObjetoDAO{
             "numero",
             "descripcion",
             "competicion",
+            "puntos",
             "fecha",
             "validada",
             "partido1",
@@ -77,25 +78,26 @@ public class JornadaQuinielaDAO extends ObjetoDAO{
         sql.setInt(1, objjor.getNumero());
         sql.setString(2, objjor.getDescripcion());
         sql.setLong(3, objjor.getCompeticion().getId());
+        sql.setInt(4, objjor.getPuntos());
 
         if (objjor.getFecha() == null)
-            sql.setTimestamp(4, null);
+            sql.setTimestamp(5, null);
         else
-            sql.setTimestamp(4,
+            sql.setTimestamp(5,
                     new Timestamp(objjor.getFecha().getTime()));
-        sql.setBoolean(5, objjor.isValidada());
+        sql.setBoolean(6, objjor.isValidada());
 
-        for (int i = 6; i < 21; i++){
-            sql.setString(i, objjor.getPartido()[i-6]);
+        for (int i = 7; i < 22; i++){
+            sql.setString(i, objjor.getPartido()[i-7]);
             if (objjor.getResultado() != null)
-                sql.setString(i + 15, objjor.getResultado()[i-6]);
+                sql.setString(i + 15, objjor.getResultado()[i-7]);
             else
                 sql.setString(i + 15, null);
         }
 
-        sql.setBoolean(36, objjor.isBloqueada());
+        sql.setBoolean(37, objjor.isBloqueada());
         // Si es un update asignamos el parametro del id
-        if (tipo == TipoSaveDAO.update) sql.setLong(37, objjor.getId());
+        if (tipo == TipoSaveDAO.update) sql.setLong(38, objjor.getId());
 
         return sql;
     }
@@ -111,6 +113,7 @@ public class JornadaQuinielaDAO extends ObjetoDAO{
         obj.setId(retorno.getLong("id"));
         obj.setNumero(retorno.getInt("numero"));
         obj.setDescripcion(retorno.getString("descripcion"));
+        obj.setPuntos(retorno.getInt("puntos"));
         obj.setFecha(retorno.getTimestamp("fecha"));
         obj.setValidada(retorno.getBoolean("validada"));
         obj.setBloqueada(retorno.getBoolean("bloqueada"));

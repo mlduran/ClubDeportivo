@@ -10,8 +10,11 @@ import mld.clubdeportivo.base.Jornada;
  */
 public class JornadaQuiniela extends Jornada{
 
+ 
+
     private String[] partido;
     private String[] resultado; // 1 X 2
+    private int puntos;
     private boolean validada;
     private boolean bloqueada;
     private ArrayList<EstadisticaQuiniela> estadisticas;
@@ -57,6 +60,16 @@ public class JornadaQuiniela extends Jornada{
         this.bloqueada = bloqueada;
     }
 
+
+    public int getPuntos() {
+        return puntos;
+    }
+
+
+    public void setPuntos(int puntos) {
+        this.puntos = puntos;
+    }
+
     public boolean resultadosCompletos(){
         
         boolean completo = true;
@@ -69,6 +82,14 @@ public class JornadaQuiniela extends Jornada{
         }
         
         return completo;
+    }
+    
+    public String getDescripcionPuntos(){
+        
+        String pts = "";
+        if (this.getPuntos() > 0)
+            pts = " (Puntos " + String.valueOf(this.getPuntos()) + ")"; 
+        return this.getDescripcion() + pts;
     }
 
 }

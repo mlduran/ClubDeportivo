@@ -7,7 +7,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import mld.clubdeportivo.base.Registro;
 import mld.clubdeportivo.bd.*;
-import org.apache.log4j.*;
+
 
 /**
  *
@@ -15,7 +15,6 @@ import org.apache.log4j.*;
  */
 public class RegistroHttpServlet extends HttpServlet {
 
-    private static Logger logger = LogManager.getLogger(LoginHttpServlet.class);
    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)

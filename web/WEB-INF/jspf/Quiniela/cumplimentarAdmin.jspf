@@ -54,6 +54,14 @@ function enviarValidacion()
                 <input type="text" name="numeroJornada" value=" ${numJornada}" size="2"/>
             </td>
         </tr>
+         <tr align="center">
+            <td>
+                PUNTOS GANADOR
+            </td>
+            <td>
+                <input type="text" name="puntosJornada" value=" ${puntosJornada}" size="2"/>
+            </td>
+        </tr>
     </table>
             
     <br/>

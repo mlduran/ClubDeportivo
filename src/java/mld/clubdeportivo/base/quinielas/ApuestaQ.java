@@ -16,7 +16,6 @@ public class ApuestaQ {
     private String columna1;
     private String columna2;
     private String resultado;
-    private String url;
 
     public String getPartido() {
         return partido;
@@ -75,12 +74,5 @@ public class ApuestaQ {
             return "RED";
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
 
 }

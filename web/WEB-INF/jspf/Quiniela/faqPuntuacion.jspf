@@ -30,16 +30,17 @@
             Por 13 aciertos : 50 puntos<br/>
             Por 14 aciertos : 200 puntos<br/>
             Por 15 o mas aciertos : 500 puntos<br/> 
-            Por 0 aciertos  : 50 puntos<br>(en este caso, NO se ha de acertar ningun resultado de los partidos para 1 de las columnas cumplimentadas, y todos los pronosticos deben estar cumplimentados)<br/>
-            Por 00 aciertos  : 150 puntos<br>(en este caso, NO se ha de acertar ningun resultado de los partidos para las 2 columnas cumplimentadas, y todos los pronosticos deben estar cumplimentados)<br/>
+            Por 0 aciertos  : 100 puntos<br>(en este caso, NO se ha de acertar ningun resultado de los partidos para 1 de las columnas cumplimentadas, y todos los pronosticos deben estar cumplimentados)<br/>
+            Por 1 aciertos  : 50 puntos<br>(en este caso, se ha de acertar 1 resultado de los partidos para 1 de las columnas cumplimentadas, y todos los pronosticos deben estar cumplimentados)<br/>            
+            Por 00 aciertos  : 500 puntos<br>(en este caso, NO se ha de acertar ningun resultado de los partidos para las 2 columnas cumplimentadas, y todos los pronosticos deben estar cumplimentados)<br/>
         </td>  
     <tr>
         <td>
             A la puntuación anterior hay que sumar los siguientes puntos, si queda entre los 4 primeros:<br/>
-            Para el puesto 1 : 16 puntos<br/>
-            Para el puesto 2 : 8 puntos<br/>
-            Para el puesto 3 : 4 puntos<br/>
-            Para el puesto 4 : 2 puntos<br/>            
+            Puntos para el puesto 1 : Se informara en la creacion de la jornada<br/>
+            Puntos para el puesto 2 : La mitad del primero<br/>
+            Puntos para el puesto 3 : La mitad del segundo<br/>
+            Puntos para el puesto 4 : La mitad del tercero<br/>    
         </td>
     </tr>
     <tr>

@@ -26,8 +26,7 @@ import mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela;
 import mld.clubdeportivo.utilidades.Correo;
 import mld.clubdeportivo.utilidades.Seguridad;
 import mld.clubdeportivo.utilidades.UtilGenericas;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import java.util.logging.*;
 
 /**
  *
@@ -36,7 +35,7 @@ import org.apache.log4j.Logger;
 public class PanelControlHttpServlet extends HttpServlet {
 
     private static Logger logger = 
-            LogManager.getLogger(PanelControlHttpServlet.class);
+            Logger.getLogger(PanelControlHttpServlet.class.getName());
    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -283,7 +282,7 @@ public class PanelControlHttpServlet extends HttpServlet {
              
              String preg = req.getParameter("pregunta");
              if (preg != null && !preg.equals("")) {
-                 preg = new String(preg.getBytes(), "UTF-8");
+                 //preg = new String(preg.getBytes(), "UTF-8");
                  Faq fq = new Faq(club, preg);
                  JDBCDAOFaq.grabarFaq(fq);
                  ServletContext appManager = req.getServletContext();
@@ -309,8 +308,8 @@ public class PanelControlHttpServlet extends HttpServlet {
             
             if (dep.equals(Deporte.Futbol8.name()))
                 deporte = Deporte.Futbol8;
-            else if (dep.equals(Deporte.Basket.name()))
-                deporte = Deporte.Basket;
+            else if (dep.equals(Deporte.Futbol8.name()))
+                deporte = Deporte.Futbol8;
             else if (dep.equals(Deporte.Quiniela.name()))
                 deporte = Deporte.Quiniela;
             

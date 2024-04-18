@@ -19,7 +19,7 @@
 <c:set var="iXm" value="${root}/images/XMarcado.jpg"/>
 <c:set var="i2m" value="${root}/images/2Marcado.jpg"/>
 
-
+JORNADA ${jornada.numero} (Puntos por victoria ${jornada.puntos})
 <table class="tabla">
     <tr>
         <th></th>

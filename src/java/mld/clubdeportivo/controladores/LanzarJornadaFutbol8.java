@@ -14,8 +14,7 @@ import mld.clubdeportivo.bd.futbol8.JDBCDAOFutbol8;
 import mld.clubdeportivo.utilidades.Calculos;
 import mld.clubdeportivo.utilidades.Correo;
 import mld.clubdeportivo.utilidades.UtilGenericas;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import java.util.logging.*;
 
 /**
  *
@@ -23,7 +22,7 @@ import org.apache.log4j.Logger;
  */
 public class LanzarJornadaFutbol8 {
     
-    private static Logger logger = LogManager.getLogger(LanzarJornadaFutbol8.class);
+    private static Logger logger = Logger.getLogger(LanzarJornadaFutbol8.class.getName());
 
    
     private ServletContext aplicacion;
@@ -257,7 +256,7 @@ public class LanzarJornadaFutbol8 {
     private String disputarJornada(JornadaFutbol8 jor, ArrayList<EquipoFutbol8> eqs,
             String tipo) throws DAOException{
         
-        logger.debug("Inicio pre Jornada");
+        logger.log(Level.INFO, "Inicio pre Jornada");
         ArrayList<EquipoFutbol8> eqsQueJuegan =
                         new ArrayList<EquipoFutbol8>();
         StringBuilder txtCorreo = new StringBuilder();
@@ -276,7 +275,7 @@ public class LanzarJornadaFutbol8 {
             
             EstadisticaPartidoFutbol8 est = new EstadisticaPartidoFutbol8(partido);
             partido.setEstadistica(est);
-            logger.debug("Pre partido");
+            logger.log(Level.INFO, "Pre partido");
             
             // calculo de posibilidades
             partido.setIsSimulacion(true);
@@ -295,7 +294,7 @@ public class LanzarJornadaFutbol8 {
             partido.setIsSimulacion(false);
             est = partido.jugarPartido();
             
-            logger.debug("Post Partido");
+            logger.log(Level.INFO, "Post Partido");
            
             eqsQueJuegan.add(eqLocal);
             eqsQueJuegan.add(eqVisit);
@@ -349,7 +348,7 @@ public class LanzarJornadaFutbol8 {
                 EquipoFutbol8.equiposAuto(eqs);
         gestionJornadaFutbol8(jor.getCompeticion().getGrupo(), 
                 eqsNoAuto, eqsNoAutoQueJuegan, eqsAuto);
-        logger.debug("Fin Jornada");
+        logger.log(Level.INFO, "Fin Jornada");
         
         return txtCorreo.toString();
         
@@ -386,7 +385,7 @@ public class LanzarJornadaFutbol8 {
             ArrayList<EquipoFutbol8> eqsQueJuegan, ArrayList<EquipoFutbol8> eqsAuto)
             throws DAOException {
     
-        logger.debug("gestionJornadaFutbol8");        
+        logger.log(Level.INFO, "gestionJornadaFutbol8");        
         
         int numTacs = Calculos.valorAleatorio(5, 10);
         UtilesFutbol8.crearEntrenadorfutbol8(grp, numTacs);
@@ -414,7 +413,7 @@ public class LanzarJornadaFutbol8 {
     }
     
     private void gestionarJuveniles(ArrayList<EquipoFutbol8> eqs) throws DAOException{
-        logger.debug("gestionarJuveniles");
+        logger.log(Level.INFO, "gestionarJuveniles");
         
 
         for (EquipoFutbol8 eq : eqs) {
@@ -442,7 +441,7 @@ public class LanzarJornadaFutbol8 {
             ArrayList<EquipoFutbol8> eqs, ArrayList<EquipoFutbol8> eqsAuto) 
             throws DAOException{
         // se gestiona solo los lunes
-        logger.debug("gestionarJugadoresSubasta");
+        logger.log(Level.INFO, "gestionarJugadoresSubasta");
         if (!UtilGenericas.isLunes()) return;
          
         ArrayList<JugadorFutbol8> jugs = JDBCDAOFutbol8.obtenerJugadoresGrupo(grp);
@@ -574,7 +573,7 @@ public class LanzarJornadaFutbol8 {
 
     public void gestionEstadio(PartidoFutbol8 partido) throws DAOException {
 
-        logger.debug("gestionEstadio");
+        logger.log(Level.INFO, "gestionEstadio");
 
         EquipoFutbol8 eq = (EquipoFutbol8) partido.getEqLocal();
         
@@ -599,7 +598,7 @@ public class LanzarJornadaFutbol8 {
     private void gestionGeneralParaTodosLosEquipos(Grupo grp, 
             ArrayList<EquipoFutbol8> eqs) throws DAOException {
         
-        logger.debug("gestionGeneralParaTodosLosEquipos");
+        logger.log(Level.INFO, "gestionGeneralParaTodosLosEquipos");
         int fluctuacion = obtenerFluctuacionBolsa(grp);
         
         for (EquipoFutbol8 eq : eqs) {
@@ -631,7 +630,7 @@ public class LanzarJornadaFutbol8 {
     
     private void gestionGeneralParaLosEquiposQueJuegan(Grupo grp, 
             ArrayList<EquipoFutbol8> eqs) throws DAOException {
-        logger.debug("gestionGeneralParaLosEquiposQueJuegan");
+        logger.log(Level.INFO, "gestionGeneralParaLosEquiposQueJuegan");
         Movimiento mov;
         int cantidad;
         for (EquipoFutbol8 eq : eqs) {
@@ -666,7 +665,7 @@ public class LanzarJornadaFutbol8 {
     private void gestionGeneralParaLosEquiposAuto(Grupo grp, 
             ArrayList<EquipoFutbol8> eqs) throws DAOException {
         
-        logger.debug("gestionGeneralParaLosEquiposAuto");
+        logger.log(Level.INFO, "gestionGeneralParaLosEquiposAuto");
         
         int valMedia = JDBCDAOFutbol8.valoracionMediaJugadores(grp);
         int subidaBajada;
@@ -689,7 +688,7 @@ public class LanzarJornadaFutbol8 {
     }
     
     private int obtenerFluctuacionBolsa(Grupo grp) throws DAOException{
-        logger.debug("obtenerFluctuacionBolsa");
+        logger.log(Level.INFO, "obtenerFluctuacionBolsa");
         boolean tipoFluctuacion = Calculos.obtener(2);
         int fluctuacion;
         if (!tipoFluctuacion)
@@ -716,7 +715,7 @@ public class LanzarJornadaFutbol8 {
 
     
     private void gestionDeContratos(EquipoFutbol8 eq) throws DAOException {
-        logger.debug("gestionDeContratos");
+        logger.log(Level.INFO, "gestionDeContratos");
         ArrayList<JugadorFutbol8> jugs = eq.getJugadores();
         ArrayList<JugadorFutbol8> jugsElim = new  ArrayList<JugadorFutbol8>();
         String txtJugs = "";

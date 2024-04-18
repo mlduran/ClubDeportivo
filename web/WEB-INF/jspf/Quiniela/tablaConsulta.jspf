@@ -27,7 +27,6 @@
         <th>Columna 1</th>
         <th>Columna 2</th>
         <th>Resultado</th>
-        <th>Detalles</th>
     </tr>
     <c:forEach var="apuesta" items="${requestScope.apuestas}" varStatus="cuenta">
         <tr>
@@ -77,10 +76,7 @@
             </td>
             <td colspan=1 align="center">
                ${apuesta.resultado}
-            </td>
-            <td colspan=1 align="center">
-               <a href="${apuesta.url}" target="_blank"><img src="${root}/images/infoIcon.gif"></a> 
-            </td>
+            </td>           
 
         </tr>
     </c:forEach>

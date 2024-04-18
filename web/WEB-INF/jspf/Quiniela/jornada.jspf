@@ -29,7 +29,7 @@
         </c:forEach>
     </SELECT>
     
-    <SELECT NAME="tipoapuesta" onchange="this.form.submit()">
+   <%-- <SELECT NAME="tipoapuesta" onchange="this.form.submit()">
         <c:forEach var="tipo" items="${requestScope.tiposapuesta}" step="1">
             <c:if test="${requestScope.apuestaelegida ne tipo}">
                 <OPTION VALUE="${tipo}"> ${tipo}
@@ -37,10 +37,11 @@
             <c:if test="${requestScope.apuestaelegida eq tipo}">
                 <OPTION SELECTED VALUE="${tipo}"> ${tipo}
             </c:if>
-        </c:forEach>
     </SELECT>
+        </c:forEach>--%>
        
     <br/>
+    Jornada numero ${jornada.numero} (Pts ganador jornada: ${jornada.puntos})
     <c:if test="${requestScope.apuestaelegida eq 'Sencilla'}">
           <c:import url="/WEB-INF/jspf/Quiniela/tablaConsulta.jspf"/>
     </c:if>
@@ -66,7 +67,7 @@
                 </tr>
             </c:forEach>
         </table>
-        Estos resultados no incluyen posibles puntos extras
+        Estos resultados incluyen posibles puntos extras
     </c:if>
 
     <br/>

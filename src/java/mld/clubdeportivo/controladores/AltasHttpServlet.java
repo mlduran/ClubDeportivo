@@ -18,8 +18,7 @@ import mld.clubdeportivo.bd.JDBCDAOGrupo;
 import mld.clubdeportivo.utilidades.Calculos;
 import mld.clubdeportivo.utilidades.Correo;
 import mld.clubdeportivo.utilidades.UtilGenericas;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import java.util.logging.*;
 
 /**
  *
@@ -27,7 +26,7 @@ import org.apache.log4j.Logger;
  */
 public class AltasHttpServlet extends HttpServlet {
 
-    private static Logger logger = LogManager.getLogger(AltasHttpServlet.class);
+    private static Logger logger = Logger.getLogger(AltasHttpServlet.class.getName());
 
 
     @Override
@@ -107,7 +106,7 @@ public class AltasHttpServlet extends HttpServlet {
 
             }
             catch (DAOException ex) {
-                logger.error("Error al dar de alta grupo: ".concat(ex.getMessage()));
+                logger.log(Level.SEVERE, "Error al dar de alta grupo: ".concat(ex.getMessage()));
                 req.setAttribute("error", ex.getMessage());
         }
         RequestDispatcher view = req.getRequestDispatcher("/Altas/altaGrupo.jsp");
@@ -222,7 +221,7 @@ public class AltasHttpServlet extends HttpServlet {
                 }
             }
             catch (DAOException ex) {
-                logger.error("Error al dar de alta Club: ".concat(ex.getMessage()));
+                logger.log(Level.SEVERE, "Error al dar de alta Club: ".concat(ex.getMessage()));
                 req.setAttribute("error", ex.getMessage());
                 RequestDispatcher view = req.getRequestDispatcher("/Altas/altaClub.jsp");
                 view.forward(req, resp);

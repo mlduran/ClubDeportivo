@@ -59,7 +59,14 @@
                 <a  href="${root}/panelControl/Quiniela/competiciones">Competiciones</a>
             </td>
 
-        </tr>     
+        </tr>  
+        
+         <tr align="center">
+            <td>
+                <a  href="${root}/panelControl/Quiniela/historico">Historico</a>
+            </td>
+
+        </tr>  
 
         <c:if test="${esAdmin}">
             <tr align="center">

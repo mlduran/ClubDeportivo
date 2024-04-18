@@ -1,0 +1,208 @@
+<%-- any content can be specified here e.g.: --%>
+<%@ page pageEncoding="UTF-8" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml"%>
+<%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<c:set var="root" value="${pageContext.servletContext.contextPath}"/>
+<c:set var="idclub" value="${sessionScope.idClub}"/>
+<c:set var="deporte" value="${sessionScope.deporte}"/>
+<c:set var="idequipo" value="${sessionScope.idEquipo}"/>
+
+<script type="text/javascript">
+    function mostrarCronica() {
+        document.getElementById('cronica').style.display = '';
+    }   
+    function cerrarCronica() {
+        document.getElementById('cronica').style.display = 'none';  
+    }       
+    function mostrarCronicaGrafica() {
+        document.getElementById('cronicaGrafica').style.display = '';
+    }   
+    function cerrarCronicaGrafica() {
+        document.getElementById('cronicaGrafica').style.display = 'none';  
+    }        
+</script>
+
+<script type="text/javascript" src="${root}/JavaScript/DomDrag.js"></script>
+
+<table class="tabladatos" width="90%">
+    <tr>
+        <th width="35%">${partido.nombreEqLocal}</th><th></th><th width="35%">${partido.nombreEqVisitante}</th>
+    </tr>
+    <tr>
+        <td><p class ="titulo2">${partido.golesLocal}</p></td><th>Goles</th><td><p class ="titulo2">${partido.golesVisitante}</p></td>        
+    </tr>
+    <c:if test="${estadistica.victoriasLocal != 0 || estadistica.victoriasVisitante != 0}">
+        <tr>
+            <td>${estadistica.victoriasLocal}%</td><th>Opciones de Victoria</th><td>${estadistica.victoriasVisitante}%</td>        
+        </tr>
+    </c:if>
+    <tr>        
+        <td><img src="${root}/images/tacticas/tacticam${estadistica.tacticaLocal}.jpg" title="Tactica ${estadistica.tacticaLocal}" alt="Tactica"/></td>
+        <th>Tactica</th>
+        <td><img src="${root}/images/tacticas/tacticam${estadistica.tacticaVisitante}.jpg" title="Tactica ${estadistica.tacticaVisitante}" alt="Tactica"/></td>     
+    </tr>
+    <tr>
+        <td>${estadistica.moralLocal}</td><th>Moral</th><td>${estadistica.moralVisitante}</td>        
+    </tr>
+    <tr>
+        <td>${estadistica.esfuerzoLocal}</td><th>Esfuerzo</th><td>${estadistica.esfuerzoVisitante}</td>        
+    </tr>
+    <tr>
+        <td>${estadistica.estrategiaLocal}</td><th>Estrategia</th><td>${estadistica.estrategiaVisitante}</td>        
+    </tr>
+    <tr>
+        <td>${estadistica.primasLocal}</td><th>Primas</th><td>${estadistica.primasVisitante}</td>        
+    </tr>
+    
+    <tr>
+        <td>${estadistica.posesionLocal}</td><th>Posesion</th><td>${estadistica.posesionVisitante}</td>        
+    </tr>
+    
+     <tr>
+        <td>${estadistica.jugadasLocal}</td><th>Jugadas</th><td>${estadistica.jugadasVisitante}</td>        
+    </tr>
+    
+    <tr>
+        <td>${estadistica.cornersLocal}</td><th>Corners</th><td>${estadistica.cornersVisitante}</td>        
+    </tr>     
+     <tr>
+        <td>${estadistica.tirosLejanosLocal}</td><th>Tiros Lejanos</th><td>${estadistica.tirosLejanosVisitante}</td>        
+    </tr>
+     <tr>
+        <td>${estadistica.tirosPuertaLocal}</td><th>Tiros Area</th><td>${estadistica.tirosPuertaVisitante}</td>        
+    </tr>
+    <tr>
+        <td>${estadistica.faltasDirectasLocal}</td><th>Tiros Falta Directa</th><td>${estadistica.faltasDirectasVisitante}</td>        
+    </tr>
+    
+     <tr>
+        <td>${estadistica.penaltiesLocal}</td><th>Penalties</th><td>${estadistica.penaltiesVisitante}</td>        
+    </tr>
+    
+    <tr>        
+        <td>
+            <c:forEach var="obj" items="${estadistica.goleadoresLocalTxt}">
+                ${obj}</br>
+            </c:forEach>
+        </td>
+        <th>Goleadores</th>
+        <td>
+            <c:forEach var="obj" items="${estadistica.goleadoresVisitanteTxt}">
+                ${obj}</br>
+            </c:forEach>
+        </td>
+    </tr>
+    <tr>        
+        <td>
+            <c:forEach var="obj" items="${estadistica.tarjetasLocalTxt}">
+                ${obj}</br>
+            </c:forEach>
+        </td>
+        <th>Tarjetas</th>
+        <td>
+            <c:forEach var="obj" items="${estadistica.tarjetasVisitanteTxt}">
+                ${obj}</br>
+            </c:forEach>
+        </td>
+    </tr>
+    <tr>        
+        <td>
+            <c:forEach var="obj" items="${estadistica.lesionadosLocalTxt}">
+                ${obj}</br>
+            </c:forEach>
+        </td>
+        <th>Lesionados</th>
+        <td>
+            <c:forEach var="obj" items="${estadistica.lesionadosVisitanteTxt}">
+                ${obj}</br>
+            </c:forEach>
+        </td>
+    </tr>
+    <tr>        
+        <td>
+            <c:forEach var="obj" items="${estadistica.extrasEqLocalTxt}">
+                ${obj}</br>
+            </c:forEach>
+        </td>
+        <th>Información Extra</th>
+        <td>
+            <c:forEach var="obj" items="${estadistica.extrasEqVisitanteTxt}">
+                ${obj}</br>
+            </c:forEach>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <input type="button" value="Cronica" onclick="mostrarCronica()">
+            <input type="button" value="Visualizar Partido" onclick="mostrarCronicaGrafica()">
+        </td>    
+    </tr>
+
+</table>
+    
+<input type="hidden" id ="txtAcciones" name="alineacion" value="${alineacionTxt}" />
+<input type="hidden" id ="root" name="root" value="${root}" />
+
+<div id="cronica" class="cajaInforme" style=display:none> 
+    <table class ="tabla" width="100%" >
+            <tr>
+                <th width="95%">CRONICA</th>
+                <th align="right" width="5%">                    
+                    <img src="${root}/images/cerrar.png" onclick="cerrarCronica()"/>
+                </th>                
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div id="cuerpo" class="informe">
+                        <c:forEach var="obj" items="${partido.cronica}">  
+                            ${obj.accion}<br/>
+                        </c:forEach>                    
+                    </div>
+                </td>   
+            </tr> 
+    </table>
+       
+</div>
+                
+<div id="cronicaGrafica" class="cajaInformeGrafico" style=display:none> 
+    <table class ="tabla" width="100%" >
+        <tr>
+            <th width="95%">VISUALIZAR PARTIDO</th>
+            <th align="right" width="5%">                    
+                <img src="${root}/images/cerrar.png" onclick="cerrarCronicaGrafica()"/>
+            </th>                
+        </tr>
+         <tr>
+                <td colspan="2">
+                    <div id="cuerpoGrafico" class="informeGrafico">
+                        <c:import url="/WEB-INF/jspf/Futbol8/pizarraPosiciones.jspf"/>                    
+                    </div>
+                </td>   
+         </tr> 
+    </table>
+    <table class ="tabla" width="100%" >              
+         <tr>
+            <td width="5%">
+                <img id="jugadaAnterior" alt="Anterior"  src="${root}/images/anterior.png"/>
+            </td>
+            <td with="90%">
+                <input class="txtMinuto" id="txtMinuto" type="text"  value="" disabled/><br/>
+                <input class="txtAccion" id="txtJugada" type="text" value="" disabled/>
+            </td>
+            <td  width="5%">                    
+                <img id="jugadaSiguiente" alt="Siguiente"  src="${root}/images/siguiente.png"/>
+            </td>                
+        </tr>
+    </table>              
+</div>
+
+
+<script type="text/javascript">
+    mover.init(document.getElementById('cronica'));
+    mover.init(document.getElementById('cronicaGrafica'));
+</script>
+    

@@ -26,13 +26,12 @@ import mld.clubdeportivo.bd.futbol8.JDBCDAOFutbol8;
 import mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela;
 import mld.clubdeportivo.utilidades.Correo;
 import mld.clubdeportivo.utilidades.UtilGenericas;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import java.util.logging.*;
 
 
 public class LanzarJornadaHttpServlet extends HttpServlet{
 
-    private static Logger logger = LogManager.getLogger(LanzarJornadaHttpServlet.class);
+    private static Logger logger = Logger.getLogger(LanzarJornadaHttpServlet.class.getName());
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -63,7 +62,7 @@ public class LanzarJornadaHttpServlet extends HttpServlet{
         try {
             
             if ((entorno == null || (entorno != null && !entorno.equals("desarrollo"))) && !comprobarLanzamiento(req, resp)){
-                logger.error("Error al lanzar Jornada: La configuracion del lanzamiento no es correcta");
+                logger.log(Level.SEVERE, "Error al lanzar Jornada: La configuracion del lanzamiento no es correcta");
                 req.setAttribute("error", "La configuracion del lanzamiento no es correcta");
                 dir = "/Utiles/error.jsp";
             }
@@ -99,16 +98,16 @@ public class LanzarJornadaHttpServlet extends HttpServlet{
             }
                 
         } catch (DAOException ex) {
-            logger.error("ERROR DAO en Lanzamiento Jornada : " + ex.getMessage());
-            logger.error(UtilGenericas.pilaError(ex));
+            logger.log(Level.SEVERE, "ERROR DAO en Lanzamiento Jornada : " + ex.getMessage());
+            logger.log(Level.SEVERE, UtilGenericas.pilaError(ex));
             req.setAttribute("error", ex.getMessage());
             req.setAttribute("errorDes", UtilGenericas.pilaError(ex));
             dir = "/Utiles/error.jsp";
             txtMail = ex.getMessage() + "<br/>" + UtilGenericas.pilaError(ex);
 
         } catch (Exception ex) {
-            logger.error("ERROR General en Lanzamiento Jornada : " + ex.getMessage());
-            logger.error(UtilGenericas.pilaError(ex));
+            logger.log(Level.SEVERE, "ERROR General en Lanzamiento Jornada : " + ex.getMessage());
+            logger.log(Level.SEVERE, UtilGenericas.pilaError(ex));
             req.setAttribute("error", ex.getMessage());
             req.setAttribute("errorDes", UtilGenericas.pilaError(ex));
             dir = "/Utiles/error.jsp";
@@ -135,7 +134,7 @@ public class LanzarJornadaHttpServlet extends HttpServlet{
         try {
             view.forward(req, resp);
         } catch (IOException ex) {
-            logger.error(ex.getMessage());
+            logger.log(Level.SEVERE, ex.getMessage());
         }
 
     }
@@ -211,7 +210,7 @@ public class LanzarJornadaHttpServlet extends HttpServlet{
             }
             
             // Eliminamos Clubs que no tienen secciones y hace mas de 15 dias que no acceden
-            if (!club.isQuiniela() && !club.isFutbol8() && !club.isBasket() && club.getDiasSinAcceder() > 15){
+            if (!club.isQuiniela() && !club.isFutbol8() && !club.isFutbol8() && club.getDiasSinAcceder() > 15){
                 JDBCDAOClub.eliminarClub(club);
             }
                 

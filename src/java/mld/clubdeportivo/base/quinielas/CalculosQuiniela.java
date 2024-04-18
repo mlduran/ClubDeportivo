@@ -15,7 +15,7 @@ import java.util.HashMap;
 public class CalculosQuiniela {
 
     public static void calculoResultadosQuiniela(
-            ArrayList<EquipoQuiniela> eqs, String[] resultados, boolean isGeneral){
+            ArrayList<EquipoQuiniela> eqs, String[] resultados, boolean isGeneral, int puntos){
 
 
         HashMap<EquipoQuiniela, Integer> aciertos1 = new HashMap();
@@ -133,10 +133,10 @@ public class CalculosQuiniela {
 
             int puntosNuevos = 0;
 
-            if (posReal == 1) puntosNuevos = 16;
-            else if (posReal == 2) puntosNuevos = 8;
-            else if (posReal == 3) puntosNuevos = 4;
-            else if (posReal == 4) puntosNuevos = 2;
+            if (posReal == 1) puntosNuevos = puntos;
+            else if (posReal == 2) puntosNuevos = puntos / 2;
+            else if (posReal == 3) puntosNuevos = puntos / 4;
+            else if (posReal == 4) puntosNuevos = puntos / 8;
             
             int suplemento = 0;
 
@@ -147,10 +147,12 @@ public class CalculosQuiniela {
             else if (puntCol == 14) suplemento = 200;
             else if (puntCol >= 15) suplemento = 500;            
             else if (todoOk.get(eq) && puntCol == 0 && puntCol2 == 0)
-                suplemento = 150;
+                suplemento = 500;
             else if (todoOk.get(eq) && (puntCol == 0 || puntCol2 == 0))
+                suplemento = 100;
+            else if (todoOk.get(eq) && (puntCol == 1 || puntCol2 == 1))
                 suplemento = 50;
-            
+                       
             puntosNuevos = puntosNuevos + puntCol + suplemento;
             
             if (!isGeneral){
