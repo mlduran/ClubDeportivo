@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Lista Canciones</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <header th:insert="~{plantillas/playhitsgame :: encabezado}"></header>
+        
+        
+        <div th:if="${lista != null and !lista.empty}">
+            
+            <table border="2">
+                <tr>
+                    <th>Titulo</th>
+                    <th>Interprete</th>
+                    <th>Año</th>
+                    <th>Genero</th>
+                    <th>Spotify</th>
+                </tr>
+                <tr th:each="elem : ${lista}">
+                    <td th:text="${elem.titulo}"></td>
+                    <td th:text="${elem.interprete}"></td>
+                    <td th:text="${elem.anyo}"></td>
+                    <td th:text="${elem.genero}"></td>
+                    <td th:text="${elem.spotify}"></td>
+                </tr>
+            </table>
+        </div>   
+        
+        <div th:if="${lista == null or lista.empty}">
+            <p>NO HAY NINGUNA CANCION PARA LISTAR</p>
+        </div>
+        
+        <footer th:insert="~{plantillas/playhitsgame :: pie}"></footer>
+    </body>
+</html>
