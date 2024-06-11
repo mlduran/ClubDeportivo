@@ -1,4 +1,4 @@
-package mld.playhitsgame;
+package mld.playhitsgame.spotify;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

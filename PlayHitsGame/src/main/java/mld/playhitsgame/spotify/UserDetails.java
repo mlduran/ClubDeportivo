@@ -1,4 +1,4 @@
-package mld.playhitsgame;
+package mld.playhitsgame.spotify;
 
 import java.io.Serializable;
 
@@ -12,7 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "USER_DETAILS")
+@Table(name = "usuarios_spotify")
 @Getter
 @Setter
 public class UserDetails implements Serializable {
@@ -31,6 +31,9 @@ public class UserDetails implements Serializable {
 
 	@Column(name = "REF_ID")
 	private String refId;
+        
+        @Column(name = "REF_SECRET")
+	private String refSecret;
 	
 	// More information as per your need
 

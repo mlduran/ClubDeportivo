@@ -2,12 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package mld.playhitsgame;
+package mld.playhitsgame.spotify;
 
 /**
  *
  * @author miguel
  */
+
 import java.io.IOException;
 import java.net.URI;
 
@@ -31,7 +32,7 @@ import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUser
 import se.michaelthelin.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/spotify")
 public class SpotifyController {
 
 	@Value("${custom.server.ip}")
