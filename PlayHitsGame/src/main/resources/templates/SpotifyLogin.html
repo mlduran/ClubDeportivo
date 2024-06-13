@@ -5,23 +5,16 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
     <head>
-        <title>Pagina de Login</title>
+        <title>Spotify</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!--<link rel="stylesheet" href="estilos/General.css">-->
+        
     </head>
     <body>
-        
-         <script>
-            function login()
-                window.alert("miguel");
-        </script>   
         <div>
-            <button onclick="login()">Login</button>
+            <p th:text="${url}"></p>
+            <a th:href="${url}">Acceder</a>
         </div>
-        <button onclick="alert('pepepepe')">Loginprueba</button>
-        
-       
-        
-        <!--<script th:src="@{Login.js}"></script>-->
     </body>
 </html>
