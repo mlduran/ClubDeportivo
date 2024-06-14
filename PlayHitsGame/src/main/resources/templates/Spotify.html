@@ -13,9 +13,20 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     </head>
     <body>
         <div>
-            <p th:text="${userid}"></p>
+            
+            <form method="post" th:action="@{/spotifyServicios}">                
+                <input type="text" placeholder="Id de PlayList" name="idplaylist" required="required"/>
+                <input type="text" placeholder="Año de la PlayList" name="anyoplaylist" required="required"/>
+                <input type="submit" value="Procesar"/>                
+            </form>
+            
+            <!--
             <a th:href="@{/api/spotify/user-saved-album(userId=${userid})}">prueba servicio</a>
             <a th:href="@{/api/spotify/playList(userId=${userid})}">PlayList</a>
+            -->
+            
+            <p th:text="${info}"></p>
+            
         </div>
     </body>
 </html>

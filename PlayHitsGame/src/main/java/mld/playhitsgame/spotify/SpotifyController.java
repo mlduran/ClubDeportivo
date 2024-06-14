@@ -22,8 +22,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import mld.playhitsgame.DAO.CancionDAO;
+import mld.playhitsgame.exemplars.Cancion;
+import mld.playhitsgame.exemplars.Genero;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
@@ -42,6 +47,9 @@ public class SpotifyController {
 
 	@Value("${custom.server.ip}")
 	private String customIp;
+        
+        @Value("${custom.usuariospotify}")
+        private String usuarioSpotify;
 	
 	@Autowired
 	private UserProfileService userProfileService;
@@ -51,6 +59,9 @@ public class SpotifyController {
 	
 	@Autowired
 	private UserDetailsRepository userDetailsRepository;
+        
+        @Autowired
+	private Utilidades utiles;
 	
 	@GetMapping("login")
 	public String spotifyLogin() {
@@ -96,7 +107,8 @@ public class SpotifyController {
 	public void home(@RequestParam String userId, HttpServletResponse response) {
 		try {
 
-                     response.sendRedirect(customIp + "/spotifyServicios/" + userId);
+                    usuarioSpotify = userId;
+                    response.sendRedirect(customIp + "/spotifyServicios");
 
 		} catch (Exception e) {
 			System.out.println("Error en acceso a SPOTIFY: " + e);
@@ -131,14 +143,17 @@ public class SpotifyController {
 	}
         
         @GetMapping(value = "playList")
-	public String playList(@RequestParam String userId) {
-		
-            UserDetails userDetails = userDetailsRepository.findByRefId(userId);
+	public String playList(@RequestParam String idPlayList, @RequestParam String anyoPlayList) {           
+            
+            UserDetails userDetails = userDetailsRepository.findByRefId(usuarioSpotify);
+            SpotifyApi object = spotifyConfiguration.getSpotifyObject();
+            object.setAccessToken(userDetails.getAccessToken());
+            object.setRefreshToken(userDetails.getRefreshToken());
             
             // {'Authorization': 'Bearer {}'.format(access_token), 'Accept': 'application/json', 'Content-Type': 'application/json'}
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.spotify.com/v1/playlists/3cEYpjA9oz9GiPac4AsH4n/tracks"))
-                .header("Authorization", "Bearer " + userDetails.getAccessToken())	
+                .uri(URI.create("https://api.spotify.com/v1/playlists/" + idPlayList + "/tracks")) //?offset=0&limit=1000")) para mas registros
+                .header("Authorization", "Bearer " + object.getAccessToken())	
                 .header("Accept", "application/json")  
                 .header("Content-Type", "application/json") 
 		.method("GET", HttpRequest.BodyPublishers.noBody())
@@ -150,9 +165,15 @@ public class SpotifyController {
             } catch (IOException | InterruptedException ex) {
                 Logger.getLogger(SpotifyController.class.getName()).log(Level.SEVERE, null, ex);
             }
+            
+            List<Cancion> canciones = utiles.obtenerDatosJson(response.body(),anyoPlayList, Genero.Generico);
+            
+            utiles.grabarListaCanciones(canciones);
+        
+            
             if (response != null)
                 return (response.body());
-            else
+            else 
                 return "ERROR EN LA PETICION";
 		
 		

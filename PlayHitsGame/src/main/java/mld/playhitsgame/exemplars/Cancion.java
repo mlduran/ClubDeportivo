@@ -29,7 +29,7 @@ public class Cancion{
     private Long id;
     private String titulo;
     private String interprete;
-    private int anyo;
+    private String anyo;
     @Enumerated(EnumType.STRING)
     private Genero genero;
     private String pais;
