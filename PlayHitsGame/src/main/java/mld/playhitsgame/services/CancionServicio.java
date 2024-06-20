@@ -27,5 +27,7 @@ public interface CancionServicio {
     Cancion updateCancion(Long id, Cancion cancion);
     void deleteCancion(Long id);
     
+    Cancion cancionAleatoria();
+    
     
 }

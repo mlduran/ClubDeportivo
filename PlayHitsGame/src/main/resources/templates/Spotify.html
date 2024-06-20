@@ -20,6 +20,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 <input type="submit" value="Procesar"/>                
             </form>
             
+            <form method="post" th:action="@{/spotifyServiciosBD}"> 
+                <input type="submit" value="Procesar Listas BD"/>                
+            </form>
+            
             <!--
             <a th:href="@{/api/spotify/user-saved-album(userId=${userid})}">prueba servicio</a>
             <a th:href="@{/api/spotify/playList(userId=${userid})}">PlayList</a>

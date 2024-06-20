@@ -19,16 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpServletResponse;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import mld.playhitsgame.DAO.CancionDAO;
-import mld.playhitsgame.exemplars.Cancion;
-import mld.playhitsgame.exemplars.Genero;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
@@ -45,6 +36,20 @@ import se.michaelthelin.spotify.requests.data.users_profile.GetCurrentUsersProfi
 @RequestMapping("/api/spotify")
 public class SpotifyController {
 
+    /**
+     * @return the usuarioSpotify
+     */
+    public String getUsuarioSpotify() {
+        return usuarioSpotify;
+    }
+
+    /**
+     * @param usuarioSpotify the usuarioSpotify to set
+     */
+    public void setUsuarioSpotify(String usuarioSpotify) {
+        this.usuarioSpotify = usuarioSpotify;
+    }
+
 	@Value("${custom.server.ip}")
 	private String customIp;
         
@@ -59,6 +64,9 @@ public class SpotifyController {
 	
 	@Autowired
 	private UserDetailsRepository userDetailsRepository;
+        
+        @Autowired
+	private ListasSpotifyRepository listasDAO;
         
         @Autowired
 	private Utilidades utiles;
@@ -107,7 +115,7 @@ public class SpotifyController {
 	public void home(@RequestParam String userId, HttpServletResponse response) {
 		try {
 
-                    usuarioSpotify = userId;
+                    setUsuarioSpotify(userId);
                     response.sendRedirect(customIp + "/spotifyServicios");
 
 		} catch (Exception e) {
@@ -142,42 +150,54 @@ public class SpotifyController {
 		return new Track[0];
 	}
         
-        @GetMapping(value = "playList")
-	public String playList(@RequestParam String idPlayList, @RequestParam String anyoPlayList) {           
+        
+        
+        private String token(){
             
             UserDetails userDetails = userDetailsRepository.findByRefId(usuarioSpotify);
             SpotifyApi object = spotifyConfiguration.getSpotifyObject();
             object.setAccessToken(userDetails.getAccessToken());
             object.setRefreshToken(userDetails.getRefreshToken());
             
-            // {'Authorization': 'Bearer {}'.format(access_token), 'Accept': 'application/json', 'Content-Type': 'application/json'}
-            HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.spotify.com/v1/playlists/" + idPlayList + "/tracks")) //?offset=0&limit=1000")) para mas registros
-                .header("Authorization", "Bearer " + object.getAccessToken())	
-                .header("Accept", "application/json")  
-                .header("Content-Type", "application/json") 
-		.method("GET", HttpRequest.BodyPublishers.noBody())
-		.build();
+            return object.getAccessToken();
             
-            HttpResponse<String> response = null;   
-            try {
-                response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-            } catch (IOException | InterruptedException ex) {
-                Logger.getLogger(SpotifyController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            List<Cancion> canciones = utiles.obtenerDatosJson(response.body(),anyoPlayList, Genero.Generico);
-            
-            utiles.grabarListaCanciones(canciones);
+        }
         
+        @GetMapping(value = "playList")
+	public String playList(@RequestParam String idPlayList, @RequestParam String anyoPlayList) {   
+                        
             
-            if (response != null)
-                return (response.body());
-            else 
-                return "ERROR EN LA PETICION";
-		
+            String err = utiles.procesarLista(idPlayList, anyoPlayList, token());
+            
+            if (err.equals(""))
+                err = "PROCESO OK";        
+                     
+            return err;	
 		
 	}
             
+        @GetMapping(value = "playListBD")
+	public String playListBD() {     
+            
+            String err = "";   
+            String idPlayList, anyoPlayList;
+            
+            List<ListasSpotify> lista = listasDAO.findAll();
+            
+            for (ListasSpotify elem : lista){
+                
+                idPlayList = elem.getCodigo();
+                anyoPlayList = elem.getAnyo();
+                
+                err = err + utiles.procesarLista(idPlayList, anyoPlayList, token());
+                
+            }   
+            
+            if (err.equals(""))
+                err = "PROCESO OK";        
+                     
+            return err;		
+		
+	}
           
 }

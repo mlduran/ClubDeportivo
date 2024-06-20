@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Alta Usuario</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <div>          
+           
+            
+            <form method="post" th:action="@{/altaUsuario}" th:object="${newusuario}">                
+                <p>Usuario (mail)<input type="text" th:field="*{usuario}" required="required"/></p>
+                <p>Alias<input type="text" th:field="*{alias}"/></p>
+                <p>Password<input type="text" th:field="*{contrasenya}" required="required"/></p>
+                <input type="submit" value="Alta Usuario"/>                
+            </form>
+            
+            <p th:text="${result}"></p>
+        </div>
+    </body>
+</html>

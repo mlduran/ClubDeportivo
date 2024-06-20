@@ -70,8 +70,8 @@ public class CancionServicioMetodos implements CancionServicio{
             cancionObj.setPais(cancion.getPais());
         }
         
-        if(Objects.nonNull(cancion.getSpotify()) && !"".equalsIgnoreCase(cancion.getSpotify())){
-            cancionObj.setSpotify(cancion.getSpotify());
+        if(Objects.nonNull(cancion.getSpotifyid()) && !"".equalsIgnoreCase(cancion.getSpotifyid())){
+            cancionObj.setSpotifyid(cancion.getSpotifyid());
         }
         
         
@@ -81,6 +81,18 @@ public class CancionServicioMetodos implements CancionServicio{
     @Override
     public void deleteCancion(Long id) {
         DAO.deleteById(id);
+    }
+
+    @Override
+    public Cancion cancionAleatoria() {
+                
+        List<Cancion> lista = DAO.findAll();
+        
+        int i;  
+        i = (int) (Math.floor(Math.random() * lista.size()));
+        
+        return lista.get(i);
+        
     }
     
  

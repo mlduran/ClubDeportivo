@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 
-
 /**
  *
  * @author miguel
@@ -24,36 +23,25 @@ import org.hibernate.annotations.CreationTimestamp;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "usuarios")
-public class Usuario{
+@Table(name = "partidaspuntos")
+public class PartidaPuntos{
    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String usuario;
-    private String alias;
-    private String contrasenya;
-    private String pais;
-    private String preferencias;
-    @Temporal(TemporalType.DATE) 
-    @Column(name = "alta", nullable = false, updatable = false)
-    @CreationTimestamp 
-    private Date alta;
     
-    @OneToMany(mappedBy = "master")
-    private List<Partida> partidasMaster;
+    int puntos;
     
-    @ManyToMany(mappedBy = "invitados")
-    private List<Partida> partidasInvitado;
-    
-    
-    public boolean hayPartidasMaster(){
-        
-        return !this.getPartidasMaster().isEmpty();
-        
-    }
+    //@OneToOne
+    //@JoinColumn(name = "puntosPartida")
+    //Partida partida;
     
 
+    
+    
+
+    
+    
 }
 
 

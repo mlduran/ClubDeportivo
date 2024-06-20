@@ -11,6 +11,7 @@ import mld.playhitsgame.exemplars.Usuario;
 import mld.playhitsgame.projections.ampliada.UsuarioAmpliadaView;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 /**
  *
@@ -26,6 +27,11 @@ public interface UsuarioDAO extends JpaRepository<Usuario, Long>{
     
     @Override
     Optional<Usuario> findById(Long id);
+    
+    
+    @Query(value = "SELECT * FROM usuarios WHERE usuario=:elusuario AND contrasenya=:lacontrasenya ;", nativeQuery=true)
+    Optional<Usuario> usuarioLogin(String elusuario, String lacontrasenya);
+    
     
     
 }

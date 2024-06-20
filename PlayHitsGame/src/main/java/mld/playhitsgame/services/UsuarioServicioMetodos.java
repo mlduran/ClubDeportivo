@@ -71,6 +71,13 @@ public class UsuarioServicioMetodos implements UsuarioServicio{
         DAO.deleteById(id);
     }
 
+    @Override
+    public Optional<Usuario> usuarioLogin(String usuario, String contrasenya) {
+        
+        return DAO.usuarioLogin(usuario, contrasenya);
+    }
+
+  
   
  
 }

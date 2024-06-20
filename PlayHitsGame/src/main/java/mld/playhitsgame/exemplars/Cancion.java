@@ -5,7 +5,7 @@
 package mld.playhitsgame.exemplars;
 
 import jakarta.persistence.*;
-import java.io.Serializable;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,8 +33,12 @@ public class Cancion{
     @Enumerated(EnumType.STRING)
     private Genero genero;
     private String pais;
-    private String spotify;
+    private String spotifyid;
+    private String spotifyplay;
+    private String spotifyimagen;
     
+    @ManyToMany(mappedBy = "canciones")
+    private List<Partida> partidasInvitado;
     
 }
 

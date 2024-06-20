@@ -7,27 +7,22 @@ package mld.playhitsgame.DAO;
 
 import java.util.List;
 import java.util.Optional;
-import mld.playhitsgame.exemplars.Cancion;
-import mld.playhitsgame.projections.ampliada.CancionAmpliadaView;
+import mld.playhitsgame.exemplars.Partida;
+import mld.playhitsgame.projections.ampliada.UsuarioAmpliadaView;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-
 
 /**
  *
  * @author miguel
  */
-//@Transactional(readOnly = true)
-public interface CancionDAO extends JpaRepository<Cancion, Long>{
+
+public interface PartidaDAO extends JpaRepository<Partida, Long>{
     
-    List<CancionAmpliadaView> findBy();
-    
-    //@Query("SELECT * FROM cancion WHERE id = :id")
-    //Optional<Cancion> findCancionById(long id);
+    List<UsuarioAmpliadaView> findBy();
     
     @Override
-    Optional<Cancion> findById(Long id);   
-
+    Optional<Partida> findById(Long id);
     
     
 }

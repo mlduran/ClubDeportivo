@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Panel</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        
+        <div th:object=${usuLogin}”>
+
+            <span th:text=”*{usuario}”></span>
+        
+        </div>
+        
+      <!--  
+        <div th:if="${usuLogin.hayPartidasMaster() == true}">
+            
+            
+            <a href="/partida" class="button" id="partidaactual"> PARTIDA ACTUAL </a>
+            <br/>
+            
+            
+            <br/>
+        </div>
+        <div th:if="${usuLogin.hayPartidasMaster() == false}">
+            <a href="/partida/crear" class="button" id="crearpartida"> CREAR PARTIDA </a>
+            
+            
+        </div>
+      -->
+    </body>
+</html>
