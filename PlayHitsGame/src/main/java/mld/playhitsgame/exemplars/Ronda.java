@@ -5,12 +5,10 @@
 package mld.playhitsgame.exemplars;
 
 import jakarta.persistence.*;
-import java.util.Date;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
+
 
 
 /**
@@ -23,18 +21,19 @@ import org.hibernate.annotations.CreationTimestamp;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "partidaspuntos")
-public class PartidaPuntos{
+@Table(name = "rondas")
+public class Ronda{
    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    int puntos;
+    private int numero;
+    private String idCancion;
     
-    //@OneToOne
-    //@JoinColumn(name = "puntosPartida")
-    //Partida partida;
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Partida partida;
+
     
 
     

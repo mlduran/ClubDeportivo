@@ -33,6 +33,7 @@ public class Usuario{
     private String usuario;
     private String alias;
     private String contrasenya;
+    private String grupo;
     private String pais;
     private String preferencias;
     @Temporal(TemporalType.DATE) 
@@ -43,13 +44,21 @@ public class Usuario{
     @OneToMany(mappedBy = "master")
     private List<Partida> partidasMaster;
     
-    @ManyToMany(mappedBy = "invitados")
-    private List<Partida> partidasInvitado;
+    //@ManyToMany(mappedBy = "invitados")
+    //private List<Partida> partidasInvitado;
     
     
     public boolean hayPartidasMaster(){
         
         return !this.getPartidasMaster().isEmpty();
+        
+    }
+    
+    public boolean hayPartidas(){
+        
+        return false;
+        //return !this.getPartidasMaster().isEmpty() ||
+        //        !this.getPartidasInvitado().isEmpty();
         
     }
     

@@ -56,6 +56,9 @@ public class UsuarioServicioMetodos implements UsuarioServicio{
         if(Objects.nonNull(usuario.getPais()) && !"".equalsIgnoreCase(usuario.getPais())){
             obj.setPais(usuario.getPais());
         }
+        if(Objects.nonNull(usuario.getGrupo()) && !"".equalsIgnoreCase(usuario.getGrupo())){
+            obj.setGrupo(usuario.getGrupo());
+        }
         
         if(Objects.nonNull(usuario.getPreferencias()) && !"".equalsIgnoreCase(usuario.getPreferencias())){
             obj.setPreferencias(usuario.getPreferencias());

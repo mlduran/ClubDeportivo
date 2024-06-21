@@ -32,13 +32,11 @@ public class Cancion{
     private String anyo;
     @Enumerated(EnumType.STRING)
     private Genero genero;
-    private String pais;
+    @Enumerated(EnumType.STRING)
+    private Pais pais;
     private String spotifyid;
     private String spotifyplay;
     private String spotifyimagen;
-    
-    @ManyToMany(mappedBy = "canciones")
-    private List<Partida> partidasInvitado;
     
 }
 

@@ -6,7 +6,7 @@ package mld.playhitsgame.DAO;
 
 
 import java.util.Optional;
-import mld.playhitsgame.exemplars.Partida;
+import mld.playhitsgame.exemplars.Ronda;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,11 +15,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author miguel
  */
 
-public interface PartidaDAO extends JpaRepository<Partida, Long>{
+public interface RondaDAO extends JpaRepository<Ronda, Long>{
     
-    
+     
     @Override
-    Optional<Partida> findById(Long id);
+    Optional<Ronda> findById(Long id);
     
     
 }

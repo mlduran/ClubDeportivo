@@ -66,7 +66,7 @@ public class CancionServicioMetodos implements CancionServicio{
             cancionObj.setAnyo(cancion.getAnyo());
         }
         
-        if(Objects.nonNull(cancion.getPais()) && !"".equalsIgnoreCase(cancion.getPais())){
+        if(Objects.nonNull(cancion.getPais())){
             cancionObj.setPais(cancion.getPais());
         }
         

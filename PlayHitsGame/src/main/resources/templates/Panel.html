@@ -11,27 +11,28 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     </head>
     <body>
         
-        <div th:object=${usuLogin}”>
+        <div th:object="${usuarioSesion}">
 
-            <span th:text=”*{usuario}”></span>
-        
-        </div>
-        
-      <!--  
-        <div th:if="${usuLogin.hayPartidasMaster() == true}">
+            <p th:text="*{usuario}"></p>
+            <p th:text="*{hayPartidasMaster()}"></p>
+
+
+            <div th:if="*{hayPartidas()} == true">
             
             
-            <a href="/partida" class="button" id="partidaactual"> PARTIDA ACTUAL </a>
-            <br/>
+                <a href="/partida" class="button" id="partidasactuales"> PARTIDAS ACTUALES </a>
+                <br/>
             
             
-            <br/>
-        </div>
-        <div th:if="${usuLogin.hayPartidasMaster() == false}">
-            <a href="/partida/crear" class="button" id="crearpartida"> CREAR PARTIDA </a>
+                <br/>
+            </div>
+            <div th:if="*{hayPartidasMaster()} == false">
+                
+                <a href="/partida/crear" class="button" id="crearpartida"> CREAR PARTIDA </a>
             
             
-        </div>
-      -->
+            </div>
+        </div> 
+
     </body>
 </html>

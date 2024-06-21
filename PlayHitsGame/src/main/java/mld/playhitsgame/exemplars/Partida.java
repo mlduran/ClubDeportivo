@@ -40,32 +40,26 @@ public class Partida{
     
     
     @ManyToOne(fetch = FetchType.EAGER)// poner LAZY para no cargar hasta hacer un get
-    @JoinColumn(name = "idMaster")
     private Usuario master;
     
     
-    @ManyToMany(fetch = FetchType.EAGER) // poner LAZY para no cargar hasta hacer un get 
-    @JoinTable(
-            name = "invitados_usuarios", 
-            joinColumns = @JoinColumn(name="idInvitado"),
-            inverseJoinColumns = @JoinColumn(name="idUsuario")
-    )
-    private List<Usuario> invitados;
+    //@ManyToMany(fetch = FetchType.EAGER) // poner LAZY para no cargar hasta hacer un get 
+    //@JoinTable(
+    //        name = "invitados_usuarios", 
+    //        joinColumns = @JoinColumn(name="idInvitado"),
+    //        inverseJoinColumns = @JoinColumn(name="idUsuario")
+    //)
+    //private List<Usuario> invitados;
     
-    @ManyToMany(fetch = FetchType.LAZY) // poner LAZY para no cargar hasta hacer un get 
-    @JoinTable(
-            name = "partidas_canciones", 
-            joinColumns = @JoinColumn(name="id_cancion"),
-            inverseJoinColumns = @JoinColumn(name="id_usuario")
-    )
-    private List<Cancion> canciones;
+    @OneToMany(mappedBy = "partida", fetch = FetchType.EAGER) // poner LAZY para no cargar hasta hacer un get 
+    private List<Ronda> rondas;
     
-    //@OneToOne(mappedBy="partida", cascade = CascadeType.ALL)
-    //PartidaPuntos puntos;
-    
-    private int numeroRondas;
+  
+  
     private Genero genero;
-    private String pais;
+    private Pais pais;
+    private int anyoInicial;
+    private int anyoFinal;
     private String grupo;
     private String ganador;
     

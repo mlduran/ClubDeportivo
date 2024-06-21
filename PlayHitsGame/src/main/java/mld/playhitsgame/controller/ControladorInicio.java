@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
  * @author miguel
  */
 @Controller
-@SessionAttributes({"usuLogin"})
+@SessionAttributes({"usuarioSesion"})
 @Slf4j
 public class ControladorInicio {
     
@@ -62,7 +62,8 @@ public class ControladorInicio {
             modelo.addAttribute("error", "Usuario o password incorrectos");
             return "Inicio";            
         }else{
-            modelo.addAttribute("usuLogin", usuLogin);
+            Usuario usuarioSesion = usuLogin.get();
+            modelo.addAttribute("usuarioSesion", usuarioSesion);
             return "Panel";
         }        
         
