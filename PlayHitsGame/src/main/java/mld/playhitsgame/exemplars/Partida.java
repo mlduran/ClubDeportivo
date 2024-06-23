@@ -43,13 +43,8 @@ public class Partida{
     private Usuario master;
     
     
-    //@ManyToMany(fetch = FetchType.EAGER) // poner LAZY para no cargar hasta hacer un get 
-    //@JoinTable(
-    //        name = "invitados_usuarios", 
-    //        joinColumns = @JoinColumn(name="idInvitado"),
-    //        inverseJoinColumns = @JoinColumn(name="idUsuario")
-    //)
-    //private List<Usuario> invitados;
+    @ManyToMany(mappedBy = "partidasInvitado") 
+    private List<Usuario> invitados;
     
     @OneToMany(mappedBy = "partida", fetch = FetchType.EAGER) // poner LAZY para no cargar hasta hacer un get 
     private List<Ronda> rondas;

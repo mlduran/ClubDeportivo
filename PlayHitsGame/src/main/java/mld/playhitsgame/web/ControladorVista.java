@@ -5,11 +5,15 @@
 package mld.playhitsgame.web;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.TreeMap;
 import lombok.extern.slf4j.Slf4j;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.Ronda;
+import mld.playhitsgame.exemplars.StatusPartida;
 import mld.playhitsgame.exemplars.Usuario;
 import mld.playhitsgame.services.CancionServicioMetodos;
 import mld.playhitsgame.services.PartidaServicioMetodos;
@@ -88,9 +92,7 @@ public class ControladorVista {
     @PostMapping("/partida/crear")
     public String crearPartida(@ModelAttribute("newpartida") Partida partida, 
             @ModelAttribute("nrondas") Integer nrondas, Model modelo){     
-        
-   
-        String resp = "OK";
+           
         
         Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");
 
@@ -110,20 +112,57 @@ public class ControladorVista {
                 partida.getRondas().add(ronda);
                 
             }
-           servPartida.updatePartida(partida.getId(), partida);           
-            
-            
-            
-            //asignar usuarios
+            partida.setStatus(StatusPartida.AnyadirJugadores);
+            servPartida.updatePartida(partida.getId(), partida);
             
             
         }catch(Exception ex){
-            resp = "ERROR " + ex; 
-        }   
+            String resp = "ERROR " + ex; 
+            modelo.addAttribute("result", resp);  
+            return "CrearPartida";
+        }          
+        // obtener los usuarios posibles por grupo
+        ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) usuariosGrupo(usu);
+
+        modelo.addAttribute("posiblesInvitados", posiblesInvitados); 
         
-        modelo.addAttribute("result", resp);  
+        //asignar usuarios
+        return "AnyadirInvitados";
         
-        return "CrearPartida";
+    }
+    
+    
+    private List<Usuario> usuariosGrupo(Usuario usu){
+        
+        
+        ArrayList<Usuario> usuarios = (ArrayList<Usuario>) servUsuario.usuariosGrupo(usu.getGrupo());
+        
+        // Nos eleiminamos a nosotros mismos
+        for (Usuario elem : usuarios){
+            if (elem.equals(usu)){
+                   usuarios.remove(usu);
+                   break;
+            }
+            
+            
+        }
+        
+        return usuarios;
+        
+    }
+    
+    
+    
+    @GetMapping("/partida/anyadirInvitados")
+    public String anyadirInvitadosPartida(Model modelo){     
+        
+        Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");
+        
+        ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) usuariosGrupo(usu);
+
+        modelo.addAttribute("posiblesInvitados", posiblesInvitados);       
+        
+        return "AnyadirInvitados";
         
     }
     
@@ -140,10 +179,24 @@ public class ControladorVista {
     
      
     @GetMapping("/listaCanciones")
-    public String listaCanciones(Model model){
+    public String listaCanciones(Model model){       
+       
         
         List<Cancion> lista = servCancion.findAll();
         
+        TreeMap<String,Integer> estadistica = new TreeMap();
+       for (int i = 1950; i <= 2023; i++) {
+           estadistica.put(String.valueOf(i), 0);
+       }
+        
+        
+        for (Cancion obj: lista){  
+                
+                estadistica.put(obj.getAnyo(), estadistica.get(obj.getAnyo()) + 1);
+            }
+            
+   
+        model.addAttribute("estadistica", estadistica);
         model.addAttribute("lista", lista);
        
         return "ListaCanciones";

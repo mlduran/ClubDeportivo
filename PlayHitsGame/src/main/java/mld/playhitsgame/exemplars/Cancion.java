@@ -34,6 +34,7 @@ public class Cancion{
     private Genero genero;
     @Enumerated(EnumType.STRING)
     private Pais pais;
+    @Column(unique = true)
     private String spotifyid;
     private String spotifyplay;
     private String spotifyimagen;

@@ -32,6 +32,7 @@ public interface UsuarioDAO extends JpaRepository<Usuario, Long>{
     @Query(value = "SELECT * FROM usuarios WHERE usuario=:elusuario AND contrasenya=:lacontrasenya ;", nativeQuery=true)
     Optional<Usuario> usuarioLogin(String elusuario, String lacontrasenya);
     
-    
+    @Query(value = "SELECT * FROM usuarios WHERE grupo=:grupo ;", nativeQuery=true)
+    List<Usuario> usuariosGrupo(String grupo);
     
 }

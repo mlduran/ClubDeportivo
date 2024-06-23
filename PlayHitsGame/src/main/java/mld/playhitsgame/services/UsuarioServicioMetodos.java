@@ -80,6 +80,12 @@ public class UsuarioServicioMetodos implements UsuarioServicio{
         return DAO.usuarioLogin(usuario, contrasenya);
     }
 
+    @Override
+    public List<Usuario> usuariosGrupo(String grupo) {
+        
+        return DAO.usuariosGrupo(grupo);
+    }
+
   
   
  

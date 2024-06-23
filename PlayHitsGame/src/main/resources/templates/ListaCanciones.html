@@ -17,6 +17,18 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             
             <table border="2">
                 <tr>
+                    <th>Año</th>
+                    <th>Canciones</th>                    
+                </tr>            
+           
+                <tr th:each="dato : ${estadistica}">
+                    <td th:text="${dato.key}"></td>
+                    <td th:text="${dato.value}"></td>
+                </tr>
+            </table>
+            
+            <table border="2">
+                <tr>
                     <th>Titulo</th>
                     <th>Interprete</th>
                     <th>Año</th>

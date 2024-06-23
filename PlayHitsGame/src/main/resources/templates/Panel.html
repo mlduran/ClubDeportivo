@@ -13,20 +13,42 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         
         <div th:object="${usuarioSesion}">
 
-            <p th:text="*{usuario}"></p>
-            <p th:text="*{hayPartidasMaster()}"></p>
-
-
-            <div th:if="*{hayPartidas()} == true">
+            <p th:text="*{nombre}">Usuario : </p>
+            
+            <div th:if="*{partidaMasterPendienteAnyadirJugadores()} != null">
             
             
-                <a href="/partida" class="button" id="partidasactuales"> PARTIDAS ACTUALES </a>
+                <a href="/partida" class="button" id="partidaMasterPendienteAnyadirJugadores"> PARTIDA PENDIENTE DE AÑADIR USUARIOS</a>
                 <br/>
             
             
                 <br/>
             </div>
-            <div th:if="*{hayPartidasMaster()} == false">
+
+
+            <div th:if="*{partidaMasterEnCurso()} != null">
+            
+            
+                <a href="/partida" class="button" id="partidaMasterEnCurso"> PARTIDAS MASTER EN CURSO </a>
+                <br/>
+            
+            
+                <br/>
+            </div>
+            
+            
+            <div th:if="*{hayPartidasInvitadoPendientes()} == true">
+            
+            
+                <a href="/partida/anyadirInvitados" class="button" id="partidasInvitadoPendientes"> PARTIDAS INVITADO EN CURSO </a>
+                <br/>
+            
+            
+                <br/>
+            </div>
+            
+            
+            <div th:if="*{sePuedeCrearPartidaMaster()} == null">
                 
                 <a href="/partida/crear" class="button" id="crearpartida"> CREAR PARTIDA </a>
             

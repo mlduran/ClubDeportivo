@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Crear Partida</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <div>          
+           
+            
+            <form method="post" th:action="@{/partida/crear}" th:object="${newpartida}"> 
+                <p>Genero
+                <select th:field="*{genero}" title="Genero">
+                    <option th:each="generoOpt : ${T(mld.playhitsgame.exemplars.Genero).values()}" 
+                    th:value="${generoOpt}" th:text="${generoOpt}"></option>
+                </select></p>
+                <p>Pais
+                <select th:field="*{pais}" title="Pais">
+                    <option th:each="paisOpt : ${T(mld.playhitsgame.exemplars.Pais).values()}" 
+                    th:value="${paisOpt}" th:text="${paisOpt}"></option>
+                </select></p>
+                
+                <p>Grupo<input type="text" th:field="*{grupo}" required="required"/></p>
+                <p>Año Inicial<input type="number" th:field="*{anyoInicial}" required="required"/></p>
+                <p>Año Final<input type="number" th:field="*{anyoFinal}" required="required"/></p>
+                <p>Numero Rondas<input value="10" type="number" name="nrondas" requied="required"/></p>
+                
+
+                <input type="submit" value="Crear"/>                
+            </form>
+            
+            <p th:text="${result}"></p>
+        </div>
+    </body>
+</html>

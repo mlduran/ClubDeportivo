@@ -11,6 +11,7 @@ package mld.playhitsgame.exemplars;
 public enum StatusPartida {
     
     Creada,
+    AnyadirJugadores,
     EnCurso,
     Terminada,
     Historico
