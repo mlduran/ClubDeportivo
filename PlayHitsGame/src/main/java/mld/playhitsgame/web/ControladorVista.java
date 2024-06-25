@@ -4,10 +4,13 @@
  */
 package mld.playhitsgame.web;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.TreeMap;
 import lombok.extern.slf4j.Slf4j;
 import mld.playhitsgame.exemplars.Cancion;
@@ -29,7 +32,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 
 @Controller
-@SessionAttributes({"usuarioSesion"})
+@SessionAttributes({"usuarioSesion", "partidaSesion", "posiblesinvitados"})
 @Slf4j
 public class ControladorVista {
     
@@ -47,6 +50,29 @@ public class ControladorVista {
     public String panel(Model modelo){
         
         return "Panel";
+        
+    }
+    
+    @GetMapping("/partidaMaster")
+    public String partidaMaster(Model modelo){
+        
+        Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");
+        
+        Partida partida = usu.partidaMasterEnCurso();
+        
+        Ronda ronda = partida.getRondas().get(partida.getRondaActual());
+        
+        modelo.addAttribute("cancion", ronda.getCancion());
+        modelo.addAttribute("ronda", ronda);
+        
+        return "Partida";
+        
+    }
+    
+    @GetMapping("/partidaInvitado")
+    public String partidaInvitado(Model modelo){
+        
+        return "SeleccionarPartida";
         
     }
     
@@ -89,6 +115,7 @@ public class ControladorVista {
         
     }
     
+       
     @PostMapping("/partida/crear")
     public String crearPartida(@ModelAttribute("newpartida") Partida partida, 
             @ModelAttribute("nrondas") Integer nrondas, Model modelo){     
@@ -98,6 +125,7 @@ public class ControladorVista {
 
         try{
             partida.setMaster(usu);
+            //partida.setRondaActual(0);
             Partida newPartida = servPartida.savePartida(partida);
             usu.getPartidasMaster().add(newPartida);
             servUsuario.updateUsuario(usu.getId(), usu);            
@@ -112,6 +140,11 @@ public class ControladorVista {
                 partida.getRondas().add(ronda);
                 
             }
+            servCancion.asignarcancionesAleatorias(partida);
+            for (Ronda ronda : partida.getRondas()){
+                servRonda.updateRonda(ronda.getId(), ronda);
+            }
+            
             partida.setStatus(StatusPartida.AnyadirJugadores);
             servPartida.updatePartida(partida.getId(), partida);
             
@@ -124,8 +157,8 @@ public class ControladorVista {
         // obtener los usuarios posibles por grupo
         ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) usuariosGrupo(usu);
 
-        modelo.addAttribute("posiblesInvitados", posiblesInvitados); 
-        
+        modelo.addAttribute("posiblesinvitados", posiblesInvitados); 
+        modelo.addAttribute("partidaSesion", partida); 
         //asignar usuarios
         return "AnyadirInvitados";
         
@@ -135,19 +168,17 @@ public class ControladorVista {
     private List<Usuario> usuariosGrupo(Usuario usu){
         
         
-        ArrayList<Usuario> usuarios = (ArrayList<Usuario>) servUsuario.usuariosGrupo(usu.getGrupo());
+        ArrayList<Usuario> usuarios = (ArrayList<Usuario>) servUsuario.usuariosGrupo(usu.getGrupo()); 
+        ArrayList<Usuario> invitados =  new ArrayList<Usuario>(); 
         
-        // Nos eleiminamos a nosotros mismos
+        // Nos eleiminamos a nosotros mismos y ponemos el resto en seleccionado por defecto
         for (Usuario elem : usuarios){
-            if (elem.equals(usu)){
-                   usuarios.remove(usu);
-                   break;
-            }
-            
-            
+            if (!Objects.equals(elem.getId(), usu.getId())){
+                   invitados.add(elem);                   
+            }                
         }
         
-        return usuarios;
+        return invitados;
         
     }
     
@@ -156,27 +187,60 @@ public class ControladorVista {
     @GetMapping("/partida/anyadirInvitados")
     public String anyadirInvitadosPartida(Model modelo){     
         
-        Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");
+        Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");   
         
-        ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) usuariosGrupo(usu);
+        Optional<Partida> partida = servPartida.partidaUsuarioMaster(usu.getId());
+        
+        if (partida.get() != null){
+            modelo.addAttribute("partidaSesion", partida.get());  
+        
+            ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) usuariosGrupo(usu);
 
-        modelo.addAttribute("posiblesInvitados", posiblesInvitados);       
+            modelo.addAttribute("posiblesinvitados", posiblesInvitados);       
         
-        return "AnyadirInvitados";
+            return "AnyadirInvitados";
+        }else{
+            
+            modelo.addAttribute("result", "NO SE HA ENCONTRADO PARTIDA");  
+            return "Panel";
+            
+        }
+            
+        
         
     }
     
-    @GetMapping("/partida")
-    public String partida(Model modelo){
+    @PostMapping("/partida/anyadirInvitados")
+    public String anyadirInvitadosPartida(Model modelo, HttpServletRequest req){     
         
-        Cancion cancionAleatoria = servCancion.cancionAleatoria();
+        Partida partida = (Partida) modelo.getAttribute("partidaSesion");
+        ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) modelo.getAttribute("posiblesinvitados");
+                 
+        partida.setInvitados(new ArrayList<Usuario> ());
         
-        modelo.addAttribute("cancion", cancionAleatoria);
+        for (Usuario usu : posiblesInvitados){            
+            
+            String valor = req.getParameter(usu.nombreId());            
+            if ("on".equals(valor)){
+                
+                Optional<Usuario> usuario = servUsuario.findById(usu.getId());
+                if (!usuario.isEmpty()){
+                
+                    usuario.get().getPartidasInvitado().add(partida); 
+                    partida.getInvitados().add(usuario.get());            
+                    servUsuario.updateUsuario( usuario.get().getId(), usuario.get());
+                }
+            }
+        }
+     
+        partida.setStatus(StatusPartida.EnCurso);
+        servPartida.updatePartida(partida.getId(), partida);
         
         return "Partida";
         
     }
     
+        
      
     @GetMapping("/listaCanciones")
     public String listaCanciones(Model model){       
@@ -184,9 +248,9 @@ public class ControladorVista {
         
         List<Cancion> lista = servCancion.findAll();
         
-        TreeMap<String,Integer> estadistica = new TreeMap();
+        TreeMap<Integer,Integer> estadistica = new TreeMap();
        for (int i = 1950; i <= 2023; i++) {
-           estadistica.put(String.valueOf(i), 0);
+           estadistica.put(i, 0);
        }
         
         

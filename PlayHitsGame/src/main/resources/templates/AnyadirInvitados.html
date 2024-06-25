@@ -13,25 +13,16 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <div>          
            
             
-            <form method="post" th:action="@{/partida/crear}" th:object="${newpartida}"> 
-                <p>Genero
-                <select th:field="*{genero}" title="Genero">
-                    <option th:each="generoOpt : ${T(mld.playhitsgame.exemplars.Genero).values()}" 
-                    th:value="${generoOpt}" th:text="${generoOpt}"></option>
-                </select></p>
-                <p>Pais
-                <select th:field="*{pais}" title="Pais">
-                    <option th:each="paisOpt : ${T(mld.playhitsgame.exemplars.Pais).values()}" 
-                    th:value="${paisOpt}" th:text="${paisOpt}"></option>
-                </select></p>
-                
-                <p>Grupo<input type="text" th:field="*{grupo}" required="required"/></p>
-                <p>Año Inicial<input type="number" th:field="*{anyoInicial}" required="required"/></p>
-                <p>Año Final<input type="number" th:field="*{anyoFinal}" required="required"/></p>
-                <p>Numero Rondas<input value="10" type="number" name="nrondas" requied="required"/></p>
-                
+            <form method="post" th:action="@{/partida/anyadirInvitados}" th:object="${posiblesinvitados}"> 
+                <table border="2">
+                    <tr th:each="elem : ${posiblesinvitados}">
+                        <!--<td><input type="checkbox" th:name="${'elem' + #strings.toString(elem.id)}" th:id="${'elem' + #strings.toString(elem.id)}" checked /></td>-->
+                        <td><input type="checkbox" th:name="${elem.nombreId}" id="${elem.nombreId}" checked /></td>
+                        <td th:text="${elem.nombre}"></td>                    
+                    </tr>
+                </table>
 
-                <input type="submit" value="Crear"/>                
+                <input type="submit" value="Añadir"/>                
             </form>
             
             <p th:text="${result}"></p>

@@ -29,7 +29,7 @@ public class Cancion{
     private Long id;
     private String titulo;
     private String interprete;
-    private String anyo;
+    private Integer anyo;
     @Enumerated(EnumType.STRING)
     private Genero genero;
     @Enumerated(EnumType.STRING)
@@ -38,6 +38,10 @@ public class Cancion{
     private String spotifyid;
     private String spotifyplay;
     private String spotifyimagen;
+    @OneToMany
+    private List<Ronda> rondas ;
+    
+    
     
 }
 

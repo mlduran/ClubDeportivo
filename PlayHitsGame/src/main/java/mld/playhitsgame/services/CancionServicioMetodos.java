@@ -4,11 +4,15 @@
  */
 package mld.playhitsgame.services;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import mld.playhitsgame.DAO.CancionDAO;
 import mld.playhitsgame.exemplars.Cancion;
+import mld.playhitsgame.exemplars.Partida;
+import mld.playhitsgame.exemplars.Ronda;
 import mld.playhitsgame.projections.ampliada.CancionAmpliadaView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,9 +66,7 @@ public class CancionServicioMetodos implements CancionServicio{
             cancionObj.setGenero(cancion.getGenero());
         }
         
-        if(Objects.nonNull(cancion.getAnyo()) && !"".equalsIgnoreCase(cancion.getAnyo())){
-            cancionObj.setAnyo(cancion.getAnyo());
-        }
+        cancionObj.setAnyo(cancion.getAnyo());
         
         if(Objects.nonNull(cancion.getPais())){
             cancionObj.setPais(cancion.getPais());
@@ -82,18 +84,57 @@ public class CancionServicioMetodos implements CancionServicio{
     public void deleteCancion(Long id) {
         DAO.deleteById(id);
     }
+    
+    private Cancion cancionRandom(List<Cancion> lista){
+        int i;  
+        i = (int) (Math.floor(Math.random() * lista.size()));
+        
+        return lista.get(i);        
+    }
 
     @Override
     public Cancion cancionAleatoria() {
                 
-        List<Cancion> lista = DAO.findAll();
+        return cancionRandom(DAO.findAll());
         
-        int i;  
-        i = (int) (Math.floor(Math.random() * lista.size()));
+      
+    }
+    
+    @Override
+    public Cancion cancionAleatoria(int anyoInicial, int anyoFinal) {
+                
+        return cancionRandom(DAO.findByAnyo(anyoInicial, anyoFinal));        
         
-        return lista.get(i);
         
     }
+    
+    
+    public void asignarcancionesAleatorias(Partida partida) {
+                
+       HashMap<Long,Cancion> listaCanciones =  new HashMap<Long,Cancion>();
+       
+       while (listaCanciones.size() < partida.getRondas().size() + 1){
+           Cancion cancion = cancionAleatoria(partida.getAnyoInicial(), partida.getAnyoFinal());
+           listaCanciones.put(cancion.getId(), cancion);           
+       }
+           
+       ArrayList<Cancion> lista = new ArrayList<Cancion>();
+       for (HashMap.Entry<Long, Cancion> elem : listaCanciones.entrySet()){
+           lista.add(elem.getValue());
+       }
+       
+       int i = 0;
+       for (Ronda ronda : partida.getRondas()){
+           ronda.setCancion(lista.get(i));
+           i = i + 1;
+       }
+       
+        
+    }
+    
+    
+    
+    
     
  
 }

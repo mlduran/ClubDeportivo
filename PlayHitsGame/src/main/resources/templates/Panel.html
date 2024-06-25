@@ -13,12 +13,13 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         
         <div th:object="${usuarioSesion}">
 
-            <p th:text="*{nombre}">Usuario : </p>
+            <p>Usuario</p>
+            <p th:text="*{nombre}"></p>
             
             <div th:if="*{partidaMasterPendienteAnyadirJugadores()} != null">
             
             
-                <a href="/partida" class="button" id="partidaMasterPendienteAnyadirJugadores"> PARTIDA PENDIENTE DE AÑADIR USUARIOS</a>
+                <a href="/partida/anyadirInvitados" class="button" id="partidaMasterPendienteAnyadirJugadores"> PARTIDA PENDIENTE DE AÑADIR USUARIOS</a>
                 <br/>
             
             
@@ -29,7 +30,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             <div th:if="*{partidaMasterEnCurso()} != null">
             
             
-                <a href="/partida" class="button" id="partidaMasterEnCurso"> PARTIDAS MASTER EN CURSO </a>
+                <a href="/partidaMaster" class="button" id="partidaMasterEnCurso"> PARTIDA MASTER EN CURSO </a>
                 <br/>
             
             
@@ -40,7 +41,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             <div th:if="*{hayPartidasInvitadoPendientes()} == true">
             
             
-                <a href="/partida/anyadirInvitados" class="button" id="partidasInvitadoPendientes"> PARTIDAS INVITADO EN CURSO </a>
+                <a href="/partidaInvitado" class="button" id="partidasInvitadoPendientes"> PARTIDAS INVITADO EN CURSO </a>
                 <br/>
             
             
@@ -48,13 +49,15 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             </div>
             
             
-            <div th:if="*{sePuedeCrearPartidaMaster()} == null">
+            <div th:if="*{sePuedeCrearPartidaMaster()} == true">
                 
                 <a href="/partida/crear" class="button" id="crearpartida"> CREAR PARTIDA </a>
             
             
             </div>
         </div> 
+        
+        <p th:text="${result}"></p>
 
     </body>
 </html>

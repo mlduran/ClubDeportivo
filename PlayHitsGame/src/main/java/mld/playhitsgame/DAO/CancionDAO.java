@@ -11,6 +11,7 @@ import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.projections.ampliada.CancionAmpliadaView;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 
 /**
@@ -27,6 +28,9 @@ public interface CancionDAO extends JpaRepository<Cancion, Long>{
     
     @Override
     Optional<Cancion> findById(Long id);   
+    
+    @Query(value = "SELECT * FROM canciones WHERE anyo>=:anyoinicial AND anyo<=:anyofinal ;", nativeQuery=true)
+    List<Cancion> findByAnyo(int anyoinicial,int anyofinal);
 
     
     

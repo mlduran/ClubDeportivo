@@ -29,12 +29,13 @@ public class Ronda{
     private Long id;
     
     private int numero;
-    private String idCancion;
+    private boolean completada;
     
     @ManyToOne(fetch = FetchType.EAGER)
     private Partida partida;
 
-    
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Cancion cancion;
 
     
     

@@ -10,14 +10,25 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
-        <div>
-            
+              
             <p>PARTIDA</p>
-            <audio controls>
-                <source th:src="${cancion.spotifyplay}" type="audio/mpeg"/>
-            </audio>
+            <div th:object="${ronda}">
             
+               <table border="2">
+                   
+                   <tr>
+                         <td th:text="'RONDA ' + ${ronda.numero}"></td>
+                   </tr>
+                   <tr></tr>
+                   <tr>
+                        <td>
+                            <audio controls>
+                                <source th:src="${cancion.spotifyplay}" type="audio/mpeg"/>
+                            </audio>                            
+                        </td>     
+                   </tr>                   
+                </table>   
             
-        </div>
+            </div>
     </body>
 </html>

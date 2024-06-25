@@ -42,7 +42,7 @@ public class RondaServicioMetodos implements RondaServicio{
         Ronda obj = DAO.findById(id).get();
         
         obj.setNumero(ronda.getNumero());
-        obj.setIdCancion(ronda.getIdCancion());  
+        obj.setCompletada(ronda.isCompletada());  
        
         
         return DAO.save(obj);

@@ -27,6 +27,7 @@ import org.hibernate.annotations.CreationTimestamp;
 @NoArgsConstructor
 @Table(name = "usuarios")
 public class Usuario{
+    
    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +39,7 @@ public class Usuario{
     private String grupo;
     private String pais;
     private String preferencias;
+
     @Temporal(TemporalType.DATE) 
     @Column( nullable = false, updatable = false)
     @CreationTimestamp 
@@ -68,6 +70,12 @@ public class Usuario{
         
         return nombre;
         
+        
+    }
+    
+    public String nombreId(){
+        
+        return nombre() + this.getClass().toString();
         
     }
        

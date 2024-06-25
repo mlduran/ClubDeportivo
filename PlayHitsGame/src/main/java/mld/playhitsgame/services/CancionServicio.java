@@ -28,6 +28,7 @@ public interface CancionServicio {
     void deleteCancion(Long id);
     
     Cancion cancionAleatoria();
+    Cancion cancionAleatoria(int anyoInicial, int anyoFinal);
     
     
 }

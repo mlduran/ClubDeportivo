@@ -63,7 +63,7 @@ public class Utilidades {
                 
                 cancion.setTitulo((String) track.getString("name"));
                 cancion.setInterprete((String) grupo.getString("name"));
-                cancion.setAnyo(anyo);
+                cancion.setAnyo(Integer.getInteger(anyo));
                 cancion.setGenero(genero);
                 cancion.setSpotifyid((String) track.getString("id"));
                 cancion.setSpotifyplay((String) track.getString("preview_url"));

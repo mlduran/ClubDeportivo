@@ -75,6 +75,10 @@ public class PartidaServicioMetodos implements PartidaServicio{
         DAO.deleteById(id);
     }    
 
+    public Optional<Partida> partidaUsuarioMaster(Long idUsuario) {
+        return DAO.partidaUsuarioMaster(idUsuario);
+    }
+
   
   
  

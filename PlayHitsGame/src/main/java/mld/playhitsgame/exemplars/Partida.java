@@ -50,7 +50,7 @@ public class Partida{
     private List<Ronda> rondas;
     
   
-  
+    private int rondaActual;
     private Genero genero;
     private Pais pais;
     private int anyoInicial;

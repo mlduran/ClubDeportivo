@@ -25,5 +25,8 @@ public interface PartidaServicio {
     Partida updatePartida(Long id, Partida partida);
     void deletePartida(Long id);
     
+    Optional<Partida> partidaUsuarioMaster(Long idUsuario);
+    
+    
     
 }
