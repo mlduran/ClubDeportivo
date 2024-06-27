@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Partida</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+              
+            
+            <div>
+            
+                <table border="2" >                   
+                   <tr>
+                       <td><p>PARTIDA</p></td>
+                       <td><p th:text="${partidaSesion.descripcion}"></p></td>
+                   </tr>
+                   
+                   <tr th:each="ronda : ${partidaSesion.rondas}">
+                         <td th:text="'RONDA ' + ${ronda.numero}"></td>                          
+                         <td>
+                            <p th:text="'Titulo: ' + ${ronda.cancion.titulo}"></p>
+                            <p th:text="'Interprete: ' + ${ronda.cancion.interprete}"></p>
+                            <p th:text="'Año: ' + ${ronda.cancion.anyo}"></p>
+                         </td>
+                   </tr>                   
+                </table>   
+                
+                <table border="2" > 
+                    <tr th:each="usu : ${partidaSesion.usuariosPartida()}">
+                        <td th:text="${usu.nombre}"</td>
+                        <td th:each="resp : ${usu.resultadosPartida(partidaSesion)">
+                            <p th:text="${resp.puntos}"/>                            
+                        </td>                        
+                    </tr>  
+                     
+                </table>
+            </div>
+    </body>
+</html>

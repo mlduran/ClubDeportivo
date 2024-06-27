@@ -100,6 +100,14 @@ public class Partida{
         
     }
     
+    public void pasarSiguienteRonda(){
+        this.setRondaActual(this.getRondaActual() + 1);
+    }
+    
+    public boolean hayMasRondas(){
+        return this.getRondaActual() < this.getRondas().size();
+    }
+    
     
 }
 

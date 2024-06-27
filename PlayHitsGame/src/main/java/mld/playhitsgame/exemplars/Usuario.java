@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -71,17 +72,13 @@ public class Usuario{
         else 
             nombre = this.getAlias();
         
-        return nombre;
-        
-        
+        return nombre;        
     }
     
     public String nombreId(){
         
-        return nombre() + this.getClass().toString();
-        
-    }
-       
+        return nombre() + this.getClass().toString();        
+    }      
     
     
     public Partida partidaMasterPendienteAnyadirJugadores(){
@@ -93,10 +90,8 @@ public class Usuario{
                 result = elem;
                 break;
             }
-        }
-        
-        return result;
-        
+        }        
+        return result;        
     }
     
     public Partida partidaMasterEnCurso(){
@@ -108,10 +103,8 @@ public class Usuario{
                 result = elem;
                 break;
             }
-        }
-        
-        return result;
-        
+        }        
+        return result;        
     }
     
     public boolean sePuedeCrearPartidaMaster(){
@@ -129,20 +122,28 @@ public class Usuario{
             if (elem.getStatus() == StatusPartida.EnCurso){
                 result.add(elem);
             }
+        }        
+        return result;        
+    }
+    
+    public boolean hayPartidasInvitadoPendientes(){       
+        return !partidasInvitadoPendientes().isEmpty();        
+    }
+    
+    public List<Respuesta> resultadosPartida(Partida partida){
+        
+        ArrayList<Respuesta> lista = new ArrayList();
+        
+        for (Respuesta resp : this.getRespuestas()){
+            
+            if (Objects.equals(resp.getRonda().getPartida(), partida))
+                lista.add(resp);           
+            
         }
-        
-        return result;
-        
-    }
-    
-    public boolean hayPartidasInvitadoPendientes(){
- 
-       
-        return !partidasInvitadoPendientes().isEmpty();
+        return lista;       
         
     }
     
-   
     
 
 }

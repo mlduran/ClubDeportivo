@@ -104,18 +104,28 @@ public class ControladorVista {
         Ronda rondaActiva = partida.rondaActiva();
         
         Respuesta resp = servRespuesta.buscarPorRondaUsuario(rondaActiva.getId(), usu.getId());
-  
-        
-                
-        //resp.setAnyo(anyo);
-        //int pts = calcularPtsPorAnyo(anyo, rondaActiva.getCancion());
-        //resp.setPuntos(pts);
-        //servRespuesta.saveRespuesta(resp);
+                 
+        resp.setAnyo(anyo);
+        int pts = calcularPtsPorAnyo(anyo, rondaActiva.getCancion());
+        resp.setPuntos(pts);
+        servRespuesta.updateRespuesta(resp.getId(), resp);
+        rondaActiva.setCompletada(true);
+        servRonda.updateRonda(rondaActiva.getId(), rondaActiva);
+        boolean acabar = true;
+        if (partida.hayMasRondas()){
+            partida.pasarSiguienteRonda();            
+            acabar = false;
+        }else{
+            partida.setStatus(StatusPartida.Terminada);
+        }
+        servPartida.updatePartida(partida.getId(), partida);
         
         modelo.addAttribute("partidaSesion", partida);
                 
-        
-        return "Partida";
+        if (acabar)
+            return "ResultadosPartida";
+        else 
+            return "Partida";
         
     }
     
