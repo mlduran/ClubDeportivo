@@ -9,8 +9,6 @@ import java.util.Objects;
 import java.util.Optional;
 import mld.playhitsgame.DAO.PartidaDAO;
 import mld.playhitsgame.exemplars.Partida;
-import mld.playhitsgame.exemplars.Usuario;
-import mld.playhitsgame.projections.ampliada.UsuarioAmpliadaView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +51,10 @@ public class PartidaServicioMetodos implements PartidaServicio{
         if(Objects.nonNull(partida.getPais())){
             obj.setPais(partida.getPais());
         } 
+        
+        if(Objects.nonNull(partida.getContexto()) && !"".equalsIgnoreCase(partida.getContexto())){
+            obj.setContexto(partida.getContexto());
+        }
         
 
         if(Objects.nonNull(partida.getGrupo()) && !"".equalsIgnoreCase(partida.getGrupo())){

@@ -48,6 +48,9 @@ public class Usuario{
     @OneToMany(mappedBy = "master")
     private List<Partida> partidasMaster;
     
+    @OneToMany(mappedBy = "usuario")
+    private List<Respuesta> respuestas;
+    
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "usuario_partida", 

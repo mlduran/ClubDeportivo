@@ -34,6 +34,7 @@ public class Cancion{
     private Genero genero;
     @Enumerated(EnumType.STRING)
     private Pais pais;
+    private String Contexto; // por ejemplo Numeros 1 40 principales
     @Column(unique = true)
     private String spotifyid;
     private String spotifyplay;

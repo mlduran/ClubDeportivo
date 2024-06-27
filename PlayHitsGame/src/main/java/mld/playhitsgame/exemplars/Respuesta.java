@@ -5,7 +5,6 @@
 package mld.playhitsgame.exemplars;
 
 import jakarta.persistence.*;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,31 +21,22 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "rondas")
-public class Ronda{
+@Table(name = "respuestas")
+public class Respuesta{
    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    private int numero;
-    private boolean completada;
+    private int anyo;
+    private int puntos;
     
     @ManyToOne(fetch = FetchType.EAGER)
-    private Partida partida;
-
+    private Ronda ronda;
+    
     @ManyToOne(fetch = FetchType.EAGER)
-    private Cancion cancion;
-    
-    @OneToMany(mappedBy = "ronda", fetch = FetchType.EAGER)
-    private List<Respuesta> respuestas;
+    private Usuario usuario;
 
-    public boolean estaCompletada(){
-        
-        return this.isCompletada();
-        
-    }
-    
 
     
     

@@ -11,20 +11,39 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     </head>
     <body>
               
-            <p>PARTIDA</p>
-            <div th:object="${ronda}">
             
-               <table border="2">
+            <div>
+            
+               <table border="2" >
                    
                    <tr>
-                         <td th:text="'RONDA ' + ${ronda.numero}"></td>
+                       <td><p>PARTIDA</p></td>
+                       <td><p th:text="${partidaSesion.descripcion}"></p></td>
                    </tr>
-                   <tr></tr>
-                   <tr>
-                        <td>
+                   
+                   <tr th:each="ronda : ${partidaSesion.rondas}">
+                         <td th:text="'RONDA ' + ${ronda.numero}"></td> 
+                         
+                         <td th:if="${ronda.estaCompletada()}">
+                            <p th:text="'Titulo: ' + ${ronda.cancion.titulo}"></p>
+                            <p th:text="'Interprete: ' + ${ronda.cancion.interprete}"></p>
+                            <p th:text="'Año: ' + ${ronda.cancion.anyo}"></p>
+                         </td>
+                         
+                         <td th:if="${partidaSesion.rondaActual != ronda.numero && !ronda.estaCompletada()}">
+                            <p>Pendiente</p>
+                         </td>
+                        
+                         <td th:if="${partidaSesion.rondaActual  == ronda.numero}">
                             <audio controls>
-                                <source th:src="${cancion.spotifyplay}" type="audio/mpeg"/>
-                            </audio>                            
+                                <source th:src="${ronda.cancion.spotifyplay}" type="audio/mpeg"/>
+                            </audio> 
+                             
+                            <form method="post" action="/partida" >                
+                                <input type="number" name="anyo" required="required"/>          
+                                <input type="submit" value="Responder"/>                
+                            </form>
+                            
                         </td>     
                    </tr>                   
                 </table>   

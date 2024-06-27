@@ -15,11 +15,14 @@ import java.util.TreeMap;
 import lombok.extern.slf4j.Slf4j;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.Partida;
+import mld.playhitsgame.exemplars.Respuesta;
+import mld.playhitsgame.exemplars.Rol;
 import mld.playhitsgame.exemplars.Ronda;
 import mld.playhitsgame.exemplars.StatusPartida;
 import mld.playhitsgame.exemplars.Usuario;
 import mld.playhitsgame.services.CancionServicioMetodos;
 import mld.playhitsgame.services.PartidaServicioMetodos;
+import mld.playhitsgame.services.RespuestaServicioMetodos;
 import mld.playhitsgame.services.RondaServicioMetodos;
 import mld.playhitsgame.services.UsuarioServicioMetodos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +35,8 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 
 @Controller
-@SessionAttributes({"usuarioSesion", "partidaSesion", "posiblesinvitados"})
+// rol puede ser master o invitado
+@SessionAttributes({"usuarioSesion", "partidaSesion", "posiblesinvitados", "rol"})
 @Slf4j
 public class ControladorVista {
     
@@ -45,6 +49,8 @@ public class ControladorVista {
     PartidaServicioMetodos servPartida;
     @Autowired
     RondaServicioMetodos servRonda;
+    @Autowired
+    RespuestaServicioMetodos servRespuesta;
     
     @GetMapping("/panel")
     public String panel(Model modelo){
@@ -57,24 +63,64 @@ public class ControladorVista {
     public String partidaMaster(Model modelo){
         
         Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");
-        
+        modelo.addAttribute("rol", Rol.master);
         Partida partida = usu.partidaMasterEnCurso();
         
-        Ronda ronda = partida.getRondas().get(partida.getRondaActual());
-        
-        modelo.addAttribute("cancion", ronda.getCancion());
-        modelo.addAttribute("ronda", ronda);
-        
-        return "Partida";
+        return partida(modelo, partida);
         
     }
     
     @GetMapping("/partidaInvitado")
     public String partidaInvitado(Model modelo){
         
+        Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");
+        modelo.addAttribute("rol", Rol.invitado);
+        
+        List<Partida> partidas = usu.getPartidasInvitado();
+        
         return "SeleccionarPartida";
         
     }
+     
+    public String partida(Model modelo, Partida partida){
+        
+        Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");
+         
+        
+        modelo.addAttribute("partidaSesion", partida);
+        
+        
+        return "Partida"; 
+     
+        
+    }
+        
+    @PostMapping("/partida")
+    public String partida(@ModelAttribute("anyo") int anyo,Model modelo){
+        
+        
+        Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");
+        Partida partida = (Partida) modelo.getAttribute("partidaSesion");
+        Ronda rondaActiva = partida.rondaActiva();
+        
+        Respuesta resp = servRespuesta.buscarPorRondaUsuario(rondaActiva.getId(), usu.getId());
+  
+        
+                
+        //resp.setAnyo(anyo);
+        //int pts = calcularPtsPorAnyo(anyo, rondaActiva.getCancion());
+        //resp.setPuntos(pts);
+        //servRespuesta.saveRespuesta(resp);
+        
+        modelo.addAttribute("partidaSesion", partida);
+                
+        
+        return "Partida";
+        
+    }
+    
+    
+    
     
  
     @GetMapping("/altaUsuario")
@@ -125,28 +171,31 @@ public class ControladorVista {
 
         try{
             partida.setMaster(usu);
-            //partida.setRondaActual(0);
+            partida.setRondaActual(1);
             Partida newPartida = servPartida.savePartida(partida);
             usu.getPartidasMaster().add(newPartida);
             servUsuario.updateUsuario(usu.getId(), usu);            
             
             //crear las rondas con nrondas
-            partida.setRondas(new ArrayList<Ronda>());
+            partida.setRondas(new ArrayList());
             for (int i = 1; i <= nrondas; i++){
                 Ronda obj = new Ronda();
                 obj.setNumero(i);
                 obj.setPartida(partida); 
+                obj.setRespuestas(new ArrayList());
                 Ronda ronda = servRonda.saveRonda(obj);
-                partida.getRondas().add(ronda);
+                partida.getRondas().add(ronda);                
                 
             }
             servCancion.asignarcancionesAleatorias(partida);
-            for (Ronda ronda : partida.getRondas()){
+            for (Ronda ronda : partida.getRondas()){                
                 servRonda.updateRonda(ronda.getId(), ronda);
             }
             
             partida.setStatus(StatusPartida.AnyadirJugadores);
             servPartida.updatePartida(partida.getId(), partida);
+            
+           
             
             
         }catch(Exception ex){
@@ -216,7 +265,7 @@ public class ControladorVista {
         Partida partida = (Partida) modelo.getAttribute("partidaSesion");
         ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) modelo.getAttribute("posiblesinvitados");
                  
-        partida.setInvitados(new ArrayList<Usuario> ());
+        partida.setInvitados(new ArrayList());
         
         for (Usuario usu : posiblesInvitados){            
             
@@ -228,14 +277,32 @@ public class ControladorVista {
                 
                     usuario.get().getPartidasInvitado().add(partida); 
                     partida.getInvitados().add(usuario.get());            
-                    servUsuario.updateUsuario( usuario.get().getId(), usuario.get());
+                    servUsuario.updateUsuario( usuario.get().getId(), usuario.get());                    
                 }
             }
         }
+        
+        //crear las respuestas 
+        for (Ronda ronda : partida.getRondas()){
+            ronda.setRespuestas(new ArrayList());
+            for (Usuario usuario : partida.usuariosPartida()){ 
+                usuario.setRespuestas(new ArrayList());
+                Respuesta newResp = new Respuesta();
+                newResp.setRonda(ronda);
+                newResp.setUsuario(usuario);
+                Respuesta resp = servRespuesta.saveRespuesta(newResp);
+                ronda.getRespuestas().add(resp);
+                usuario.getRespuestas().add(resp);
+                servUsuario.updateUsuario(usuario.getId(), usuario);
+            }            
+            
+        }        
      
         partida.setStatus(StatusPartida.EnCurso);
         servPartida.updatePartida(partida.getId(), partida);
         
+        modelo.addAttribute("partidaSesion", partida);
+           
         return "Partida";
         
     }
@@ -266,4 +333,27 @@ public class ControladorVista {
         return "ListaCanciones";
         
     }
+    
+    public int calcularPtsPorAnyo(int anyo, Cancion cancion){
+        
+        int anyoCancion = cancion.getAnyo();
+        int pts = 0;
+        
+        int x = Math.abs(anyo - anyoCancion);
+        
+        if (x == 0)
+            pts = 25;
+        if (x == 1)
+            pts = 15;
+        if (x == 2)
+            pts = 10;
+        if (x > 2)
+            pts = 10 - x;
+        if (pts < 0)
+            pts = 0;
+
+        return pts;
+        
+    }
+    
 }

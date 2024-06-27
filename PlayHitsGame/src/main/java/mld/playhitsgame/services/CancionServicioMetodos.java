@@ -62,6 +62,10 @@ public class CancionServicioMetodos implements CancionServicio{
             cancionObj.setInterprete(cancion.getInterprete());
         }
         
+        if(Objects.nonNull(cancion.getContexto()) && !"".equalsIgnoreCase(cancion.getContexto())){
+            cancionObj.setContexto(cancion.getContexto());
+        }
+        
         if(Objects.nonNull(cancion.getGenero())){
             cancionObj.setGenero(cancion.getGenero());
         }
@@ -111,14 +115,14 @@ public class CancionServicioMetodos implements CancionServicio{
     
     public void asignarcancionesAleatorias(Partida partida) {
                 
-       HashMap<Long,Cancion> listaCanciones =  new HashMap<Long,Cancion>();
+       HashMap<Long,Cancion> listaCanciones =  new HashMap();
        
        while (listaCanciones.size() < partida.getRondas().size() + 1){
            Cancion cancion = cancionAleatoria(partida.getAnyoInicial(), partida.getAnyoFinal());
            listaCanciones.put(cancion.getId(), cancion);           
        }
            
-       ArrayList<Cancion> lista = new ArrayList<Cancion>();
+       ArrayList<Cancion> lista = new ArrayList();
        for (HashMap.Entry<Long, Cancion> elem : listaCanciones.entrySet()){
            lista.add(elem.getValue());
        }
