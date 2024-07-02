@@ -52,8 +52,8 @@ public class PartidaServicioMetodos implements PartidaServicio{
             obj.setPais(partida.getPais());
         } 
         
-        if(Objects.nonNull(partida.getContexto()) && !"".equalsIgnoreCase(partida.getContexto())){
-            obj.setContexto(partida.getContexto());
+        if(Objects.nonNull(partida.getTema()) && !"".equalsIgnoreCase(partida.getTema())){
+            obj.setTema(partida.getTema());
         }
         
 

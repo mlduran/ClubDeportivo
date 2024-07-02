@@ -62,8 +62,12 @@ public class CancionServicioMetodos implements CancionServicio{
             cancionObj.setInterprete(cancion.getInterprete());
         }
         
-        if(Objects.nonNull(cancion.getContexto()) && !"".equalsIgnoreCase(cancion.getContexto())){
-            cancionObj.setContexto(cancion.getContexto());
+        if(Objects.nonNull(cancion.getAlbum()) && !"".equalsIgnoreCase(cancion.getAlbum())){
+            cancionObj.setAlbum(cancion.getAlbum());
+        }
+        
+        if(Objects.nonNull(cancion.getTema()) && !"".equalsIgnoreCase(cancion.getTema())){
+            cancionObj.setTema(cancion.getTema());
         }
         
         if(Objects.nonNull(cancion.getGenero())){

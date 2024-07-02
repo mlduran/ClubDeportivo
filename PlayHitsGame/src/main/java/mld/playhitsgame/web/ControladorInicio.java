@@ -63,6 +63,9 @@ public class ControladorInicio {
             return "Inicio";            
         }else{
             Usuario usuarioSesion = usuLogin.get();
+            usuarioSesion.getPartidasInvitado();
+            usuarioSesion.getPartidasMaster();
+            
             modelo.addAttribute("usuarioSesion", usuarioSesion);
             return "Panel";
         }        
@@ -107,6 +110,33 @@ public class ControladorInicio {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(customIp+ "/api/spotify/playList?idPlayList=" +
                         idplaylist + "&anyoPlayList=" + anyoplaylist))
+ 		.method("GET", HttpRequest.BodyPublishers.noBody())
+		.build();
+            
+        HttpResponse<String> response = null;   
+        try {
+            response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException ex) {
+            Logger.getLogger(SpotifyController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if (response != null)
+            info = response.body();
+        else
+            info = "ERROR EN LA PETICION";
+        
+        modelo.addAttribute("info", info);
+        
+        return "Spotify";
+    }
+    
+    @PostMapping("/spotifyServiciosTema")
+    public String respuestaServiciosTema(String idplaylist , String temaplaylist, Model modelo){
+        
+        String info;
+        
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(customIp+ "/api/spotify/playListTema?idPlayList=" +
+                        idplaylist + "&temaPlayList=" + temaplaylist))
  		.method("GET", HttpRequest.BodyPublishers.noBody())
 		.build();
             

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import mld.playhitsgame.exemplars.Cancion;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
@@ -168,6 +169,19 @@ public class SpotifyController {
                         
             
             String err = utiles.procesarLista(idPlayList, anyoPlayList, token());
+            
+            if (err.equals(""))
+                err = "PROCESO OK";        
+                     
+            return err;	
+		
+	}
+        
+        @GetMapping(value = "playListTema")
+	public String playListTema(@RequestParam String idPlayList, @RequestParam String temaPlayList) {   
+                  
+                 
+            String err = utiles.procesarListaTema(idPlayList, temaPlayList, token());
             
             if (err.equals(""))
                 err = "PROCESO OK";        

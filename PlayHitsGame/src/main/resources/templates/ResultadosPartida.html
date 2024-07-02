@@ -13,7 +13,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
               
             
             <div>
-            
+             
                 <table border="2" >                   
                    <tr>
                        <td><p>PARTIDA</p></td>
@@ -30,13 +30,25 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                    </tr>                   
                 </table>   
                 
-                <table border="2" > 
-                    <tr th:each="usu : ${partidaSesion.usuariosPartida()}">
-                        <td th:text="${usu.nombre}"</td>
-                        <td th:each="resp : ${usu.resultadosPartida(partidaSesion)">
-                            <p th:text="${resp.puntos}"/>                            
-                        </td>                        
-                    </tr>  
+                <table border="2" >                     
+                    <tr>
+                       <th>Usuario</th>
+                       <th th:each="ronda : ${partidaSesion.rondas}" th:text="'Ronda ' + ${ronda.numero}"/>
+                    </tr> 
+                    <tr>
+                       <th>PUNTOS</th>
+                    </tr>
+                    <tr th:each="elem : ${resultados}">
+                        <td th:text="${elem.key}"></td>
+                        <td th:each="resp : ${elem.value}" th:text="${resp.puntos}"/> 
+                    </tr>          
+                     <tr>
+                       <th>RESPUESTA AÑO</th>
+                    </tr>
+                    <tr th:each="elem : ${resultados}">
+                        <td th:text="${elem.key}"></td>
+                        <td th:each="resp : ${elem.value}" th:text="${resp.anyo}"/> 
+                    </tr>   
                      
                 </table>
             </div>

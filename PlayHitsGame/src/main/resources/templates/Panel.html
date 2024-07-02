@@ -53,8 +53,28 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 
                 <a href="/partida/crear" class="button" id="crearpartida"> CREAR PARTIDA </a>
             
+                 <br/>
             
             </div>
+            
+            <div th:if="*{hayPartidasTerminadas()} == true">
+                
+                <table border="2" > 
+                    <tr>
+                        <th>PARTIDAS FINALIZADAS</th>                   
+                    </tr>    
+                    <tr th:each="unapartida : *{partidasTerminadas()}">
+                        <td>
+                                <a th:href="'/partidaConsulta/' + ${unapartida.id}" class="button"> 
+                                <p th:text="${unapartida.id}"/>
+                            </a>
+                        </td>                       
+                    </tr>  
+                     
+                </table>
+             
+            </div>           
+            
         </div> 
         
         <p th:text="${result}"></p>

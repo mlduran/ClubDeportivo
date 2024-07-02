@@ -46,10 +46,10 @@ public class Usuario{
     @CreationTimestamp 
     private Date alta;
     
-    @OneToMany(mappedBy = "master")
+    @OneToMany(mappedBy = "master", fetch = FetchType.EAGER)
     private List<Partida> partidasMaster;
     
-    @OneToMany(mappedBy = "usuario")
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.EAGER)
     private List<Respuesta> respuestas;
     
     @ManyToMany(fetch = FetchType.LAZY)
@@ -130,20 +130,30 @@ public class Usuario{
         return !partidasInvitadoPendientes().isEmpty();        
     }
     
-    public List<Respuesta> resultadosPartida(Partida partida){
+    
+    public List<Partida> partidasTerminadas(){
         
-        ArrayList<Respuesta> lista = new ArrayList();
+        List<Partida>  result = new ArrayList<>();
         
-        for (Respuesta resp : this.getRespuestas()){
-            
-            if (Objects.equals(resp.getRonda().getPartida(), partida))
-                lista.add(resp);           
-            
-        }
-        return lista;       
+        for (Partida elem : this.getPartidasMaster()){
+            if (elem.getStatus() == StatusPartida.Terminada){
+                result.add(elem);
+            }
+        }        
         
+        for (Partida elem : this.getPartidasInvitado()){
+            if (elem.getStatus() == StatusPartida.Terminada){
+                result.add(elem);
+            }
+        }        
+        return result;        
     }
     
+    public boolean hayPartidasTerminadas(){
+        
+        return !partidasTerminadas().isEmpty();      
+        
+    }
     
 
 }

@@ -5,10 +5,10 @@
 package mld.playhitsgame.exemplars;
 
 import jakarta.persistence.*;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 
 
 /**
@@ -21,30 +21,16 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "canciones")
-public class Cancion{
+@Table(name = "temas")
+public class Tema{
+    
    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String titulo;
-    private String interprete;
-    private String album;
-    private Integer anyo;
-    @Enumerated(EnumType.STRING)
-    private Genero genero;
-    @Enumerated(EnumType.STRING)
-    private Pais pais;
-    private String tema; // por ejemplo Numeros 1 40 principales
     @Column(unique = true)
-    private String spotifyid;
-    private String spotifyplay;
-    private String spotifyimagen;
-    @OneToMany
-    private List<Ronda> rondas ;
-    
-    
-    
+    private String tema;
+
 }
 
 

@@ -24,10 +24,15 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                     <option th:each="paisOpt : ${T(mld.playhitsgame.exemplars.Pais).values()}" 
                     th:value="${paisOpt}" th:text="${paisOpt}"></option>
                 </select></p>
+                <p>Tema
+                <select th:field="*{tema}" title="Tema">
+                    <option th:each="elem : ${temas}" 
+                    th:value="${elem}" th:text="${elem}"></option>
+                </select></p>
                 
                 <p>Grupo<input type="text" th:field="*{grupo}" required="required"/></p>
-                <p>Año Inicial<input type="number" th:field="*{anyoInicial}" required="required"/></p>
-                <p>Año Final<input type="number" th:field="*{anyoFinal}" required="required"/></p>
+                <p>Año Inicial<input type="number" th:field="*{anyoInicial}" th:value="${newpartida.anyoInicial}" required="required"/></p>
+                <p>Año Final<input type="number" th:field="*{anyoFinal}" th:value="${newpartida.anyoFinal}" required="required"/></p>
                 <p>Numero Rondas<input value="10" type="number" name="nrondas" requied="required"/></p>
                 
 
