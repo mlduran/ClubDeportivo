@@ -5,10 +5,8 @@
 package mld.playhitsgame.web;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -65,11 +63,8 @@ public class ControladorVista {
         return "Panel";        
     }
     
-    @GetMapping("/partidaConsulta/{id}")
-    public String partidaConsulta(@PathVariable Long id, Model modelo){
-        
-        Optional<Partida> partida = servPartida.findById(id);
-        Partida partidaSesion = partida.get();  
+    
+    private void resultadosPartida(Partida partidaSesion, Model modelo){
         
         HashMap<String,List<Respuesta>> resultadosPartida = new HashMap();
         String nomUsu;
@@ -86,8 +81,19 @@ public class ControladorVista {
                 resultadosPartida.put(nomUsu, lista);
             }
         }
-                         
+        
         modelo.addAttribute("resultados", resultadosPartida);
+        
+    }
+    
+    @GetMapping("/partidaConsulta/{id}")
+    public String partidaConsulta(@PathVariable Long id, Model modelo){
+        
+        Optional<Partida> partida = servPartida.findById(id);
+        Partida partidaSesion = partida.get();  
+        
+        resultadosPartida(partidaSesion, modelo);
+        
         modelo.addAttribute("partidaSesion", partidaSesion);        
         
         return "ResultadosPartida";
@@ -154,9 +160,10 @@ public class ControladorVista {
         
         modelo.addAttribute("partidaSesion", partida);
                 
-        if (acabar)
+        if (acabar){
+            resultadosPartida(partida, modelo);
             return "ResultadosPartida";
-        else 
+        }else 
             return "Partida";        
     }
     
@@ -214,8 +221,21 @@ public class ControladorVista {
            
         
         Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");
+        Calendar cal= Calendar.getInstance();
+        int anyoActual = cal.get(Calendar.YEAR);
 
         try{
+            
+            // Validaciones
+            if (partida.getAnyoFinal() <= partida.getAnyoInicial())
+                throw new Exception("Las Fechas Iniciales y Finales no son correctas");            
+            if (partida.getAnyoFinal() > anyoActual)
+                throw new Exception("El año final es erroneo");
+            if (partida.getAnyoInicial() < 1950)
+                throw new Exception("El año inicial es erroneo");
+            if (nrondas < 5 || nrondas > 30)
+                throw new Exception("Las rondas deben estar entre 5 y 30");
+            
             partida.setMaster(usu);
             partida.setRondaActual(1);
             Partida newPartida = servPartida.savePartida(partida);
@@ -272,8 +292,7 @@ public class ControladorVista {
         
         return invitados;
         
-    }
-    
+    }   
     
     
     @GetMapping("/partida/anyadirInvitados")
@@ -281,21 +300,53 @@ public class ControladorVista {
         
         Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");   
         
-        Optional<Partida> partida = servPartida.partidaUsuarioMaster(usu.getId());
+        Optional<Partida> partidas = servPartida.partidaUsuarioMaster(usu.getId());
+        Partida partida = partidas.get();
         
-        if (partida.get() != null){
-            modelo.addAttribute("partidaSesion", partida.get());  
+        if (partida != null){
+            modelo.addAttribute("partidaSesion", partida);  
         
             ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) usuariosGrupo(usu);
 
-            modelo.addAttribute("posiblesinvitados", posiblesInvitados);       
+            if (!posiblesInvitados.isEmpty()){
+                modelo.addAttribute("posiblesinvitados", posiblesInvitados);      
+                return "AnyadirInvitados";
+            }else{
+                
+                crearRespuestas(partida);
+                partida.setStatus(StatusPartida.EnCurso);
+                servPartida.updatePartida(partida.getId(), partida);
         
-            return "AnyadirInvitados";
+                modelo.addAttribute("partidaSesion", partida);           
+                return "Partida";
+
+            }
+            
         }else{
             
             modelo.addAttribute("result", "NO SE HA ENCONTRADO PARTIDA");  
             return "Panel";            
         } 
+    }
+    
+    private void crearRespuestas(Partida partida){
+        
+         for (Ronda ronda : partida.getRondas()){
+            ronda.setRespuestas(new ArrayList());
+            for (Usuario usuario : partida.usuariosPartida()){ 
+                usuario.setRespuestas(new ArrayList());
+                Respuesta newResp = new Respuesta();
+                newResp.setRonda(ronda);
+                newResp.setUsuario(usuario);
+                Respuesta resp = servRespuesta.saveRespuesta(newResp);
+                ronda.getRespuestas().add(resp);
+                usuario.getRespuestas().add(resp);
+                servUsuario.updateUsuario(usuario.getId(), usuario);
+            }            
+            
+        }        
+        
+        
     }
     
     @PostMapping("/partida/anyadirInvitados")
@@ -322,20 +373,7 @@ public class ControladorVista {
         }
         
         //crear las respuestas 
-        for (Ronda ronda : partida.getRondas()){
-            ronda.setRespuestas(new ArrayList());
-            for (Usuario usuario : partida.usuariosPartida()){ 
-                usuario.setRespuestas(new ArrayList());
-                Respuesta newResp = new Respuesta();
-                newResp.setRonda(ronda);
-                newResp.setUsuario(usuario);
-                Respuesta resp = servRespuesta.saveRespuesta(newResp);
-                ronda.getRespuestas().add(resp);
-                usuario.getRespuestas().add(resp);
-                servUsuario.updateUsuario(usuario.getId(), usuario);
-            }            
-            
-        }        
+        crearRespuestas(partida);
      
         partida.setStatus(StatusPartida.EnCurso);
         servPartida.updatePartida(partida.getId(), partida);

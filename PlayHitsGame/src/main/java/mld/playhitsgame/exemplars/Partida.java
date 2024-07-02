@@ -5,6 +5,8 @@
 package mld.playhitsgame.exemplars;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,11 +57,15 @@ public class Partida{
     private int rondaActual;
     private Genero genero;
     private Pais pais;
-    private String tema; // por ejemplo Descripciones genericas
+    private String tema; // por ejemplo Descripciones genericas 
+    @Min(1950)
     private int anyoInicial;
+    @Min(1950)
     private int anyoFinal;
     private String grupo;
     private String ganador;
+        
+    
     
     public String getDescripcion(){
         

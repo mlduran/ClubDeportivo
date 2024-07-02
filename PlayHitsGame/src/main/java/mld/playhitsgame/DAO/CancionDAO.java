@@ -32,6 +32,7 @@ public interface CancionDAO extends JpaRepository<Cancion, Long>{
     @Query(value = "SELECT * FROM canciones WHERE anyo>=:anyoinicial AND anyo<=:anyofinal ;", nativeQuery=true)
     List<Cancion> findByAnyo(int anyoinicial,int anyofinal);
 
-    
+    @Query(value = "SELECT * FROM canciones WHERE anyo>=:anyoinicial AND anyo<=:anyofinal AND tema=:tema ;", nativeQuery=true)
+    List<Cancion> findByTema(int anyoinicial,int anyofinal, String tema);
     
 }

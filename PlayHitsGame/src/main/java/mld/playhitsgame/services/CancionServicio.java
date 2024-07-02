@@ -7,6 +7,7 @@ package mld.playhitsgame.services;
 import java.util.List;
 import java.util.Optional;
 import mld.playhitsgame.exemplars.Cancion;
+import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.projections.ampliada.CancionAmpliadaView;
 
 
@@ -29,6 +30,6 @@ public interface CancionServicio {
     
     Cancion cancionAleatoria();
     Cancion cancionAleatoria(int anyoInicial, int anyoFinal);
-    
+    Cancion cancionAleatoriaPorTema(int anyoInicial, int anyoFinal, String tema);
     
 }

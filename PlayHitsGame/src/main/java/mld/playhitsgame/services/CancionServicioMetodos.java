@@ -13,6 +13,7 @@ import mld.playhitsgame.DAO.CancionDAO;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.Ronda;
+import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.projections.ampliada.CancionAmpliadaView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -116,14 +117,48 @@ public class CancionServicioMetodos implements CancionServicio{
         
     }
     
+    @Override
+    public Cancion cancionAleatoriaPorTema(int anyoInicial, int anyoFinal, String tema) {
+                
+        return cancionRandom(DAO.findByTema(anyoInicial, anyoFinal, tema));        
+        
+        
+    }
+    
+    
     
     public void asignarcancionesAleatorias(Partida partida) {
                 
-       HashMap<Long,Cancion> listaCanciones =  new HashMap();
+       HashMap<Long,Cancion> listaCanciones =  new HashMap();       
+       
+       // esto es por si no hay suficientes canciones poder cager de toda la BD
+       // en este momento ya hemos creado la partida y no podemos volver a atras
+       int intentos = 0;
        
        while (listaCanciones.size() < partida.getRondas().size() + 1){
-           Cancion cancion = cancionAleatoria(partida.getAnyoInicial(), partida.getAnyoFinal());
-           listaCanciones.put(cancion.getId(), cancion);           
+           
+           Cancion cancion = null;
+           
+            if (intentos < partida.getRondas().size() * 3){
+                           
+                // Si lo hacemos por tema
+                if (!partida.getTema().isBlank()){
+                    cancion = cancionAleatoriaPorTema(partida.getAnyoInicial(), partida.getAnyoFinal(), partida.getTema());
+                }
+
+                // No hay ninguna seleecion ademas del año
+                if (partida.getTema().isBlank()){ //aquiponer el resto
+                    cancion = cancionAleatoria(partida.getAnyoInicial(), partida.getAnyoFinal());
+                }
+            
+            }else{
+                cancion = cancionAleatoria();
+            }
+            
+           if (cancion != null)
+                listaCanciones.put(cancion.getId(), cancion); 
+           else 
+               intentos = intentos + 1;
        }
            
        ArrayList<Cancion> lista = new ArrayList();
