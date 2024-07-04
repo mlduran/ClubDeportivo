@@ -42,8 +42,13 @@ public class Cancion{
     private String spotifyimagen;
     @OneToMany
     private List<Ronda> rondas ;
+    private boolean revisar;
     
-    
+     public boolean pendienteRevision(){
+        
+        return this.isRevisar();
+        
+    }
     
 }
 

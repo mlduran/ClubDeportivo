@@ -13,7 +13,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 import lombok.extern.slf4j.Slf4j;
+import mld.playhitsgame.exemplars.SearchCriteria;
+import mld.playhitsgame.exemplars.SearchSpecifications;
 import mld.playhitsgame.exemplars.Cancion;
+import mld.playhitsgame.exemplars.Genero;
+import mld.playhitsgame.exemplars.Pais;
 import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.Respuesta;
 import mld.playhitsgame.exemplars.Rol;
@@ -382,32 +386,116 @@ public class ControladorVista {
            
         return "Partida";
         
-    }
-    
-        
+    }        
      
     @GetMapping("/listaCanciones")
     public String listaCanciones(Model model){       
-       
         
         List<Cancion> lista = servCancion.findAll();
         
         TreeMap<Integer,Integer> estadistica = new TreeMap();
-       for (int i = 1950; i <= 2023; i++) {
+        for (int i = 1950; i <= 2023; i++) {
            estadistica.put(i, 0);
-       }
-        
-        
+        }        
         for (Cancion obj: lista){  
-                
-                estadistica.put(obj.getAnyo(), estadistica.get(obj.getAnyo()) + 1);
-            }
-            
+            estadistica.put(obj.getAnyo(), estadistica.get(obj.getAnyo()) + 1);
+        }            
    
         model.addAttribute("estadistica", estadistica);
-        model.addAttribute("lista", lista);
-       
-        return "ListaCanciones";
+        model.addAttribute("lista", lista);       
+        return "ListaCanciones";        
+    }
+    
+    @GetMapping("/altaCancion")
+    public String altaCancion(Model modelo){       
+        
+        modelo.addAttribute("newcancion", new Cancion());
+        return "AltaCancion";        
+    }
+    
+    @PostMapping("/altaCancion")
+    public String altaCancion(@ModelAttribute("newcancion") Cancion cancion,Model modelo){       
+        
+        String resp = "OK";
+        
+        try{
+            servCancion.saveCancion(cancion);
+        }catch(Exception ex){
+            resp = "ERROR " + ex; 
+        }   
+        
+        modelo.addAttribute("result", resp);        
+        
+    
+        return "AltaCancion";        
+    }
+    
+    
+    @GetMapping("/modificarCancion/{id}")
+    public String modificarCancion(@ModelAttribute("id") Long id, Model modelo){       
+        
+        Optional<Cancion> cancion = servCancion.findById(id);
+        
+        modelo.addAttribute("cancion", cancion);
+        return "ModificarCancion";        
+    }
+    
+    @PostMapping("/modificarCancion")
+    public String modificarCancion( @ModelAttribute("cancion") Cancion cancion,Model modelo){       
+        
+        String resp = "OK";
+        
+        try{
+            servCancion.updateCancion(cancion.getId(),cancion);
+        }catch(Exception ex){
+            resp = "ERROR " + ex; 
+        }   
+        
+        modelo.addAttribute("result", resp); 
+        
+        return "ModificarCancion";        
+    }
+    
+    @GetMapping("/eliminarCancion/{id}")
+    public String eliminarCancion(@ModelAttribute("id") Long id, Model modelo){       
+        
+        servCancion.deleteCancion(id);   
+        return "redirect:/gestionCanciones";        
+    }
+    
+    @GetMapping("/gestionCanciones")
+    public String revisionCanciones(Model modelo){  
+        
+        ArrayList temas = new ArrayList();
+        temas.add("");
+        for (Tema tema : servTema.findAll())
+            temas.add(tema.getTema());
+        modelo.addAttribute("temas", temas);
+        
+        modelo.addAttribute("canciones", servCancion.findAll());
+           
+        return "GestionCanciones";        
+    }
+    
+    @PostMapping("/gestionCanciones")
+    public String revisionCanciones(Model modelo, String genero, String pais, 
+            String tema, int anyoInicial, int anyoFinal){  
+        
+        ArrayList<String> generos = new ArrayList();
+        ArrayList<String> paises = new ArrayList();
+        ArrayList<String> temas = new ArrayList();
+        
+        if (!genero.equals(Genero.Generico.toString()))
+            generos.add(genero);
+        if (!pais.equals(Pais.International.toString()))
+            paises.add(pais);
+        if (!"".equals(tema))
+            temas.add(tema);
+            
+        List<Cancion> canciones = servCancion.buscarCancionesPorCriterios(generos, paises, temas, anyoInicial, anyoFinal);
+        modelo.addAttribute("canciones", canciones);
+        
+        return "GestionCanciones";
         
     }
     

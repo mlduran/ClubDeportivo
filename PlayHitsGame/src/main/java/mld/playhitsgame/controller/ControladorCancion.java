@@ -6,6 +6,8 @@ package mld.playhitsgame.controller;
 
 import java.util.List;
 import java.util.Optional;
+import mld.playhitsgame.exemplars.SearchCriteria;
+import mld.playhitsgame.exemplars.SearchSpecifications;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.projections.ampliada.CancionAmpliadaView;
 import mld.playhitsgame.services.CancionServicio;
@@ -34,6 +36,9 @@ public class ControladorCancion {
     @GetMapping("/listaCanciones")
     public List<Cancion> listaCanciones(Model modelo){
         
+        SearchSpecifications<SearchCriteria> searchSpecifications =
+             new SearchSpecifications();   
+        //return CancionServicio.findAll(searchSpecifications);
         return CancionServicio.findAll();
         
     }

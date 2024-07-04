@@ -5,6 +5,8 @@
 package mld.playhitsgame.DAO;
 
 
+import mld.playhitsgame.exemplars.SearchSpecifications;
+import mld.playhitsgame.exemplars.SearchCriteria;
 import java.util.List;
 import java.util.Optional;
 import mld.playhitsgame.exemplars.Cancion;
@@ -21,6 +23,9 @@ import org.springframework.data.jpa.repository.Query;
 //@Transactional(readOnly = true)
 public interface CancionDAO extends JpaRepository<Cancion, Long>{
     
+    @Override
+    List<Cancion> findAll();
+    //List<Cancion> findAllSpecificaciones(SearchSpecifications<SearchCriteria> searchSpecifications);
     List<CancionAmpliadaView> findBy();
     
     //@Query("SELECT * FROM cancion WHERE id = :id")
@@ -34,5 +39,11 @@ public interface CancionDAO extends JpaRepository<Cancion, Long>{
 
     @Query(value = "SELECT * FROM canciones WHERE anyo>=:anyoinicial AND anyo<=:anyofinal AND tema=:tema ;", nativeQuery=true)
     List<Cancion> findByTema(int anyoinicial,int anyofinal, String tema);
+    
+   
+    
+    
+    
+    
     
 }

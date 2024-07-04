@@ -6,8 +6,9 @@ package mld.playhitsgame.services;
 
 import java.util.List;
 import java.util.Optional;
+import mld.playhitsgame.exemplars.SearchCriteria;
+import mld.playhitsgame.exemplars.SearchSpecifications;
 import mld.playhitsgame.exemplars.Cancion;
-import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.projections.ampliada.CancionAmpliadaView;
 
 
@@ -17,7 +18,8 @@ import mld.playhitsgame.projections.ampliada.CancionAmpliadaView;
  */
 public interface CancionServicio {
     
-    List<Cancion> findAll();   
+    List<Cancion> findAll();
+    //List<Cancion> findAllSpecificaciones(SearchSpecifications<SearchCriteria> searchSpecifications);   
   
     List<CancionAmpliadaView> findBy();
     
@@ -31,5 +33,6 @@ public interface CancionServicio {
     Cancion cancionAleatoria();
     Cancion cancionAleatoria(int anyoInicial, int anyoFinal);
     Cancion cancionAleatoriaPorTema(int anyoInicial, int anyoFinal, String tema);
+
     
 }

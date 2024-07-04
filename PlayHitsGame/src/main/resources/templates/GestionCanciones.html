@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Gestion Canciones</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+
+    </head>
+    <body>
+        <header th:insert="~{plantillas/playhitsgame :: encabezado}"></header>
+        
+             
+        <div>
+             <form method="post" th:action="@{/gestionCanciones}" > 
+                <table border="2">
+                <tr>
+                    <th>Genero</th>
+                    <th>Pais</th>
+                    <th>Tema</th>
+                    <th>Año Inicial</th>
+                    <th>Año Final</th>
+                </tr>
+                <tr>
+                    <td>
+                        <select th:name="genero" title="Genero">
+                            <option th:each="generoOpt : ${T(mld.playhitsgame.exemplars.Genero).values()}" 
+                            th:value="${generoOpt}" th:text="${generoOpt}"></option>
+                        </select>
+                    </td>
+                    <td>
+                        <select th:name="pais" title="Pais">
+                            <option th:each="paisOpt : ${T(mld.playhitsgame.exemplars.Pais).values()}" 
+                            th:value="${paisOpt}" th:text="${paisOpt}"></option>
+                        </select>
+                    </td>
+                    <td>
+                        <select th:name="tema" title="Tema">
+                            <option th:each="elem : ${temas}" 
+                            th:value="${elem}" th:text="${elem}"></option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" th:name="anyoInicial" value="1950" required="required"/>
+                    </td>
+                     <td>
+                        <input type="number" th:name="anyoFinal" value="2050" required="required"/>
+                    </td>
+                    <td>
+                        <input type="submit" value="Buscar"/>   
+                    </td>
+                </tr>           
+                             
+            </form>
+            
+            <br/>
+            
+             <a href="/altaCancion" class="button" id="altaCancion"> ALTA CANCION </a>
+            
+            <p th:text="${result}"></p>
+            
+        </div>
+        
+        <div th:if="${canciones != null and !canciones.empty}">
+            
+            
+            <table border="2">
+                <tr>
+                    <th>Titulo</th>
+                    <th>Interprete</th>
+                    <th>Album</th>
+                    <th>Genero</th>
+                    <th>Pais</th>
+                    <th>Tema</th>                   
+                    <th>Año</th>
+                    <th>Spotifyid</th>
+                    <th>Acciones</th>
+                </tr>
+                <tr th:each="elem : ${canciones}">
+                    <td th:text="${elem.titulo}"></td>
+                    <td th:text="${elem.interprete}"></td>
+                    <td th:text="${elem.album}"></td>
+                    <td th:text="${elem.genero}"></td>
+                    <td th:text="${elem.pais}"></td>
+                    <td th:text="${elem.tema}"></td>
+                    <td th:text="${elem.anyo}"></td>
+                    <td th:text="${elem.spotifyid}"></td>
+                    <td>
+                        <a th:href="@{'/modificarCancion/' + ${elem.id}}">Editar</a>
+                        <a th:href="@{'/eliminarCancion/' + ${elem.id}}">Eliminar</a>
+                    </td>
+                </tr>
+            </table>
+        </div>   
+        
+        <div th:if="${canciones == null or canciones.empty}">
+            <p>NO HAY NINGUNA CANCION PARA LISTAR</p>
+        </div>
+        
+        <footer th:insert="~{plantillas/playhitsgame :: pie}"></footer>
+    </body>
+</html>

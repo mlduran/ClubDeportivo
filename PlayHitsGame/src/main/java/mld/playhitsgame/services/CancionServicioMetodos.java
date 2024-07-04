@@ -10,10 +10,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import mld.playhitsgame.DAO.CancionDAO;
+import mld.playhitsgame.exemplars.SearchCriteria;
+import mld.playhitsgame.exemplars.SearchOperation;
+import mld.playhitsgame.exemplars.SearchSpecifications;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.Ronda;
-import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.projections.ampliada.CancionAmpliadaView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,10 +27,16 @@ public class CancionServicioMetodos implements CancionServicio{
     CancionDAO DAO;
 
     @Override
-    public List<Cancion> findAll() {
-        return DAO.findAll();
+    public List<Cancion> findAll(){
+        
+        return DAO.findAll();        
+        
     }
-
+        
+   // @Override
+   // public List<Cancion> findAllSpecificaciones(SearchSpecifications<SearchCriteria> searchSpecifications){
+   //     return DAO.findAllSpecificaciones(searchSpecifications);           
+   //}
     
     @Override
     public List<CancionAmpliadaView> findBy() {
@@ -85,6 +93,8 @@ public class CancionServicioMetodos implements CancionServicio{
             cancionObj.setSpotifyid(cancion.getSpotifyid());
         }
         
+        cancionObj.setRevisar(cancion.pendienteRevision());
+        
         
         return DAO.save(cancionObj);
     }
@@ -125,6 +135,26 @@ public class CancionServicioMetodos implements CancionServicio{
         
     }
     
+    public List<Cancion> buscarCancionesPorCriterios(List<String> generos, List<String> paises, 
+            List <String> temas, int anyoInicial, int anyofinal ){
+        
+        
+        SearchSpecifications<SearchCriteria> searchSpecifications = new SearchSpecifications();
+        
+        if(!generos.isEmpty())
+            searchSpecifications.add(new SearchCriteria("genero",generos, SearchOperation.IN));
+        if(!paises.isEmpty())
+            searchSpecifications.add(new SearchCriteria("pais",paises, SearchOperation.IN));
+        if(!temas.isEmpty())
+            searchSpecifications.add(new SearchCriteria("tema",temas, SearchOperation.IN));
+        searchSpecifications.add(new SearchCriteria("anyo", anyoInicial, SearchOperation.GREATER_THAN_EQUAL));
+        searchSpecifications.add(new SearchCriteria("anyo", anyofinal, SearchOperation.LESS_THAN_EQUAL));
+         
+        //return findAll(searchSpecifications);
+        return DAO.findAll();
+    }
+    
+     
     
     
     public void asignarcancionesAleatorias(Partida partida) {
@@ -155,9 +185,9 @@ public class CancionServicioMetodos implements CancionServicio{
                 cancion = cancionAleatoria();
             }
             
-           if (cancion != null)
+            if (cancion != null && !cancion.pendienteRevision())
                 listaCanciones.put(cancion.getId(), cancion); 
-           else 
+            else 
                intentos = intentos + 1;
        }
            
@@ -174,7 +204,7 @@ public class CancionServicioMetodos implements CancionServicio{
        
         
     }
-    
+
     
     
     
