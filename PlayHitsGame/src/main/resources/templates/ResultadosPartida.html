@@ -17,7 +17,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 <table border="2" >                   
                    <tr>
                        <td><p>PARTIDA</p></td>
-                       <td><p th:text="${partidaSesion.descripcion}"></p></td>
+                       <td>
+                           <p th:each="txt : ${partidaSesion.descripcion}" th:text="${txt}"></p>
+                       </td>
+                       <td>Album</td>
                    </tr>
                    
                    <tr th:each="ronda : ${partidaSesion.rondas}">
@@ -27,6 +30,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <p th:text="'Interprete: ' + ${ronda.cancion.interprete}"></p>
                             <p th:text="'Año: ' + ${ronda.cancion.anyo}"></p>
                          </td>
+                         <td>
+                             <img th:src="${ronda.cancion.spotifyimagen}" alt="PLAYHITSGAME" width="100" height="100" />
+                         </td>                             
                    </tr>                   
                 </table>   
                 

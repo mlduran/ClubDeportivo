@@ -67,21 +67,21 @@ public class Partida{
         
     
     
-    public String getDescripcion(){
+    public List<String> getDescripcion(){
         
-        String txt = "";
+        ArrayList<String> txt = new ArrayList();
         
         if (this.getGrupo() != null && !this.getGrupo().isEmpty())
-            txt = txt.concat("Grupo: ").concat(this.getGrupo() + "\n");
+            txt.add("Grupo: ".concat(this.getGrupo()));
         if (this.getTema()!= null && !this.getTema().isEmpty())
-            txt = txt.concat("Tema: ").concat(this.getTema()+ "\n");
+            txt.add("Tema: ".concat(this.getTema()));
         if (this.getGenero()!= null && this.getGenero() != null)
-            txt = txt.concat("Genero: ").concat(this.getGenero().toString() + "\n");
+            txt.add("Genero: ".concat(this.getGenero().toString()));
         if (this.getPais()!= null && this.getPais()!= null)
-            txt = txt.concat("Pais: ").concat(this.getPais().toString() + "\n");
+            txt.add("Pais: ".concat(this.getPais().toString()));
         
-        txt = txt.concat("Año inicial: " + String.valueOf(this.getAnyoInicial()) + "\n");
-        txt = txt.concat("Año final: " + String.valueOf(this.getAnyoFinal()));
+        txt.add("Año inicial: " + String.valueOf(this.getAnyoInicial()));
+        txt.add("Año final: " + String.valueOf(this.getAnyoFinal()));
         
         
         return txt;

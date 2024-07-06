@@ -16,7 +16,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         
              
         <div>
-             <form method="post" th:action="@{/gestionCanciones}" > 
+             <form method="post" th:action="@{/gestionCanciones}" th:object="${filtro}" > 
                 <table border="2">
                 <tr>
                     <th>Genero</th>
@@ -24,40 +24,45 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                     <th>Tema</th>
                     <th>Año Inicial</th>
                     <th>Año Final</th>
+                    <th>Verificar</th>
                 </tr>
                 <tr>
                     <td>
-                        <select th:name="genero" title="Genero">
+                        <select th:field="*{genero}" title="Genero">
                             <option th:each="generoOpt : ${T(mld.playhitsgame.exemplars.Genero).values()}" 
                             th:value="${generoOpt}" th:text="${generoOpt}"></option>
                         </select>
                     </td>
                     <td>
-                        <select th:name="pais" title="Pais">
+                        <select th:field="*{pais}" title="Pais">
                             <option th:each="paisOpt : ${T(mld.playhitsgame.exemplars.Pais).values()}" 
                             th:value="${paisOpt}" th:text="${paisOpt}"></option>
                         </select>
                     </td>
                     <td>
-                        <select th:name="tema" title="Tema">
+                        <select th:field="*{tema}" title="Tema">
                             <option th:each="elem : ${temas}" 
                             th:value="${elem}" th:text="${elem}"></option>
                         </select>
                     </td>
                     <td>
-                        <input type="number" th:name="anyoInicial" value="1950" required="required"/>
+                        <input type="number" th:field="*{anyoInicial}" required="required"/>
                     </td>
                      <td>
-                        <input type="number" th:name="anyoFinal" value="2050" required="required"/>
+                        <input type="number" th:field="*{anyoFinal}" required="required"/>
                     </td>
+                    
+                    <td>
+                        <input type="checkbox" th:field="*{revisar}" />
+                    </td>
+                    
                     <td>
                         <input type="submit" value="Buscar"/>   
                     </td>
                 </tr>           
                              
-            </form>
-            
-            <br/>
+            </form> 
+                 
             
              <a href="/altaCancion" class="button" id="altaCancion"> ALTA CANCION </a>
             
@@ -65,36 +70,43 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             
         </div>
         
+        
         <div th:if="${canciones != null and !canciones.empty}">
             
-            
-            <table border="2">
-                <tr>
-                    <th>Titulo</th>
-                    <th>Interprete</th>
-                    <th>Album</th>
-                    <th>Genero</th>
-                    <th>Pais</th>
-                    <th>Tema</th>                   
-                    <th>Año</th>
-                    <th>Spotifyid</th>
-                    <th>Acciones</th>
-                </tr>
-                <tr th:each="elem : ${canciones}">
-                    <td th:text="${elem.titulo}"></td>
-                    <td th:text="${elem.interprete}"></td>
-                    <td th:text="${elem.album}"></td>
-                    <td th:text="${elem.genero}"></td>
-                    <td th:text="${elem.pais}"></td>
-                    <td th:text="${elem.tema}"></td>
-                    <td th:text="${elem.anyo}"></td>
-                    <td th:text="${elem.spotifyid}"></td>
-                    <td>
-                        <a th:href="@{'/modificarCancion/' + ${elem.id}}">Editar</a>
-                        <a th:href="@{'/eliminarCancion/' + ${elem.id}}">Eliminar</a>
-                    </td>
-                </tr>
-            </table>
+            <form method="post" th:action="@{/marcarRevision}" >
+                <input type="submit" value="Marcar la seleccion para pendiente de validar"/>  
+                <table border="2">
+                    <tr> 
+                        <th>Sel</th>
+                        <th>Titulo</th>
+                        <th>Interprete</th>
+                        <th>Album</th>
+                        <th>Genero</th>
+                        <th>Pais</th>
+                        <th>Tema</th>                   
+                        <th>Año</th>
+                        <th>Spotifyid</th>                   
+                        <th>Verificar?</th>
+                        <th>Acciones</th>
+                    </tr>
+                    <tr th:each="elem : ${canciones}">
+                        <td><input type="checkbox" th:name="${elem.selId()}" th:id="${elem.selId()}" /></td>
+                        <td th:text="${elem.titulo}"></td>
+                        <td th:text="${elem.interprete}"></td>
+                        <td th:text="${elem.album}"></td>
+                        <td th:text="${elem.genero}"></td>
+                        <td th:text="${elem.pais}"></td>
+                        <td th:text="${elem.tema}"></td>
+                        <td th:text="${elem.anyo}"></td>
+                        <td th:text="${elem.spotifyid}"></td>
+                        <td th:text="${elem.txtRevision()}"></td>
+                        <td>
+                            <a th:href="@{'/modificarCancion/' + ${elem.id}}">Editar</a>
+                            <a th:href="@{'/eliminarCancion/' + ${elem.id}}">Eliminar</a>
+                        </td>
+                    </tr>
+                </table>
+            </form>
         </div>   
         
         <div th:if="${canciones == null or canciones.empty}">

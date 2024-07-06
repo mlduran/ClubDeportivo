@@ -17,7 +17,7 @@ import org.springframework.data.jpa.domain.Specification;
  *
  * @author miguel
  */
-public class SearchSpecifications <T> implements Specification<T> {
+public class SearchSpecifications implements Specification<Cancion> {
     private List<SearchCriteria> searchCriteriaList;
     public SearchSpecifications() {
         this.searchCriteriaList = new ArrayList<>();
@@ -26,7 +26,7 @@ public class SearchSpecifications <T> implements Specification<T> {
         searchCriteriaList.add(criteria);
     }
     @Override
-    public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
+    public Predicate toPredicate(Root<Cancion> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
         List<Predicate> predicates = new ArrayList<>();
         for (SearchCriteria criteria : searchCriteriaList) {
             switch (criteria.getSearchOperation() ) {

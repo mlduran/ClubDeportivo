@@ -14,6 +14,7 @@ import mld.playhitsgame.exemplars.SearchCriteria;
 import mld.playhitsgame.exemplars.SearchOperation;
 import mld.playhitsgame.exemplars.SearchSpecifications;
 import mld.playhitsgame.exemplars.Cancion;
+import mld.playhitsgame.exemplars.FiltroCanciones;
 import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.Ronda;
 import mld.playhitsgame.projections.ampliada.CancionAmpliadaView;
@@ -42,13 +43,8 @@ public class CancionServicioMetodos implements CancionServicio{
     public List<CancionAmpliadaView> findBy() {
         return DAO.findBy();
         
-    }
+    }  
   
-    /*@Override
-    public Optional<Cancion> findCancionById(Long id) {
-        return DAO.findCancionById(id);
-    }*/
-    
     @Override
     public Optional<Cancion> findById(Long id) {
         return DAO.findById(id);
@@ -109,37 +105,14 @@ public class CancionServicioMetodos implements CancionServicio{
         i = (int) (Math.floor(Math.random() * lista.size()));
         
         return lista.get(i);        
-    }
+    }   
 
-    @Override
-    public Cancion cancionAleatoria() {
-                
-        return cancionRandom(DAO.findAll());
-        
-      
-    }
-    
-    @Override
-    public Cancion cancionAleatoria(int anyoInicial, int anyoFinal) {
-                
-        return cancionRandom(DAO.findByAnyo(anyoInicial, anyoFinal));        
-        
-        
-    }
-    
-    @Override
-    public Cancion cancionAleatoriaPorTema(int anyoInicial, int anyoFinal, String tema) {
-                
-        return cancionRandom(DAO.findByTema(anyoInicial, anyoFinal, tema));        
-        
-        
-    }
     
     public List<Cancion> buscarCancionesPorCriterios(List<String> generos, List<String> paises, 
             List <String> temas, int anyoInicial, int anyofinal ){
         
         
-        SearchSpecifications<SearchCriteria> searchSpecifications = new SearchSpecifications();
+        SearchSpecifications searchSpecifications = new SearchSpecifications();
         
         if(!generos.isEmpty())
             searchSpecifications.add(new SearchCriteria("genero",generos, SearchOperation.IN));
@@ -154,53 +127,52 @@ public class CancionServicioMetodos implements CancionServicio{
         return DAO.findAll();
     }
     
-     
+    public List<Cancion> buscarCancionesPorFiltro(FiltroCanciones filtro ){
+        
+        if ("".equals(filtro.getTema()))       
+            return DAO.findByFiltroSinTema(filtro.getGenero(), filtro.getPais(),  filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar());
+        else 
+           return DAO.findByFiltroConTema(filtro.getGenero(), filtro.getPais(), filtro.getTema(), filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar());         
+          
+    }
     
-    
+        
     public void asignarcancionesAleatorias(Partida partida) {
                 
-       HashMap<Long,Cancion> listaCanciones =  new HashMap();       
+        HashMap<Long,Cancion> listaCanciones =  new HashMap(); 
+        List<Cancion> canciones;
        
-       // esto es por si no hay suficientes canciones poder cager de toda la BD
-       // en este momento ya hemos creado la partida y no podemos volver a atras
-       int intentos = 0;
+        if (!partida.getTema().isBlank())
+            canciones = DAO.findByFiltroSinTema(partida.getGenero().toString(), 
+                    partida.getPais().toString(),  partida.getAnyoInicial(), 
+                    partida.getAnyoFinal(), false);
+        else 
+            canciones = DAO.findByFiltroConTema(partida.getGenero().toString(), 
+                    partida.getPais().toString(),  partida.getTema(), partida.getAnyoInicial(), 
+                    partida.getAnyoFinal(), false);
        
-       while (listaCanciones.size() < partida.getRondas().size() + 1){
+        if (canciones.size() < partida.getRondas().size()){            
+            // No hay suficientes canciones, valorar de sacar un mensaje al usuario
+            canciones = DAO.finBySinRevisar();            
+        }
+            
+        while (listaCanciones.size() < partida.getRondas().size() + 1){
            
-           Cancion cancion = null;
-           
-            if (intentos < partida.getRondas().size() * 3){
-                           
-                // Si lo hacemos por tema
-                if (!partida.getTema().isBlank()){
-                    cancion = cancionAleatoriaPorTema(partida.getAnyoInicial(), partida.getAnyoFinal(), partida.getTema());
-                }
+            Cancion cancion = cancionRandom(canciones);
+            listaCanciones.put(cancion.getId(), cancion); 
 
-                // No hay ninguna seleecion ademas del año
-                if (partida.getTema().isBlank()){ //aquiponer el resto
-                    cancion = cancionAleatoria(partida.getAnyoInicial(), partida.getAnyoFinal());
-                }
-            
-            }else{
-                cancion = cancionAleatoria();
-            }
-            
-            if (cancion != null && !cancion.pendienteRevision())
-                listaCanciones.put(cancion.getId(), cancion); 
-            else 
-               intentos = intentos + 1;
-       }
+        }
            
-       ArrayList<Cancion> lista = new ArrayList();
-       for (HashMap.Entry<Long, Cancion> elem : listaCanciones.entrySet()){
-           lista.add(elem.getValue());
-       }
-       
-       int i = 0;
-       for (Ronda ronda : partida.getRondas()){
-           ronda.setCancion(lista.get(i));
-           i = i + 1;
-       }
+        ArrayList<Cancion> lista = new ArrayList();
+        for (HashMap.Entry<Long, Cancion> elem : listaCanciones.entrySet()){
+            lista.add(elem.getValue());
+        }
+
+        int i = 0;
+        for (Ronda ronda : partida.getRondas()){
+            ronda.setCancion(lista.get(i));
+            i = i + 1;
+        }
        
         
     }

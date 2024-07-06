@@ -25,7 +25,7 @@ public interface CancionDAO extends JpaRepository<Cancion, Long>{
     
     @Override
     List<Cancion> findAll();
-    //List<Cancion> findAllSpecificaciones(SearchSpecifications<SearchCriteria> searchSpecifications);
+    //List<Cancion> findAll(SearchSpecifications searchSpecifications);
     List<CancionAmpliadaView> findBy();
     
     //@Query("SELECT * FROM cancion WHERE id = :id")
@@ -34,12 +34,14 @@ public interface CancionDAO extends JpaRepository<Cancion, Long>{
     @Override
     Optional<Cancion> findById(Long id);   
     
-    @Query(value = "SELECT * FROM canciones WHERE anyo>=:anyoinicial AND anyo<=:anyofinal ;", nativeQuery=true)
-    List<Cancion> findByAnyo(int anyoinicial,int anyofinal);
-
-    @Query(value = "SELECT * FROM canciones WHERE anyo>=:anyoinicial AND anyo<=:anyofinal AND tema=:tema ;", nativeQuery=true)
-    List<Cancion> findByTema(int anyoinicial,int anyofinal, String tema);
+    @Query(value = "SELECT * FROM canciones WHERE genero=:genero AND pais=:pais AND anyo>=:anyoinicial AND anyo<=:anyofinal AND revisar=:revisar ;", nativeQuery = true)
+    List<Cancion> findByFiltroSinTema(String genero, String pais, int anyoinicial, int anyofinal, boolean revisar);
     
+    @Query(value = "SELECT * FROM canciones WHERE genero=:genero AND pais=:pais AND tema=:tema AND anyo>=:anyoinicial AND anyo<=:anyofinal AND revisar=:revisar ;", nativeQuery = true)
+    List<Cancion> findByFiltroConTema(String genero, String pais, String tema, int anyoinicial, int anyofinal, boolean revisar);
+
+    @Query(value = "SELECT * FROM canciones WHERE revisar=false ;", nativeQuery = true)
+    List<Cancion> finBySinRevisar();
    
     
     

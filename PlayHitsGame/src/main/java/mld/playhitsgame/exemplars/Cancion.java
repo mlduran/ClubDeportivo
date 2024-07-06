@@ -44,11 +44,26 @@ public class Cancion{
     private List<Ronda> rondas ;
     private boolean revisar;
     
-     public boolean pendienteRevision(){
+    public String selId(){
+        
+        return "sel_" + String.valueOf(this.getId());
+    }
+    
+    public boolean pendienteRevision(){
         
         return this.isRevisar();
         
     }
+    
+    public String txtRevision(){
+        
+        if (this.isRevisar())
+            return "SI";
+        else 
+            return "NO";
+        
+    }
+     
     
 }
 

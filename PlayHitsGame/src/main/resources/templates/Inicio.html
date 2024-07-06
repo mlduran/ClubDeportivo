@@ -18,7 +18,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             
             <form method="post" th:action="@{/}">                
                 <input type="text" placeholder="Usuario (mail)" name="elUsuario" required="required"/>
-                <input type="text" placeholder="Contraseña" name="laContrasenya" required="required"/>
+                <input type="password" placeholder="Contraseña" name="laContrasenya" required="required"/>
                 <input type="submit" value="ACCEDER"/>                
             </form>
             <p th:text="${error}"></p>
