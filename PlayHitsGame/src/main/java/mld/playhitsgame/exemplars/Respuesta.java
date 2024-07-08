@@ -31,10 +31,10 @@ public class Respuesta{
     private int anyo;
     private int puntos;
     
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch=FetchType.EAGER)
     private Ronda ronda;
     
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     private Usuario usuario;
 
 

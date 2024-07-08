@@ -46,13 +46,13 @@ public class Usuario{
     @CreationTimestamp 
     private Date alta;
     
-    @OneToMany(mappedBy = "master", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "master")
     private List<Partida> partidasMaster;
     
-    @OneToMany(mappedBy = "usuario", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "usuario")
     private List<Respuesta> respuestas;
     
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany
     @JoinTable(
             name = "usuario_partida", 
             joinColumns = @JoinColumn(name="usuario_id", referencedColumnName = "id"),

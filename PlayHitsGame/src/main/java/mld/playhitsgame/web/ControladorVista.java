@@ -58,7 +58,9 @@ public class ControladorVista {
     
     @GetMapping("/panel")
     public String panel(Model modelo){    
-         
+        
+        Usuario usuarioSesion = (Usuario) modelo.getAttribute(")usuarioSesion");
+        modelo.addAttribute("usuarioSesion", usuarioSesion);
         return "Panel";        
     }
     
@@ -66,6 +68,7 @@ public class ControladorVista {
     private void resultadosPartida(Partida partidaSesion, Model modelo){
         
         HashMap<String,List<Respuesta>> resultadosPartida = new HashMap();
+        HashMap<String,Integer> totales = new HashMap();
         String nomUsu;
         ArrayList lista;
         
@@ -81,9 +84,19 @@ public class ControladorVista {
             }
         }
         
+        //Crear la suma total
+        for (String usu : resultadosPartida.keySet() ){
+            int total = 0;
+            for (Respuesta resp : resultadosPartida.get(usu))
+                total = total + resp.getPuntos();
+            totales.put(usu, total);
+        }
+        
+        modelo.addAttribute("ptstotales", totales);
         modelo.addAttribute("resultados", resultadosPartida);
         
     }
+    
     
     @GetMapping("/partidaConsulta/{id}")
     public String partidaConsulta(@PathVariable Long id, Model modelo){
@@ -124,8 +137,8 @@ public class ControladorVista {
      
     public String partida(Model modelo, Partida partida){
         
-        Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");
-             
+        Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");        
+            
         modelo.addAttribute("partidaSesion", partida);
                 
         return "Partida";      
@@ -152,6 +165,7 @@ public class ControladorVista {
             partida.pasarSiguienteRonda();            
             acabar = false;
         }else{
+            resultadosPartida(partida, modelo);
             partida.setStatus(StatusPartida.Terminada);
             partida.asignarGanador();
         }
@@ -159,9 +173,8 @@ public class ControladorVista {
         
         modelo.addAttribute("partidaSesion", partida);
                 
-        if (acabar){
-            resultadosPartida(partida, modelo);
-            return "ResultadosPartida";
+        if (acabar){            
+            return "redirect:/partidaConsulta/" + String.valueOf(partida.getId()); 
         }else 
             return "Partida";        
     }

@@ -9,10 +9,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
-    <body>
-              
+    <body>           
             
             <div>
+                <a href="/panel" class="button">Volver</a>
              
                 <table border="2" >                   
                    <tr>
@@ -20,7 +20,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                        <td>
                            <p th:each="txt : ${partidaSesion.descripcion}" th:text="${txt}"></p>
                        </td>
-                       <td>Album</td>
+                       <td></td>
                    </tr>
                    
                    <tr th:each="ronda : ${partidaSesion.rondas}">
@@ -40,6 +40,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                     <tr>
                        <th>Usuario</th>
                        <th th:each="ronda : ${partidaSesion.rondas}" th:text="'Ronda ' + ${ronda.numero}"/>
+                       <th>Total</th>
                     </tr> 
                     <tr>
                        <th>PUNTOS</th>
@@ -47,6 +48,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                     <tr th:each="elem : ${resultados}">
                         <td th:text="${elem.key}"></td>
                         <td th:each="resp : ${elem.value}" th:text="${resp.puntos}"/> 
+                        <td th:each="pts : ${ptstotales}">
+                            <p th:if="${pts.key} == ${elem.key}" th:text="${pts.value}"/>
+                        </td>
                     </tr>          
                      <tr>
                        <th>RESPUESTA AÑO</th>

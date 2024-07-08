@@ -6,7 +6,6 @@ package mld.playhitsgame.exemplars;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -43,16 +42,15 @@ public class Partida{
     private StatusPartida status;
     
     
-    @ManyToOne(fetch = FetchType.EAGER)// poner LAZY para no cargar hasta hacer un get
+    @ManyToOne// poner LAZY para no cargar hasta hacer un get
     private Usuario master;
     
     
-    @ManyToMany(mappedBy = "partidasInvitado", fetch = FetchType.EAGER) 
+    @ManyToMany(mappedBy = "partidasInvitado", fetch=FetchType.EAGER)
     private List<Usuario> invitados;
     
-    @OneToMany(mappedBy = "partida", fetch = FetchType.EAGER) // poner LAZY para no cargar hasta hacer un get 
-    private List<Ronda> rondas;
-    
+    @OneToMany(mappedBy = "partida", fetch=FetchType.EAGER) // poner LAZY para no cargar hasta hacer un get 
+    private List<Ronda> rondas;    
   
     private int rondaActual;
     private Genero genero;

@@ -32,13 +32,13 @@ public class Ronda{
     private int numero;
     private boolean completada;
     
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch=FetchType.EAGER)
     private Partida partida;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     private Cancion cancion;
     
-    @OneToMany(mappedBy = "ronda", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "ronda", fetch=FetchType.EAGER)
     private List<Respuesta> respuestas;
 
     public boolean estaCompletada(){

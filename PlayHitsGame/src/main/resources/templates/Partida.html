@@ -14,38 +14,47 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             
             <div>
             
-               <table border="2" >
-                   
+               <table border="2" >                   
                    <tr>
                        <td><p>PARTIDA</p></td>
-                       <td><p th:text="${partidaSesion.descripcion}"></p></td>
+                       <td>
+                           <p th:each="txt : ${partidaSesion.descripcion}" th:text="${txt}"></p>
+                       </td>
+                       <td></td>
                    </tr>
-                   
-                   <tr th:each="ronda : ${partidaSesion.rondas}">
-                         <td th:text="'RONDA ' + ${ronda.numero}"></td> 
-                         
-                         <td th:if="${ronda.estaCompletada()}">
-                            <p th:text="'Titulo: ' + ${ronda.cancion.titulo}"></p>
-                            <p th:text="'Interprete: ' + ${ronda.cancion.interprete}"></p>
-                            <p th:text="'Año: ' + ${ronda.cancion.anyo}"></p>
-                         </td>
-                         
-                         <td th:if="${partidaSesion.rondaActual != ronda.numero && !ronda.estaCompletada()}">
-                            <p>Pendiente</p>
-                         </td>
-                        
-                         <td th:if="${partidaSesion.rondaActual  == ronda.numero}">
-                            <audio controls>
-                                <source th:src="${ronda.cancion.spotifyplay}" type="audio/mpeg"/>
-                            </audio> 
-                             
-                            <form method="post" action="/partida" >                
-                                <input type="number" name="anyo" required="required"/>          
-                                <input type="submit" value="Responder"/>                
-                            </form>
-                            
-                        </td>     
-                   </tr>                   
+                   <tr th:each="ronda : ${partidaSesion.rondas}">                                              
+                         <div th:if="${partidaSesion.rondaActual  == ronda.numero}">
+                            <td th:text="'RONDA ' + ${ronda.numero}"></td>  
+                            <td>
+                                <audio controls>
+                                    <source th:src="${ronda.cancion.spotifyplay}" type="audio/mpeg"/>
+                                </audio>                              
+                                <form method="post" action="/partida" >                
+                                    <input type="number" name="anyo" required="required"/>          
+                                    <input type="submit" value="Responder"/>                
+                                </form>  
+                            </td>
+                         </div>    
+                   </tr> 
+                   <tr th:each="ronda : ${partidaSesion.rondas}">                         
+                         <div th:if="${ronda.estaCompletada()}">
+                            <td th:text="'RONDA ' + ${ronda.numero}"></td> 
+                            <td>
+                                <p th:text="'Titulo: ' + ${ronda.cancion.titulo}"></p>
+                                <p th:text="'Interprete: ' + ${ronda.cancion.interprete}"></p>
+                                <p th:text="'Año: ' + ${ronda.cancion.anyo}"></p>
+                            </td>
+                            <td>
+                                <img th:src="${ronda.cancion.spotifyimagen}" alt="PLAYHITSGAME" width="100" height="100" />
+                            </td>  
+                         </div>
+                         <div th:if="${partidaSesion.rondaActual != ronda.numero && !ronda.estaCompletada()}">
+                             <td th:text="'RONDA ' + ${ronda.numero}"></td> 
+                             <td>
+                                <p>Pendiente</p>
+                            </td> 
+                         </div>                     
+                   </tr>      
                 </table>   
             
             </div>

@@ -17,48 +17,29 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             <p th:text="*{nombre}"></p>
             
             <div th:if="*{partidaMasterPendienteAnyadirJugadores()} != null">
-            
-            
                 <a href="/partida/anyadirInvitados" class="button" id="partidaMasterPendienteAnyadirJugadores"> PARTIDA PENDIENTE DE AÑADIR USUARIOS</a>
                 <br/>
-            
-            
                 <br/>
             </div>
-
 
             <div th:if="*{partidaMasterEnCurso()} != null">
-            
-            
                 <a href="/partidaMaster" class="button" id="partidaMasterEnCurso"> PARTIDA MASTER EN CURSO </a>
                 <br/>
-            
-            
                 <br/>
-            </div>
-            
+            </div>            
             
             <div th:if="*{hayPartidasInvitadoPendientes()} == true">
-            
-            
                 <a href="/partidaInvitado" class="button" id="partidasInvitadoPendientes"> PARTIDAS INVITADO EN CURSO </a>
                 <br/>
-            
-            
                 <br/>
-            </div>
-            
+            </div>            
             
             <div th:if="*{sePuedeCrearPartidaMaster()} == true">
-                
                 <a href="/partida/crear" class="button" id="crearpartida"> CREAR PARTIDA </a>
-            
                  <br/>
-            
             </div>
             
             <div th:if="*{hayPartidasTerminadas()} == true">
-                
                 <table border="2" > 
                     <tr>
                         <th>PARTIDAS FINALIZADAS</th>                   
@@ -69,14 +50,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                 <p th:text="${unapartida.id}"/>
                             </a>
                         </td>                       
-                    </tr>  
-                     
-                </table>
-             
-            </div>           
-            
-        </div> 
-        
+                    </tr>                       
+                </table>             
+            </div> 
+        </div>         
         <p th:text="${result}"></p>
 
     </body>
