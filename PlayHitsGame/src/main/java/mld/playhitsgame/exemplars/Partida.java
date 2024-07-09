@@ -63,7 +63,18 @@ public class Partida{
     private String grupo;
     private String ganador;
         
-    
+    public List<Respuesta> respuestasUsuario(Usuario usuario){
+        
+        ArrayList<Respuesta> respuestas = new ArrayList();
+        for (Ronda ronda : this.getRondas()){
+            for (Respuesta resp : ronda.getRespuestas()){
+                if (resp.getUsuario() == usuario)
+                    respuestas.add(resp);
+            }           
+        }
+        
+        return respuestas;
+    }
     
     public List<String> getDescripcion(){
         

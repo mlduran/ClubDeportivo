@@ -46,7 +46,13 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             </td>
                             <td>
                                 <img th:src="${ronda.cancion.spotifyimagen}" alt="PLAYHITSGAME" width="100" height="100" />
-                            </td>  
+                            </td> 
+                            <div th:each="resp : ${respuestas}">
+                                <td th:if="${resp.ronda.numero == ronda.numero}">
+                                    <p th:text="Respuestas"/>
+                                    <p th:text="'Año ' + ${resp.anyo}"/>
+                                </td>
+                            </div>
                          </div>
                          <div th:if="${partidaSesion.rondaActual != ronda.numero && !ronda.estaCompletada()}">
                              <td th:text="'RONDA ' + ${ronda.numero}"></td> 

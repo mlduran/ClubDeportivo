@@ -139,6 +139,7 @@ public class ControladorVista {
         Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");        
             
         modelo.addAttribute("partidaSesion", partida);
+        modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
                 
         return "Partida";      
         
@@ -170,6 +171,7 @@ public class ControladorVista {
         }
         servPartida.updatePartida(partida.getId(), partida);        
         modelo.addAttribute("partidaSesion", partida);
+        modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
                 
         if (acabar){            
             return "redirect:/partidaConsulta/" + String.valueOf(partida.getId()); 
