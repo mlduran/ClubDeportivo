@@ -98,14 +98,7 @@ public class CancionServicioMetodos implements CancionServicio{
     @Override
     public void deleteCancion(Long id) {
         DAO.deleteById(id);
-    }
-    
-    private Cancion cancionRandom(List<Cancion> lista){
-        int i;  
-        i = (int) (Math.floor(Math.random() * lista.size()));
-        
-        return lista.get(i);        
-    }   
+    } 
 
     
     public List<Cancion> buscarCancionesPorCriterios(List<String> generos, List<String> paises, 
@@ -129,53 +122,30 @@ public class CancionServicioMetodos implements CancionServicio{
     
     public List<Cancion> buscarCancionesPorFiltro(FiltroCanciones filtro ){
         
-        if ("".equals(filtro.getTema()))       
+        if (!"".equals(filtro.getTema()))  
+            return DAO.findByFiltroConTema(filtro.getTema(), filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar());  
+        else
             return DAO.findByFiltroSinTema(filtro.getGenero(), filtro.getPais(),  filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar());
-        else 
-           return DAO.findByFiltroConTema(filtro.getGenero(), filtro.getPais(), filtro.getTema(), filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar());         
+        
+                  
           
     }
     
+    public List<Cancion> obtenerCanciones(Partida partida){        
         
-    public void asignarcancionesAleatorias(Partida partida) {
-                
-        HashMap<Long,Cancion> listaCanciones =  new HashMap(); 
         List<Cancion> canciones;
        
         if (!partida.getTema().isBlank())
+            canciones = DAO.findByFiltroConTema(partida.getTema(), partida.getAnyoInicial(), 
+                    partida.getAnyoFinal(), false);            
+        else 
             canciones = DAO.findByFiltroSinTema(partida.getGenero().toString(), 
                     partida.getPais().toString(),  partida.getAnyoInicial(), 
-                    partida.getAnyoFinal(), false);
-        else 
-            canciones = DAO.findByFiltroConTema(partida.getGenero().toString(), 
-                    partida.getPais().toString(),  partida.getTema(), partida.getAnyoInicial(), 
-                    partida.getAnyoFinal(), false);
-       
-        if (canciones.size() < partida.getRondas().size()){            
-            // No hay suficientes canciones, valorar de sacar un mensaje al usuario
-            canciones = DAO.finBySinRevisar();            
-        }
-            
-        while (listaCanciones.size() < partida.getRondas().size() + 1){
-           
-            Cancion cancion = cancionRandom(canciones);
-            listaCanciones.put(cancion.getId(), cancion); 
-
-        }
-           
-        ArrayList<Cancion> lista = new ArrayList();
-        for (HashMap.Entry<Long, Cancion> elem : listaCanciones.entrySet()){
-            lista.add(elem.getValue());
-        }
-
-        int i = 0;
-        for (Ronda ronda : partida.getRondas()){
-            ronda.setCancion(lista.get(i));
-            i = i + 1;
-        }
-       
+                    partida.getAnyoFinal(), false);       
         
-    }
+        return canciones;
+        
+    }  
 
     
     

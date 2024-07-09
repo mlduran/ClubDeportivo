@@ -26,6 +26,7 @@ import mld.playhitsgame.services.RespuestaServicioMetodos;
 import mld.playhitsgame.services.RondaServicioMetodos;
 import mld.playhitsgame.services.TemaServicioMetodos;
 import mld.playhitsgame.services.UsuarioServicioMetodos;
+import static mld.playhitsgame.web.Utilidades.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -58,9 +59,7 @@ public class ControladorVista {
     
     @GetMapping("/panel")
     public String panel(Model modelo){    
-        
-        Usuario usuarioSesion = (Usuario) modelo.getAttribute(")usuarioSesion");
-        modelo.addAttribute("usuarioSesion", usuarioSesion);
+         
         return "Panel";        
     }
     
@@ -169,8 +168,7 @@ public class ControladorVista {
             partida.setStatus(StatusPartida.Terminada);
             partida.asignarGanador();
         }
-        servPartida.updatePartida(partida.getId(), partida);
-        
+        servPartida.updatePartida(partida.getId(), partida);        
         modelo.addAttribute("partidaSesion", partida);
                 
         if (acabar){            
@@ -207,6 +205,18 @@ public class ControladorVista {
     
     
     
+    private void anyadirTemas(Model modelo){
+        
+        ArrayList<String> temas = new ArrayList();
+        temas.add("");
+        for (Tema tema : servTema.findAll())
+            temas.add(tema.getTema());
+        modelo.addAttribute("temas", temas);
+        
+    }
+    
+    
+    
     @GetMapping("/partida/crear")
     public String crearPartida(Model modelo){     
         
@@ -215,13 +225,8 @@ public class ControladorVista {
         Partida newPartida = new Partida();
         newPartida.setAnyoInicial(1950);
         newPartida.setAnyoFinal(fecha.get(Calendar.YEAR) -1);
-        modelo.addAttribute("newpartida", newPartida);
-        ArrayList<String> temas = new ArrayList();
-        temas.add("");
-        for (Tema tema : servTema.findAll())
-            temas.add(tema.getTema());
-        modelo.addAttribute("temas", temas);
-        
+        modelo.addAttribute("newpartida", newPartida); 
+        anyadirTemas(modelo);
         return "CrearPartida";
         
     }
@@ -248,6 +253,12 @@ public class ControladorVista {
             if (nrondas < 5 || nrondas > 30)
                 throw new Exception("Las rondas deben estar entre 5 y 30");
             
+            List<Cancion> canciones = servCancion.obtenerCanciones(partida);
+            
+            if (canciones.size() < nrondas){           
+                throw new Exception("No hay suficientes canciones, cambia la seleccion");
+            }
+            
             partida.setMaster(usu);
             partida.setRondaActual(1);
             Partida newPartida = servPartida.savePartida(partida);
@@ -265,7 +276,7 @@ public class ControladorVista {
                 partida.getRondas().add(ronda);                
                 
             }
-            servCancion.asignarcancionesAleatorias(partida);
+            asignarCancionesAleatorias(partida, canciones);
             for (Ronda ronda : partida.getRondas()){                
                 servRonda.updateRonda(ronda.getId(), ronda);
             }
@@ -274,8 +285,9 @@ public class ControladorVista {
             servPartida.updatePartida(partida.getId(), partida);
             
         }catch(Exception ex){
-            String resp = "ERROR " + ex; 
-            modelo.addAttribute("result", resp);  
+            String resp = "ERROR " + ex.getMessage();
+            modelo.addAttribute("result", resp); 
+            anyadirTemas(modelo);
             return "CrearPartida";
         }          
         // obtener los usuarios posibles por grupo
@@ -291,26 +303,7 @@ public class ControladorVista {
         
     }
     
-    
-    private List<Usuario> usuariosGrupo(Usuario usu){
-        
-        
-        ArrayList<Usuario> usuarios = (ArrayList<Usuario>) servUsuario.usuariosGrupo(usu.getGrupo()); 
-        ArrayList<Usuario> invitados =  new ArrayList(); 
-        
-        // Nos eleiminamos a nosotros mismos y ponemos el resto en seleccionado por defecto
-        for (Usuario elem : usuarios){
-            if (!Objects.equals(elem.getId(), usu.getId())){
-                   invitados.add(elem);                   
-            }                
-        }
-        
-        return invitados;
-        
-    }   
-    
-    
-    
+     
     
     @GetMapping("/partida/anyadirInvitados")
     public String anyadirInvitadosPartida(Model modelo){     
@@ -345,26 +338,7 @@ public class ControladorVista {
             return "Panel";            
         } 
     }
-    
-    private void crearRespuestas(Partida partida){
         
-         for (Ronda ronda : partida.getRondas()){
-            ronda.setRespuestas(new ArrayList());
-            for (Usuario usuario : partida.usuariosPartida()){ 
-                usuario.setRespuestas(new ArrayList());
-                Respuesta newResp = new Respuesta();
-                newResp.setRonda(ronda);
-                newResp.setUsuario(usuario);
-                Respuesta resp = servRespuesta.saveRespuesta(newResp);
-                ronda.getRespuestas().add(resp);
-                usuario.getRespuestas().add(resp);
-                servUsuario.updateUsuario(usuario.getId(), usuario);
-            }            
-            
-        }        
-        
-        
-    }
     
     @PostMapping("/partida/anyadirInvitados")
     public String anyadirInvitadosPartida(Model modelo, HttpServletRequest req){     
@@ -399,28 +373,39 @@ public class ControladorVista {
            
         return "Partida";
         
-    }        
-    
-    public int calcularPtsPorAnyo(int anyo, Cancion cancion){
-        
-        int anyoCancion = cancion.getAnyo();
-        int pts = 0;
-        
-        int x = Math.abs(anyo - anyoCancion);
-        
-        if (x == 0)
-            pts = 25;
-        if (x == 1)
-            pts = 15;
-        if (x == 2)
-            pts = 10;
-        if (x > 2)
-            pts = 10 - x;
-        if (pts < 0)
-            pts = 0;
+    }   
 
-        return pts;
+    private void crearRespuestas(Partida partida){
+        
+         for (Ronda ronda : partida.getRondas()){
+            ronda.setRespuestas(new ArrayList());
+            for (Usuario usuario : partida.usuariosPartida()){ 
+                usuario.setRespuestas(new ArrayList());
+                Respuesta newResp = new Respuesta();
+                newResp.setRonda(ronda);
+                newResp.setUsuario(usuario);
+                Respuesta resp = servRespuesta.saveRespuesta(newResp);
+                ronda.getRespuestas().add(resp);
+                usuario.getRespuestas().add(resp);
+                servUsuario.updateUsuario(usuario.getId(), usuario);
+            }            
+        }         
         
     }
     
+    private List<Usuario> usuariosGrupo(Usuario usu){        
+        
+        ArrayList<Usuario> usuarios = (ArrayList<Usuario>) servUsuario.usuariosGrupo(usu.getGrupo()); 
+        ArrayList<Usuario> invitados =  new ArrayList(); 
+        
+        // Nos eleiminamos a nosotros mismos y ponemos el resto en seleccionado por defecto
+        for (Usuario elem : usuarios){
+            if (!Objects.equals(elem.getId(), usu.getId())){
+                   invitados.add(elem);                   
+            }                
+        }
+        
+        return invitados;        
+    }   
 }
+

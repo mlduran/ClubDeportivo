@@ -37,8 +37,8 @@ public interface CancionDAO extends JpaRepository<Cancion, Long>{
     @Query(value = "SELECT * FROM canciones WHERE genero=:genero AND pais=:pais AND anyo>=:anyoinicial AND anyo<=:anyofinal AND revisar=:revisar ;", nativeQuery = true)
     List<Cancion> findByFiltroSinTema(String genero, String pais, int anyoinicial, int anyofinal, boolean revisar);
     
-    @Query(value = "SELECT * FROM canciones WHERE genero=:genero AND pais=:pais AND tema=:tema AND anyo>=:anyoinicial AND anyo<=:anyofinal AND revisar=:revisar ;", nativeQuery = true)
-    List<Cancion> findByFiltroConTema(String genero, String pais, String tema, int anyoinicial, int anyofinal, boolean revisar);
+    @Query(value = "SELECT * FROM canciones WHERE tema=:tema AND anyo>=:anyoinicial AND anyo<=:anyofinal AND revisar=:revisar ;", nativeQuery = true)
+    List<Cancion> findByFiltroConTema(String tema, int anyoinicial, int anyofinal, boolean revisar);
 
     @Query(value = "SELECT * FROM canciones WHERE revisar=false ;", nativeQuery = true)
     List<Cancion> finBySinRevisar();
