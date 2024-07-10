@@ -8,19 +8,15 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
-
-
 /**
  *
  * @author miguel
  */
-
 
 @Data
 @Entity
@@ -78,21 +74,10 @@ public class Usuario{
     public String nombreId(){
         
         return nombre() + this.getClass().toString();        
-    }      
+    }     
     
     
-    public Partida partidaMasterPendienteAnyadirJugadores(){
-        
-        Partida result = null;
-        
-        for (Partida elem : this.getPartidasMaster()){
-            if (elem.getStatus() == StatusPartida.AnyadirJugadores){
-                result = elem;
-                break;
-            }
-        }        
-        return result;        
-    }
+   
     
     public Partida partidaMasterEnCurso(){
         
@@ -109,8 +94,7 @@ public class Usuario{
     
     public boolean sePuedeCrearPartidaMaster(){
         
-        return partidaMasterEnCurso() == null && 
-                partidaMasterPendienteAnyadirJugadores() == null;
+        return partidaMasterEnCurso() == null;
         
     }
         
@@ -152,6 +136,15 @@ public class Usuario{
     public boolean hayPartidasTerminadas(){
         
         return !partidasTerminadas().isEmpty();      
+        
+    }
+    
+    public String getTxtGrupo(){
+        
+        if (this.getGrupo() == null || this.getGrupo().isBlank())
+            return "Sin Informar";
+        else
+            return this.getGrupo();        
         
     }
     

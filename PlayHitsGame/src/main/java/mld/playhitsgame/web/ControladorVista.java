@@ -62,55 +62,7 @@ public class ControladorVista {
          
         return "Panel";        
     }
-    
-    
-    private void resultadosPartida(Partida partidaSesion, Model modelo){
-        
-        HashMap<String,List<Respuesta>> resultadosPartida = new HashMap();
-        HashMap<String,Integer> totales = new HashMap();
-        String nomUsu;
-        ArrayList lista;
-        
-         
-        for (Ronda ronda : partidaSesion.getRondas()){            
-            for (Respuesta respuesta : ronda.getRespuestas()){
-                nomUsu = respuesta.getUsuario().nombre();
-                if (!resultadosPartida.containsKey(nomUsu))
-                    resultadosPartida.put(nomUsu, new ArrayList());
-                lista = (ArrayList) resultadosPartida.get(nomUsu);
-                lista.add(respuesta);                
-                resultadosPartida.put(nomUsu, lista);
-            }
-        }
-        
-        //Crear la suma total
-        for (String usu : resultadosPartida.keySet() ){
-            int total = 0;
-            for (Respuesta resp : resultadosPartida.get(usu))
-                total = total + resp.getPuntos();
-            totales.put(usu, total);
-        }
-        
-        modelo.addAttribute("ptstotales", totales);
-        modelo.addAttribute("resultados", resultadosPartida);
-        
-    }
-    
-    
-    @GetMapping("/partidaConsulta/{id}")
-    public String partidaConsulta(@PathVariable Long id, Model modelo){
-        
-        Optional<Partida> partida = servPartida.findById(id);
-        Partida partidaSesion = partida.get();  
-        
-        resultadosPartida(partidaSesion, modelo);
-        
-        modelo.addAttribute("partidaSesion", partidaSesion);        
-        
-        return "ResultadosPartida";
-        
-    }
-    
+   
     @GetMapping("/partidaMaster")
     public String partidaMaster(Model modelo){
         
@@ -122,15 +74,19 @@ public class ControladorVista {
         
     }
     
-    @GetMapping("/partidaInvitado")
-    public String partidaInvitado(Model modelo){
+    @GetMapping("/partidaInvitado/{id}")
+    public String partidaInvitado(Model modelo, @PathVariable Long id){
         
         Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");
         modelo.addAttribute("rol", Rol.invitado);
         
-        List<Partida> partidas = usu.getPartidasInvitado();
+        Partida partida = null;
+        for (Partida p : usu.getPartidasInvitado()){
+            if (p.getId().equals(id))
+                partida = p;
+        }
         
-        return "SeleccionarPartida";
+        return partida(modelo, partida);
         
     }
      
@@ -203,9 +159,7 @@ public class ControladorVista {
         
         return "AltaUsuario";
         
-    }
-    
-    
+    }      
     
     private void anyadirTemas(Model modelo){
         
@@ -218,17 +172,25 @@ public class ControladorVista {
     }
     
     
-    
     @GetMapping("/partida/crear")
     public String crearPartida(Model modelo){     
         
         Calendar fecha = Calendar.getInstance();
         
+        Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");
         Partida newPartida = new Partida();
         newPartida.setAnyoInicial(1950);
         newPartida.setAnyoFinal(fecha.get(Calendar.YEAR) -1);
+        newPartida.setGrupo(usu.getGrupo());
         modelo.addAttribute("newpartida", newPartida); 
         anyadirTemas(modelo);
+        ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) usuariosGrupo(usu);
+
+        if (!posiblesInvitados.isEmpty())
+            modelo.addAttribute("posiblesinvitados", posiblesInvitados);      
+        else
+            modelo.addAttribute("posiblesinvitados", null); 
+   
         return "CrearPartida";
         
     }
@@ -236,8 +198,7 @@ public class ControladorVista {
        
     @PostMapping("/partida/crear")
     public String crearPartida(@ModelAttribute("newpartida") Partida partida, 
-            @ModelAttribute("nrondas") Integer nrondas, Model modelo){     
-           
+            @ModelAttribute("nrondas") Integer nrondas, Model modelo,  HttpServletRequest req){           
         
         Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");
         Calendar cal= Calendar.getInstance();
@@ -259,31 +220,59 @@ public class ControladorVista {
             
             if (canciones.size() < nrondas){           
                 throw new Exception("No hay suficientes canciones, cambia la seleccion");
+            } 
+            
+            partida.setInvitados(new ArrayList());
+        
+            ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) modelo.getAttribute("posiblesinvitados");
+            if (posiblesInvitados != null){
+                for (Usuario usuarioInv : posiblesInvitados){            
+
+                    String valor = req.getParameter(usuarioInv.nombreId());            
+                    if ("on".equals(valor)){
+
+                        Optional<Usuario> usuario = servUsuario.findById(usuarioInv.getId());
+                        if (!usuario.isEmpty()){                        
+                            usuario.get().getPartidasInvitado().add(partida); 
+                            partida.getInvitados().add(usuario.get());                                               
+                        }
+                    }
+                }
             }
             
             partida.setMaster(usu);
             partida.setRondaActual(1);
             Partida newPartida = servPartida.savePartida(partida);
             usu.getPartidasMaster().add(newPartida);
-            servUsuario.updateUsuario(usu.getId(), usu);            
+            for (Usuario usuPartida: partida.getInvitados())
+                servUsuario.updateUsuario(usuPartida.getId(), usuPartida);            
             
             //crear las rondas con nrondas
             partida.setRondas(new ArrayList());
             for (int i = 1; i <= nrondas; i++){
-                Ronda obj = new Ronda();
-                obj.setNumero(i);
-                obj.setPartida(partida); 
-                obj.setRespuestas(new ArrayList());
-                Ronda ronda = servRonda.saveRonda(obj);
+                Ronda newRonda = new Ronda();
+                newRonda.setNumero(i);
+                newRonda.setPartida(partida); 
+                newRonda.setRespuestas(new ArrayList());
+                Ronda ronda = servRonda.saveRonda(newRonda);
+                //Crear las respuestas
+                for (Usuario usuario : partida.usuariosPartida()){ 
+                    usuario.setRespuestas(new ArrayList());
+                    Respuesta newResp = new Respuesta();
+                    newResp.setRonda(ronda);
+                    newResp.setUsuario(usuario);
+                    servRespuesta.saveRespuesta(newResp);
+                }
+                
+                servRonda.updateRonda(ronda.getId(), ronda);
                 partida.getRondas().add(ronda);                
                 
             }
             asignarCancionesAleatorias(partida, canciones);
             for (Ronda ronda : partida.getRondas()){                
                 servRonda.updateRonda(ronda.getId(), ronda);
-            }
-            
-            partida.setStatus(StatusPartida.AnyadirJugadores);
+            }            
+            partida.setStatus(StatusPartida.EnCurso);
             servPartida.updatePartida(partida.getId(), partida);
             
         }catch(Exception ex){
@@ -291,107 +280,58 @@ public class ControladorVista {
             modelo.addAttribute("result", resp); 
             anyadirTemas(modelo);
             return "CrearPartida";
-        }          
-        // obtener los usuarios posibles por grupo
-        ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) usuariosGrupo(usu);
-
-        modelo.addAttribute("posiblesinvitados", posiblesInvitados); 
+        }
+        
         modelo.addAttribute("partidaSesion", partida); 
-        //asignar usuarios
-        if (posiblesInvitados.isEmpty())
-            return "redirect:/partida/anyadirInvitados";
-        else 
-            return "AnyadirInvitados";
-        
-    }
-    
-     
-    
-    @GetMapping("/partida/anyadirInvitados")
-    public String anyadirInvitadosPartida(Model modelo){     
-        
-        Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");   
-        
-        Optional<Partida> partidas = servPartida.partidaUsuarioMaster(usu.getId());
-        Partida partida = partidas.get();
-        
-        if (partida != null){
-            modelo.addAttribute("partidaSesion", partida);  
-        
-            ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) usuariosGrupo(usu);
 
-            if (!posiblesInvitados.isEmpty()){
-                modelo.addAttribute("posiblesinvitados", posiblesInvitados);      
-                return "AnyadirInvitados";
-            }else{
-                
-                crearRespuestas(partida);
-                partida.setStatus(StatusPartida.EnCurso);
-                servPartida.updatePartida(partida.getId(), partida);
+        return "Partida";
         
-                modelo.addAttribute("partidaSesion", partida);           
-                return "Partida";
-
-            }
-            
-        }else{
-            
-            modelo.addAttribute("result", "NO SE HA ENCONTRADO PARTIDA");  
-            return "Panel";            
-        } 
-    }
-        
+    }  
     
-    @PostMapping("/partida/anyadirInvitados")
-    public String anyadirInvitadosPartida(Model modelo, HttpServletRequest req){     
+    private void resultadosPartida(Partida partidaSesion, Model modelo){
         
-        Partida partida = (Partida) modelo.getAttribute("partidaSesion");
-        ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) modelo.getAttribute("posiblesinvitados");
-                 
-        partida.setInvitados(new ArrayList());
+        HashMap<String,List<Respuesta>> resultadosPartida = new HashMap();
+        HashMap<String,Integer> totales = new HashMap();
+        String nomUsu;
+        ArrayList lista;
         
-        for (Usuario usu : posiblesInvitados){            
-            
-            String valor = req.getParameter(usu.nombreId());            
-            if ("on".equals(valor)){
-                
-                Optional<Usuario> usuario = servUsuario.findById(usu.getId());
-                if (!usuario.isEmpty()){
-                
-                    usuario.get().getPartidasInvitado().add(partida); 
-                    partida.getInvitados().add(usuario.get());            
-                    servUsuario.updateUsuario( usuario.get().getId(), usuario.get());                    
-                }
+         
+        for (Ronda ronda : partidaSesion.getRondas()){            
+            for (Respuesta respuesta : ronda.getRespuestas()){
+                nomUsu = respuesta.getUsuario().nombre();
+                if (!resultadosPartida.containsKey(nomUsu))
+                    resultadosPartida.put(nomUsu, new ArrayList());
+                lista = (ArrayList) resultadosPartida.get(nomUsu);
+                lista.add(respuesta);                
+                resultadosPartida.put(nomUsu, lista);
             }
         }
         
-        //crear las respuestas 
-        crearRespuestas(partida);
-     
-        partida.setStatus(StatusPartida.EnCurso);
-        servPartida.updatePartida(partida.getId(), partida);
+        //Crear la suma total
+        for (String usu : resultadosPartida.keySet() ){
+            int total = 0;
+            for (Respuesta resp : resultadosPartida.get(usu))
+                total = total + resp.getPuntos();
+            totales.put(usu, total);
+        }
         
-        modelo.addAttribute("partidaSesion", partida);
-           
-        return "Partida";
+        modelo.addAttribute("ptstotales", totales);
+        modelo.addAttribute("resultados", resultadosPartida);
         
-    }   
-
-    private void crearRespuestas(Partida partida){
+    }
+    
+    
+    @GetMapping("/partidaConsulta/{id}")
+    public String partidaConsulta(@PathVariable Long id, Model modelo){
         
-         for (Ronda ronda : partida.getRondas()){
-            ronda.setRespuestas(new ArrayList());
-            for (Usuario usuario : partida.usuariosPartida()){ 
-                usuario.setRespuestas(new ArrayList());
-                Respuesta newResp = new Respuesta();
-                newResp.setRonda(ronda);
-                newResp.setUsuario(usuario);
-                Respuesta resp = servRespuesta.saveRespuesta(newResp);
-                ronda.getRespuestas().add(resp);
-                usuario.getRespuestas().add(resp);
-                servUsuario.updateUsuario(usuario.getId(), usuario);
-            }            
-        }         
+        Optional<Partida> partida = servPartida.findById(id);
+        Partida partidaSesion = partida.get();  
+        
+        resultadosPartida(partidaSesion, modelo);
+        
+        modelo.addAttribute("partidaSesion", partidaSesion);        
+        
+        return "ResultadosPartida";
         
     }
     

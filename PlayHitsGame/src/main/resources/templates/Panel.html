@@ -14,13 +14,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <div th:object="${usuarioSesion}">
 
             <p>Usuario</p>
-            <p th:text="*{nombre}"></p>
-            
-            <div th:if="*{partidaMasterPendienteAnyadirJugadores()} != null">
-                <a href="/partida/anyadirInvitados" class="button" id="partidaMasterPendienteAnyadirJugadores"> PARTIDA PENDIENTE DE AÑADIR USUARIOS</a>
-                <br/>
-                <br/>
-            </div>
+            <p th:text="*{nombre}"></p>            
+          
 
             <div th:if="*{partidaMasterEnCurso()} != null">
                 <a href="/partidaMaster" class="button" id="partidaMasterEnCurso"> PARTIDA MASTER EN CURSO </a>
@@ -29,8 +24,17 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             </div>            
             
             <div th:if="*{hayPartidasInvitadoPendientes()} == true">
-                <a href="/partidaInvitado" class="button" id="partidasInvitadoPendientes"> PARTIDAS INVITADO EN CURSO </a>
-                <br/>
+                <table border="2" > 
+                    <tr>
+                        <th>PARTIDAS INVITADO</th>                   
+                    </tr>   
+                    <tr th:each="unapartida : *{partidasInvitado}">
+                        <td>
+                            <a th:href="'/partidaInvitado/'+${unapartida.id}" class="button" id="${unapartida.id}">
+                                <p th:text="${unapartida.descripcion}"/>
+                            </a>
+                        </td>
+                    </tr>
                 <br/>
             </div>            
             
@@ -46,8 +50,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                     </tr>    
                     <tr th:each="unapartida : *{partidasTerminadas()}">
                         <td>
+                            <p th:text="${unapartida.fechaFormateada}"/>
+                        </td>
+                        <td>
                                 <a th:href="'/partidaConsulta/' + ${unapartida.id}" class="button"> 
-                                <p th:text="${unapartida.id}"/>
+                                <p th:text="${unapartida.descripcion}"/>
                             </a>
                         </td>                       
                     </tr>                       

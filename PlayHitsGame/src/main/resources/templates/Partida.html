@@ -9,18 +9,24 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
-    <body>
-              
-            
-            <div>
-            
-               <table border="2" >                   
+    <body>           
+            <div>            
+               <table border="2" > 
+                   <tr>
+                   <p th:text="${usuarioSesion.alias}"/>
+                   <input type="hidden" id="usuario" value="${usuarioSesion.usuario}"/>
+                   </tr>
                    <tr>
                        <td><p>PARTIDA</p></td>
                        <td>
                            <p th:each="txt : ${partidaSesion.descripcion}" th:text="${txt}"></p>
                        </td>
-                       <td></td>
+                       <td>
+                           <p th:text="'Usuarios que han respondido'"/>
+                           <div id="mensajesSockets">
+                               
+                           </div>                           
+                       </td>
                    </tr>
                    <tr th:each="ronda : ${partidaSesion.rondas}">                                              
                          <div th:if="${partidaSesion.rondaActual  == ronda.numero}">
@@ -49,7 +55,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             </td> 
                             <div th:each="resp : ${respuestas}">
                                 <td th:if="${resp.ronda.numero == ronda.numero}">
-                                    <p th:text="Respuestas"/>
+                                    <p th:text="Enviado"/>
                                     <p th:text="'Año ' + ${resp.anyo}"/>
                                 </td>
                             </div>
@@ -64,5 +70,20 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 </table>   
             
             </div>
+        <script th:inline="javascript">
+            let socket = new WebSocket("ws://localhost:8080/websocket");
+            socket.onmessage = function(event){
+                let mensajesSockets = document.getElementById("mensajesSockets");
+                mensajesSockets.innerHTML += '<p>' + event.data + '</p>';
+            };
+            //El sendMessage no hace falta ya lo hara el servlet
+            // sino habria que hacer boton con onclick="sendMessage()"
+            function sendMessage(){
+                let username = document.getElementById("usuario");
+                let mensaje = username.value;
+                socket.send(mensaje);                
+            };
+            
+        </script>    
     </body>
 </html>

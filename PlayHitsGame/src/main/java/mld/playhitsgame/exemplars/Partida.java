@@ -6,6 +6,7 @@ package mld.playhitsgame.exemplars;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -62,13 +63,22 @@ public class Partida{
     private int anyoFinal;
     private String grupo;
     private String ganador;
+    
+    public String fechaFormateada(){
+        
+        //String strDateFormat = "hh:mm:ss a dd-MMM-yyyy"; 
+        String strDateFormat = "dd/MMM/yyyy";
+        SimpleDateFormat objSDF = new SimpleDateFormat(strDateFormat); 
+        return objSDF.format(this.getFecha()); 
+        
+    }
         
     public List<Respuesta> respuestasUsuario(Usuario usuario){
         
         ArrayList<Respuesta> respuestas = new ArrayList();
         for (Ronda ronda : this.getRondas()){
             for (Respuesta resp : ronda.getRespuestas()){
-                if (resp.getUsuario() == usuario)
+                if (Objects.equals(usuario, resp.getUsuario()))
                     respuestas.add(resp);
             }           
         }

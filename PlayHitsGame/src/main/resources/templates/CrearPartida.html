@@ -26,13 +26,29 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 <select th:field="*{tema}" title="Tema">
                     <option th:each="elem : ${temas}" 
                     th:value="${elem}" th:text="${elem}"></option>
-                </select></p>
+                </select></p>                
                 
-                <p>Grupo<input type="text" th:field="*{grupo}" /></p>
                 <p>Año Inicial<input type="number" th:field="*{anyoInicial}" th:value="${newpartida.anyoInicial}" required="required"/></p>
                 <p>Año Final<input type="number" th:field="*{anyoFinal}" th:value="${newpartida.anyoFinal}" required="required"/></p>
                 <p>Numero Rondas<input value="10" type="number" name="nrondas" requied="required"/></p>
                 
+                <p th:text="${'GRUPO '+ usuarioSesion.txtGrupo}"></p>
+                
+                <div th:if="${posiblesinvitados != null}">
+                    <table border="2">
+                        <tr th:each="elem : ${posiblesinvitados}">
+                            <!--<td><input type="checkbox" th:name="${'elem' + #strings.toString(elem.id)}" th:id="${'elem' + #strings.toString(elem.id)}" checked /></td>-->
+                            <td><input type="checkbox" th:name="${elem.nombreId}" id="${elem.nombreId}" checked /></td>
+                            <td th:text="${elem.nombre}"></td>                    
+                        </tr>
+                    </table>
+                </div>
+                <div th:if="${posiblesinvitados == null}">
+                    <p th:text="'LA PARTIDA SERA PARA TI SOLO YA NO HAY NINGUN USUARIO QUE ESTE EN TU GRUPO PARA AÑADIR COMO INVITADO'"/>
+                </div>              
+            
+            <p th:text="${result}"></p>
+        </div>
 
                 <input type="submit" value="Crear"/>                
             </form>

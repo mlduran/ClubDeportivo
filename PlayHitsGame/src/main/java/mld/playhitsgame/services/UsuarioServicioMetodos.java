@@ -49,6 +49,10 @@ public class UsuarioServicioMetodos implements UsuarioServicio{
             obj.setUsuario(usuario.getUsuario());
         }
         
+        if(Objects.nonNull(usuario.getAlias()) && !"".equalsIgnoreCase(usuario.getAlias())){
+            obj.setAlias(usuario.getAlias());
+        }
+        
         if(Objects.nonNull(usuario.getContrasenya()) && !"".equalsIgnoreCase(usuario.getContrasenya())){
             obj.setContrasenya(usuario.getContrasenya());
         }

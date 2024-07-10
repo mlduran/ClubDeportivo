@@ -22,7 +22,7 @@ public interface RespuestaDAO extends JpaRepository<Respuesta, Long>{
     @Override
     Optional<Respuesta> findById(Long id);
     
-    @Query(value = "SELECT * FROM respuestas WHERE ronda_id=:idronda AND usuario_id<=:idusuario ;", nativeQuery=true)
+    @Query(value = "SELECT * FROM respuestas WHERE ronda_id=:idronda AND usuario_id=:idusuario ;", nativeQuery=true)
     Respuesta buscarPorRondaUsuario(Long idronda, Long idusuario);
     
 }
