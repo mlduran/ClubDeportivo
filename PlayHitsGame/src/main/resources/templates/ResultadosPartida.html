@@ -48,9 +48,13 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                     <tr th:each="elem : ${resultados}">
                         <td th:text="${elem.key}"></td>
                         <td th:each="resp : ${elem.value}" th:text="${resp.puntos}"/> 
-                        <td th:each="pts : ${ptstotales}">
-                            <p th:if="${pts.key} == ${elem.key}" th:text="${pts.value}"/>
-                        </td>
+                        <div th:each="pts : ${ptstotales}">
+                            <div th:if="${pts.key} == ${elem.key}">
+                                <td>
+                                    <p th:text="${pts.value}"/>
+                                </td>
+                            </div>
+                        </div>
                     </tr>          
                      <tr>
                        <th>RESPUESTA AÑO</th>

@@ -14,7 +14,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                <table border="2" > 
                    <tr>
                    <p th:text="${usuarioSesion.nombre}"/>
-                   <input type="hidden" id="usuario" value="${usuarioSesion.usuario}"/>
+                   <input type="hidden" id="usuario" th:value="${usuarioSesion.id}"/>
                    </tr>
                    <tr>
                        <td><p>PARTIDA</p></td>
@@ -72,18 +72,19 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             </div>
         <script th:inline="javascript">
             let socket = new WebSocket("ws://localhost:8080/websocket");
+            //let socket = new WebSocket("ws:/websocket");
             socket.onmessage = function(event){
                 let mensajesSockets = document.getElementById("mensajesSockets");
                 mensajesSockets.innerHTML += '<p>' + event.data + '</p>';
             };
             //El sendMessage no hace falta ya lo hara el servlet
             // sino habria que hacer boton con onclick="sendMessage()"
-            function sendMessage(){
+            window.addEventListener('load', function() {
                 let username = document.getElementById("usuario");
                 let mensaje = username.value;
-                socket.send(mensaje);                
-            };
-            
+                //window.alert(mensaje);
+                socket.send(mensaje);  
+            });
         </script>    
     </body>
 </html>

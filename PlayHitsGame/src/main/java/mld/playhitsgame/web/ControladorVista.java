@@ -43,8 +43,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 // persistencia en sesion y no usar tanta memoria
 @SessionAttributes({"id_usuarioSesion", "id_partidaSesion", "posiblesinvitados", "rol"})
 @Slf4j
-public class ControladorVista {
-    
+public class ControladorVista {    
      
     @Autowired
     CancionServicioMetodos servCancion;
@@ -79,9 +78,8 @@ public class ControladorVista {
     private void informarPartidaModelo(Model modelo, Partida partida){        
         
         modelo.addAttribute("partidaSesion", partida);        
-    }
-    
-    
+    }  
+        
     @GetMapping("/panel")
     public String panel(Model modelo){  
         
@@ -125,10 +123,19 @@ public class ControladorVista {
         informarUsuarioModelo(modelo, usu);
         modelo.addAttribute("id_partidaSesion", partida.getId());
         modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
-                
         return "Partida";      
         
     }
+    
+    @GetMapping("/partida")
+    public String partida(Model modelo){ 
+        
+        informarUsuarioModelo(modelo, usuarioModelo(modelo));
+        informarPartidaModelo(modelo, partidaModelo(modelo));
+        
+        return "Partida";
+    } 
+    
         
     @PostMapping("/partida")
     public String partida(@ModelAttribute("anyo") int anyo,Model modelo){        
@@ -139,7 +146,7 @@ public class ControladorVista {
         
         Respuesta resp = servRespuesta.buscarPorRondaUsuario(rondaActiva.getId(), usu.getId());
 
-        if (resp.getAnyo() != 0){
+        if (anyo != 0){
             resp.setAnyo(anyo);
             int pts = calcularPtsPorAnyo(anyo, rondaActiva.getCancion());
             resp.setPuntos(pts);
@@ -226,6 +233,8 @@ public class ControladorVista {
             modelo.addAttribute("posiblesinvitados", posiblesInvitados);      
         else
             modelo.addAttribute("posiblesinvitados", null); 
+        
+        informarUsuarioModelo(modelo, usu);
    
         return "CrearPartida";
         
@@ -318,7 +327,8 @@ public class ControladorVista {
             return "CrearPartida";
         }
         
-        informarPartidaModelo(modelo, partida); 
+        informarPartidaModelo(modelo, partida);
+        informarUsuarioModelo(modelo, usu);
 
         return "Partida";
         

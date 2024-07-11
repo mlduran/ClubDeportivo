@@ -12,10 +12,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     <body>
         
         <div th:object="${usuarioSesion}">
-
-            <p>Usuario</p>
-            <p th:text="*{nombre}"></p>            
-          
+            <p th:text="'Usuario : ' + *{nombre}"/>                      
 
             <div th:if="*{partidaMasterEnCurso()} != null">
                 <a href="/partidaMaster" class="button" id="partidaMasterEnCurso"> PARTIDA MASTER EN CURSO </a>
@@ -28,14 +25,14 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                     <tr>
                         <th>PARTIDAS INVITADO</th>                   
                     </tr>   
-                    <tr th:each="unapartida : *{partidasInvitado}">
+                    <tr th:each="unapartida : *{partidasInvitadoPendientes()}">
                         <td>
                             <a th:href="'/partidaInvitado/'+${unapartida.id}" class="button" id="${unapartida.id}">
                                 <p th:text="${unapartida.descripcion}"/>
                             </a>
                         </td>
                     </tr>
-                <br/>
+                </table>
             </div>            
             
             <div th:if="*{sePuedeCrearPartidaMaster()} == true">
@@ -54,7 +51,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <p th:text="${unapartida.fechaFormateada}"/>
                         </td>
                         <td>
-                                <a th:href="'/partidaConsulta/' + ${unapartida.id}" class="button"> 
+                            <a th:href="'/partidaConsulta/' + ${unapartida.id}" class="button"> 
                                 <p th:text="${unapartida.descripcion}"/>
                             </a>
                         </td>                       
@@ -63,6 +60,5 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             </div> 
         </div>         
         <p th:text="${result}"></p>
-
     </body>
 </html>
