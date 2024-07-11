@@ -130,9 +130,11 @@ public class ControladorVista {
     @GetMapping("/partida")
     public String partida(Model modelo){ 
         
-        informarUsuarioModelo(modelo, usuarioModelo(modelo));
-        informarPartidaModelo(modelo, partidaModelo(modelo));
-        
+        Usuario usu = usuarioModelo(modelo);
+        informarUsuarioModelo(modelo, usu);
+        Partida partida = partidaModelo(modelo);
+        informarPartidaModelo(modelo, partida);
+        modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
         return "Partida";
     } 
     
