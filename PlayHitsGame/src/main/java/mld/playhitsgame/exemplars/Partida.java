@@ -124,7 +124,8 @@ public class Partida{
         
         return lista;       
         
-    }
+    }   
+    
     
     public void pasarSiguienteRonda(){
         this.setRondaActual(this.getRondaActual() + 1);

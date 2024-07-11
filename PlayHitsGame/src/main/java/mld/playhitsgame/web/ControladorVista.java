@@ -123,6 +123,7 @@ public class ControladorVista {
         Usuario usu = usuarioModelo(modelo);           
         informarPartidaModelo(modelo, partida);
         informarUsuarioModelo(modelo, usu);
+        modelo.addAttribute("id_partidaSesion", partida.getId());
         modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
                 
         return "Partida";      
@@ -137,24 +138,31 @@ public class ControladorVista {
         Ronda rondaActiva = partida.rondaActiva();
         
         Respuesta resp = servRespuesta.buscarPorRondaUsuario(rondaActiva.getId(), usu.getId());
-                 
-        resp.setAnyo(anyo);
-        int pts = calcularPtsPorAnyo(anyo, rondaActiva.getCancion());
-        resp.setPuntos(pts);
-        servRespuesta.updateRespuesta(resp.getId(), resp);
-        rondaActiva.setCompletada(true);
-        servRonda.updateRonda(rondaActiva.getId(), rondaActiva);
-        boolean acabar = true;
-        if (partida.hayMasRondas()){
-            partida.pasarSiguienteRonda();            
-            acabar = false;
-        }else{
-            resultadosPartida(partida, modelo);
-            partida.setStatus(StatusPartida.Terminada);
-            partida.asignarGanador();
-        }
-        servPartida.updatePartida(partida.getId(), partida);        
+
+        if (resp.getAnyo() != 0){
+            resp.setAnyo(anyo);
+            int pts = calcularPtsPorAnyo(anyo, rondaActiva.getCancion());
+            resp.setPuntos(pts);
+            servRespuesta.updateRespuesta(resp.getId(), resp);
+        }   
+        boolean acabar = false;
+        if (rondaActiva.isTodasLasRespuestasOK()){
+            rondaActiva.setCompletada(true);
+            servRonda.updateRonda(rondaActiva.getId(), rondaActiva);    
+            
+            if (partida.hayMasRondas()){
+                partida.pasarSiguienteRonda();            
+                acabar = false;
+            }else{
+                resultadosPartida(partida, modelo);
+                partida.setStatus(StatusPartida.Terminada);
+                partida.asignarGanador();
+                acabar = true;
+            }
+            servPartida.updatePartida(partida.getId(), partida); 
+        }   
         informarPartidaModelo(modelo, partida);
+        informarUsuarioModelo(modelo, usu);
         modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
                 
         if (acabar){            

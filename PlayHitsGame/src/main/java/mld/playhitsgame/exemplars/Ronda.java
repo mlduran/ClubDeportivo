@@ -47,6 +47,18 @@ public class Ronda{
         
     }
     
+    public boolean isTodasLasRespuestasOK(){
+        
+        boolean ok = true;
+        for(Respuesta resp : this.getRespuestas()){
+            if (resp.getAnyo() == 0){   
+                ok = false;
+                break;
+            }               
+        }
+        return ok;
+    }
+    
 
     
     
