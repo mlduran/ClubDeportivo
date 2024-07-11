@@ -39,7 +39,9 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 @Controller
 // rol puede ser master o invitado
-@SessionAttributes({"usuarioSesion", "partidaSesion", "posiblesinvitados", "rol"})
+// utilizamos los ids para usuario y partida de sesion, para no cargar tantos datos de
+// persistencia en sesion y no usar tanta memoria
+@SessionAttributes({"id_usuarioSesion", "id_partidaSesion", "posiblesinvitados", "rol"})
 @Slf4j
 public class ControladorVista {
     
@@ -55,18 +57,44 @@ public class ControladorVista {
     @Autowired
     RespuestaServicioMetodos servRespuesta;
     @Autowired
-    TemaServicioMetodos servTema;
+    TemaServicioMetodos servTema;    
+    
+    private Usuario usuarioModelo(Model modelo){
+        
+        Long id_usu = (Long) modelo.getAttribute("id_usuarioSesion");
+        Usuario usuarioSesion = servUsuario.findById(id_usu).get();
+        return usuarioSesion;        
+    }
+    private void informarUsuarioModelo(Model modelo, Usuario usuario){        
+        
+        modelo.addAttribute("usuarioSesion", usuario);        
+    }
+    
+    private Partida partidaModelo(Model modelo){
+        
+        Long id_part = (Long) modelo.getAttribute("id_partidaSesion");
+        Partida partidaSesion = servPartida.findById(id_part).get();
+        return partidaSesion;        
+    }
+    private void informarPartidaModelo(Model modelo, Partida partida){        
+        
+        modelo.addAttribute("partidaSesion", partida);        
+    }
+    
     
     @GetMapping("/panel")
-    public String panel(Model modelo){    
-         
+    public String panel(Model modelo){  
+        
+        Usuario usu = usuarioModelo(modelo);
+        informarUsuarioModelo(modelo, usu);
+        
         return "Panel";        
     }
    
     @GetMapping("/partidaMaster")
     public String partidaMaster(Model modelo){
         
-        Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");
+        Usuario usu = usuarioModelo(modelo);
         modelo.addAttribute("rol", Rol.master);
         Partida partida = usu.partidaMasterEnCurso();
         
@@ -77,7 +105,7 @@ public class ControladorVista {
     @GetMapping("/partidaInvitado/{id}")
     public String partidaInvitado(Model modelo, @PathVariable Long id){
         
-        Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");
+        Usuario usu = usuarioModelo(modelo);
         modelo.addAttribute("rol", Rol.invitado);
         
         Partida partida = null;
@@ -92,9 +120,9 @@ public class ControladorVista {
      
     public String partida(Model modelo, Partida partida){
         
-        Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");        
-            
-        modelo.addAttribute("partidaSesion", partida);
+        Usuario usu = usuarioModelo(modelo);           
+        informarPartidaModelo(modelo, partida);
+        informarUsuarioModelo(modelo, usu);
         modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
                 
         return "Partida";      
@@ -104,8 +132,8 @@ public class ControladorVista {
     @PostMapping("/partida")
     public String partida(@ModelAttribute("anyo") int anyo,Model modelo){        
         
-        Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");
-        Partida partida = (Partida) modelo.getAttribute("partidaSesion");
+        Usuario usu = usuarioModelo(modelo);
+        Partida partida = partidaModelo(modelo);
         Ronda rondaActiva = partida.rondaActiva();
         
         Respuesta resp = servRespuesta.buscarPorRondaUsuario(rondaActiva.getId(), usu.getId());
@@ -126,7 +154,7 @@ public class ControladorVista {
             partida.asignarGanador();
         }
         servPartida.updatePartida(partida.getId(), partida);        
-        modelo.addAttribute("partidaSesion", partida);
+        informarPartidaModelo(modelo, partida);
         modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
                 
         if (acabar){            
@@ -177,7 +205,7 @@ public class ControladorVista {
         
         Calendar fecha = Calendar.getInstance();
         
-        Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");
+        Usuario usu = usuarioModelo(modelo);
         Partida newPartida = new Partida();
         newPartida.setAnyoInicial(1950);
         newPartida.setAnyoFinal(fecha.get(Calendar.YEAR) -1);
@@ -200,7 +228,7 @@ public class ControladorVista {
     public String crearPartida(@ModelAttribute("newpartida") Partida partida, 
             @ModelAttribute("nrondas") Integer nrondas, Model modelo,  HttpServletRequest req){           
         
-        Usuario usu = (Usuario) modelo.getAttribute("usuarioSesion");
+        Usuario usu = usuarioModelo(modelo);
         Calendar cal= Calendar.getInstance();
         int anyoActual = cal.get(Calendar.YEAR);
 
@@ -282,7 +310,7 @@ public class ControladorVista {
             return "CrearPartida";
         }
         
-        modelo.addAttribute("partidaSesion", partida); 
+        informarPartidaModelo(modelo, partida); 
 
         return "Partida";
         
@@ -298,7 +326,7 @@ public class ControladorVista {
          
         for (Ronda ronda : partidaSesion.getRondas()){            
             for (Respuesta respuesta : ronda.getRespuestas()){
-                nomUsu = respuesta.getUsuario().nombre();
+                nomUsu = respuesta.getUsuario().getNombre();
                 if (!resultadosPartida.containsKey(nomUsu))
                     resultadosPartida.put(nomUsu, new ArrayList());
                 lista = (ArrayList) resultadosPartida.get(nomUsu);
@@ -329,7 +357,7 @@ public class ControladorVista {
         
         resultadosPartida(partidaSesion, modelo);
         
-        modelo.addAttribute("partidaSesion", partidaSesion);        
+        informarPartidaModelo(modelo, partidaSesion);        
         
         return "ResultadosPartida";
         

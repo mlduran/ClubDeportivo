@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
  * @author miguel
  */
 @Controller
-@SessionAttributes({"usuarioSesion"})
+@SessionAttributes({"id_usuarioSesion"})
 @Slf4j
 public class ControladorInicio {
     
@@ -66,11 +66,10 @@ public class ControladorInicio {
             usuarioSesion.getPartidasInvitado();
             usuarioSesion.getPartidasMaster();
             
+            modelo.addAttribute("id_usuarioSesion", usuarioSesion.getId());
             modelo.addAttribute("usuarioSesion", usuarioSesion);
             return "Panel";
-        }        
-        
-     
+        }
     }
     
     @GetMapping("/spotify")

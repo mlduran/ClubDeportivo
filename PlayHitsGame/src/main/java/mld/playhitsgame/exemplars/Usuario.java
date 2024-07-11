@@ -57,7 +57,7 @@ public class Usuario{
     private List<Partida> partidasInvitado;
     
     
-    public String nombre(){
+    public String getNombre(){
         
         String nombre; 
         
@@ -73,7 +73,7 @@ public class Usuario{
     
     public String nombreId(){
         
-        return nombre() + this.getClass().toString();        
+        return this.getNombre() + this.getClass().toString();        
     }     
     
     

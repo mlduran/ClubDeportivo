@@ -46,6 +46,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             <div th:if="*{hayPartidasTerminadas()} == true">
                 <table border="2" > 
                     <tr>
+                        <th></th>
                         <th>PARTIDAS FINALIZADAS</th>                   
                     </tr>    
                     <tr th:each="unapartida : *{partidasTerminadas()}">

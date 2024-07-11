@@ -155,7 +155,7 @@ public class Partida{
         for (Usuario usuario : this.usuariosPartida()){
             int ptsUsu = ptsUsuario(usuario);
             if(ptsUsu > ptsGanador){
-                ganadorPartida = usuario.nombre();
+                ganadorPartida = usuario.getNombre();
                 ptsGanador = ptsUsu;
             }
         }
