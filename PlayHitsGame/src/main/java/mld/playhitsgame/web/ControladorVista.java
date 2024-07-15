@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -121,6 +122,13 @@ public class ControladorVista {
         Usuario usu = usuarioModelo(modelo);           
         informarPartidaModelo(modelo, partida);
         informarUsuarioModelo(modelo, usu);
+        Ronda rondaActual = partida.getRondas().get(partida.getRondaActual());
+        Map<Long,String> opcTitulos = opcionesTitulosCanciones(
+                partida.canciones(), rondaActual.getCancion());
+        Map<Long,String> opcInterpretes = opcionesInterpretesCanciones(
+                partida.canciones(), rondaActual.getCancion());
+        modelo.addAttribute("opcTitulos", opcTitulos);
+        modelo.addAttribute("opcInterpretes", opcInterpretes);
         modelo.addAttribute("id_partidaSesion", partida.getId());
         modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
         return "Partida";      
@@ -133,7 +141,7 @@ public class ControladorVista {
         Usuario usu = usuarioModelo(modelo);
         informarUsuarioModelo(modelo, usu);
         Partida partida = partidaModelo(modelo);
-        informarPartidaModelo(modelo, partida);
+        informarPartidaModelo(modelo, partida);        
         modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
         return "Partida";
     } 

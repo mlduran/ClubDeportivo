@@ -39,8 +39,12 @@ public class RespuestaServicioMetodos implements RespuestaServicio{
     public Respuesta updateRespuesta(Long id, Respuesta respuesta) {
         Respuesta obj = DAO.findById(id).get();
         
-        obj.setAnyo(respuesta.getAnyo());
-        obj.setPuntos(respuesta.getPuntos());
+        if (obj.getAnyo() != 0 && respuesta.getAnyo() != 0){
+            obj.setAnyo(respuesta.getAnyo());
+            obj.setPuntos(respuesta.getPuntos());
+        }
+        
+        
        
         
         return DAO.save(obj);

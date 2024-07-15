@@ -102,16 +102,12 @@ public class Partida{
         txt.add("Año inicial: " + String.valueOf(this.getAnyoInicial()));
         txt.add("Año final: " + String.valueOf(this.getAnyoFinal()));
         
-        
         return txt;
-        
     }
-    
-    
+        
     public Ronda rondaActiva(){
         
-        return this.rondas.get(this.rondaActual - 1);        
-        
+        return this.rondas.get(this.rondaActual - 1);  
     }
     
     public List<Usuario> usuariosPartida(){
@@ -122,10 +118,8 @@ public class Partida{
         if (!this.getInvitados().isEmpty())
             lista.addAll(this.getInvitados());
         
-        return lista;       
-        
-    }   
-    
+        return lista;
+    }       
     
     public void pasarSiguienteRonda(){
         this.setRondaActual(this.getRondaActual() + 1);
@@ -159,9 +153,18 @@ public class Partida{
                 ganadorPartida = usuario.getNombre();
                 ptsGanador = ptsUsu;
             }
-        }
+        }        
+        this.setGanador(ganadorPartida);        
+    }
+    
+    public List<Cancion> canciones(){
         
-        this.setGanador(ganadorPartida);
+        ArrayList<Cancion> lista = new ArrayList();
+        
+        for (Ronda ronda : this.getRondas())
+            lista.add(ronda.getCancion());
+        
+        return lista;
         
     }
     

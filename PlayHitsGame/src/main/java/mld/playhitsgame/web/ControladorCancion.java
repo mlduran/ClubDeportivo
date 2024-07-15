@@ -6,15 +6,12 @@ package mld.playhitsgame.web;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeMap;
 import lombok.extern.slf4j.Slf4j;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.FiltroCanciones;
-import mld.playhitsgame.exemplars.Genero;
-import mld.playhitsgame.exemplars.Pais;
 import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.services.CancionServicioMetodos;
 import mld.playhitsgame.services.TemaServicioMetodos;
@@ -86,6 +83,7 @@ public class ControladorCancion {
     public String modificarCancion(@ModelAttribute("id") Long id, Model modelo){       
         
         Optional<Cancion> cancion = servCancion.findById(id);
+        temasBD(modelo);
         
         modelo.addAttribute("cancion", cancion);
         return "ModificarCancion";        

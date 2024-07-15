@@ -24,23 +24,58 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                        <td>
                            <p th:text="'Usuarios que han respondido'"/>
                            <div id="mensajesSockets">
-                               
+                                <a href="/partida" class="button" id="refrecar">REFRESCAR</a>
                            </div>                           
                        </td>
                    </tr>
                    <tr th:each="ronda : ${partidaSesion.rondas}">                                              
-                         <div th:if="${partidaSesion.rondaActual  == ronda.numero}">
+                        <div th:if="${partidaSesion.rondaActual  == ronda.numero}">
                             <td th:text="'RONDA ' + ${ronda.numero}"></td>  
                             <td>
-                                <audio controls>
-                                    <source th:src="${ronda.cancion.spotifyplay}" type="audio/mpeg"/>
-                                </audio>                              
-                                <form method="post" action="/partida" >                
-                                    <input type="number" name="anyo" required="required"/>          
-                                    <input type="submit" value="Responder"/>                
-                                </form>  
+                                <table border="2" > 
+                                    <tr>
+                                        <td>
+                                            <audio controls>
+                                                <source th:src="${ronda.cancion.spotifyplay}" type="audio/mpeg"/>
+                                            </audio>
+                                        </td>
+                                        <td/>
+                                    </tr>
+                                    <tr>                                        
+                                        <td>
+                                            <form method="post" action="/partida" > 
+                                                <p>Año</p>
+                                                <input type="number" name="anyo" required="required"/>          
+                                                <input type="submit" value="Responder"/>                
+                                            </form> 
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Titulo</th>
+                                        <th>Interprete</th>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div th:each="opTitulo : ${opcTitulos}">                                   
+                                                <button onclick="respuestaTitulo()" th:id="${opTitulo.key}">
+                                                    <p th:text="${opTitulo.value}"></p>
+                                                </button>
+                                                <br/>                                  
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div th:each="opcInterprete : ${opcInterpretes}">                                   
+                                                <button onclick="respuestaInterprete()" th:id="${opcInterprete.key}">
+                                                    <p th:text="${opcInterprete.value}"></p>
+                                                </button>
+                                                <br/>                                  
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>                               
                             </td>
-                         </div>    
+                        </div>    
                    </tr> 
                    <tr th:each="ronda : ${partidaSesion.rondas}">                         
                          <div th:if="${ronda.estaCompletada()}">
