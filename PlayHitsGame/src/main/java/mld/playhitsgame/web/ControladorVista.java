@@ -145,8 +145,8 @@ public class ControladorVista {
         modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
         return "Partida";
     } 
-    
-        
+
+            
     @PostMapping("/partida")
     public String partida(@ModelAttribute("anyo") int anyo,Model modelo){        
         

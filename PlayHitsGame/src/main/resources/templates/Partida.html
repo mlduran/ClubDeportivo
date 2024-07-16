@@ -14,12 +14,13 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                <table border="2" > 
                    <tr>
                    <p th:text="${usuarioSesion.nombre}"/>
-                   <input type="hidden" id="usuario" th:value="${usuarioSesion.id}"/>
+                   <input type="hidden" id="idusuario" th:value="${usuarioSesion.id}"/>
                    </tr>
                    <tr>
                        <td><p>PARTIDA</p></td>
                        <td>
                            <p th:each="txt : ${partidaSesion.descripcion}" th:text="${txt}"></p>
+                           <input type="hidden" id="idpartida" th:value="${partidaSesion.id}"/>
                        </td>
                        <td>
                            <p th:text="'Usuarios que han respondido'"/>
@@ -43,11 +44,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </tr>
                                     <tr>                                        
                                         <td>
-                                            <form method="post" action="/partida" > 
-                                                <p>Año</p>
-                                                <input type="number" name="anyo" required="required"/>          
-                                                <input type="submit" value="Responder"/>                
-                                            </form> 
+                                            Año
+                                            <input type="number" name="anyo" id="anyo" min="1" max="2050"/>
+                                            <button th:onclick="respuestaAnyo()">
+                                                <p>Enviar</p>
+                                            </button>
                                         </td>
                                         <td></td>
                                     </tr>
@@ -57,16 +58,16 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </tr>
                                     <tr>
                                         <td>
-                                            <div th:each="opTitulo : ${opcTitulos}">                                   
-                                                <button onclick="respuestaTitulo()" th:id="${opTitulo.key}">
+                                            <div th:each="opTitulo : ${opcTitulos}"> 
+                                                <button th:data-name="${opTitulo.key}" th:onclick="respuestaTitulo(this.getAttribute('data-name'))">
                                                     <p th:text="${opTitulo.value}"></p>
                                                 </button>
                                                 <br/>                                  
                                             </div>
                                         </td>
                                         <td>
-                                            <div th:each="opcInterprete : ${opcInterpretes}">                                   
-                                                <button onclick="respuestaInterprete()" th:id="${opcInterprete.key}">
+                                            <div th:each="opcInterprete : ${opcInterpretes}">   
+                                                <button th:data-name="${opcInterprete.key}" th:onclick="respuestaInterprete(this.getAttribute('data-name'))">
                                                     <p th:text="${opcInterprete.value}"></p>
                                                 </button>
                                                 <br/>                                  
@@ -102,24 +103,59 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             </td> 
                          </div>                     
                    </tr>      
-                </table>   
-            
+                </table> 
             </div>
+        
         <script th:inline="javascript">
+            
             let socket = new WebSocket("ws://localhost:8080/websocket");
             //let socket = new WebSocket("ws:/websocket");
             socket.onmessage = function(event){
                 let mensajesSockets = document.getElementById("mensajesSockets");
                 mensajesSockets.innerHTML += '<p>' + event.data + '</p>';
             };
+            
+            
+            function txtMensaje(op, idCancion, anyo){
+                
+                let userId = document.getElementById("idusuario").value;
+                let partidaId = document.getElementById("idpartida").value;
+                let mensaje = "{'op' : '" + op + "',";
+                mensaje = mensaje + "'idUsuario' : " + userId + ","; 
+                mensaje = mensaje + "'idPartida' : " + partidaId;
+                if(idCancion !== null){
+                    mensaje = mensaje + ",'idCancion' : " + idCancion;
+                }
+                if(anyo !== null){
+                    mensaje = mensaje + ",'anyo' : " + anyo;
+                }
+                mensaje = mensaje + "}";
+                window.alert(mensaje);
+                return mensaje;
+            }
+            
             //El sendMessage no hace falta ya lo hara el servlet
             // sino habria que hacer boton con onclick="sendMessage()"
             window.addEventListener('load', function() {
-                let username = document.getElementById("usuario");
-                let mensaje = username.value;
-                //window.alert(mensaje);
-                socket.send(mensaje);  
-            });
+                socket.send(txtMensaje("alta", null, null));  
+            });       
+            
+            
+            function respuestaTitulo(codCancion){               
+                socket.send(txtMensaje("titulo", codCancion, null));                
+            }
+            
+            function respuestaInterprete(codCancion){               
+                socket.send(txtMensaje("interprete", codCancion, null));                
+            }
+            
+            function respuestaAnyo(){
+                let anyo = document.getElementById("anyo").value;
+                if (anyo === 0)
+                    window.alert("Se ha de informar un año");
+                else
+                    socket.send(txtMensaje("anyo", null , anyo));                
+            }
         </script>    
     </body>
 </html>
