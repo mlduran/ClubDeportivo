@@ -16,7 +16,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 public class WebsocketConfig implements WebSocketConfigurer {
     
     @Autowired
-    private WebsocketHandler websocketHandler;
+    private WebsocketControler websocketHandler;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
@@ -25,7 +25,7 @@ public class WebsocketConfig implements WebSocketConfigurer {
                 //.withSockJS();
     }
 
-    public WebsocketHandler getWebsocketHandler() {
+    public WebsocketControler getWebsocketHandler() {
         return websocketHandler;
     }
 

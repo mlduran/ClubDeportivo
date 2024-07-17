@@ -80,6 +80,31 @@ public class ControladorVista {
         
         modelo.addAttribute("partidaSesion", partida);        
     }  
+    
+    @GetMapping("/")
+    public String inicio(Model modelo){
+        
+        return "Inicio";
+        
+    }
+    @PostMapping("/") 
+    public String inicio(@ModelAttribute("elUsuario") String elUsuario, 
+            @ModelAttribute("laContrasenya") String laContrasenya, Model modelo){
+        
+        Optional<Usuario> usuLogin = servUsuario.usuarioLogin(elUsuario, laContrasenya);
+        
+        if (usuLogin.isEmpty()){
+            modelo.addAttribute("error", "Usuario o password incorrectos");
+            return "Inicio";            
+        }else{
+            Usuario usuarioSesion = usuLogin.get();
+            usuarioSesion.getPartidasInvitado();
+            usuarioSesion.getPartidasMaster();      
+            modelo.addAttribute("id_usuarioSesion", usuarioSesion.getId());
+            informarUsuarioModelo(modelo, usuarioSesion);
+            return "Panel";
+        }
+    }
         
     @GetMapping("/panel")
     public String panel(Model modelo){  
@@ -138,17 +163,49 @@ public class ControladorVista {
     @GetMapping("/partida")
     public String partida(Model modelo){ 
         
-        Usuario usu = usuarioModelo(modelo);
-        informarUsuarioModelo(modelo, usu);
         Partida partida = partidaModelo(modelo);
-        informarPartidaModelo(modelo, partida);        
-        modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
-        return "Partida";
+        return partida(modelo, partida);
     } 
+    
+    @GetMapping("/nuevaRonda_eliminar")
+    public String nuevaRonda_eliminar(Model modelo){
+        
+        Usuario usu = usuarioModelo(modelo);
+        Partida partida = partidaModelo(modelo);
+        Ronda rondaActiva = partida.rondaActiva();
+        
+        boolean acabar = false;
+        //if (rondaActiva.isTodasLasRespuestasOK()){
+        if (true){ // de momento lo damos por bueno 
+            rondaActiva.setCompletada(true);
+            servRonda.updateRonda(rondaActiva.getId(), rondaActiva);    
+            
+            if (partida.hayMasRondas()){
+                partida.pasarSiguienteRonda();            
+                acabar = false;
+            }else{
+                resultadosPartida(partida, modelo);
+                partida.setStatus(StatusPartida.Terminada);
+                partida.asignarGanador();
+                acabar = true;
+            }
+            servPartida.updatePartida(partida.getId(), partida); 
+        }   
+        informarPartidaModelo(modelo, partida);
+        informarUsuarioModelo(modelo, usu);
+        modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
+                
+        if (acabar){            
+            return "redirect:/partidaConsulta/" + String.valueOf(partida.getId()); 
+        }else 
+            return "Partida";  
+        
+        
+    }
 
             
-    @PostMapping("/partida")
-    public String partida(@ModelAttribute("anyo") int anyo,Model modelo){        
+    @PostMapping("/partida_old_borrar")
+    public String partida_old_borrar(@ModelAttribute("anyo") int anyo,Model modelo){        
         
         Usuario usu = usuarioModelo(modelo);
         Partida partida = partidaModelo(modelo);

@@ -14,21 +14,15 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import lombok.extern.slf4j.Slf4j;
-import mld.playhitsgame.exemplars.Usuario;
-import mld.playhitsgame.services.UsuarioServicioMetodos;
 import mld.playhitsgame.spotify.SpotifyController;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 
 /**
@@ -36,41 +30,12 @@ import org.springframework.web.bind.annotation.SessionAttributes;
  * @author miguel
  */
 @Controller
-@SessionAttributes({"id_usuarioSesion"})
 @Slf4j
-public class ControladorInicio {
+public class ControladorSpotify {
     
     @Value("${custom.server.ip}")
     private String customIp;
     
-    @Autowired
-    UsuarioServicioMetodos servUsuario;
-    
-    @GetMapping("/")
-    public String inicio(Model modelo){
-        
-        return "Inicio";
-        
-    }
-    @PostMapping("/") 
-    public String inicio(@ModelAttribute("elUsuario") String elUsuario, 
-            @ModelAttribute("laContrasenya") String laContrasenya, Model modelo){
-        
-        Optional<Usuario> usuLogin = servUsuario.usuarioLogin(elUsuario, laContrasenya);
-        
-        if (usuLogin.isEmpty()){
-            modelo.addAttribute("error", "Usuario o password incorrectos");
-            return "Inicio";            
-        }else{
-            Usuario usuarioSesion = usuLogin.get();
-            usuarioSesion.getPartidasInvitado();
-            usuarioSesion.getPartidasMaster();
-            
-            modelo.addAttribute("id_usuarioSesion", usuarioSesion.getId());
-            modelo.addAttribute("usuarioSesion", usuarioSesion);
-            return "Panel";
-        }
-    }
     
     @GetMapping("/spotify")
     public String spotify(Model modelo){
@@ -82,9 +47,9 @@ public class ControladorInicio {
             BufferedReader urlLectura = new BufferedReader(new InputStreamReader(url.openStream()));
             urlLogin = urlLectura.readLine();
         } catch (MalformedURLException ex) {
-            Logger.getLogger(ControladorInicio.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ControladorSpotify.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {        
-            Logger.getLogger(ControladorInicio.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ControladorSpotify.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         modelo.addAttribute("url", urlLogin);
