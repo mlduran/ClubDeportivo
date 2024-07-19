@@ -5,10 +5,8 @@
 package mld.playhitsgame.services;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import mld.playhitsgame.DAO.RondaDAO;
-import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.Ronda;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

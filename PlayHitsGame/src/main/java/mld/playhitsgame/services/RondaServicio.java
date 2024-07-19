@@ -6,7 +6,6 @@ package mld.playhitsgame.services;
 
 import java.util.List;
 import java.util.Optional;
-import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.Ronda;
 
 

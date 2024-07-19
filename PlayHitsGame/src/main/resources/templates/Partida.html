@@ -10,7 +10,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>           
-            <div>            
+            <div>  
+               <input type="hidden" id="serverWS" th:value="${serverWebsocket}"/>
                <table border="2" > 
                    <tr>
                    <p th:text="${usuarioSesion.nombre}"/>
@@ -57,16 +58,16 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     <tr>
                                         <td>
                                             <div th:each="opTitulo : ${opcTitulos}"> 
-                                                <button th:data-name="${opTitulo.key}" th:onclick="respuestaTitulo(this.getAttribute('data-name'))" th:id="'titulo_' + ${opTitulo.key}">
-                                                    <p th:text="${opTitulo.value}"></p>
+                                                <button th:data-name="${opTitulo.cancion}" th:onclick="respuestaTitulo(this.getAttribute('data-name'))" th:id="'titulo_' + ${opTitulo.cancion}">
+                                                    <p th:text="${opTitulo.opTitulo}"></p>
                                                 </button>
                                                 <br/>                                  
                                             </div>
                                         </td>
                                         <td>
                                             <div th:each="opcInterprete : ${opcInterpretes}">   
-                                                <button th:data-name="${opcInterprete.key}" th:onclick="respuestaInterprete(this.getAttribute('data-name'))" th:id="'interprete_' + ${opcInterprete.key}">
-                                                    <p th:text="${opcInterprete.value}"></p>
+                                                <button th:data-name="${opcInterprete.cancion}" th:onclick="respuestaInterprete(this.getAttribute('data-name'))" th:id="'interprete_' + ${opcInterprete.cancion}">
+                                                    <p th:text="${opcInterprete.opInterprete}"></p>
                                                 </button>
                                                 <br/>                                  
                                             </div>
@@ -96,7 +97,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <div th:each="resp : ${respuestas}">
                                 <td th:if="${resp.ronda.numero == ronda.numero}">
                                     <p th:text="Enviado"/>
-                                    <p th:text="'Año ' + ${resp.anyo}"/>
+                                    <p th:text="'Año : ' + ${resp.anyo}"/>
+                                    <p th:text="'Titulo : ' + ${resp.titulo}"/>
+                                    <p th:text="'Interp : ' + ${resp.interprete}"/>
                                 </td>
                             </div>
                          </div>
@@ -111,12 +114,20 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             </div>
         
         <script th:inline="javascript">
-            
-            let socket = new WebSocket("ws://localhost:8080/websocket");
-            //let socket = new WebSocket("ws:/websocket");
+            let serverWS = document.getElementById("serverWS").value;
+            let dirSocket = "ws:"+serverWS+"/websocket";
+            let socket = new WebSocket(dirSocket);
+
             socket.onmessage = function(event){
                 if (event.data === '#nueva#')
                     location.reload();
+                if (event.data === '#acabar#'){
+                    location.roload(); 
+                    txtHtml = txtHtml + '<p>' + 'pruebaaaa' + '</p>';
+                    mensajesSockets.innerHTML = txtHtml;
+                    // no e si hay que hacer algo mas
+                    return;
+                }
                 let mensajesSockets = document.getElementById("mensajesSockets");
                 let usuarios = event.data.split(",");
                 let txtHtml = '';
@@ -150,7 +161,18 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             //El sendMessage no hace falta ya lo hara el servlet
             // sino habria que hacer boton con onclick="sendMessage()"
             window.addEventListener('load', function() {
-                socket.send(txtMensaje("alta", null, null));  
+                try {
+                    socket.send(txtMensaje("alta", null, null));  
+                } catch (e){
+                    // si no funciona con la configurada
+                    // probamos con la local host
+                    try {
+                        
+                        socket.send(txtMensaje("alta", null, null));  
+                    } catch (e){
+                        window.alert("No hay conexion al socket " + dirSocket);
+                    }
+                }
             });            
             
             function respuestaTitulo(codCancion){ 

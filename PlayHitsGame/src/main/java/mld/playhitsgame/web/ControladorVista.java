@@ -27,8 +27,13 @@ import mld.playhitsgame.services.RespuestaServicioMetodos;
 import mld.playhitsgame.services.RondaServicioMetodos;
 import mld.playhitsgame.services.TemaServicioMetodos;
 import mld.playhitsgame.services.UsuarioServicioMetodos;
-import static mld.playhitsgame.web.Utilidades.*;
+import static mld.playhitsgame.Utilidades.Utilidades.*;
+import mld.playhitsgame.exemplars.OpcionInterpreteTmp;
+import mld.playhitsgame.exemplars.OpcionTituloTmp;
+import mld.playhitsgame.services.OpcionInterpreteTmpServicioMetodos;
+import mld.playhitsgame.services.OpcionTituloTmpServicioMetodos;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,8 +49,10 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 // persistencia en sesion y no usar tanta memoria
 @SessionAttributes({"id_usuarioSesion", "id_partidaSesion", "posiblesinvitados", "rol"})
 @Slf4j
-public class ControladorVista {    
-     
+public class ControladorVista {   
+    
+    @Value("${custom.server.websocket}")
+    private String serverWebsocket;
     @Autowired
     CancionServicioMetodos servCancion;
     @Autowired
@@ -58,10 +65,18 @@ public class ControladorVista {
     RespuestaServicioMetodos servRespuesta;
     @Autowired
     TemaServicioMetodos servTema;    
+    @Autowired
+    OpcionTituloTmpServicioMetodos servOpTitulo; 
+    @Autowired
+    OpcionInterpreteTmpServicioMetodos servOpInterprete;  
     
     private Usuario usuarioModelo(Model modelo){
         
         Long id_usu = (Long) modelo.getAttribute("id_usuarioSesion");
+        if (id_usu == null){
+            System.out.println("Se ha perdido la sesion usuario, delvolvemos la login");
+            inicio(modelo);
+        }
         Usuario usuarioSesion = servUsuario.findById(id_usu).get();
         return usuarioSesion;        
     }
@@ -73,6 +88,10 @@ public class ControladorVista {
     private Partida partidaModelo(Model modelo){
         
         Long id_part = (Long) modelo.getAttribute("id_partidaSesion");
+        if (id_part == null){
+            System.out.println("Se ha perdido la partida usuario, delvolvemos al panel");
+            panel(modelo);
+        }
         Partida partidaSesion = servPartida.findById(id_part).get();
         return partidaSesion;        
     }
@@ -147,11 +166,12 @@ public class ControladorVista {
         Usuario usu = usuarioModelo(modelo);           
         informarPartidaModelo(modelo, partida);
         informarUsuarioModelo(modelo, usu);
-        Ronda rondaActual = partida.getRondas().get(partida.getRondaActual());
-        Map<Long,String> opcTitulos = opcionesTitulosCanciones(
-                partida.canciones(), rondaActual.getCancion());
-        Map<Long,String> opcInterpretes = opcionesInterpretesCanciones(
-                partida.canciones(), rondaActual.getCancion());
+        Ronda rondaActual = partida.getRondas().get(partida.getRondaActual() -1 );
+        List<OpcionTituloTmp> opcTitulos = 
+                servOpTitulo.findByPartidaRonda(partida.getId(),rondaActual.getId() );
+        List<OpcionInterpreteTmp> opcInterpretes = 
+                servOpInterprete.findByPartidaRonda(partida.getId(),rondaActual.getId() );        
+        modelo.addAttribute("serverWebsocket", this.serverWebsocket);
         modelo.addAttribute("opcTitulos", opcTitulos);
         modelo.addAttribute("opcInterpretes", opcInterpretes);
         modelo.addAttribute("id_partidaSesion", partida.getId());
@@ -387,18 +407,22 @@ public class ControladorVista {
             partida.setStatus(StatusPartida.EnCurso);
             servPartida.updatePartida(partida.getId(), partida);
             
+            // Crear las opciones para las respuestas
+            for (Ronda ronda : partida.getRondas()){
+                for (OpcionTituloTmp op : opcionesTitulosCanciones(ronda))
+                    servOpTitulo.saveOpcionTituloTmp(op);
+                for (OpcionInterpreteTmp op : opcionesInterpretesCanciones(ronda))
+                    servOpInterprete.saveOpcionInterpreteTmp(op);  
+            }
+            
         }catch(Exception ex){
             String resp = "ERROR " + ex.getMessage();
             modelo.addAttribute("result", resp); 
             anyadirTemas(modelo);
             return "CrearPartida";
         }
-        
-        informarPartidaModelo(modelo, partida);
-        informarUsuarioModelo(modelo, usu);
-
-        return "Partida";
-        
+        modelo.addAttribute("id_partidaSesion", partida.getId()); 
+        return "redirect:/partida";        
     }  
     
     private void resultadosPartida(Partida partidaSesion, Model modelo){

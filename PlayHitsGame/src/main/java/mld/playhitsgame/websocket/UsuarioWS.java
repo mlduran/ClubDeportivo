@@ -12,7 +12,7 @@ import org.springframework.web.socket.WebSocketSession;
  * @author miguel
  */
 @Data
-public class UsuarioWS {
+public class UsuarioWS implements Comparable<UsuarioWS>{
     
     private long id;
     private WebSocketSession session;
@@ -22,4 +22,23 @@ public class UsuarioWS {
     private boolean respInterprete;
     private int orden;
     
+    
+    public boolean isTodoRespondido(){
+        return this.isRespAnyo() && 
+                this.isRespInterprete() &&
+                this.isRespTitulo();
+    }   
+
+    @Override 
+    public int compareTo(UsuarioWS otroUsuarioWS) {
+        
+        if (this.orden > otroUsuarioWS.getOrden()) {
+           return -1; 
+        } 
+        if (this.orden < otroUsuarioWS.getOrden()) {
+           return 1; 
+        } 
+        return 0; 
+    }
 }
+

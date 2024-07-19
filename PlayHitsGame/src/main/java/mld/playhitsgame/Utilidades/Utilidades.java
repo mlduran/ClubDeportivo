@@ -2,13 +2,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package mld.playhitsgame.web;
+package mld.playhitsgame.Utilidades;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import mld.playhitsgame.exemplars.Cancion;
+import mld.playhitsgame.exemplars.OpcionInterpreteTmp;
+import mld.playhitsgame.exemplars.OpcionTituloTmp;
 import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.Ronda;
 
@@ -18,7 +22,44 @@ import mld.playhitsgame.exemplars.Ronda;
  */
 public class Utilidades {
     
-    private static int NUMERO_OPCIONES = 5;
+    private static final int NUMERO_OPCIONES = 5;
+    
+    public static int calcularPtsPorAnyo(int anyo, Cancion cancion){
+        
+        int anyoCancion = cancion.getAnyo();
+        int pts = 0;
+        
+        int x = Math.abs(anyo - anyoCancion);
+        
+        if (x == 0)
+            pts = 30;
+        if (x == 1)
+            pts = 20;
+        if (x == 2)
+            pts = 10;
+        if (x > 2)
+            pts = 10 - x;
+        if (pts < 0)
+            pts = 0;
+
+        return pts;        
+    }
+    
+    public static int calcularPtsPorTitulo(String titulo, Cancion cancion){
+        
+        if (titulo.equals(cancion.getTitulo()))
+            return 15;
+        else 
+            return 0;
+    }
+    
+    public static int calcularPtsPorInterprete(String interprete, Cancion cancion){
+        
+        if (interprete.equals(cancion.getInterprete()))
+            return 15;
+        else 
+            return 0;
+    }
      
     private static Cancion cancionRandom(List<Cancion> lista){
       int i;  
@@ -48,29 +89,7 @@ public class Utilidades {
             i = i + 1;
         }       
         
-    }
-        
-    public static int calcularPtsPorAnyo(int anyo, Cancion cancion){
-        
-        int anyoCancion = cancion.getAnyo();
-        int pts = 0;
-        
-        int x = Math.abs(anyo - anyoCancion);
-        
-        if (x == 0)
-            pts = 25;
-        if (x == 1)
-            pts = 15;
-        if (x == 2)
-            pts = 10;
-        if (x > 2)
-            pts = 10 - x;
-        if (pts < 0)
-            pts = 0;
-
-        return pts;        
-    }
-    
+    }   
     
     private static List<Cancion> cancionesParaListaOpciones(List<Cancion> canciones, 
             Cancion cancionCorrecta, int numero){
@@ -85,7 +104,7 @@ public class Utilidades {
         for (Map.Entry<Long,Cancion> elem : lista.entrySet())
             listaFinal.add(elem.getValue());        
         
-        // Las reordenamos aleatoria mente para que la correcta, no este
+        // Las reordenamos aleatoriamente para que la correcta, no este
         // siempre la primera
         ArrayList<Cancion> listaDesordenada = new ArrayList();
         while (!listaFinal.isEmpty()){
@@ -116,37 +135,62 @@ public class Utilidades {
         return newText.toString();        
     }    
     
-    public static Map<Long, String> opcionesTitulosCanciones(List<Cancion> canciones, 
-            Cancion cancionCorrecta){
+    public static List<OpcionTituloTmp> opcionesTitulosCanciones(Ronda ronda){
         
         // de las canciones elije aleatoriamente que une a la correcta y 
         // devuelve una lista con las canciones encriptadas
         
-        HashMap<Long, String> opciones = new HashMap();        
+        ArrayList<OpcionTituloTmp>  opciones = new ArrayList();        
         List<Cancion> cancionesParaOpciones = 
-                cancionesParaListaOpciones(canciones, cancionCorrecta, NUMERO_OPCIONES );
+                cancionesParaListaOpciones(ronda.getPartida().canciones(), ronda.getCancion(), NUMERO_OPCIONES );
         
-        for (Cancion cancion : cancionesParaOpciones)
-            opciones.put(cancion.getId(), encriptarString(cancion.getTitulo()));       
-        
-        return opciones;
-        
+        OpcionTituloTmp newObj;
+        for (Cancion cancion : cancionesParaOpciones){
+            newObj = new OpcionTituloTmp();
+            newObj.setPartida(ronda.getPartida().getId());
+            newObj.setRonda(ronda.getId());
+            newObj.setCancion(cancion.getId());
+            newObj.setOpTitulo(encriptarString(cancion.getTitulo()));
+            opciones.add(newObj);
+        }
+       
+        return opciones;        
     }
     
-    public static Map<Long, String> opcionesInterpretesCanciones(List<Cancion> canciones, 
-            Cancion cancionCorrecta){
+    public static List<OpcionInterpreteTmp> opcionesInterpretesCanciones(Ronda ronda){
         
         // de las canciones elije aleatoriamente que une a la correcta y 
         // devuelve una lista con las canciones encriptadas
         
-        HashMap<Long, String> opciones = new HashMap();        
+        ArrayList<OpcionInterpreteTmp>  opciones = new ArrayList();        
         List<Cancion> cancionesParaOpciones = 
-                cancionesParaListaOpciones(canciones, cancionCorrecta, NUMERO_OPCIONES );
+                cancionesParaListaOpciones(ronda.getPartida().canciones(), 
+                        ronda.getCancion(), NUMERO_OPCIONES );
         
-        for (Cancion cancion : cancionesParaOpciones)
-            opciones.put(cancion.getId(), encriptarString(cancion.getInterprete()));       
-        
-        return opciones;
-        
+        OpcionInterpreteTmp newObj;
+        for (Cancion cancion : cancionesParaOpciones){
+            newObj = new OpcionInterpreteTmp();
+            newObj.setPartida(ronda.getPartida().getId());
+            newObj.setRonda(ronda.getId());
+            newObj.setCancion(cancion.getId());
+            newObj.setOpInterprete(encriptarString(cancion.getInterprete()));
+            opciones.add(newObj);
+        }
+       
+        return opciones;        
+    }
+    
+    public static String nombreServidor() {      
+      
+        InetAddress ip;
+        String host = null;
+        try {
+            ip = InetAddress.getLocalHost();
+            host = ip.getHostName();         
+        } catch (UnknownHostException ex) {
+            System.out.println("No se puede obtener nombre del host");
+        }
+  
+        return host;
     }
 }

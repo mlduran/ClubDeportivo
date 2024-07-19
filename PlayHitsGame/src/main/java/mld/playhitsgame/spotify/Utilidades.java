@@ -138,18 +138,14 @@ public class Utilidades {
                
        return lista; 
         
-    }   
+    }    
     
     
-    
-    
-    public void grabarListaCanciones(List<Cancion> lista){
-        
+    public void grabarListaCanciones(List<Cancion> lista){        
        
         for (Cancion cancion: lista){
            
-            DAO.save(cancion);
-           
+            DAO.save(cancion);           
         }
         
     }
