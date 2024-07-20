@@ -4,19 +4,19 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to c
 Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <script src="/Javascript/Usuario.js"></script>
     <head>
         <title>Alta Usuario</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
-        <div>          
-           
-            
+        <div>            
             <form method="post" th:action="@{/altaUsuario}" th:object="${newusuario}">                
-                <p>Usuario (mail)<input type="text" th:field="*{usuario}" required="required"/></p>
+                <p>Usuario (mail)<input type="email" th:field="*{usuario}" required="required"/></p>
                 <p>Alias<input type="text" th:field="*{alias}"/></p>
-                <p>Password<input type="text" th:field="*{contrasenya}" required="required"/></p>
+                <p>Password<input type="password" th:field="*{contrasenya}" id="pws1" required="required"/></p>
+                <p>Confirma Password<input type="password" id="pws2" required="required"/></p>
                 <p>Grupo<input type="text" th:field="*{grupo}"/></p>
                 <input type="submit" value="Alta Usuario"/>                
             </form>

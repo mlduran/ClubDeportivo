@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +41,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-
 @Controller
 // rol puede ser master o invitado
 // utilizamos los ids para usuario y partida de sesion, para no cargar tantos datos de
@@ -72,14 +70,15 @@ public class ControladorVista {
     
     private Usuario usuarioModelo(Model modelo){
         
-        Long id_usu = (Long) modelo.getAttribute("id_usuarioSesion");
-        if (id_usu == null){
-            System.out.println("Se ha perdido la sesion usuario, delvolvemos la login");
-            inicio(modelo);
-        }
-        Usuario usuarioSesion = servUsuario.findById(id_usu).get();
+        Long id_usu = (Long) modelo.getAttribute("id_usuarioSesion");        
+        Usuario usuarioSesion = null;
+        try{
+            usuarioSesion = servUsuario.findById(id_usu).get();
+        }catch(Exception ex){}
+        
         return usuarioSesion;        
     }
+    
     private void informarUsuarioModelo(Model modelo, Usuario usuario){        
         
         modelo.addAttribute("usuarioSesion", usuario);        
@@ -88,13 +87,14 @@ public class ControladorVista {
     private Partida partidaModelo(Model modelo){
         
         Long id_part = (Long) modelo.getAttribute("id_partidaSesion");
-        if (id_part == null){
-            System.out.println("Se ha perdido la partida usuario, delvolvemos al panel");
-            panel(modelo);
-        }
-        Partida partidaSesion = servPartida.findById(id_part).get();
+        Partida partidaSesion = null;
+        try{
+            partidaSesion = servPartida.findById(id_part).get();
+        }catch(Exception ex){}
+        
         return partidaSesion;        
     }
+    
     private void informarPartidaModelo(Model modelo, Partida partida){        
         
         modelo.addAttribute("partidaSesion", partida);        
@@ -103,9 +103,9 @@ public class ControladorVista {
     @GetMapping("/")
     public String inicio(Model modelo){
         
-        return "Inicio";
-        
+        return "Inicio";        
     }
+    
     @PostMapping("/") 
     public String inicio(@ModelAttribute("elUsuario") String elUsuario, 
             @ModelAttribute("laContrasenya") String laContrasenya, Model modelo){
@@ -129,6 +129,19 @@ public class ControladorVista {
     public String panel(Model modelo){  
         
         Usuario usu = usuarioModelo(modelo);
+        if (usu == null)
+            return "redirect:/";
+        informarUsuarioModelo(modelo, usu);
+        
+        return "Panel";        
+    }
+    
+    @GetMapping("/updateUsuario")
+    public String updateUsuario(Model modelo){  
+        
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null)
+            return "redirect:/";
         informarUsuarioModelo(modelo, usu);
         
         return "Panel";        
@@ -138,17 +151,20 @@ public class ControladorVista {
     public String partidaMaster(Model modelo){
         
         Usuario usu = usuarioModelo(modelo);
+        if (usu == null)
+            return "redirect:/";
         modelo.addAttribute("rol", Rol.master);
         Partida partida = usu.partidaMasterEnCurso();
         
-        return partida(modelo, partida);
-        
+        return partida(modelo, partida);        
     }
     
     @GetMapping("/partidaInvitado/{id}")
     public String partidaInvitado(Model modelo, @PathVariable Long id){
         
         Usuario usu = usuarioModelo(modelo);
+        if (usu == null)
+            return "redirect:/";
         modelo.addAttribute("rol", Rol.invitado);
         
         Partida partida = null;
@@ -157,14 +173,17 @@ public class ControladorVista {
                 partida = p;
         }
         
-        return partida(modelo, partida);
-        
+        return partida(modelo, partida);        
     }
      
     public String partida(Model modelo, Partida partida){
         
-        Usuario usu = usuarioModelo(modelo);           
+        Usuario usu = usuarioModelo(modelo); 
+        if (usu == null)
+            return "redirect:/";
         informarPartidaModelo(modelo, partida);
+        if (partida == null)
+            return "redirect:/panel";
         informarUsuarioModelo(modelo, usu);
         Ronda rondaActual = partida.getRondas().get(partida.getRondaActual() -1 );
         List<OpcionTituloTmp> opcTitulos = 
@@ -176,8 +195,7 @@ public class ControladorVista {
         modelo.addAttribute("opcInterpretes", opcInterpretes);
         modelo.addAttribute("id_partidaSesion", partida.getId());
         modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
-        return "Partida";      
-        
+        return "Partida";
     }
     
     @GetMapping("/partida")
@@ -187,91 +205,11 @@ public class ControladorVista {
         return partida(modelo, partida);
     } 
     
-    @GetMapping("/nuevaRonda_eliminar")
-    public String nuevaRonda_eliminar(Model modelo){
-        
-        Usuario usu = usuarioModelo(modelo);
-        Partida partida = partidaModelo(modelo);
-        Ronda rondaActiva = partida.rondaActiva();
-        
-        boolean acabar = false;
-        //if (rondaActiva.isTodasLasRespuestasOK()){
-        if (true){ // de momento lo damos por bueno 
-            rondaActiva.setCompletada(true);
-            servRonda.updateRonda(rondaActiva.getId(), rondaActiva);    
-            
-            if (partida.hayMasRondas()){
-                partida.pasarSiguienteRonda();            
-                acabar = false;
-            }else{
-                resultadosPartida(partida, modelo);
-                partida.setStatus(StatusPartida.Terminada);
-                partida.asignarGanador();
-                acabar = true;
-            }
-            servPartida.updatePartida(partida.getId(), partida); 
-        }   
-        informarPartidaModelo(modelo, partida);
-        informarUsuarioModelo(modelo, usu);
-        modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
-                
-        if (acabar){            
-            return "redirect:/partidaConsulta/" + String.valueOf(partida.getId()); 
-        }else 
-            return "Partida";  
-        
-        
-    }
-
-            
-    @PostMapping("/partida_old_borrar")
-    public String partida_old_borrar(@ModelAttribute("anyo") int anyo,Model modelo){        
-        
-        Usuario usu = usuarioModelo(modelo);
-        Partida partida = partidaModelo(modelo);
-        Ronda rondaActiva = partida.rondaActiva();
-        
-        Respuesta resp = servRespuesta.buscarPorRondaUsuario(rondaActiva.getId(), usu.getId());
-
-        if (anyo != 0){
-            resp.setAnyo(anyo);
-            int pts = calcularPtsPorAnyo(anyo, rondaActiva.getCancion());
-            resp.setPuntos(pts);
-            servRespuesta.updateRespuesta(resp.getId(), resp);
-        }   
-        boolean acabar = false;
-        if (rondaActiva.isTodasLasRespuestasOK()){
-            rondaActiva.setCompletada(true);
-            servRonda.updateRonda(rondaActiva.getId(), rondaActiva);    
-            
-            if (partida.hayMasRondas()){
-                partida.pasarSiguienteRonda();            
-                acabar = false;
-            }else{
-                resultadosPartida(partida, modelo);
-                partida.setStatus(StatusPartida.Terminada);
-                partida.asignarGanador();
-                acabar = true;
-            }
-            servPartida.updatePartida(partida.getId(), partida); 
-        }   
-        informarPartidaModelo(modelo, partida);
-        informarUsuarioModelo(modelo, usu);
-        modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
-                
-        if (acabar){            
-            return "redirect:/partidaConsulta/" + String.valueOf(partida.getId()); 
-        }else 
-            return "Partida";        
-    }
-    
- 
     @GetMapping("/altaUsuario")
     public String altaUsuario(Model modelo){
         
         modelo.addAttribute("newusuario", new Usuario());
-        return "AltaUsuario";
-        
+        return "AltaUsuario";        
     }
     
     @PostMapping("/altaUsuario")
@@ -286,9 +224,7 @@ public class ControladorVista {
         }   
         
         modelo.addAttribute("result", resp);        
-        
-        return "AltaUsuario";
-        
+        return "AltaUsuario";        
     }      
     
     private void anyadirTemas(Model modelo){
@@ -297,8 +233,7 @@ public class ControladorVista {
         temas.add("");
         for (Tema tema : servTema.findAll())
             temas.add(tema.getTema());
-        modelo.addAttribute("temas", temas);
-        
+        modelo.addAttribute("temas", temas);        
     }
     
     
@@ -308,6 +243,8 @@ public class ControladorVista {
         Calendar fecha = Calendar.getInstance();
         
         Usuario usu = usuarioModelo(modelo);
+        if (usu == null)
+            return "redirect:/";
         Partida newPartida = new Partida();
         newPartida.setAnyoInicial(1950);
         newPartida.setAnyoFinal(fecha.get(Calendar.YEAR) -1);
@@ -320,11 +257,8 @@ public class ControladorVista {
             modelo.addAttribute("posiblesinvitados", posiblesInvitados);      
         else
             modelo.addAttribute("posiblesinvitados", null); 
-        
-        informarUsuarioModelo(modelo, usu);
    
-        return "CrearPartida";
-        
+        return "CrearPartida";        
     }
     
        
@@ -333,12 +267,15 @@ public class ControladorVista {
             @ModelAttribute("nrondas") Integer nrondas, Model modelo,  HttpServletRequest req){           
         
         Usuario usu = usuarioModelo(modelo);
+        if (usu == null)
+            return "redirect:/";
         Calendar cal= Calendar.getInstance();
         int anyoActual = cal.get(Calendar.YEAR);
 
-        try{
-            
+        try{            
             // Validaciones
+            if (!usu.sePuedeCrearPartidaMaster())
+                throw new Exception("Ya tienes una partida Master creada, no se pueden crear mas");
             if (partida.getAnyoFinal() <= partida.getAnyoInicial())
                 throw new Exception("Las Fechas Iniciales y Finales no son correctas");            
             if (partida.getAnyoFinal() > anyoActual)
@@ -430,8 +367,7 @@ public class ControladorVista {
         HashMap<String,List<Respuesta>> resultadosPartida = new HashMap();
         HashMap<String,Integer> totales = new HashMap();
         String nomUsu;
-        ArrayList lista;
-        
+        ArrayList lista;        
          
         for (Ronda ronda : partidaSesion.getRondas()){            
             for (Respuesta respuesta : ronda.getRespuestas()){
@@ -442,8 +378,7 @@ public class ControladorVista {
                 lista.add(respuesta);                
                 resultadosPartida.put(nomUsu, lista);
             }
-        }
-        
+        }        
         //Crear la suma total
         for (String usu : resultadosPartida.keySet() ){
             int total = 0;
@@ -453,23 +388,25 @@ public class ControladorVista {
         }
         
         modelo.addAttribute("ptstotales", totales);
-        modelo.addAttribute("resultados", resultadosPartida);
-        
+        modelo.addAttribute("resultados", resultadosPartida);        
     }
-    
-    
+        
     @GetMapping("/partidaConsulta/{id}")
-    public String partidaConsulta(@PathVariable Long id, Model modelo){
+    public String partidaConsulta(@PathVariable Long id, Model modelo){        
         
-        Optional<Partida> partida = servPartida.findById(id);
-        Partida partidaSesion = partida.get();  
+        Partida partidaSesion = null;
+        try {
+            Optional<Partida> partida = servPartida.findById(id);
+            partidaSesion = partida.get();
+        } catch (Exception e) {
+        }
         
-        resultadosPartida(partidaSesion, modelo);
-        
+        if (partidaSesion == null)
+            return "redirect:/";
+        resultadosPartida(partidaSesion, modelo);        
         informarPartidaModelo(modelo, partidaSesion);        
         
-        return "ResultadosPartida";
-        
+        return "ResultadosPartida";        
     }
     
     private List<Usuario> usuariosGrupo(Usuario usu){        
@@ -482,8 +419,7 @@ public class ControladorVista {
             if (!Objects.equals(elem.getId(), usu.getId())){
                    invitados.add(elem);                   
             }                
-        }
-        
+        }        
         return invitados;        
     }   
 }

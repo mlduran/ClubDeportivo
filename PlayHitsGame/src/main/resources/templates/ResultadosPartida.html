@@ -56,14 +56,27 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             </div>
                         </div>
                     </tr>          
-                     <tr>
+                    <tr>
                        <th>RESPUESTA AÑO</th>
                     </tr>
                     <tr th:each="elem : ${resultados}">
                         <td th:text="${elem.key}"></td>
                         <td th:each="resp : ${elem.value}" th:text="${resp.anyo}"/> 
+                    </tr> 
+                    <tr>
+                       <th>RESPUESTA TITULO</th>
+                    </tr>
+                    <tr th:each="elem : ${resultados}">
+                        <td th:text="${elem.key}"></td>
+                        <td th:each="resp : ${elem.value}" th:text="${resp.titulo}"/> 
                     </tr>   
-                     
+                    <tr>
+                       <th>RESPUESTA INTERPRETE</th>
+                    </tr>
+                    <tr th:each="elem : ${resultados}">
+                        <td th:text="${elem.key}"></td>
+                        <td th:each="resp : ${elem.value}" th:text="${resp.interprete}"/> 
+                    </tr>   
                 </table>
             </div>
     </body>

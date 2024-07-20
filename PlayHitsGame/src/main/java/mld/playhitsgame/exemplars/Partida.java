@@ -64,6 +64,12 @@ public class Partida{
     private String grupo;
     private String ganador;
     
+    public boolean isTerminada(){
+        
+        return this.status == StatusPartida.Terminada;
+        
+    }
+    
     public String fechaFormateada(){
         
         //String strDateFormat = "hh:mm:ss a dd-MMM-yyyy"; 

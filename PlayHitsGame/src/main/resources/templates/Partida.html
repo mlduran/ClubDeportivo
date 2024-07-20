@@ -30,56 +30,64 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                    </tr>
                    <tr th:each="ronda : ${partidaSesion.rondas}">                                              
                         <div th:if="${partidaSesion.rondaActual  == ronda.numero}">
-                            <td th:text="'RONDA ' + ${ronda.numero}"></td>  
-                            <td>
-                                <table border="2" > 
-                                    <tr>
-                                        <td>
-                                            <audio controls>
-                                                <source th:src="${ronda.cancion.spotifyplay}" type="audio/mpeg"/>
-                                            </audio>
-                                        </td>
-                                        <td/>
-                                    </tr>
-                                    <tr>                                        
-                                        <td>
-                                            Año
-                                            <input type="number" name="anyo" id="anyo" min="1" max="2050"/>
-                                            <button th:onclick="respuestaAnyo()" id="botonAnyo">
-                                                <p>Enviar</p>
-                                            </button>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Titulo</th>
-                                        <th>Interprete</th>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div th:each="opTitulo : ${opcTitulos}"> 
-                                                <button th:data-name="${opTitulo.cancion}" th:onclick="respuestaTitulo(this.getAttribute('data-name'))" th:id="'titulo_' + ${opTitulo.cancion}">
-                                                    <p th:text="${opTitulo.opTitulo}"></p>
+                            <div th:if="${partidaSesion.terminada == true}"> 
+                                <td th:text="'RONDA FINALIZADA'"/>  
+                                <td/><td/>  
+                            </div>
+                            <div th:if="${partidaSesion.terminada == false}">    
+                                <td th:text="'RONDA ' + ${ronda.numero}"></td>  
+                                <td>                                
+                                    <table border="2" > 
+                                        <tr>
+                                            <td>
+                                                <audio controls>
+                                                    <source th:src="${ronda.cancion.spotifyplay}" type="audio/mpeg"/>
+                                                </audio>
+                                            </td>
+                                            <td/>
+                                        </tr>
+                                        <tr>                                        
+                                            <td>
+                                                Año
+                                                <input type="number" name="anyo" id="anyo" min="1" max="2050"/>
+                                                <button th:onclick="respuestaAnyo()" id="botonAnyo">
+                                                    <p>Enviar</p>
                                                 </button>
-                                                <br/>                                  
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div th:each="opcInterprete : ${opcInterpretes}">   
-                                                <button th:data-name="${opcInterprete.cancion}" th:onclick="respuestaInterprete(this.getAttribute('data-name'))" th:id="'interprete_' + ${opcInterprete.cancion}">
-                                                    <p th:text="${opcInterprete.opInterprete}"></p>
-                                                </button>
-                                                <br/>                                  
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </table>                               
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Titulo</th>
+                                            <th>Interprete</th>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div th:each="opTitulo : ${opcTitulos}"> 
+                                                    <button th:data-name="${opTitulo.cancion}" th:onclick="respuestaTitulo(this.getAttribute('data-name'))" th:id="'titulo_' + ${opTitulo.cancion}">
+                                                        <p th:text="${opTitulo.opTitulo}"></p>
+                                                    </button>
+                                                    <br/>                                  
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div th:each="opcInterprete : ${opcInterpretes}">   
+                                                    <button th:data-name="${opcInterprete.cancion}" th:onclick="respuestaInterprete(this.getAttribute('data-name'))" th:id="'interprete_' + ${opcInterprete.cancion}">
+                                                        <p th:text="${opcInterprete.opInterprete}"></p>
+                                                    </button>
+                                                    <br/>                                  
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>  
+                                </div>
                             </td>
                             <td>
                                 <p th:text="ENVIADO"/>
                                 <div id="mensajesSockets"> 
                                 </div>
-                                <a href="/partida" class="button" id="refrecar">SIGUIENTE RONDA</a>
+                                <div th:if="${partidaSesion.terminada}">
+                                    <a th:href="'/partidaConsulta/' + ${partidaSesion.id}" class="button" id="resultados">VER RESULTADOS</a>
+                                </div>
                             </td>
                         </div>    
                    </tr> 
@@ -122,11 +130,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 if (event.data === '#nueva#')
                     location.reload();
                 if (event.data === '#acabar#'){
-                    location.roload(); 
-                    txtHtml = txtHtml + '<p>' + 'pruebaaaa' + '</p>';
-                    mensajesSockets.innerHTML = txtHtml;
-                    // no e si hay que hacer algo mas
-                    return;
+                    location.reload(); // ahora hacemos lo mismo, pero se deja por si hubiese otra cosa que hacer
                 }
                 let mensajesSockets = document.getElementById("mensajesSockets");
                 let usuarios = event.data.split(",");

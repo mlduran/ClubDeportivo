@@ -32,7 +32,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -51,37 +50,13 @@ public class WebsocketControler extends TextWebSocketHandler{
     @Autowired
     RondaServicioMetodos servRonda;
     
-    private static final Set<WebSocketSession> sessions = new HashSet(); 
     private static final HashMap<Long, Set<UsuarioWS>> partidas = new HashMap(); 
-    private static final HashMap<Long, Integer> nRespuestas = new HashMap();
-
-    //@Override
-    public void afterConnectionEstablished_(WebSocketSession session) throws Exception {
-        sessions.add(session);
-        System.out.println(new Date() + " Se ha conectado sesion " + session.getId());
-    }
-
-    //@Override
-    public void afterConnectionClosed_(WebSocketSession session, CloseStatus status) throws Exception {
-        for (Set<UsuarioWS> usuariosWS : partidas.values()){
-            for (UsuarioWS usuarioWS : usuariosWS)
-                if (session == usuarioWS.getSession()){
-                    System.out.println(new Date() + " Se ha desconectado del WebSocket el usuario " + usuarioWS.getUsuario() + 
-                            " con sesion " + session.getId());
-                    usuariosWS.remove(usuarioWS);
-                }
-        } 
-        System.out.println(new Date() + " Se ha desconectado sesion " + session.getId());
-        sessions.remove(session);
-    }
-    
-    
+    private static final HashMap<Long, Integer> nRespuestas = new HashMap();    
     
     public static Set<UsuarioWS> usuariosPartida(Long idPartida){
         
         return partidas.get(idPartida);        
-    }
-    
+    }    
     
     public static UsuarioWS anyadirPartidaUsuario(WebSocketSession session, long partida, long idUsuario, String nombre){
         
@@ -156,8 +131,36 @@ public class WebsocketControler extends TextWebSocketHandler{
             }                
         }        
         return completo;       
+    }    
+    
+    private UsuarioWS registrarPeticionWS(JSONObject obJson, WebSocketSession session){
+        
+        UsuarioWS usuWS = buscarUsuarioWS(
+                    obJson.getLong("idPartida"),obJson.getLong("idUsuario"));
+               
+        if (usuWS == null){            
+            Usuario usuBD = obtenerUsuario(obJson.getLong("idUsuario"));
+            usuWS = anyadirPartidaUsuario(session,
+                    obJson.getLong("idPartida"), 
+                    obJson.getLong("idUsuario"),
+                    usuBD.getNombre()
+                    );
+            System.out.println(new Date() + " Se ha conectado al WebSocket el usuario " + usuWS.getUsuario() + 
+                            " con sesion " + session.getId());        
+        }else{
+            if (!usuWS.getSession().getId().equals(session.getId())){
+                usuWS.setSession(session);
+                System.out.println(new Date() + " Se actualiza sesion del usuario " + usuWS.getUsuario() + 
+                             " con sesion " + session.getId()); 
+            }else
+                System.out.println(new Date() + " Peticion " +  obJson.getString("op") +
+                        " al WebSocket del usuario " + usuWS.getUsuario() + 
+                        " con sesion " + session.getId()); 
+        }
+        
+        return usuWS;        
     }
-
+    
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
      
@@ -168,75 +171,64 @@ public class WebsocketControler extends TextWebSocketHandler{
             System.out.println(new Date() + " Error al capturar json : " + message.getPayload()); 
         }
         
-        if (obJson == null || obJson.isEmpty())
-            return;  
+        if (obJson == null || obJson.isEmpty()){
+            //aqui habria que lanzar un error de momento paramos para ver que pasa
+            throw new Exception("ERROR al obtener json");  
+        }
+        UsuarioWS usuarioWS = registrarPeticionWS(obJson,session);        
         
         if ("alta".equals(obJson.getString("op"))){
-            UsuarioWS usuWS = buscarUsuarioWS(obJson.getLong("idPartida"),obJson.getLong("idUsuario"));
-            if (usuWS == null){            
-                Usuario usuBD = obtenerUsuario(obJson.getLong("idUsuario"));
-                usuWS = anyadirPartidaUsuario(session,
-                        obJson.getLong("idPartida"), 
-                        obJson.getLong("idUsuario"),
-                        usuBD.getNombre()
-                        );
-                System.out.println(new Date() + " Se ha conectado al WebSocket el usuario " + usuWS.getUsuario() + 
-                                " con sesion " + session.getId());
-            }else{
-                   usuWS.setSession(session);
-                   System.out.println(new Date() + " Se actualiza sesion del usuario " + usuWS.getUsuario() + 
-                                " con sesion " + session.getId()); 
-            }
-            
-        }else{
-        
-            UsuarioWS usuarioWS = null;
-            for (UsuarioWS usu : usuariosPartida(obJson.getLong("idPartida")))
-                if (usu.getId() == obJson.getLong("idUsuario"))
-                    usuarioWS = usu;
-        
-            if ("titulo".equals(obJson.getString("op"))){
-                responderTitulo(
-                        obJson.getLong("idPartida"), 
-                        obJson.getLong("idUsuario"),
-                        obJson.getLong("idCancion"));
-                usuarioWS.setRespTitulo(true);
-            }
+            // De momento no hacemos nada, si al final no tiene utilidad borrar
+        }
 
-            if ("interprete".equals(obJson.getString("op"))){
-                responderInterprete(
-                        obJson.getLong("idPartida"), 
-                        obJson.getLong("idUsuario"),
-                        obJson.getLong("idCancion"));
-                usuarioWS.setRespInterprete(true);
-            }
+        if ("titulo".equals(obJson.getString("op"))){
+            responderTitulo(
+                    obJson.getLong("idPartida"), 
+                    obJson.getLong("idUsuario"),
+                    obJson.getLong("idCancion"));
+            usuarioWS.setRespTitulo(true);
+        }
 
-            if ("anyo".equals(obJson.getString("op"))){
-                responderAnyo(
-                        obJson.getLong("idPartida"), 
-                        obJson.getLong("idUsuario"),
-                        obJson.getInt("anyo"));
-                usuarioWS.setRespAnyo(true);
-            }
-            
-            if (usuarioWS.isTodoRespondido()){
-                int nr = nRespuestas.get(obJson.getLong("idPartida"));
-                usuarioWS.setOrden(nr +1);
-                nRespuestas.put(obJson.getLong("idPartida"), nr + 1);
-            }                
-      
-            String respuesta = usuariosRespuestasCompletadas(obJson.getLong("idPartida"));
-            TextMessage messageResp = new TextMessage(respuesta);
+        if ("interprete".equals(obJson.getString("op"))){
+            responderInterprete(
+                    obJson.getLong("idPartida"), 
+                    obJson.getLong("idUsuario"),
+                    obJson.getLong("idCancion"));
+            usuarioWS.setRespInterprete(true);
+        }
 
-            for(UsuarioWS usu: usuariosPartida(obJson.getLong("idPartida")))
-               usu.getSession().sendMessage(messageResp);
-            
-            if (isTodoCompletado(obJson.getLong("idPartida")))
-                pasarSiguienteRonda(obJson.getLong("idPartida"));
-            
-        }        
-        
-        
+        if ("anyo".equals(obJson.getString("op"))){
+            responderAnyo(
+                    obJson.getLong("idPartida"), 
+                    obJson.getLong("idUsuario"),
+                    obJson.getInt("anyo"));
+            usuarioWS.setRespAnyo(true);
+        }
+
+        if (usuarioWS.isTodoRespondido()){
+            int nr = nRespuestas.get(obJson.getLong("idPartida"));
+            usuarioWS.setOrden(nr +1);
+            nRespuestas.put(obJson.getLong("idPartida"), nr + 1);
+        }                
+
+        String respuesta = usuariosRespuestasCompletadas(obJson.getLong("idPartida"));
+        TextMessage messageResp = new TextMessage(respuesta);
+
+        for(UsuarioWS usu: usuariosPartida(obJson.getLong("idPartida"))){
+            try {
+                if (usu.getSession().isOpen())
+                    usu.getSession().sendMessage(messageResp);
+                else
+                    System.out.println(new Date() + " La conexion del usuario " + usu.getUsuario() + 
+                         " con sesion " + usu.getSession().getId() + " esta cerrada");
+            } catch (IOException iOException) {
+                System.out.println(new Date() + " No se ha podido entregar notificacion del usuario " + usu.getUsuario() + 
+                         " con sesion " + usu.getSession().getId()); 
+            }
+        }           
+
+        if (isTodoCompletado(obJson.getLong("idPartida")))
+            pasarSiguienteRonda(obJson.getLong("idPartida"));        
     }
     
     private Usuario obtenerUsuario(Long idUsuario){
