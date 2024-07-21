@@ -178,7 +178,9 @@ public class WebsocketControler extends TextWebSocketHandler{
         UsuarioWS usuarioWS = registrarPeticionWS(obJson,session);        
         
         if ("alta".equals(obJson.getString("op"))){
-            // De momento no hacemos nada, si al final no tiene utilidad borrar
+            // De momento no hacemos nada, lo mantemos para 
+            // hacer el alta en lacarga de la pagina y ahorrarnos
+            // luego la consulta a BD del usuario
         }
 
         if ("titulo".equals(obJson.getString("op"))){

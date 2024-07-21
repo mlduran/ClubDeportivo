@@ -134,18 +134,7 @@ public class ControladorVista {
         informarUsuarioModelo(modelo, usu);
         
         return "Panel";        
-    }
-    
-    @GetMapping("/updateUsuario")
-    public String updateUsuario(Model modelo){  
-        
-        Usuario usu = usuarioModelo(modelo);
-        if (usu == null)
-            return "redirect:/";
-        informarUsuarioModelo(modelo, usu);
-        
-        return "Panel";        
-    }
+    }    
    
     @GetMapping("/partidaMaster")
     public String partidaMaster(Model modelo){
@@ -225,7 +214,32 @@ public class ControladorVista {
         
         modelo.addAttribute("result", resp);        
         return "AltaUsuario";        
-    }      
+    }  
+
+    @GetMapping("/modificarUsuario")
+    public String modificarUsuario(Model modelo){  
+        
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null)
+            return "redirect:/";
+        informarUsuarioModelo(modelo, usu);        
+        return "ModificarUsuario";        
+    }
+    
+    @PostMapping("/modificarUsuario")
+    public String modificarUsuario(@ModelAttribute("usuarioSesion") Usuario usuario, Model modelo){
+        
+        String resp = "OK";
+        
+        try{
+            servUsuario.updateUsuario(usuario.getId(), usuario);
+        }catch(Exception ex){
+            resp = "ERROR " + ex; 
+        }   
+        
+        modelo.addAttribute("result", resp);        
+        return "ModificarUsuario";        
+    }  
     
     private void anyadirTemas(Model modelo){
         
@@ -258,6 +272,7 @@ public class ControladorVista {
         else
             modelo.addAttribute("posiblesinvitados", null); 
    
+        informarUsuarioModelo(modelo, usu);
         return "CrearPartida";        
     }
     

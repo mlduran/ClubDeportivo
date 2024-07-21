@@ -48,8 +48,8 @@ public class PartidaServicioMetodos implements PartidaServicio{
             obj.setGenero(partida.getGenero());
         }
         
-        if(Objects.nonNull(partida.getPais())){
-            obj.setPais(partida.getPais());
+        if(Objects.nonNull(partida.getIdioma())){
+            obj.setIdioma(partida.getIdioma());
         } 
         
         if(Objects.nonNull(partida.getTema()) && !"".equalsIgnoreCase(partida.getTema())){

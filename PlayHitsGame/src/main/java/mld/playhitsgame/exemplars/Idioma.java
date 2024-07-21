@@ -8,9 +8,9 @@ package mld.playhitsgame.exemplars;
  *
  * @author miguel
  */
-public enum Pais {
+public enum Idioma {
     
-    International,
+    English,
     Spanish    
 
     

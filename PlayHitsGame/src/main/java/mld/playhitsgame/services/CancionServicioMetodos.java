@@ -4,8 +4,6 @@
  */
 package mld.playhitsgame.services;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -16,7 +14,6 @@ import mld.playhitsgame.exemplars.SearchSpecifications;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.FiltroCanciones;
 import mld.playhitsgame.exemplars.Partida;
-import mld.playhitsgame.exemplars.Ronda;
 import mld.playhitsgame.projections.ampliada.CancionAmpliadaView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -81,8 +78,8 @@ public class CancionServicioMetodos implements CancionServicio{
         
         cancionObj.setAnyo(cancion.getAnyo());
         
-        if(Objects.nonNull(cancion.getPais())){
-            cancionObj.setPais(cancion.getPais());
+        if(Objects.nonNull(cancion.getIdioma())){
+            cancionObj.setIdioma(cancion.getIdioma());
         }
         
         if(Objects.nonNull(cancion.getSpotifyid()) && !"".equalsIgnoreCase(cancion.getSpotifyid())){
@@ -125,7 +122,7 @@ public class CancionServicioMetodos implements CancionServicio{
         if (!"".equals(filtro.getTema()))  
             return DAO.findByFiltroConTema(filtro.getTema(), filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar());  
         else
-            return DAO.findByFiltroSinTema(filtro.getGenero(), filtro.getPais(),  filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar());
+            return DAO.findByFiltroSinTema(filtro.getGenero(), filtro.getIdioma(),  filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar());
         
                   
           
@@ -140,7 +137,7 @@ public class CancionServicioMetodos implements CancionServicio{
                     partida.getAnyoFinal(), false);            
         else 
             canciones = DAO.findByFiltroSinTema(partida.getGenero().toString(), 
-                    partida.getPais().toString(),  partida.getAnyoInicial(), 
+                    partida.getIdioma().toString(),  partida.getAnyoInicial(), 
                     partida.getAnyoFinal(), false);       
         
         return canciones;

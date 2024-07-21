@@ -55,7 +55,7 @@ public class Partida{
   
     private int rondaActual;
     private Genero genero;
-    private Pais pais;
+    private Idioma idioma;
     private String tema; // por ejemplo Descripciones genericas 
     @Min(1950)
     private int anyoInicial;
@@ -102,8 +102,8 @@ public class Partida{
             txt.add("Tema: ".concat(this.getTema()));
         if (this.getGenero()!= null && this.getGenero() != null)
             txt.add("Genero: ".concat(this.getGenero().toString()));
-        if (this.getPais()!= null && this.getPais()!= null)
-            txt.add("Pais: ".concat(this.getPais().toString()));
+        if (this.getIdioma()!= null && this.getIdioma()!= null)
+            txt.add("Pais: ".concat(this.getIdioma().toString()));
         
         txt.add("Año inicial: " + String.valueOf(this.getAnyoInicial()));
         txt.add("Año final: " + String.valueOf(this.getAnyoFinal()));

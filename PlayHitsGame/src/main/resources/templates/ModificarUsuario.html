@@ -11,13 +11,12 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     </head>
     <body>
         <div>            
-            <form method="post" th:action="@{/altaUsuario}" th:object="${newusuario}" id="form">                
-                <p>Usuario (mail)<input type="email" th:field="*{usuario}" required="required"/></p>
+            <form method="post" th:action="@{/modificarUsuario}" th:object="${usuarioSesion}" id="form">                
                 <p>Alias<input type="text" th:field="*{alias}"/></p>
                 <p>Password<input type="password" th:field="*{contrasenya}" id="pws1" required="required"/></p>
                 <p>Confirma Password<input type="password" id="pws2" required="required"/></p>
                 <p>Grupo<input type="text" th:field="*{grupo}"/></p>
-                <input type="submit" value="Alta Usuario" id="enviar" th:onclick="validarPasswd()"/>                
+                <input type="submit" value="Modificar Usuario" id="enviar" th:onclick="validarPasswd()"/>                
             </form>
             
             <p th:text="${result}"></p>

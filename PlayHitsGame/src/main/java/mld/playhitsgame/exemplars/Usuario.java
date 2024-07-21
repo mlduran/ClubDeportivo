@@ -23,8 +23,7 @@ import org.hibernate.annotations.CreationTimestamp;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "usuarios")
-public class Usuario{
-    
+public class Usuario{    
    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -74,10 +73,7 @@ public class Usuario{
     public String nombreId(){
         
         return this.getNombre() + this.getClass().toString();        
-    }     
-    
-    
-   
+    }        
     
     public Partida partidaMasterEnCurso(){
         
@@ -112,8 +108,7 @@ public class Usuario{
     
     public boolean hayPartidasInvitadoPendientes(){       
         return !partidasInvitadoPendientes().isEmpty();        
-    }
-    
+    }    
     
     public List<Partida> partidasTerminadas(){
         
@@ -135,8 +130,7 @@ public class Usuario{
     
     public boolean hayPartidasTerminadas(){
         
-        return !partidasTerminadas().isEmpty();      
-        
+        return !partidasTerminadas().isEmpty();        
     }
     
     public String getTxtGrupo(){
@@ -144,8 +138,7 @@ public class Usuario{
         if (this.getGrupo() == null || this.getGrupo().isBlank())
             return "Sin Informar";
         else
-            return this.getGrupo();        
-        
+            return this.getGrupo();
     }
     
 

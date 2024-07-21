@@ -11,7 +11,7 @@ package mld.playhitsgame.exemplars;
 public class FiltroCanciones {
     
     private String genero;
-    private String pais;
+    private String idioma;
     private String tema;
     private int anyoInicial;
     private int anyoFinal;
@@ -20,7 +20,7 @@ public class FiltroCanciones {
         public FiltroCanciones(){
         
         this.genero = Genero.Generico.toString();
-        this.pais = Pais.International.toString();
+        this.idioma = Idioma.English.toString();
         this.tema = "";
         this.anyoInicial = 1950;
         this.anyoFinal = 2050;
@@ -45,15 +45,15 @@ public class FiltroCanciones {
     /**
      * @return the pais
      */
-    public String getPais() {
-        return pais;
+    public String getIdioma() {
+        return idioma;
     }
 
     /**
-     * @param pais the pais to set
+     * @param idioma the pais to set
      */
-    public void setPais(String pais) {
-        this.pais = pais;
+    public void setIdioma(String idioma) {
+        this.idioma = idioma;
     }
 
     /**
@@ -125,7 +125,7 @@ public class FiltroCanciones {
         String sql = "";
         
         sql = sql.concat("genero = '").concat(this.getGenero()).concat("' AND ");
-        sql = sql.concat("pais = '").concat(this.getPais()).concat("' AND ");
+        sql = sql.concat("idioma = '").concat(this.getIdioma()).concat("' AND ");
         if (!"".equals(this.getTema()))
             sql = sql.concat("tema = '").concat(this.getTema()).concat("' AND ");
         sql = sql.concat("anyo >= ").concat(String.valueOf(this.getAnyoInicial())).concat(" AND ");

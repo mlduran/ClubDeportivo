@@ -18,9 +18,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                     th:value="${generoOpt}" th:text="${generoOpt}"></option>
                 </select></p>
                 <p>Pais
-                <select th:field="*{pais}" title="Pais">
-                    <option th:each="paisOpt : ${T(mld.playhitsgame.exemplars.Pais).values()}" 
-                    th:value="${paisOpt}" th:text="${paisOpt}"></option>
+                <select th:field="*{idioma}" title="Idioma">
+                    <option th:each="idiomaOpt : ${T(mld.playhitsgame.exemplars.Idioma).values()}" 
+                    th:value="${idiomaOpt}" th:text="${idiomaOpt}"></option>
                 </select></p>
                 <p>Tema
                 <select th:field="*{tema}" title="Tema">
@@ -44,7 +44,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                     </table>
                 </div>
                 <div th:if="${posiblesinvitados == null}">
-                    <p th:text="'LA PARTIDA SERA PARA TI SOLO YA NO HAY NINGUN USUARIO QUE ESTE EN TU GRUPO PARA AÑADIR COMO INVITADO'"/>
+                    <p th:text="'LA PARTIDA SERA PARA TI SOLO, YA QUE NO HAY NINGUN USUARIO QUE ESTE EN TU GRUPO PARA AÑADIR COMO INVITADO'"/>
                 </div>              
             
             <p th:text="${result}"></p>
