@@ -5,8 +5,6 @@
 package mld.playhitsgame.DAO;
 
 
-import mld.playhitsgame.exemplars.SearchSpecifications;
-import mld.playhitsgame.exemplars.SearchCriteria;
 import java.util.List;
 import java.util.Optional;
 import mld.playhitsgame.exemplars.Cancion;
@@ -34,8 +32,8 @@ public interface CancionDAO extends JpaRepository<Cancion, Long>{
     @Override
     Optional<Cancion> findById(Long id);   
     
-    @Query(value = "SELECT * FROM canciones WHERE genero=:genero AND pais=:pais AND anyo>=:anyoinicial AND anyo<=:anyofinal AND revisar=:revisar ;", nativeQuery = true)
-    List<Cancion> findByFiltroSinTema(String genero, String pais, int anyoinicial, int anyofinal, boolean revisar);
+    @Query(value = "SELECT * FROM canciones WHERE genero=:genero AND idioma=:idioma AND anyo>=:anyoinicial AND anyo<=:anyofinal AND revisar=:revisar ;", nativeQuery = true)
+    List<Cancion> findByFiltroSinTema(String genero, String idioma, int anyoinicial, int anyofinal, boolean revisar);
     
     @Query(value = "SELECT * FROM canciones WHERE tema=:tema AND anyo>=:anyoinicial AND anyo<=:anyofinal AND revisar=:revisar ;", nativeQuery = true)
     List<Cancion> findByFiltroConTema(String tema, int anyoinicial, int anyofinal, boolean revisar);

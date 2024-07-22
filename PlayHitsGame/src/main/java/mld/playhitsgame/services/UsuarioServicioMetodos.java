@@ -57,8 +57,8 @@ public class UsuarioServicioMetodos implements UsuarioServicio{
             obj.setContrasenya(usuario.getContrasenya());
         }
 
-        if(Objects.nonNull(usuario.getPais()) && !"".equalsIgnoreCase(usuario.getPais())){
-            obj.setPais(usuario.getPais());
+        if(Objects.nonNull(usuario.getIdioma()) && !"".equalsIgnoreCase(usuario.getIdioma())){
+            obj.setIdioma(usuario.getIdioma());
         }
         if(Objects.nonNull(usuario.getGrupo()) && !"".equalsIgnoreCase(usuario.getGrupo())){
             obj.setGrupo(usuario.getGrupo());

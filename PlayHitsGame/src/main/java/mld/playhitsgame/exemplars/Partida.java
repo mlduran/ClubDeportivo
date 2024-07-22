@@ -103,7 +103,7 @@ public class Partida{
         if (this.getGenero()!= null && this.getGenero() != null)
             txt.add("Genero: ".concat(this.getGenero().toString()));
         if (this.getIdioma()!= null && this.getIdioma()!= null)
-            txt.add("Pais: ".concat(this.getIdioma().toString()));
+            txt.add("Idioma: ".concat(this.getIdioma().toString()));
         
         txt.add("Año inicial: " + String.valueOf(this.getAnyoInicial()));
         txt.add("Año final: " + String.valueOf(this.getAnyoFinal()));

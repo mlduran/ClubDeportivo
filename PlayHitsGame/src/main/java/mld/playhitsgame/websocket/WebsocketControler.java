@@ -32,6 +32,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -285,6 +288,12 @@ public class WebsocketControler extends TextWebSocketHandler{
         resp.setAnyo(anyo);
         servRespuesta.updateRespuesta(resp.getId(), resp);    
     }
+    
+    @GetMapping("/forzarAcabarRonda/{idPartida}")
+    public void acabarRonda(Model modelo, @PathVariable Long idPartida){
+        // esto es para poder llamarse desde el master para forzar acabar la ronda
+        pasarSiguienteRonda(idPartida); 
+    }
 
     private void pasarSiguienteRonda(Long idPartida) {
         // A este metodo llegamos si todos los usuarios conectados
@@ -317,20 +326,21 @@ public class WebsocketControler extends TextWebSocketHandler{
         
         if (acabar)
             messageResp = new TextMessage("#acabar#");
-        else {   
-            messageResp = new TextMessage("#nueva#");
-            limpiarDatos(idPartida);
-        }
+        else    
+            messageResp = new TextMessage("#nueva#"); 
 
         for(UsuarioWS usu: usuariosPartida(idPartida))
             try {
-                usu.getSession().sendMessage(messageResp);
+                if (usu.getSession().isOpen())
+                    usu.getSession().sendMessage(messageResp);
             } catch (IOException ex) {
                 Logger.getLogger(WebsocketControler.class.getName()).log(Level.SEVERE, null, ex);
             }  
         
         if (acabar)
             limpiarPartida(idPartida);
+        else
+            limpiarDatos(idPartida);
         
     }
     
@@ -343,6 +353,7 @@ public class WebsocketControler extends TextWebSocketHandler{
         Usuario usuarioAcertante = null;
         for (UsuarioWS usuWS : usuariosWS){
             for (Respuesta res : respuestas){
+                if (res.getTitulo() == null) continue;
                 if (res.getTitulo().equals(rondaActiva.getCancion().getTitulo())){
                     if (res.getUsuario().getId().equals(usuWS.getId())){
                         usuarioAcertante = res.getUsuario();
@@ -365,6 +376,7 @@ public class WebsocketControler extends TextWebSocketHandler{
         Usuario usuarioAcertante = null;
         for (UsuarioWS usuWS : usuariosWS){
             for (Respuesta res : respuestas){
+                if (res.getInterprete() == null) continue;
                 if (res.getInterprete().equals(rondaActiva.getCancion().getInterprete())){
                     if (res.getUsuario().getId().equals(usuWS.getId())){
                         usuarioAcertante = res.getUsuario();

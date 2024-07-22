@@ -23,10 +23,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                     <option th:each="generoOpt : ${T(mld.playhitsgame.exemplars.Genero).values()}" 
                     th:value="${generoOpt}" th:text="${generoOpt}"></option>
                 </select></p>
-                <p>Pais
-                <select th:field="*{pais}" title="Pais">
-                    <option th:each="paisOpt : ${T(mld.playhitsgame.exemplars.Pais).values()}" 
-                    th:value="${paisOpt}" th:text="${paisOpt}"></option>
+                <p>Idioma
+                <select th:field="*{idioma}" title="Idioma">
+                    <option th:each="idiomaOpt : ${T(mld.playhitsgame.exemplars.Idioma).values()}" 
+                    th:value="${idiomaOpt}" th:text="${idiomaOpt}"></option>
                 </select></p>
                 <p>Tema
                 <select th:field="*{tema}" title="Tema">

@@ -43,14 +43,14 @@ public class FiltroCanciones {
     }
 
     /**
-     * @return the pais
+     * @return the idioma
      */
     public String getIdioma() {
         return idioma;
     }
 
     /**
-     * @param idioma the pais to set
+     * @param idioma the idioma to set
      */
     public void setIdioma(String idioma) {
         this.idioma = idioma;

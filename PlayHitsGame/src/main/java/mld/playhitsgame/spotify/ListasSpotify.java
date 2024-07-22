@@ -29,8 +29,8 @@ public class ListasSpotify implements Serializable {
 	@Column(name = "ANYO")
 	private String anyo;
         
-        @Column(name = "PAIS")
-	private String pais;
+        @Column(name = "IDIOMA")
+	private String idioma;
 
 
 }

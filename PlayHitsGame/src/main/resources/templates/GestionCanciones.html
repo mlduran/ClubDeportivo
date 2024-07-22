@@ -20,7 +20,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 <table border="2">
                 <tr>
                     <th>Genero</th>
-                    <th>Pais</th>
+                    <th>Idioma</th>
                     <th>Tema</th>
                     <th>Año Inicial</th>
                     <th>Año Final</th>
@@ -34,9 +34,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         </select>
                     </td>
                     <td>
-                        <select th:field="*{pais}" title="Pais">
-                            <option th:each="paisOpt : ${T(mld.playhitsgame.exemplars.Pais).values()}" 
-                            th:value="${paisOpt}" th:text="${paisOpt}"></option>
+                        <select th:field="*{idioma}" title="Idioma">
+                            <option th:each="idiomaOpt : ${T(mld.playhitsgame.exemplars.Idioma).values()}" 
+                            th:value="${idiomaOpt}" th:text="${idiomaOpt}"></option>
                         </select>
                     </td>
                     <td>
@@ -82,7 +82,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         <th>Interprete</th>
                         <th>Album</th>
                         <th>Genero</th>
-                        <th>Pais</th>
+                        <th>Idioma</th>
                         <th>Tema</th>                   
                         <th>Año</th>
                         <th>Spotifyid</th>                   
@@ -95,7 +95,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         <td th:text="${elem.interprete}"></td>
                         <td th:text="${elem.album}"></td>
                         <td th:text="${elem.genero}"></td>
-                        <td th:text="${elem.pais}"></td>
+                        <td th:text="${elem.idioma}"></td>
                         <td th:text="${elem.tema}"></td>
                         <td th:text="${elem.anyo}"></td>
                         <td th:text="${elem.spotifyid}"></td>

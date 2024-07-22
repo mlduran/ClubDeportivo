@@ -85,6 +85,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                 <p th:text="ENVIADO"/>
                                 <div id="mensajesSockets"> 
                                 </div>
+                                <div th:if="${rol == T(mld.playhitsgame.exemplars.Rol).master}">
+                                    <a th:href="'/forzarAcabarRonda/' + ${partidaSesion.id}" class="button"> 
+                                        Acabar Ronda
+                                    </a>
+                                </div>
                                 <div th:if="${partidaSesion.terminada}">
                                     <a th:href="'/partidaConsulta/' + ${partidaSesion.id}" class="button" id="resultados">VER RESULTADOS</a>
                                 </div>

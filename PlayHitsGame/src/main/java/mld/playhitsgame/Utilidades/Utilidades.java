@@ -47,7 +47,7 @@ public class Utilidades {
     
     public static int calcularPtsPorTitulo(String titulo, Cancion cancion){
         
-        if (titulo.equals(cancion.getTitulo()))
+        if (titulo != null && titulo.equals(cancion.getTitulo()))
             return 15;
         else 
             return 0;
@@ -55,7 +55,7 @@ public class Utilidades {
     
     public static int calcularPtsPorInterprete(String interprete, Cancion cancion){
         
-        if (interprete.equals(cancion.getInterprete()))
+        if (interprete != null && interprete.equals(cancion.getInterprete()))
             return 15;
         else 
             return 0;

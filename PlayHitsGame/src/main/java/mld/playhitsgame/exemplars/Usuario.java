@@ -33,7 +33,7 @@ public class Usuario{
     private String alias;
     private String contrasenya;
     private String grupo;
-    private String pais;
+    private String idioma;
     private String preferencias;
 
     @Temporal(TemporalType.DATE) 

@@ -98,7 +98,7 @@ public class CancionServicioMetodos implements CancionServicio{
     } 
 
     
-    public List<Cancion> buscarCancionesPorCriterios(List<String> generos, List<String> paises, 
+    public List<Cancion> buscarCancionesPorCriterios(List<String> generos, List<String> idiomas, 
             List <String> temas, int anyoInicial, int anyofinal ){
         
         
@@ -106,8 +106,8 @@ public class CancionServicioMetodos implements CancionServicio{
         
         if(!generos.isEmpty())
             searchSpecifications.add(new SearchCriteria("genero",generos, SearchOperation.IN));
-        if(!paises.isEmpty())
-            searchSpecifications.add(new SearchCriteria("pais",paises, SearchOperation.IN));
+        if(!idiomas.isEmpty())
+            searchSpecifications.add(new SearchCriteria("idioma",idiomas, SearchOperation.IN));
         if(!temas.isEmpty())
             searchSpecifications.add(new SearchCriteria("tema",temas, SearchOperation.IN));
         searchSpecifications.add(new SearchCriteria("anyo", anyoInicial, SearchOperation.GREATER_THAN_EQUAL));
