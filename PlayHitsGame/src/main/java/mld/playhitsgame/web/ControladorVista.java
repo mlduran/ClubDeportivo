@@ -4,13 +4,18 @@
  */
 package mld.playhitsgame.web;
 
+import mld.playhitsgame.seguridad.CrearUsuarioDTO;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.Partida;
@@ -26,19 +31,28 @@ import mld.playhitsgame.services.RespuestaServicioMetodos;
 import mld.playhitsgame.services.RondaServicioMetodos;
 import mld.playhitsgame.services.TemaServicioMetodos;
 import mld.playhitsgame.services.UsuarioServicioMetodos;
-import static mld.playhitsgame.Utilidades.Utilidades.*;
+import static mld.playhitsgame.utilidades.Utilidades.*;
+import mld.playhitsgame.exemplars.Genero;
+import mld.playhitsgame.exemplars.Idioma;
 import mld.playhitsgame.exemplars.OpcionInterpreteTmp;
 import mld.playhitsgame.exemplars.OpcionTituloTmp;
+import mld.playhitsgame.seguridad.Roles;
+import mld.playhitsgame.seguridad.UsuarioRol;
 import mld.playhitsgame.services.OpcionInterpreteTmpServicioMetodos;
 import mld.playhitsgame.services.OpcionTituloTmpServicioMetodos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 @Controller
@@ -67,6 +81,9 @@ public class ControladorVista {
     OpcionTituloTmpServicioMetodos servOpTitulo; 
     @Autowired
     OpcionInterpreteTmpServicioMetodos servOpInterprete;  
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     
     private Usuario usuarioModelo(Model modelo){
         
@@ -102,21 +119,38 @@ public class ControladorVista {
     
     @GetMapping("/")
     public String inicio(Model modelo){
-        
-        return "Inicio";        
-    }
+        return "Inicio";
+    }    
+  
+    @GetMapping("/logout")
+    public String logout(Model modelo){
+        modelo.addAttribute("id_usuarioSesion", ""); 
+        modelo.addAttribute("id_partidaSesion", "");         
+        return "Inicio";
+    }    
     
-    @PostMapping("/") 
-    public String inicio(@ModelAttribute("elUsuario") String elUsuario, 
-            @ModelAttribute("laContrasenya") String laContrasenya, Model modelo){
+    @PostMapping("/login") 
+    public String login(@ModelAttribute("elUsuario") String elUsuario, 
+            @ModelAttribute("laContrasenya") String laContrasenya, Model modelo){        
         
-        Optional<Usuario> usuLogin = servUsuario.usuarioLogin(elUsuario, laContrasenya);
+        //String passEncrip = passwordEncoder.encode(laContrasenya);       
+        //Optional<Usuario> usuLogin = servUsuario.usuarioLogin(elUsuario, passEncrip);
+        
+        Optional<Usuario> usuLogin =servUsuario.findByUsuario(elUsuario);         
         
         if (usuLogin.isEmpty()){
             modelo.addAttribute("error", "Usuario o password incorrectos");
             return "Inicio";            
         }else{
             Usuario usuarioSesion = usuLogin.get();
+            
+            boolean ok = passwordEncoder.matches(laContrasenya, usuarioSesion.getContrasenya());         
+            
+            if (!ok){
+                modelo.addAttribute("error", "Usuario o password incorrectos");
+                return "Inicio";    
+            }
+            
             usuarioSesion.getPartidasInvitado();
             usuarioSesion.getPartidasMaster();      
             modelo.addAttribute("id_usuarioSesion", usuarioSesion.getId());
@@ -201,13 +235,23 @@ public class ControladorVista {
         return "AltaUsuario";        
     }
     
-    @PostMapping("/altaUsuario")
+     @PostMapping("/altaUsuario")
     public String altaUsuario(@ModelAttribute("newusuario") Usuario usuario, Model modelo){
         
-        String resp = "OK";
+        String resp = "OK Se ha creado el usuario ".concat(usuario.getUsuario());
+        String passEncrip = passwordEncoder.encode(usuario.getContrasenya());
+        
+        Set<UsuarioRol> roles = new HashSet();
+        UsuarioRol usurol = new UsuarioRol();
+        usurol.setName(Roles.USER);        
+        roles.add(usurol);
         
         try{
-            servUsuario.saveUsuario(usuario);
+            usuario.setRoles(roles);
+            usuario.setActivo(false);
+            usuario.setContrasenya(passEncrip); 
+            usuario.setPreferencias("");
+            servUsuario.save(usuario);
         }catch(Exception ex){
             resp = "ERROR " + ex; 
         }   
@@ -215,6 +259,39 @@ public class ControladorVista {
         modelo.addAttribute("result", resp);        
         return "AltaUsuario";        
     }  
+    
+    @PostMapping("/crearUsuario")
+    public ResponseEntity<?> crearUsuario(@Valid @RequestBody CrearUsuarioDTO crearUsuarioDTO){
+        
+        Set<UsuarioRol> roles = crearUsuarioDTO.getRoles().stream()
+                .map(role -> UsuarioRol.builder()
+                        .name(Roles.valueOf(role))
+                        .build())
+                        .collect(Collectors.toSet());
+        
+        Usuario usuario = Usuario.builder()
+                .usuario(crearUsuarioDTO.getUsuario())
+                .contrasenya(passwordEncoder.encode(crearUsuarioDTO.getContrasenya()))
+                .alias(crearUsuarioDTO.getAlias())
+                .grupo(crearUsuarioDTO.getGrupo())
+                .idioma(crearUsuarioDTO.getIdioma())
+                .preferencias(crearUsuarioDTO.getPreferencias())
+                .roles(roles)
+                .build();
+        servUsuario.save(usuario);
+                
+        return ResponseEntity.ok(usuario);
+    }
+    
+    @DeleteMapping("/borrarUsuario")
+    public String borrarUsuario(@RequestParam String id){
+        
+        servUsuario.deleteById(Long.valueOf(id));
+        return "Se borra usuario id".concat(id);
+        
+    }  
+    
+   
 
     @GetMapping("/modificarUsuario")
     public String modificarUsuario(Model modelo){  
@@ -232,7 +309,7 @@ public class ControladorVista {
         String resp = "OK";
         
         try{
-            servUsuario.updateUsuario(usuario.getId(), usuario);
+            servUsuario.update(usuario.getId(), usuario);
         }catch(Exception ex){
             resp = "ERROR " + ex; 
         }   
@@ -250,6 +327,15 @@ public class ControladorVista {
         modelo.addAttribute("temas", temas);        
     }
     
+    private void anyadirIdiomas(Model modelo){
+        
+        ArrayList<String> elems = new ArrayList();
+        elems.add("");
+        for (Idioma elem :Idioma.values())
+            elems.add(elem.toString());
+        modelo.addAttribute("idiomas", elems);        
+    }
+    
     
     @GetMapping("/partida/crear")
     public String crearPartida(Model modelo){     
@@ -265,6 +351,7 @@ public class ControladorVista {
         newPartida.setGrupo(usu.getGrupo());
         modelo.addAttribute("newpartida", newPartida); 
         anyadirTemas(modelo);
+        anyadirIdiomas(modelo);
         ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) usuariosGrupo(usu);
 
         if (!posiblesInvitados.isEmpty())
@@ -329,7 +416,7 @@ public class ControladorVista {
             Partida newPartida = servPartida.savePartida(partida);
             usu.getPartidasMaster().add(newPartida);
             for (Usuario usuPartida: partida.getInvitados())
-                servUsuario.updateUsuario(usuPartida.getId(), usuPartida);            
+                servUsuario.update(usuPartida.getId(), usuPartida);            
             
             //crear las rondas con nrondas
             partida.setRondas(new ArrayList());

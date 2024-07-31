@@ -20,6 +20,7 @@ public interface UsuarioServicio {
     List<Usuario> findAll();   
   
     List<UsuarioAmpliadaView> findBy();
+    Optional <Usuario> findByUsuario(String usuario);
     
     Optional<Usuario> usuarioLogin(String usuario, String contrasenya);
     List<Usuario> usuariosGrupo(String grupo);
@@ -27,9 +28,9 @@ public interface UsuarioServicio {
     //Optional<Cancion> findCancionById(Long id); //si retorna solo 1 reg, sino poner list
     Optional<Usuario> findById(Long id);
     
-    Usuario saveUsuario(Usuario usuario);    
-    Usuario updateUsuario(Long id, Usuario usuario);
-    void deleteUsuario(Long id);
+    Usuario save(Usuario ususario);
+    Usuario update(Long id, Usuario usuario);
+    void deleteById(Long id);
     
     
 }

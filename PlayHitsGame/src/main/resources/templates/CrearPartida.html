@@ -17,9 +17,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                     <option th:each="generoOpt : ${T(mld.playhitsgame.exemplars.Genero).values()}" 
                     th:value="${generoOpt}" th:text="${generoOpt}"></option>
                 </select></p>
-                <p>idioma
+                <p>Idioma
                 <select th:field="*{idioma}" title="Idioma">
-                    <option th:each="idiomaOpt : ${T(mld.playhitsgame.exemplars.Idioma).values()}" 
+                    <option th:each="idiomaOpt : ${idiomas}" 
                     th:value="${idiomaOpt}" th:text="${idiomaOpt}"></option>
                 </select></p>
                 <p>Tema

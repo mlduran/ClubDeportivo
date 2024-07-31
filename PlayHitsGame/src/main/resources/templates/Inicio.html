@@ -3,32 +3,28 @@
 Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
 Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
 -->
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
     <head>
-        <title>PlayListGame</title>
         <meta charset="UTF-8">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
-
-        <!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
     </head>
     <body>
-        
-            
+        <header th:insert="~{plantillas/playhitsgame :: encabezado}"></header>
             <p>PAGINA DE LOGIN</p>
             
-            <form method="post" th:action="@{/}">                
+            <form method="post" th:action="@{/login}" id="login" >                
                 <input type="text" placeholder="Usuario (mail)" name="elUsuario" required="required"/>
                 <input type="password" placeholder="Contraseña" name="laContrasenya" required="required"/>
-                <input type="submit" value="ACCEDER"/>                
+                <!--<input type="submit" th:value="#{inicio.acceder}" th:onclick="hacerLogin()"/>-->
+                <input type="submit" th:value="#{inicio.acceder}"/>                
             </form>
             <p th:text="${error}"></p>
             <br/>
             <br/>
-            <a href="/altaUsuario" class="button" id="altaUsuario"> ALTA USUARIO </a>
+            <a href="/altaUsuario" class="button" id="altaUsuario"> [[#{inicio.alta}]] </a>
             <br/>
-            <br/>
+            <br/>            
             
-            
-          <footer th:insert="~{plantillas/playhitsgame :: pie}"></footer>
+        <footer th:insert="~{plantillas/playhitsgame :: pie}"></footer>
+        <script type="text/javascript" th:src="@{/javascript/Usuario.js}"></script>
     </body>
 </html>

@@ -30,6 +30,7 @@ public class Tema{
     private Long id;
     @Column(unique = true)
     private String tema;
+    private String descripcion;
 
 }
 

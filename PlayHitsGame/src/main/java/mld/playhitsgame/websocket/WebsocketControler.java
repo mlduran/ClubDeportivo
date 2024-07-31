@@ -16,7 +16,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import mld.playhitsgame.Utilidades.Utilidades;
+import lombok.extern.slf4j.Slf4j;
+import mld.playhitsgame.utilidades.Utilidades;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.Respuesta;
@@ -39,6 +40,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+@Slf4j
 @Controller
 public class WebsocketControler extends TextWebSocketHandler{
     
@@ -148,15 +150,15 @@ public class WebsocketControler extends TextWebSocketHandler{
                     obJson.getLong("idUsuario"),
                     usuBD.getNombre()
                     );
-            System.out.println(new Date() + " Se ha conectado al WebSocket el usuario " + usuWS.getUsuario() + 
+            log.info(new Date() + " Se ha conectado al WebSocket el usuario " + usuWS.getUsuario() + 
                             " con sesion " + session.getId());        
         }else{
             if (!usuWS.getSession().getId().equals(session.getId())){
                 usuWS.setSession(session);
-                System.out.println(new Date() + " Se actualiza sesion del usuario " + usuWS.getUsuario() + 
+                log.info(new Date() + " Se actualiza sesion del usuario " + usuWS.getUsuario() + 
                              " con sesion " + session.getId()); 
             }else
-                System.out.println(new Date() + " Peticion " +  obJson.getString("op") +
+                log.info(new Date() + " Peticion " +  obJson.getString("op") +
                         " al WebSocket del usuario " + usuWS.getUsuario() + 
                         " con sesion " + session.getId()); 
         }
@@ -171,7 +173,7 @@ public class WebsocketControler extends TextWebSocketHandler{
         try {
             obJson = new JSONObject(message.getPayload());
         } catch (JSONException jSONException) {
-            System.out.println(new Date() + " Error al capturar json : " + message.getPayload()); 
+            log.info(new Date() + " Error al capturar json : " + message.getPayload()); 
         }
         
         if (obJson == null || obJson.isEmpty()){
@@ -224,10 +226,10 @@ public class WebsocketControler extends TextWebSocketHandler{
                 if (usu.getSession().isOpen())
                     usu.getSession().sendMessage(messageResp);
                 else
-                    System.out.println(new Date() + " La conexion del usuario " + usu.getUsuario() + 
+                    log.info(new Date() + " La conexion del usuario " + usu.getUsuario() + 
                          " con sesion " + usu.getSession().getId() + " esta cerrada");
             } catch (IOException iOException) {
-                System.out.println(new Date() + " No se ha podido entregar notificacion del usuario " + usu.getUsuario() + 
+                log.info(new Date() + " No se ha podido entregar notificacion del usuario " + usu.getUsuario() + 
                          " con sesion " + usu.getSession().getId()); 
             }
         }           

@@ -92,6 +92,22 @@ public class Partida{
         return respuestas;
     }
     
+    public String getUsuariosTxT(){
+        
+        String txt = "";
+        
+        boolean primero = true;
+        
+        for (Usuario usu : this.usuariosPartida()){
+            if (primero)
+                primero = false;
+            else 
+                txt = txt.concat(", ");
+            txt = txt.concat(usu.getNombre());            
+        }        
+        return txt;        
+    }
+    
     public List<String> getDescripcion(){
         
         ArrayList<String> txt = new ArrayList();

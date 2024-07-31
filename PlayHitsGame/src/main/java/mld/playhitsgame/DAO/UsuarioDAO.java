@@ -22,8 +22,7 @@ public interface UsuarioDAO extends JpaRepository<Usuario, Long>{
     
     List<UsuarioAmpliadaView> findBy();
     
-    //@Query("SELECT * FROM cancion WHERE id = :id")
-    //Optional<Cancion> findCancionById(long id);
+    Optional <Usuario> findByUsuario(String usuario);
     
     @Override
     Optional<Usuario> findById(Long id);

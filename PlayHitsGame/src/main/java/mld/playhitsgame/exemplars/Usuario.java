@@ -4,11 +4,16 @@
  */
 package mld.playhitsgame.exemplars;
 
+import mld.playhitsgame.seguridad.UsuarioRol;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -22,6 +27,7 @@ import org.hibernate.annotations.CreationTimestamp;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Table(name = "usuarios")
 public class Usuario{    
    
@@ -29,13 +35,22 @@ public class Usuario{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(unique = true)
+    @Email
+    @NotBlank
     private String usuario;
+    private boolean activo;
     private String alias;
+    @NotBlank
     private String contrasenya;
     private String grupo;
     private String idioma;
     private String preferencias;
-
+    
+    @ManyToMany(fetch = FetchType.EAGER, targetEntity = UsuarioRol.class, cascade = CascadeType.PERSIST)
+    @JoinTable(name = "usuario_roles", joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "rol_id"))
+    private Set<UsuarioRol> roles;
+    
     @Temporal(TemporalType.DATE) 
     @Column( nullable = false, updatable = false)
     @CreationTimestamp 

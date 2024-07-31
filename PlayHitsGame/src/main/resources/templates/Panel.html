@@ -53,6 +53,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         <td>
                             <a th:href="'/partidaConsulta/' + ${unapartida.id}" class="button"> 
                                 <p th:text="${unapartida.descripcion}"/>
+                                <p th:text="${unapartida.usuariosTxT}"/>
                             </a>
                         </td>                       
                     </tr>                       
@@ -60,6 +61,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             </div> 
         </div> 
         <a th:href="'/modificarUsuario'" class="button">Mis Datos</a> 
+        <a th:href="'/logout'" class="button">Salir</a>
         <p th:text="${result}"></p>
     </body>
 </html>

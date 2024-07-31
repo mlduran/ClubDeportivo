@@ -23,27 +23,29 @@ public class UsuarioServicioMetodos implements UsuarioServicio{
     public List<Usuario> findAll() {
         return DAO.findAll();
     }
-    
-    
+        
     @Override
     public List<UsuarioAmpliadaView> findBy() {
-        return DAO.findBy();
-        
+        return DAO.findBy();        
     }
-        
+    
+    @Override
+    public Optional <Usuario> findByUsuario(String usuario) {
+        return DAO.findByUsuario(usuario);        
+    } 
+            
     @Override
     public Optional<Usuario> findById(Long id) {
-        return DAO.findById(id);
-        
+        return DAO.findById(id);        
     }
 
     @Override
-    public Usuario saveUsuario(Usuario usuario) {
+    public Usuario save(Usuario usuario) {
         return DAO.save(usuario);
     }
 
     @Override
-    public Usuario updateUsuario(Long id, Usuario usuario) {
+    public Usuario update(Long id, Usuario usuario) {
         Usuario obj = DAO.findById(id).get();
         if(Objects.nonNull(usuario.getUsuario()) && !"".equalsIgnoreCase(usuario.getUsuario())){
             obj.setUsuario(usuario.getUsuario());
@@ -68,13 +70,14 @@ public class UsuarioServicioMetodos implements UsuarioServicio{
             obj.setPreferencias(usuario.getPreferencias());
         }
         
+        obj.setActivo(usuario.isActivo());
         obj.setAlta(usuario.getAlta());
         
         return DAO.save(obj);
     }
 
     @Override
-    public void deleteUsuario(Long id) {
+    public void deleteById(Long id) {
         DAO.deleteById(id);
     }
 
@@ -88,9 +91,6 @@ public class UsuarioServicioMetodos implements UsuarioServicio{
     public List<Usuario> usuariosGrupo(String grupo) {
         
         return DAO.usuariosGrupo(grupo);
-    }
-
-  
-  
+    } 
  
 }
