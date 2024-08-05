@@ -44,6 +44,8 @@ public class Usuario{
     private String contrasenya;
     private String grupo;
     private String idioma;
+    private int puntos;
+    private int estrellas;
     private String preferencias;
     
     @ManyToMany(fetch = FetchType.EAGER, targetEntity = UsuarioRol.class, cascade = CascadeType.PERSIST)

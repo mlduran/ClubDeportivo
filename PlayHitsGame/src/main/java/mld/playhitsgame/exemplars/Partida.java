@@ -61,6 +61,7 @@ public class Partida{
     private int anyoInicial;
     @Min(1950)
     private int anyoFinal;
+    private int nCanciones;
     private String grupo;
     private String ganador;
     
@@ -120,7 +121,7 @@ public class Partida{
             txt.add("Genero: ".concat(this.getGenero().toString()));
         if (this.getIdioma()!= null && this.getIdioma()!= null)
             txt.add("Idioma: ".concat(this.getIdioma().toString()));
-        
+        txt.add("Canciones Seleccionadas: " + String.valueOf(this.nCanciones));
         txt.add("Año inicial: " + String.valueOf(this.getAnyoInicial()));
         txt.add("Año final: " + String.valueOf(this.getAnyoFinal()));
         

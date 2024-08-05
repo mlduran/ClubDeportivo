@@ -122,7 +122,7 @@ public class CancionServicioMetodos implements CancionServicio{
         if (!"".equals(filtro.getTema()))  
             return DAO.findByFiltroConTema(filtro.getTema(), filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar());  
         else
-            return DAO.findByFiltroSinTema(filtro.getGenero(), filtro.getIdioma(),  filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar());
+            return DAO.findByFiltroBasico(filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar());
         
                   
           
@@ -136,8 +136,7 @@ public class CancionServicioMetodos implements CancionServicio{
             canciones = DAO.findByFiltroConTema(partida.getTema(), partida.getAnyoInicial(), 
                     partida.getAnyoFinal(), false);            
         else 
-            canciones = DAO.findByFiltroSinTema(partida.getGenero().toString(), 
-                    partida.getIdioma().toString(),  partida.getAnyoInicial(), 
+            canciones = DAO.findByFiltroBasico(partida.getAnyoInicial(), 
                     partida.getAnyoFinal(), false);       
         
         return canciones;

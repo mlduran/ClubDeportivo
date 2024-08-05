@@ -4,7 +4,6 @@
  */
 package mld.playhitsgame.websocket;
 
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,8 +41,8 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 @Slf4j
 @Controller
-public class WebsocketControler extends TextWebSocketHandler{
-    
+public class WebsocketControler extends TextWebSocketHandler {
+
     @Autowired
     CancionServicioMetodos servCancion;
     @Autowired
@@ -54,247 +53,251 @@ public class WebsocketControler extends TextWebSocketHandler{
     RespuestaServicioMetodos servRespuesta;
     @Autowired
     RondaServicioMetodos servRonda;
-    
-    private static final HashMap<Long, Set<UsuarioWS>> partidas = new HashMap(); 
-    private static final HashMap<Long, Integer> nRespuestas = new HashMap();    
-    
-    public static Set<UsuarioWS> usuariosPartida(Long idPartida){
-        
-        return partidas.get(idPartida);        
-    }    
-    
-    public static UsuarioWS anyadirPartidaUsuario(WebSocketSession session, long partida, long idUsuario, String nombre){
-        
-        if (partidas.get(partida) == null){
+
+    private static final HashMap<Long, Set<UsuarioWS>> partidas = new HashMap();
+    private static final HashMap<Long, Integer> nRespuestas = new HashMap();
+
+    public static Set<UsuarioWS> usuariosPartida(Long idPartida) {
+
+        return partidas.get(idPartida);
+    }
+
+    public static UsuarioWS anyadirPartidaUsuario(WebSocketSession session, long partida, long idUsuario, String nombre) {
+
+        if (partidas.get(partida) == null) {
             partidas.put(partida, new HashSet());
         }
         UsuarioWS usu = new UsuarioWS();
         usu.setId(idUsuario);
         usu.setUsuario(nombre);
         usu.setSession(session);
-        partidas.get(partida).add(usu);  
+        partidas.get(partida).add(usu);
         nRespuestas.put(partida, 0);
-        
+
         return usu;
     }
-    
-    public static UsuarioWS buscarUsuarioWS(Long idPartida, Long idUsuario){
-        
+
+    public static UsuarioWS buscarUsuarioWS(Long idPartida, Long idUsuario) {
+
         UsuarioWS usuWS = null;
-        
-        if (partidas.get(idPartida) != null){        
-            for(UsuarioWS usu : usuariosPartida(idPartida)){
-                if (usu.getId() == idUsuario){
-                usuWS = usu;
-                break;
-                }                
+
+        if (partidas.get(idPartida) != null) {
+            for (UsuarioWS usu : usuariosPartida(idPartida)) {
+                if (usu.getId() == idUsuario) {
+                    usuWS = usu;
+                    break;
+                }
             }
         }
-        return usuWS;        
+        return usuWS;
     }
-    
-    public static void limpiarPartida(long partida){
-        
+
+    public static void limpiarPartida(long partida) {
+
         partidas.remove(partida);
     }
-    
-    public static void limpiarDatos(long partida){
-        
-        for (UsuarioWS usuWS : partidas.get(partida)){
+
+    public static void limpiarDatos(long partida) {
+
+        for (UsuarioWS usuWS : partidas.get(partida)) {
             usuWS.setOrden(0);
             usuWS.setRespAnyo(false);
             usuWS.setRespInterprete(false);
-            usuWS.setRespTitulo(false);      
+            usuWS.setRespTitulo(false);
         }
 
     }
-    
-    public static String usuariosRespuestasCompletadas(long partida){
-        
+
+    public static String usuariosRespuestasCompletadas(long partida) {
+
         String usuarios = "";
-        boolean primero = true; 
-        for(UsuarioWS usu : usuariosPartida(partida)){
-            if (usu.isTodoRespondido()){
-                if (primero)
+        boolean primero = true;
+        for (UsuarioWS usu : usuariosPartida(partida)) {
+            if (usu.isTodoRespondido()) {
+                if (primero) {
                     primero = false;
-                else
+                } else {
                     usuarios = usuarios + ",";
-                usuarios = usuarios + usu.getUsuario(); 
-            }                
+                }
+                usuarios = usuarios + usu.getUsuario();
+            }
         }
-        
-        return usuarios;       
+
+        return usuarios;
     }
-    
-    public static boolean isTodoCompletado(long partida){
-        
+
+    public static boolean isTodoCompletado(long partida) {
+
         boolean completo = true;
-        for(UsuarioWS usu : usuariosPartida(partida)){
-            if (!usu.isTodoRespondido()){
+        for (UsuarioWS usu : usuariosPartida(partida)) {
+            if (!usu.isTodoRespondido()) {
                 completo = false;
                 break;
-            }                
-        }        
-        return completo;       
-    }    
-    
-    private UsuarioWS registrarPeticionWS(JSONObject obJson, WebSocketSession session){
-        
+            }
+        }
+        return completo;
+    }
+
+    private UsuarioWS registrarPeticionWS(JSONObject obJson, WebSocketSession session) {
+
         UsuarioWS usuWS = buscarUsuarioWS(
-                    obJson.getLong("idPartida"),obJson.getLong("idUsuario"));
-               
-        if (usuWS == null){            
+                obJson.getLong("idPartida"), obJson.getLong("idUsuario"));
+
+        if (usuWS == null) {
             Usuario usuBD = obtenerUsuario(obJson.getLong("idUsuario"));
             usuWS = anyadirPartidaUsuario(session,
-                    obJson.getLong("idPartida"), 
+                    obJson.getLong("idPartida"),
                     obJson.getLong("idUsuario"),
                     usuBD.getNombre()
-                    );
-            log.info(new Date() + " Se ha conectado al WebSocket el usuario " + usuWS.getUsuario() + 
-                            " con sesion " + session.getId());        
-        }else{
-            if (!usuWS.getSession().getId().equals(session.getId())){
+            );
+            log.info(new Date() + " Se ha conectado al WebSocket el usuario " + usuWS.getUsuario()
+                    + " con sesion " + session.getId());
+        } else {
+            if (!usuWS.getSession().getId().equals(session.getId())) {
                 usuWS.setSession(session);
-                log.info(new Date() + " Se actualiza sesion del usuario " + usuWS.getUsuario() + 
-                             " con sesion " + session.getId()); 
-            }else
-                log.info(new Date() + " Peticion " +  obJson.getString("op") +
-                        " al WebSocket del usuario " + usuWS.getUsuario() + 
-                        " con sesion " + session.getId()); 
+                log.info(new Date() + " Se actualiza sesion del usuario " + usuWS.getUsuario()
+                        + " con sesion " + session.getId());
+            } else {
+                log.info(new Date() + " Peticion " + obJson.getString("op")
+                        + " al WebSocket del usuario " + usuWS.getUsuario()
+                        + " con sesion " + session.getId());
+            }
         }
-        
-        return usuWS;        
+
+        return usuWS;
     }
-    
+
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-     
+
         JSONObject obJson = null;
         try {
             obJson = new JSONObject(message.getPayload());
         } catch (JSONException jSONException) {
-            log.info(new Date() + " Error al capturar json : " + message.getPayload()); 
+            log.info(new Date() + " Error al capturar json : " + message.getPayload());
         }
-        
-        if (obJson == null || obJson.isEmpty()){
+
+        if (obJson == null || obJson.isEmpty()) {
             //aqui habria que lanzar un error de momento paramos para ver que pasa
-            throw new Exception("ERROR al obtener json");  
+            throw new Exception("ERROR al obtener json");
         }
-        UsuarioWS usuarioWS = registrarPeticionWS(obJson,session);        
-        
-        if ("alta".equals(obJson.getString("op"))){
+        UsuarioWS usuarioWS = registrarPeticionWS(obJson, session);
+
+        if ("alta".equals(obJson.getString("op"))) {
             // De momento no hacemos nada, lo mantemos para 
             // hacer el alta en lacarga de la pagina y ahorrarnos
             // luego la consulta a BD del usuario
         }
 
-        if ("titulo".equals(obJson.getString("op"))){
+        if ("titulo".equals(obJson.getString("op"))) {
             responderTitulo(
-                    obJson.getLong("idPartida"), 
+                    obJson.getLong("idPartida"),
                     obJson.getLong("idUsuario"),
                     obJson.getLong("idCancion"));
             usuarioWS.setRespTitulo(true);
         }
 
-        if ("interprete".equals(obJson.getString("op"))){
+        if ("interprete".equals(obJson.getString("op"))) {
             responderInterprete(
-                    obJson.getLong("idPartida"), 
+                    obJson.getLong("idPartida"),
                     obJson.getLong("idUsuario"),
                     obJson.getLong("idCancion"));
             usuarioWS.setRespInterprete(true);
         }
 
-        if ("anyo".equals(obJson.getString("op"))){
+        if ("anyo".equals(obJson.getString("op"))) {
             responderAnyo(
-                    obJson.getLong("idPartida"), 
+                    obJson.getLong("idPartida"),
                     obJson.getLong("idUsuario"),
                     obJson.getInt("anyo"));
             usuarioWS.setRespAnyo(true);
         }
 
-        if (usuarioWS.isTodoRespondido()){
+        if (usuarioWS.isTodoRespondido()) {
             int nr = nRespuestas.get(obJson.getLong("idPartida"));
-            usuarioWS.setOrden(nr +1);
+            usuarioWS.setOrden(nr + 1);
             nRespuestas.put(obJson.getLong("idPartida"), nr + 1);
-        }                
+        }
 
         String respuesta = usuariosRespuestasCompletadas(obJson.getLong("idPartida"));
         TextMessage messageResp = new TextMessage(respuesta);
 
-        for(UsuarioWS usu: usuariosPartida(obJson.getLong("idPartida"))){
+        for (UsuarioWS usu : usuariosPartida(obJson.getLong("idPartida"))) {
             try {
-                if (usu.getSession().isOpen())
+                if (usu.getSession().isOpen()) {
                     usu.getSession().sendMessage(messageResp);
-                else
-                    log.info(new Date() + " La conexion del usuario " + usu.getUsuario() + 
-                         " con sesion " + usu.getSession().getId() + " esta cerrada");
+                } else {
+                    log.info(new Date() + " La conexion del usuario " + usu.getUsuario()
+                            + " con sesion " + usu.getSession().getId() + " esta cerrada");
+                }
             } catch (IOException iOException) {
-                log.info(new Date() + " No se ha podido entregar notificacion del usuario " + usu.getUsuario() + 
-                         " con sesion " + usu.getSession().getId()); 
+                log.info(new Date() + " No se ha podido entregar notificacion del usuario " + usu.getUsuario()
+                        + " con sesion " + usu.getSession().getId());
             }
-        }           
+        }
 
-        if (isTodoCompletado(obJson.getLong("idPartida")))
-            pasarSiguienteRonda(obJson.getLong("idPartida"));        
+        if (isTodoCompletado(obJson.getLong("idPartida"))) {
+            pasarSiguienteRonda(obJson.getLong("idPartida"));
+        }
     }
-    
-    private Usuario obtenerUsuario(Long idUsuario){
-        
+
+    private Usuario obtenerUsuario(Long idUsuario) {
+
         Optional<Usuario> usuBD = servUsuario.findById(idUsuario);
-        return usuBD.get();        
+        return usuBD.get();
     }
-    
-    private Cancion obtenerCancion(long idCancion){
-        
+
+    private Cancion obtenerCancion(long idCancion) {
+
         Optional<Cancion> can = servCancion.findById(idCancion);
-        Cancion cancion = can.get();        
-        return cancion;        
-    }    
-    
-    private Respuesta obtenerRespuesta(long idPartida, long idUsuario){
-        
+        Cancion cancion = can.get();
+        return cancion;
+    }
+
+    private Respuesta obtenerRespuesta(long idPartida, long idUsuario) {
+
         Optional<Usuario> usu = servUsuario.findById(idUsuario);
         Usuario usuario = usu.get();
         Optional<Partida> part = servPartida.findById(idPartida);
-        Partida partida = part.get();       
+        Partida partida = part.get();
         Ronda rondaActiva = partida.rondaActiva();
-        Respuesta resp = servRespuesta.buscarPorRondaUsuario(rondaActiva.getId(), usuario.getId());        
-        return resp;        
+        Respuesta resp = servRespuesta.buscarPorRondaUsuario(rondaActiva.getId(), usuario.getId());
+        return resp;
     }
-    
-    private Partida obtenerPartida(long idPartida){
-        
-        Optional<Partida> part = servPartida.findById(idPartida);        
-        return part.get();        
+
+    private Partida obtenerPartida(long idPartida) {
+
+        Optional<Partida> part = servPartida.findById(idPartida);
+        return part.get();
     }
-    
-    private void responderTitulo(long idPartida, long idUsuario, long idCancion){
-        
+
+    private void responderTitulo(long idPartida, long idUsuario, long idCancion) {
+
         Respuesta resp = obtenerRespuesta(idPartida, idUsuario);
         Cancion cancion = obtenerCancion(idCancion);
         resp.setTitulo(cancion.getTitulo());
-        servRespuesta.updateRespuesta(resp.getId(), resp);         
+        servRespuesta.updateRespuesta(resp.getId(), resp);
     }
-    
-    private void responderInterprete(long idPartida, long idUsuario, long idCancion){
-        
+
+    private void responderInterprete(long idPartida, long idUsuario, long idCancion) {
+
         Respuesta resp = obtenerRespuesta(idPartida, idUsuario);
         Cancion cancion = obtenerCancion(idCancion);
         resp.setInterprete(cancion.getInterprete());
-        servRespuesta.updateRespuesta(resp.getId(), resp);         
+        servRespuesta.updateRespuesta(resp.getId(), resp);
     }
 
     private void responderAnyo(long idPartida, long idUsuario, int anyo) {
-        
+
         Respuesta resp = obtenerRespuesta(idPartida, idUsuario);
         resp.setAnyo(anyo);
-        servRespuesta.updateRespuesta(resp.getId(), resp);    
+        servRespuesta.updateRespuesta(resp.getId(), resp);
     }
-    
+
     @GetMapping("/forzarAcabarRonda/{idPartida}")
-    public void acabarRonda(Model modelo, @PathVariable Long idPartida){
+    public void acabarRonda(Model modelo, @PathVariable Long idPartida) {
         // esto es para poder llamarse desde el master para forzar acabar la ronda
-        pasarSiguienteRonda(idPartida); 
+        pasarSiguienteRonda(idPartida);
     }
 
     private void pasarSiguienteRonda(Long idPartida) {
@@ -302,95 +305,105 @@ public class WebsocketControler extends TextWebSocketHandler{
         // han respondido, eso no quiere decir que todos esten
         // eso se tendra que tratar mas adelante pero de momento
         // cambiaremos de ronda
-        
+
         Partida partida = obtenerPartida(idPartida);
-        
+
         Ronda rondaActiva = partida.rondaActiva();
-        
+
         boolean acabar;
         //if (rondaActiva.isTodasLasRespuestasOK()){
-        if (true){ // de momento lo damos por bueno 
+        if (true) { // de momento lo damos por bueno 
             asignarPuntuacion(rondaActiva);
             rondaActiva.setCompletada(true);
-            servRonda.updateRonda(rondaActiva.getId(), rondaActiva);    
-            
-            if (partida.hayMasRondas()){
-                partida.pasarSiguienteRonda();            
+            servRonda.updateRonda(rondaActiva.getId(), rondaActiva);
+
+            if (partida.hayMasRondas()) {
+                partida.pasarSiguienteRonda();
                 acabar = false;
-            }else{              
+            } else {
                 partida.setStatus(StatusPartida.Terminada);
                 acabar = true;
             }
-            servPartida.updatePartida(partida.getId(), partida); 
-        }          
-               
-        TextMessage messageResp;
-        
-        if (acabar)
-            messageResp = new TextMessage("#acabar#");
-        else    
-            messageResp = new TextMessage("#nueva#"); 
+            servPartida.updatePartida(partida.getId(), partida);
+        }
 
-        for(UsuarioWS usu: usuariosPartida(idPartida))
+        TextMessage messageResp;
+
+        if (acabar) {
+            messageResp = new TextMessage("#acabar#");
+        } else {
+            messageResp = new TextMessage("#nueva#");
+        }
+
+        for (UsuarioWS usu : usuariosPartida(idPartida))
             try {
-                if (usu.getSession().isOpen())
-                    usu.getSession().sendMessage(messageResp);
-            } catch (IOException ex) {
-                Logger.getLogger(WebsocketControler.class.getName()).log(Level.SEVERE, null, ex);
-            }  
-        
-        if (acabar)
+            if (usu.getSession().isOpen()) {
+                usu.getSession().sendMessage(messageResp);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(WebsocketControler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        if (acabar) {
+            asignarPuntuacionesUsuario(idPartida);
             limpiarPartida(idPartida);
-        else
+        } else {
             limpiarDatos(idPartida);
-        
+        }
+
     }
-    
-    private Usuario primerUsuarioAcertarTitulo(Ronda rondaActiva){
-        
+
+    private Usuario primerUsuarioAcertarTitulo(Ronda rondaActiva) {
+
         List<Respuesta> respuestas = rondaActiva.getRespuestas();
         Set<UsuarioWS> listaUsuariosWS = partidas.get(rondaActiva.getPartida().getId());
         List<UsuarioWS> usuariosWS = new ArrayList<>(listaUsuariosWS);
-        Collections.sort(usuariosWS); 
+        Collections.sort(usuariosWS);
         Usuario usuarioAcertante = null;
-        for (UsuarioWS usuWS : usuariosWS){
-            for (Respuesta res : respuestas){
-                if (res.getTitulo() == null) continue;
-                if (res.getTitulo().equals(rondaActiva.getCancion().getTitulo())){
-                    if (res.getUsuario().getId().equals(usuWS.getId())){
+        for (UsuarioWS usuWS : usuariosWS) {
+            for (Respuesta res : respuestas) {
+                if (res.getTitulo() == null) {
+                    continue;
+                }
+                if (res.getTitulo().equals(rondaActiva.getCancion().getTitulo())) {
+                    if (res.getUsuario().getId().equals(usuWS.getId())) {
                         usuarioAcertante = res.getUsuario();
                         break;
                     }
                 }
             }
-            if (usuarioAcertante != null)
+            if (usuarioAcertante != null) {
                 break;
+            }
         }
-        return usuarioAcertante;        
-    }    
-    
-    private Usuario primerUsuarioAcertarInterprete(Ronda rondaActiva){
-        
+        return usuarioAcertante;
+    }
+
+    private Usuario primerUsuarioAcertarInterprete(Ronda rondaActiva) {
+
         List<Respuesta> respuestas = rondaActiva.getRespuestas();
         Set<UsuarioWS> listaUsuariosWS = partidas.get(rondaActiva.getPartida().getId());
         List<UsuarioWS> usuariosWS = new ArrayList<>(listaUsuariosWS);
-        Collections.sort(usuariosWS); 
+        Collections.sort(usuariosWS);
         Usuario usuarioAcertante = null;
-        for (UsuarioWS usuWS : usuariosWS){
-            for (Respuesta res : respuestas){
-                if (res.getInterprete() == null) continue;
-                if (res.getInterprete().equals(rondaActiva.getCancion().getInterprete())){
-                    if (res.getUsuario().getId().equals(usuWS.getId())){
+        for (UsuarioWS usuWS : usuariosWS) {
+            for (Respuesta res : respuestas) {
+                if (res.getInterprete() == null) {
+                    continue;
+                }
+                if (res.getInterprete().equals(rondaActiva.getCancion().getInterprete())) {
+                    if (res.getUsuario().getId().equals(usuWS.getId())) {
                         usuarioAcertante = res.getUsuario();
                         break;
                     }
                 }
             }
-            if (usuarioAcertante != null)
+            if (usuarioAcertante != null) {
                 break;
+            }
         }
-        return usuarioAcertante;        
-    }    
+        return usuarioAcertante;
+    }
 
     private void asignarPuntuacion(Ronda rondaActiva) {
 
@@ -400,21 +413,37 @@ public class WebsocketControler extends TextWebSocketHandler{
         int ptsInterp;
         Usuario primerAcertanteTitulo = primerUsuarioAcertarTitulo(rondaActiva);
         Usuario primerAcertanteInterprete = primerUsuarioAcertarInterprete(rondaActiva);
-        for (Respuesta resp : rondaActiva.getRespuestas()){
+        for (Respuesta resp : rondaActiva.getRespuestas()) {
             totalPts = Utilidades.calcularPtsPorAnyo(resp.getAnyo(), cancion);
             ptsTitulo = Utilidades.calcularPtsPorTitulo(resp.getTitulo(), cancion);
-            if (resp.getUsuario().equals(primerAcertanteTitulo))
+            if (resp.getUsuario().equals(primerAcertanteTitulo)) {
                 ptsTitulo = ptsTitulo * 2;
+            }
             totalPts = totalPts + ptsTitulo;
             ptsInterp = Utilidades.calcularPtsPorInterprete(resp.getInterprete(), cancion);
-            if (resp.getUsuario().equals(primerAcertanteInterprete))
+            if (resp.getUsuario().equals(primerAcertanteInterprete)) {
                 ptsInterp = ptsInterp * 2;
+            }
             totalPts = totalPts + ptsInterp;
             resp.setPuntos(totalPts);
-            servRespuesta.updateRespuesta(resp.getId(), resp);            
-        }       
+            servRespuesta.updateRespuesta(resp.getId(), resp);
+        }
 
+    }
 
-    }    
-      
+    private void asignarPuntuacionesUsuario(Long idPartida) {
+
+        Optional<Partida> partida = servPartida.findById(idPartida);
+        Partida p = partida.get();
+
+        for (Usuario usu : p.usuariosPartida()) {
+            int pts = Utilidades.calcularPtsUsuario(usu, p);
+            if (pts > usu.getPuntos()) {
+                usu.setPuntos(pts);
+                servUsuario.update(usu.getId(), usu);
+            }
+        }
+
+    }
+
 }

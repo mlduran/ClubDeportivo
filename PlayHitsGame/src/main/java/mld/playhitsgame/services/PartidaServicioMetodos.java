@@ -68,6 +68,7 @@ public class PartidaServicioMetodos implements PartidaServicio{
         obj.setFecha(partida.getFecha());
         obj.setAnyoInicial(partida.getAnyoInicial());
         obj.setAnyoFinal(partida.getAnyoFinal());
+        obj.setNCanciones(partida.getNCanciones());
         obj.setRondaActual(partida.getRondaActual());
         
         return DAO.save(obj);

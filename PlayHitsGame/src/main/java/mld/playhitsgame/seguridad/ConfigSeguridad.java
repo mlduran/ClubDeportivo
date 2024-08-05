@@ -69,6 +69,8 @@ public class ConfigSeguridad {
                     auth.requestMatchers("/login").permitAll();
                     auth.requestMatchers("/altaUsuario").permitAll();
                     auth.requestMatchers("/panel").permitAll();
+                    auth.requestMatchers("/crearPartida").permitAll();
+                    auth.requestMatchers("/partidaMaster").permitAll();
                     //auth.requestMatchers("/panel").hasAnyRole("USER","COLABORADOR");
                     //auth.requestMatchers("/crearUsuario").hasAnyRole("ADMIN");
                     auth.anyRequest().authenticated();

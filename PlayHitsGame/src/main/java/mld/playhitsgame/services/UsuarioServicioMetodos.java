@@ -14,8 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UsuarioServicioMetodos implements UsuarioServicio{
-    
+public class UsuarioServicioMetodos implements UsuarioServicio {
+
     @Autowired
     UsuarioDAO DAO;
 
@@ -23,20 +23,20 @@ public class UsuarioServicioMetodos implements UsuarioServicio{
     public List<Usuario> findAll() {
         return DAO.findAll();
     }
-        
+
     @Override
     public List<UsuarioAmpliadaView> findBy() {
-        return DAO.findBy();        
+        return DAO.findBy();
     }
-    
+
     @Override
-    public Optional <Usuario> findByUsuario(String usuario) {
-        return DAO.findByUsuario(usuario);        
-    } 
-            
+    public Optional<Usuario> findByUsuario(String usuario) {
+        return DAO.findByUsuario(usuario);
+    }
+
     @Override
     public Optional<Usuario> findById(Long id) {
-        return DAO.findById(id);        
+        return DAO.findById(id);
     }
 
     @Override
@@ -47,32 +47,31 @@ public class UsuarioServicioMetodos implements UsuarioServicio{
     @Override
     public Usuario update(Long id, Usuario usuario) {
         Usuario obj = DAO.findById(id).get();
-        if(Objects.nonNull(usuario.getUsuario()) && !"".equalsIgnoreCase(usuario.getUsuario())){
+        if (Objects.nonNull(usuario.getUsuario()) && !"".equalsIgnoreCase(usuario.getUsuario())) {
             obj.setUsuario(usuario.getUsuario());
         }
-        
-        if(Objects.nonNull(usuario.getAlias()) && !"".equalsIgnoreCase(usuario.getAlias())){
-            obj.setAlias(usuario.getAlias());
-        }
-        
-        if(Objects.nonNull(usuario.getContrasenya()) && !"".equalsIgnoreCase(usuario.getContrasenya())){
+
+        obj.setAlias(usuario.getAlias());
+
+        if (Objects.nonNull(usuario.getContrasenya()) && !"".equalsIgnoreCase(usuario.getContrasenya())) {
             obj.setContrasenya(usuario.getContrasenya());
         }
 
-        if(Objects.nonNull(usuario.getIdioma()) && !"".equalsIgnoreCase(usuario.getIdioma())){
+        if (Objects.nonNull(usuario.getIdioma()) && !"".equalsIgnoreCase(usuario.getIdioma())) {
             obj.setIdioma(usuario.getIdioma());
         }
-        if(Objects.nonNull(usuario.getGrupo()) && !"".equalsIgnoreCase(usuario.getGrupo())){
-            obj.setGrupo(usuario.getGrupo());
-        }
-        
-        if(Objects.nonNull(usuario.getPreferencias()) && !"".equalsIgnoreCase(usuario.getPreferencias())){
+
+        obj.setGrupo(usuario.getGrupo());
+
+        if (Objects.nonNull(usuario.getPreferencias()) && !"".equalsIgnoreCase(usuario.getPreferencias())) {
             obj.setPreferencias(usuario.getPreferencias());
         }
-        
+
+        obj.setPuntos(usuario.getPuntos());
+        obj.setEstrellas(usuario.getEstrellas());
         obj.setActivo(usuario.isActivo());
         obj.setAlta(usuario.getAlta());
-        
+
         return DAO.save(obj);
     }
 
@@ -83,14 +82,14 @@ public class UsuarioServicioMetodos implements UsuarioServicio{
 
     @Override
     public Optional<Usuario> usuarioLogin(String usuario, String contrasenya) {
-        
+
         return DAO.usuarioLogin(usuario, contrasenya);
     }
 
     @Override
     public List<Usuario> usuariosGrupo(String grupo) {
-        
+
         return DAO.usuariosGrupo(grupo);
-    } 
- 
+    }
+
 }

@@ -8,60 +8,121 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <title>Panel</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     </head>
     <body>
-        
-        <div th:object="${usuarioSesion}">
-            <p th:text="'Usuario : ' + *{nombre}"/>                      
-
-            <div th:if="*{partidaMasterEnCurso()} != null">
-                <a href="/partidaMaster" class="button" id="partidaMasterEnCurso"> PARTIDA MASTER EN CURSO </a>
-                <br/>
-                <br/>
-            </div>            
-            
-            <div th:if="*{hayPartidasInvitadoPendientes()} == true">
-                <table border="2" > 
-                    <tr>
-                        <th>PARTIDAS INVITADO</th>                   
-                    </tr>   
-                    <tr th:each="unapartida : *{partidasInvitadoPendientes()}">
-                        <td>
-                            <a th:href="'/partidaInvitado/'+${unapartida.id}" class="button" id="${unapartida.id}">
-                                <p th:text="${unapartida.descripcion}"/>
-                            </a>
-                        </td>
-                    </tr>
-                </table>
-            </div>            
-            
-            <div th:if="*{sePuedeCrearPartidaMaster()} == true">
-                <a href="/partida/crear" class="button" id="crearpartida"> CREAR PARTIDA </a>
-                 <br/>
+        <section class="h-100">
+            <div class="container h-100" th:object="${usuarioSesion}">
+                <div class="row justify-content-sm-center h-100">
+                    <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
+                        <div class="text-center my-5">
+                            <img th:src="@{'/images/playhitsgame.png'}" class="img-fluid" alt="PLAYHITSGAME" />
+                        </div>
+                        <div class="card shadow-lg">
+                            <div class="card-body p-5" >
+                                <h1 class="fs-4 card-title fw-bold mb-4" th:text="#{general.jugador} + ' : ' + *{nombre}"/>
+                                <h1 class="fs-4 card-title fw-bold mb-4" th:text="#{general.puntos} + ' : ' + *{puntos}"/>
+                                <a href="/modificarUsuario" class="text-dark">
+                                    <p th:text="#{general.modificardatos}"/>  
+                                </a>
+                            </div>
+                            <div th:if="*{partidaMasterEnCurso()} != null">
+                                <div  class="card-body p-5" >
+                                    <a href="/partidaMaster" class="btn btn-primary" role="button" th:text="#{general.partidamasterpendiente}"/>
+                                </div>
+                            </div>
+                            <div th:if="*{hayPartidasInvitadoPendientes()} == true">
+                                <div class="card-body p-5" >
+                                    <div class="table-responsive-lg">
+                                        <table class="table" > 
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        <p th:text="#{general.partidasinvitado}"/>
+                                                    </th>                   
+                                                </tr>   
+                                                <tr th:each="unapartida : *{partidasInvitadoPendientes()}">
+                                                    <td>
+                                                        <a th:href="'/partidaInvitado/'+${unapartida.id}" class="button" id="${unapartida.id}">
+                                                            <p th:text="${unapartida.descripcion}"/>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>  
+                            <div th:if="*{sePuedeCrearPartidaMaster()} == true">
+                                <div class="card-body p-5" >
+                                    <a href="/crearPartida" class="btn btn-primary" role="button" th:text="#{general.crearpartida}"/>
+                                </div>
+                            </div>
+                            <div th:if="*{hayPartidasTerminadas()} == true">
+                                <div class="card-body p-5" >
+                                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#tablapartidas" 
+                                            aria-expanded="false" aria-controls="tablapartidas" th:text="#{general.partidasterminadas}"/>                                       
+                                    </button>
+                                    <div class="collapse" id="tablapartidas">
+                                        <div class="table-responsive-lg ">
+                                            <table class="table table-sm table-striped table-bordered" > 
+                                                <thead class="table-light" style="text-align:center;">
+                                                    <tr>
+                                                        <th colspan="3">
+                                                            <p th:text="#{general.partidasterminadas}"/>
+                                                        </th>                   
+                                                    </tr> 
+                                                    <tr>
+                                                        <th>
+                                                            <p th:text="#{general.fecha}"/> 
+                                                        </th>
+                                                        <th>
+                                                            <p th:text="#{general.configuracion}"/> 
+                                                        </th>
+                                                        <th>
+                                                            <p th:text="#{general.usuarios}"/> 
+                                                        </th>
+                                                    </tr>                                            
+                                                </thead>
+                                                <tbody>
+                                                    <tr th:each="unapartida : *{partidasTerminadas()}">
+                                                        <td>
+                                                            <a th:href="'/partidaConsulta/' + ${unapartida.id}" class="button"> 
+                                                                <p th:text="${unapartida.fechaFormateada}"/>
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <a th:href="'/partidaConsulta/' + ${unapartida.id}" class="button"> 
+                                                                <p th:text="${unapartida.descripcion}"/>
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <a th:href="'/partidaConsulta/' + ${unapartida.id}" class="button"> 
+                                                                <p th:text="${unapartida.usuariosTxT}"/>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="card-footer py-3 border-0">
+                                <div class="text-center">                       
+                                    <a href="/" class="text-dark">
+                                        <p th:text="#{general.salir}"/>  
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-5 text-muted">
+                            <p th:text="#{general.version}"/>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <div th:if="*{hayPartidasTerminadas()} == true">
-                <table border="2" > 
-                    <tr>
-                        <th></th>
-                        <th>PARTIDAS FINALIZADAS</th>                   
-                    </tr>    
-                    <tr th:each="unapartida : *{partidasTerminadas()}">
-                        <td>
-                            <p th:text="${unapartida.fechaFormateada}"/>
-                        </td>
-                        <td>
-                            <a th:href="'/partidaConsulta/' + ${unapartida.id}" class="button"> 
-                                <p th:text="${unapartida.descripcion}"/>
-                                <p th:text="${unapartida.usuariosTxT}"/>
-                            </a>
-                        </td>                       
-                    </tr>                       
-                </table>             
-            </div> 
-        </div> 
-        <a th:href="'/modificarUsuario'" class="button">Mis Datos</a> 
-        <a th:href="'/logout'" class="button">Salir</a>
-        <p th:text="${result}"></p>
+        </section>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     </body>
 </html>
