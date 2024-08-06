@@ -13,66 +13,60 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     </head>
     <body>
         <header th:insert="~{plantillas/playhitsgame :: encabezado}"></header>
-        
-             
+
+
         <div>
-             <form method="post" th:action="@{/gestionCanciones}" th:object="${filtro}" > 
+            <form method="post" th:action="@{/gestionCanciones}" th:object="${filtro}" > 
                 <table border="2">
-                <tr>
-                    <th>Genero</th>
-                    <th>Idioma</th>
-                    <th>Tema</th>
-                    <th>Año Inicial</th>
-                    <th>Año Final</th>
-                    <th>Verificar</th>
-                </tr>
-                <tr>
-                    <td>
-                        <select th:field="*{genero}" title="Genero">
-                            <option th:each="generoOpt : ${T(mld.playhitsgame.exemplars.Genero).values()}" 
-                            th:value="${generoOpt}" th:text="${generoOpt}"></option>
-                        </select>
-                    </td>
-                    <td>
-                        <select th:field="*{idioma}" title="Idioma">
-                            <option th:each="idiomaOpt : ${T(mld.playhitsgame.exemplars.Idioma).values()}" 
-                            th:value="${idiomaOpt}" th:text="${idiomaOpt}"></option>
-                        </select>
-                    </td>
-                    <td>
-                        <select th:field="*{tema}" title="Tema">
-                            <option th:each="elem : ${temas}" 
-                            th:value="${elem}" th:text="${elem}"></option>
-                        </select>
-                    </td>
-                    <td>
-                        <input type="number" th:field="*{anyoInicial}" required="required"/>
-                    </td>
-                     <td>
-                        <input type="number" th:field="*{anyoFinal}" required="required"/>
-                    </td>
-                    
-                    <td>
-                        <input type="checkbox" th:field="*{revisar}" />
-                    </td>
-                    
-                    <td>
-                        <input type="submit" value="Buscar"/>   
-                    </td>
-                </tr>           
-                             
+                    <tr>
+                        <th>Genero</th>
+                        <th>Idioma</th>
+                        <th>Tema</th>
+                        <th>Año Inicial</th>
+                        <th>Año Final</th>
+                        <th>Verificar</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <select th:field="*{genero}" title="Genero">
+                                <option th:each="generoOpt : ${T(mld.playhitsgame.exemplars.Genero).values()}" 
+                                        th:value="${generoOpt}" th:text="${generoOpt}"></option>
+                            </select>
+                        </td>
+                        <td>
+                            <select th:field="*{idioma}" title="Idioma">
+                                <option th:each="idiomaOpt : ${T(mld.playhitsgame.exemplars.Idioma).values()}" 
+                                        th:value="${idiomaOpt}" th:text="${idiomaOpt}"></option>
+                            </select>
+                        </td>
+                        <td>
+                            <select th:field="*{tema}" title="Tema">
+                                <option th:each="elem : ${temas}" 
+                                        th:value="${elem}" th:text="${elem}"></option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" th:field="*{anyoInicial}" required="required"/>
+                        </td>
+                        <td>
+                            <input type="number" th:field="*{anyoFinal}" required="required"/>
+                        </td>
+
+                        <td>
+                            <input type="checkbox" th:field="*{revisar}" />
+                        </td>
+
+                        <td>
+                            <input type="submit" value="Buscar"/>   
+                        </td>
+                    </tr>         
+
             </form> 
-                 
-            
-             <a href="/altaCancion" class="button" id="altaCancion"> ALTA CANCION </a>
-            
+            <a th:href="@{/altaCancion}" class="button" id="altaCancion"> ALTA CANCION </a>
             <p th:text="${result}"></p>
-            
         </div>
-        
-        
         <div th:if="${canciones != null and !canciones.empty}">
-            
+
             <form method="post" th:action="@{/marcarRevision}" >
                 <input type="submit" value="Marcar la seleccion para pendiente de validar"/>  
                 <table border="2">
@@ -108,11 +102,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 </table>
             </form>
         </div>   
-        
+
         <div th:if="${canciones == null or canciones.empty}">
             <p>NO HAY NINGUNA CANCION PARA LISTAR</p>
         </div>
-        
+
         <footer th:insert="~{plantillas/playhitsgame :: pie}"></footer>
     </body>
 </html>

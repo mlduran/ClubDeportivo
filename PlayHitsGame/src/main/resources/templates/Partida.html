@@ -15,156 +15,155 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             <input type="hidden" id="serverWS" th:value="${serverWebsocket}"/>
             <input type="hidden" id="idusuario" th:value="${usuarioSesion.id}"/>
             <input type="hidden" id="idpartida" th:value="${partidaSesion.id}"/>
-            <div class="container">
-                <div class="col-xxl-2 col-xl-3 col-lg-5 col-md-7 col-sm-9">
-                    <div class="table-responsive-md ">
-                        <table class="table table-md table-bordered" > 
-                            <thead class="table-light" style="text-align:center;">
-                                <tr>
-                                    <td colspan="3">
-                                        <img th:src="@{'/images/playhitsgame.png'}" class="img-fluid" alt="PLAYHITSGAME" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th colspan="3">
-                                        <p th:text="#{general.jugador} + ' : ' + ${usuarioSesion.nombre}"/>
-                                    </th>   
-                                </tr>    
-                                <tr>
-                                    <td>
-                                        <p th:text="#{general.partida}"/>
-                                    </td>
-                                    <td>
-                                        <p th:each="txt : ${partidaSesion.descripcion}" th:text="${txt}"/>
-                                    </td>
-                                    <td>
-                                        <p th:text="#{general.participantes}"/>
-                                        <p th:each="usu : ${partidaSesion.usuariosPartida()}" th:text="${usu.nombre}"/>                     
-                                    </td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="ronda : ${partidaSesion.rondas}">                                              
-                            <div th:if="${partidaSesion.rondaActual  == ronda.numero}">
-                                <div th:if="${partidaSesion.terminada == true}"> 
-                                    <td colspan="3" th:text="#{general.partidafinalizada}"/>                                              
-                                </div>
-                                <div th:if="${partidaSesion.terminada == false}">    
-                                    <td style="text-align:center;">
-                                        <p th:text="#{general.ronda}">  
-                                        <p th:text="${ronda.numero}"/>
-                                    </td>                                           
-                                    <td>                                
-                                        <table class="table table-sm table-bordered"  style="text-align:center;"> 
-                                            <tr>
-                                                <td colspan='2'>
-                                                    <audio controls>
-                                                        <source th:src="${ronda.cancion.spotifyplay}" type="audio/mpeg"/>
-                                                    </audio>
-                                                </td>                                                        
-                                            </tr>
-                                            <tr>                                        
-                                                <td>
-                                                    Año
-                                                    <input type="number" name="anyo" id="anyo" min="1" max="2050"/>
-                                                     <button th:onclick="respuestaAnyo()" id="botonAnyo">
-                                                         <h6 th:text="#{general.enviar}"/>
-                                                </td>
-                                                <td>
-                                                    <input type="image" th:src="@{'/images/actualizar.png'}" width="40" height="40"
-                                                           onclick="document.location.reload();" >
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Titulo</th>
-                                                <th>Interprete</th>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div th:each="opTitulo : ${opcTitulos}"> 
-                                                        <button th:data-name="${opTitulo.cancion}" th:onclick="respuestaTitulo(this.getAttribute('data-name'))" th:id="'titulo_' + ${opTitulo.cancion}">
-                                                            <p th:text="${opTitulo.opTitulo}"></p>
-                                                        </button>
-                                                        <br/>                                  
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div th:each="opcInterprete : ${opcInterpretes}">   
-                                                        <button th:data-name="${opcInterprete.cancion}" th:onclick="respuestaInterprete(this.getAttribute('data-name'))" th:id="'interprete_' + ${opcInterprete.cancion}">
-                                                            <p th:text="${opcInterprete.opInterprete}"></p>
-                                                        </button>
-                                                        <br/>                                  
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </table> 
-                                    </td>
-                                    <td>
-                                        <p th:text="ENVIADO"/>
-                                        <div id="mensajesSockets"> 
-                                        </div>
-                                        <div th:if="${rol == T(mld.playhitsgame.exemplars.Rol).master}">
-                                            <a th:href="'/forzarAcabarRonda/' + ${partidaSesion.id}" class="button"> 
-                                                Acabar Ronda
-                                            </a>
-                                        </div>
-                                        <div th:if="${partidaSesion.terminada}">
-                                            <a th:href="'/partidaConsulta/' + ${partidaSesion.id}" class="button" id="resultados">VER RESULTADOS</a>
-                                        </div>
-                                    </td>
-                                </div>    
-                                </tr> 
-                                <tr th:each="ronda : ${partidaSesion.rondas}">                         
-                                <div th:if="${ronda.estaCompletada()}">
-                                    <td style="text-align:center;">
-                                        <p th:text="#{general.ronda}">  
-                                        <p th:text="${ronda.numero}"/>
-                                    </td>      
-                                    <td>
-                                        <table>
-                                            <tr>
-                                                <td>
-                                                    <img th:src="${ronda.cancion.spotifyimagen}" alt="PLAYHITSGAME" width="100" height="100"/>  
-                                                </td>
-                                                <td>
-                                                    <p th:text="'Titulo: ' + ${ronda.cancion.titulo}"></p>
-                                                    <p th:text="'Interprete: ' + ${ronda.cancion.interprete}"></p>
-                                                    <p th:text="'Año: ' + ${ronda.cancion.anyo}"></p>  
-                                                </td>
-                                            </tr>
-                                        </table>  
-                                    </td>
-                                    <div th:each="resp : ${respuestas}">
-                                        <td th:if="${resp.ronda.numero == ronda.numero}">                                                    
-                                            <p th:text="Respondido"/>                                                    
-                                            <p th:text="${resp.titulo}"/>
-                                            <p th:text="${resp.interprete}"/>
-                                            <p th:text="${resp.anyo}"/>
-                                        </td>
+            <div class="container-sm">
+                <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                    <table class="table-responsive table-bordered" > 
+                        <thead class="table-light" style="text-align:center;">
+                            <tr>
+                                <td colspan="3">
+                                    <img th:src="@{'/images/playhitsgame.png'}" class="img-fluid" alt="PLAYHITSGAME" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <th colspan="3">
+                                    <p th:text="#{general.jugador} + ' : ' + ${usuarioSesion.nombre}"/>
+                                </th>   
+                            </tr>    
+                            <tr>
+                                <td>
+                                    <p th:text="#{general.partida}"/>
+                                </td>
+                                <td>
+                                    <p th:each="txt : ${partidaSesion.descripcion}" th:text="${txt}"/>
+                                </td>
+                                <td>
+                                    <p th:text="#{general.participantes}"/>
+                                    <p th:each="usu : ${partidaSesion.usuariosPartida()}" th:text="${usu.nombre}"/>                     
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="ronda : ${partidaSesion.rondas}">                                              
+                        <div th:if="${partidaSesion.rondaActual  == ronda.numero}">
+                            <div th:if="${partidaSesion.terminada == true}"> 
+                                <td colspan="3" th:text="#{general.partidafinalizada}"/>                                              
+                            </div>
+                            <div th:if="${partidaSesion.terminada == false}">    
+                                <td style="text-align:center;">
+                                    <p th:text="#{general.ronda}">  
+                                    <p th:text="${ronda.numero}"/>
+                                </td>                                           
+                                <td>                                
+                                    <table class="table table-sm table-bordered"  style="text-align:center;"> 
+                                        <tr>
+                                            <td colspan='2'>
+                                                <audio controls>
+                                                    <source th:src="${ronda.cancion.spotifyplay}" type="audio/mpeg"/>
+                                                </audio>
+                                            </td>                                                        
+                                        </tr>
+                                        <tr>                                        
+                                            <td>
+                                                Año
+                                                <input type="number" name="anyo" id="anyo" min="1" max="2050"/>
+                                                <button th:onclick="respuestaAnyo()" id="botonAnyo">
+                                                    <h6 th:text="#{general.enviar}"/>
+                                            </td>
+                                            <td>
+                                                <input type="image" th:src="@{'/images/actualizar.png'}" width="40" height="40"
+                                                       onclick="document.location.reload();" >
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Titulo</th>
+                                            <th>Interprete</th>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div th:each="opTitulo : ${opcTitulos}"> 
+                                                    <button th:data-name="${opTitulo.cancion}" th:onclick="respuestaTitulo(this.getAttribute('data-name'))" th:id="'titulo_' + ${opTitulo.cancion}">
+                                                        <p th:text="${opTitulo.opTitulo}"></p>
+                                                    </button>
+                                                    <br/>                                  
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div th:each="opcInterprete : ${opcInterpretes}">   
+                                                    <button th:data-name="${opcInterprete.cancion}" th:onclick="respuestaInterprete(this.getAttribute('data-name'))" th:id="'interprete_' + ${opcInterprete.cancion}">
+                                                        <p th:text="${opcInterprete.opInterprete}"></p>
+                                                    </button>
+                                                    <br/>                                  
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table> 
+                                </td>
+                                <td>
+                                    <p th:text="ENVIADO"/>
+                                    <div id="mensajesSockets"> 
                                     </div>
+                                    <div th:if="${rol == T(mld.playhitsgame.exemplars.Rol).master}">
+                                        <a th:href="'/forzarAcabarRonda/' + ${partidaSesion.id}" class="button"> 
+                                            Acabar Ronda
+                                        </a>
+                                    </div>
+                                    <div th:if="${partidaSesion.terminada}">
+                                        <a th:href="'/partidaConsulta/' + ${partidaSesion.id}" class="button" id="resultados">VER RESULTADOS</a>
+                                    </div>
+                                </td>
+                            </div>    
+                            </tr> 
+                            <tr th:each="ronda : ${partidaSesion.rondas}">                         
+                            <div th:if="${ronda.estaCompletada()}">
+                                <td style="text-align:center;">
+                                    <p th:text="#{general.ronda}">  
+                                    <p th:text="${ronda.numero}"/>
+                                </td>      
+                                <td>
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <img th:src="${ronda.cancion.spotifyimagen}" alt="PLAYHITSGAME" width="100" height="100"/>  
+                                            </td>
+                                            <td>
+                                                <p th:text="'Titulo: ' + ${ronda.cancion.titulo}"></p>
+                                                <p th:text="'Interprete: ' + ${ronda.cancion.interprete}"></p>
+                                                <p th:text="'Año: ' + ${ronda.cancion.anyo}"></p>  
+                                            </td>
+                                        </tr>
+                                    </table>  
+                                </td>
+                                <div th:each="resp : ${respuestas}">
+                                    <td th:if="${resp.ronda.numero == ronda.numero}">                                                    
+                                        <p th:text="Respondido"/>                                                    
+                                        <p th:text="${resp.titulo}"/>
+                                        <p th:text="${resp.interprete}"/>
+                                        <p th:text="${resp.anyo}"/>
+                                    </td>
                                 </div>
-                                <div th:if="${partidaSesion.rondaActual != ronda.numero && !ronda.estaCompletada()}">
-                                    <td style="text-align:center;">
-                                        <p th:text="#{general.ronda}">  
-                                        <p th:text="${ronda.numero}"/>
-                                    </td>       
-                                    <td colspan="2" th:text="#{general.rondapendiente}"/>
-                                </div>                     
-                                </tr>  
-                            </div>                              
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="text-center">                       
-                        <a href="/panel" class="text-dark">
-                            <p th:text="#{general.salir}"/>  
-                        </a>
-                    </div>
-                    <div class="text-center text-muted">
-                        <p th:text="#{general.version}"/>
-                    </div>
+                            </div>
+                            <div th:if="${partidaSesion.rondaActual != ronda.numero && !ronda.estaCompletada()}">
+                                <td style="text-align:center;">
+                                    <p th:text="#{general.ronda}">  
+                                    <p th:text="${ronda.numero}"/>
+                                </td>       
+                                <td colspan="2" th:text="#{general.rondapendiente}"/>
+                            </div>                     
+                            </tr>  
+                        </div>                              
+                        </tbody>
+                    </table>
+
                 </div>
-            </div>
+                <div class="text-center">                       
+                    <a href="/panel" class="text-dark">
+                        <p th:text="#{general.salir}"/>  
+                    </a>
+                </div>
+                <div class="text-center text-muted">
+                    <p th:text="#{general.version}"/>
+                </div>
+            </div>       
 
         </section>
         <script type="text/javascript" th:src="@{/javascript/Partida.js}"></script>   

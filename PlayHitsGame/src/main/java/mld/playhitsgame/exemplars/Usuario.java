@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import mld.playhitsgame.seguridad.Roles;
 import org.hibernate.annotations.CreationTimestamp;
 
 /**
@@ -72,6 +73,30 @@ public class Usuario{
     )
     private List<Partida> partidasInvitado;
     
+    
+    public boolean isAdmin(){
+        
+        boolean adm = false;
+        for (UsuarioRol rol :this.roles){
+            if (rol.getName().equals(Roles.ADMIN)){
+                adm = true;
+                break;
+            }
+        }       
+        return adm;        
+    }
+    
+    public boolean isColaborador(){
+        
+        boolean adm = false;
+        for (UsuarioRol rol :this.roles){
+            if (rol.getName().equals(Roles.COLABORADOR)){
+                adm = true;
+                break;
+            }
+        }       
+        return adm;        
+    }
     
     public String getNombre(){
         

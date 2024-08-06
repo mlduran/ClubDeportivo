@@ -26,86 +26,83 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     <p th:text="#{general.modificardatos}"/>  
                                 </a>
                             </div>
-                            <div th:if="*{partidaMasterEnCurso()} != null">
-                                <div  class="card-body p-5" >
-                                    <a href="/partidaMaster" class="btn btn-primary" role="button" th:text="#{general.partidamasterpendiente}"/>
-                                </div>
+                            <div th:if="*{admin} == true or *{colaborador} == true" class="card-body p-5">
+                                <a href="/gestionCanciones" class="btn btn-primary" role="button" th:text="#{general.gestioncanciones}"/>
                             </div>
-                            <div th:if="*{hayPartidasInvitadoPendientes()} == true">
-                                <div class="card-body p-5" >
-                                    <div class="table-responsive-lg">
-                                        <table class="table" > 
-                                            <thead>
+                            <div th:if="*{partidaMasterEnCurso()} != null" class="card-body p-5">
+                                <a href="/partidaMaster" class="btn btn-primary" role="button" th:text="#{general.partidamasterpendiente}"/>
+                            </div>
+                            <div th:if="*{hayPartidasInvitadoPendientes()} == true" class="card-body p-5">
+
+                                <div class="table-responsive-lg">
+                                    <table class="table" > 
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <p th:text="#{general.partidasinvitado}"/>
+                                                </th>                   
+                                            </tr>   
+                                            <tr th:each="unapartida : *{partidasInvitadoPendientes()}">
+                                                <td>
+                                                    <a th:href="'/partidaInvitado/'+${unapartida.id}" class="button" id="${unapartida.id}">
+                                                        <p th:text="${unapartida.descripcion}"/>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>  
+                            <div th:if="*{sePuedeCrearPartidaMaster()} == true" class="card-body p-5">
+                                <a href="/crearPartida" class="btn btn-primary" role="button" th:text="#{general.crearpartida}"/>
+                            </div>
+                            <div th:if="*{hayPartidasTerminadas()} == true" class="card-body p-5" >
+
+                                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#tablapartidas" 
+                                        aria-expanded="false" aria-controls="tablapartidas" th:text="#{general.partidasterminadas}"/>                                       
+                                </button>
+                                <div class="collapse" id="tablapartidas">
+                                    <div class="table-responsive-lg ">
+                                        <table class="table table-sm table-striped table-bordered" > 
+                                            <thead class="table-light" style="text-align:center;">
+                                                <tr>
+                                                    <th colspan="3">
+                                                        <p th:text="#{general.partidasterminadas}"/>
+                                                    </th>                   
+                                                </tr> 
                                                 <tr>
                                                     <th>
-                                                        <p th:text="#{general.partidasinvitado}"/>
-                                                    </th>                   
-                                                </tr>   
-                                                <tr th:each="unapartida : *{partidasInvitadoPendientes()}">
+                                                        <p th:text="#{general.fecha}"/> 
+                                                    </th>
+                                                    <th>
+                                                        <p th:text="#{general.configuracion}"/> 
+                                                    </th>
+                                                    <th>
+                                                        <p th:text="#{general.usuarios}"/> 
+                                                    </th>
+                                                </tr>                                            
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="unapartida : *{partidasTerminadas()}">
                                                     <td>
-                                                        <a th:href="'/partidaInvitado/'+${unapartida.id}" class="button" id="${unapartida.id}">
+                                                        <a th:href="'/partidaConsulta/' + ${unapartida.id}" class="button"> 
+                                                            <p th:text="${unapartida.fechaFormateada}"/>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <a th:href="'/partidaConsulta/' + ${unapartida.id}" class="button"> 
                                                             <p th:text="${unapartida.descripcion}"/>
                                                         </a>
                                                     </td>
+                                                    <td>
+                                                        <a th:href="'/partidaConsulta/' + ${unapartida.id}" class="button"> 
+                                                            <p th:text="${unapartida.usuariosTxT}"/>
+                                                        </a>
+                                                    </td>
                                                 </tr>
-                                            </thead>
+                                            </tbody>
                                         </table>
                                     </div>
-                                </div>
-                            </div>  
-                            <div th:if="*{sePuedeCrearPartidaMaster()} == true">
-                                <div class="card-body p-5" >
-                                    <a href="/crearPartida" class="btn btn-primary" role="button" th:text="#{general.crearpartida}"/>
-                                </div>
-                            </div>
-                            <div th:if="*{hayPartidasTerminadas()} == true">
-                                <div class="card-body p-5" >
-                                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#tablapartidas" 
-                                            aria-expanded="false" aria-controls="tablapartidas" th:text="#{general.partidasterminadas}"/>                                       
-                                    </button>
-                                    <div class="collapse" id="tablapartidas">
-                                        <div class="table-responsive-lg ">
-                                            <table class="table table-sm table-striped table-bordered" > 
-                                                <thead class="table-light" style="text-align:center;">
-                                                    <tr>
-                                                        <th colspan="3">
-                                                            <p th:text="#{general.partidasterminadas}"/>
-                                                        </th>                   
-                                                    </tr> 
-                                                    <tr>
-                                                        <th>
-                                                            <p th:text="#{general.fecha}"/> 
-                                                        </th>
-                                                        <th>
-                                                            <p th:text="#{general.configuracion}"/> 
-                                                        </th>
-                                                        <th>
-                                                            <p th:text="#{general.usuarios}"/> 
-                                                        </th>
-                                                    </tr>                                            
-                                                </thead>
-                                                <tbody>
-                                                    <tr th:each="unapartida : *{partidasTerminadas()}">
-                                                        <td>
-                                                            <a th:href="'/partidaConsulta/' + ${unapartida.id}" class="button"> 
-                                                                <p th:text="${unapartida.fechaFormateada}"/>
-                                                            </a>
-                                                        </td>
-                                                        <td>
-                                                            <a th:href="'/partidaConsulta/' + ${unapartida.id}" class="button"> 
-                                                                <p th:text="${unapartida.descripcion}"/>
-                                                            </a>
-                                                        </td>
-                                                        <td>
-                                                            <a th:href="'/partidaConsulta/' + ${unapartida.id}" class="button"> 
-                                                                <p th:text="${unapartida.usuariosTxT}"/>
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div> 
                                 </div>
                             </div>
                             <div class="card-footer py-3 border-0">

@@ -13,7 +13,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <div>          
            
             
-            <form method="post" action="/altaCancion" th:object="${newcancion}">                
+            <form method="post" th:action="@{/altaCancion}" th:object="${newcancion}">                
                 <p>Titulo<input type="text" th:field="*{titulo}" required="required"/></p>
                 <p>Interprete<input type="text" th:field="*{interprete}" required="required"/></p>
                 <p>Album<input type="text" th:field="*{album}"/></p>
@@ -37,7 +37,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 <p>spotifyplay<input type="text" th:field="*{spotifyplay}" required="required"/></p>
                 <p>spotifyimagen<input type="text" th:field="*{spotifyimagen}" required="required"/></p>
                 <p>Revisar<input type="checkbox" th:field="*{revisar}" /></p>
-                <input type="submit" value="Alta Cancion"/>                
+                <input class="btn btn-primary ms-auto" type="submit" value="Alta Cancion" />                
             </form>
             
             <p th:text="${result}"></p>
