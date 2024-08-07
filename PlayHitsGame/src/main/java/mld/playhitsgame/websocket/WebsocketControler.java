@@ -4,7 +4,6 @@
  */
 package mld.playhitsgame.websocket;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -13,8 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lombok.extern.slf4j.Slf4j;
 import mld.playhitsgame.utilidades.Utilidades;
 import mld.playhitsgame.exemplars.Cancion;
@@ -31,17 +28,18 @@ import mld.playhitsgame.services.UsuarioServicioMetodos;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
+
 
 @Slf4j
 @Controller
-public class WebsocketControler extends TextWebSocketHandler {
+public class WebsocketControler {
 
     @Autowired
     CancionServicioMetodos servCancion;
@@ -56,13 +54,35 @@ public class WebsocketControler extends TextWebSocketHandler {
 
     private static final HashMap<Long, Set<UsuarioWS>> partidas = new HashMap();
     private static final HashMap<Long, Integer> nRespuestas = new HashMap();
+    
+    @MessageMapping("/partida/{id_partida}/usuario/{id_usuario}")
+    @SendTo("/tema/partida/{id_partida}")
+    public String getMessage(@DestinationVariable String id_usuario, 
+            @DestinationVariable String id_partida, String message ){
+        
+        JSONObject obJson = null;
+        try {
+            obJson = new JSONObject(message);
+        } catch (JSONException jSONException) {
+            log.info(new Date() + " Error al obtener json : " + message);
+        }
 
+        if (obJson == null || obJson.isEmpty()) {
+            return "";
+        }
+        
+        String resp = tratarEntradaWS(obJson);
+        
+        return resp;
+        
+    }
+    
     public static Set<UsuarioWS> usuariosPartida(Long idPartida) {
 
         return partidas.get(idPartida);
     }
 
-    public static UsuarioWS anyadirPartidaUsuario(WebSocketSession session, long partida, long idUsuario, String nombre) {
+    public static UsuarioWS anyadirPartidaUsuario(long partida, long idUsuario, String nombre) {
 
         if (partidas.get(partida) == null) {
             partidas.put(partida, new HashSet());
@@ -70,7 +90,6 @@ public class WebsocketControler extends TextWebSocketHandler {
         UsuarioWS usu = new UsuarioWS();
         usu.setId(idUsuario);
         usu.setUsuario(nombre);
-        usu.setSession(session);
         partidas.get(partida).add(usu);
         nRespuestas.put(partida, 0);
 
@@ -138,55 +157,33 @@ public class WebsocketControler extends TextWebSocketHandler {
         return completo;
     }
 
-    private UsuarioWS registrarPeticionWS(JSONObject obJson, WebSocketSession session) {
+    private UsuarioWS registrarPeticionWS(JSONObject obJson) {
 
         UsuarioWS usuWS = buscarUsuarioWS(
                 obJson.getLong("idPartida"), obJson.getLong("idUsuario"));
 
         if (usuWS == null) {
             Usuario usuBD = obtenerUsuario(obJson.getLong("idUsuario"));
-            usuWS = anyadirPartidaUsuario(session,
+            usuWS = anyadirPartidaUsuario(
                     obJson.getLong("idPartida"),
                     obJson.getLong("idUsuario"),
                     usuBD.getNombre()
             );
-            log.info(new Date() + " Se ha conectado al WebSocket el usuario " + usuWS.getUsuario()
-                    + " con sesion " + session.getId());
-        } else {
-            if (!usuWS.getSession().getId().equals(session.getId())) {
-                usuWS.setSession(session);
-                log.info(new Date() + " Se actualiza sesion del usuario " + usuWS.getUsuario()
-                        + " con sesion " + session.getId());
-            } else {
-                log.info(new Date() + " Peticion " + obJson.getString("op")
-                        + " al WebSocket del usuario " + usuWS.getUsuario()
-                        + " con sesion " + session.getId());
-            }
+            log.info(new Date() + " Se ha conectado al WebSocket el usuario " + usuWS.getUsuario());
         }
 
         return usuWS;
     }
 
-    @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+    private String tratarEntradaWS(JSONObject obJson) {
 
-        JSONObject obJson = null;
-        try {
-            obJson = new JSONObject(message.getPayload());
-        } catch (JSONException jSONException) {
-            log.info(new Date() + " Error al capturar json : " + message.getPayload());
-        }
-
-        if (obJson == null || obJson.isEmpty()) {
-            //aqui habria que lanzar un error de momento paramos para ver que pasa
-            throw new Exception("ERROR al obtener json");
-        }
-        UsuarioWS usuarioWS = registrarPeticionWS(obJson, session);
+        UsuarioWS usuarioWS = registrarPeticionWS(obJson);
 
         if ("alta".equals(obJson.getString("op"))) {
             // De momento no hacemos nada, lo mantemos para 
             // hacer el alta en lacarga de la pagina y ahorrarnos
             // luego la consulta a BD del usuario
+            return "";
         }
 
         if ("titulo".equals(obJson.getString("op"))) {
@@ -220,25 +217,12 @@ public class WebsocketControler extends TextWebSocketHandler {
         }
 
         String respuesta = usuariosRespuestasCompletadas(obJson.getLong("idPartida"));
-        TextMessage messageResp = new TextMessage(respuesta);
-
-        for (UsuarioWS usu : usuariosPartida(obJson.getLong("idPartida"))) {
-            try {
-                if (usu.getSession().isOpen()) {
-                    usu.getSession().sendMessage(messageResp);
-                } else {
-                    log.info(new Date() + " La conexion del usuario " + usu.getUsuario()
-                            + " con sesion " + usu.getSession().getId() + " esta cerrada");
-                }
-            } catch (IOException iOException) {
-                log.info(new Date() + " No se ha podido entregar notificacion del usuario " + usu.getUsuario()
-                        + " con sesion " + usu.getSession().getId());
-            }
-        }
-
+        
         if (isTodoCompletado(obJson.getLong("idPartida"))) {
-            pasarSiguienteRonda(obJson.getLong("idPartida"));
+            respuesta = pasarSiguienteRonda(obJson.getLong("idPartida"));
         }
+        
+        return respuesta;
     }
 
     private Usuario obtenerUsuario(Long idUsuario) {
@@ -295,12 +279,12 @@ public class WebsocketControler extends TextWebSocketHandler {
     }
 
     @GetMapping("/forzarAcabarRonda/{idPartida}")
-    public void acabarRonda(Model modelo, @PathVariable Long idPartida) {
+    public void acabarRonda(@PathVariable Long idPartida, Model modelo) {
         // esto es para poder llamarse desde el master para forzar acabar la ronda
         pasarSiguienteRonda(idPartida);
     }
 
-    private void pasarSiguienteRonda(Long idPartida) {
+    private String pasarSiguienteRonda(Long idPartida) {
         // A este metodo llegamos si todos los usuarios conectados
         // han respondido, eso no quiere decir que todos esten
         // eso se tendra que tratar mas adelante pero de momento
@@ -327,22 +311,12 @@ public class WebsocketControler extends TextWebSocketHandler {
             servPartida.updatePartida(partida.getId(), partida);
         }
 
-        TextMessage messageResp;
-
+        String messageResp;
         if (acabar) {
-            messageResp = new TextMessage("#acabar#");
+            messageResp = "#acabar#";
         } else {
-            messageResp = new TextMessage("#nueva#");
-        }
-
-        for (UsuarioWS usu : usuariosPartida(idPartida))
-            try {
-            if (usu.getSession().isOpen()) {
-                usu.getSession().sendMessage(messageResp);
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(WebsocketControler.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            messageResp = "#nueva#";
+        }       
 
         if (acabar) {
             asignarPuntuacionesUsuario(idPartida);
@@ -350,7 +324,8 @@ public class WebsocketControler extends TextWebSocketHandler {
         } else {
             limpiarDatos(idPartida);
         }
-
+        
+        return messageResp;
     }
 
     private Usuario primerUsuarioAcertarTitulo(Ronda rondaActiva) {
@@ -445,5 +420,4 @@ public class WebsocketControler extends TextWebSocketHandler {
         }
 
     }
-
 }

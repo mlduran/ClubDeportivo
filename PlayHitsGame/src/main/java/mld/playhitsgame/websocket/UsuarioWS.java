@@ -5,7 +5,6 @@
 package mld.playhitsgame.websocket;
 
 import lombok.Data;
-import org.springframework.web.socket.WebSocketSession;
 
 /**
  *
@@ -15,7 +14,6 @@ import org.springframework.web.socket.WebSocketSession;
 public class UsuarioWS implements Comparable<UsuarioWS>{
     
     private long id;
-    private WebSocketSession session;
     private String usuario;
     private boolean respAnyo;
     private boolean respTitulo;

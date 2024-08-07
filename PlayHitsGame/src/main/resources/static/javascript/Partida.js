@@ -6,27 +6,46 @@
 
 let serverWS = document.getElementById("serverWS").value;
 let dirSocket = "ws:" + serverWS + "/websocket";
-let socket = new WebSocket(dirSocket);
+let userId = document.getElementById("idusuario").value;
+let partidaId = document.getElementById("idpartida").value;
+var stompClient = new StompJs.Client({
+    brokerURL: dirSocket
+});
 
-socket.onmessage = function (event) {
-    if (event.data === '#nueva#')
+
+function sendmensaje(mensaje) {
+    stompClient.publish({
+        destination: '/app/partida/' + partidaId + '/usuario/' + userId,
+        body: mensaje});
+}
+
+var procesar = function (mensaje) {
+
+    if (mensaje === null)
+        return;
+    data = mensaje.body;
+    if (data === null || data === "")
+        return;
+    if (data === '#nueva#')
         location.reload();
-    if (event.data === '#acabar#') {
+    if (data === '#acabar#')
         location.reload(); // ahora hacemos lo mismo, pero se deja por si hubiese otra cosa que hacer
-    }
+
     let mensajesSockets = document.getElementById("mensajesSockets");
-    let usuarios = event.data.split(",");
+    let usuarios = data.split(",");
     let txtHtml = '';
-    for (let i = 0; i < usuarios.length; i++) {
+    for (let i = 0; i < usuarios.length; i++)
         txtHtml = txtHtml + '<p>' + usuarios[i] + '</p>';
-    }
+
     mensajesSockets.innerHTML = txtHtml;
 };
 
+var botonAnyo = false;
+var botonTitulo = false;
+var botonInterprete = false;
+
 function txtMensaje(op, idCancion, anyo) {
 
-    let userId = document.getElementById("idusuario").value;
-    let partidaId = document.getElementById("idpartida").value;
     let mensaje = "{'op' : '" + op + "',";
     mensaje = mensaje + "'idUsuario' : " + userId + ",";
     mensaje = mensaje + "'idPartida' : " + partidaId;
@@ -41,9 +60,29 @@ function txtMensaje(op, idCancion, anyo) {
     return mensaje;
 }
 
-var botonAnyo = false;
-var botonTitulo = false;
-var botonInterprete = false;
+function inicializar(){
+    stompClient.activate();
+    //stompClient.deactivate();
+    stompClient.onConnect = (frame) => {
+
+        console.log('Connected: ' + frame);
+        stompClient.subscribe('/tema/partida/' + partidaId, procesar);
+    };
+
+    window.addEventListener('load', function () {
+        //sendmensaje(txtMensaje("alta", null, null));
+    });
+
+    stompClient.onWebSocketError = (error) => {
+        console.error('Error websocket ', error);
+    };
+
+    stompClient.onStompError = (frame) => {
+        console.error('Broker reported error: ' + frame.headers['ḿessage']);
+        console.error('Additional details: ' + frame.body);
+    };
+    
+};
 
 async function sleep(t){
     await new Promise(resolve => setTimeout(resolve, t));
@@ -52,13 +91,14 @@ async function sleep(t){
 // Hacemos el alta para dar de alta el usuario el el WS
 // y hacer la consulta de BD en el momento de carga de 
 // la pagina
-
-async function enviarMensaje(txt) {
-    let intentos = 3;
+async function altaWS(){
+    // si no hacemos esto el usuario no se registra y por ejemplo
+    // el ultimo no se tendria en cuenta
+    let intentos = 10;
 
     for (var i = 1; i < intentos; i++) {
         try {
-            socket.send(txt);
+            sendmensaje(txtMensaje("alta", null, null));
             break;
         } catch (e) {
             window.alert("Temporal para quitar!!!, problema evio a socket: " + e.toString());
@@ -66,18 +106,17 @@ async function enviarMensaje(txt) {
                 window.alert("No hay conexion al socket " + dirSocket +
                         " despues de " + i.toString() + " intentos");
             }
-            await sleep(1000);// Esperamos 1 seg
+            await sleep(1000);// Esperamos 1 seg        
         }
-    }
+    };    
 }
 
-window.addEventListener('load', function () {
-    enviarMensaje(txtMensaje("alta", null, null));
-});
+document.addEventListener("DOMContentLoaded", inicializar);
+window.addEventListener('load', altaWS);
 
 function respuestaTitulo(codCancion) {
     if (botonTitulo === false) {
-        enviarMensaje(txtMensaje("titulo", codCancion, null));
+        sendmensaje(txtMensaje("titulo", codCancion, null));
         let boton = document.getElementById("titulo_" + codCancion);
         boton.style.backgroundColor = "green";
         botonTitulo = true;
@@ -86,7 +125,7 @@ function respuestaTitulo(codCancion) {
 
 function respuestaInterprete(codCancion) {
     if (botonInterprete === false) {
-        enviarMensaje(txtMensaje("interprete", codCancion, null));
+        sendmensaje(txtMensaje("interprete", codCancion, null));
         let boton = document.getElementById("interprete_" + codCancion);
         boton.style.backgroundColor = "green";
         botonInterprete = true;
@@ -100,9 +139,10 @@ function respuestaAnyo() {
         if (anyo.value === "" || anyo.value === 0)
             window.alert("Se ha de informar un año");
         else {
-            enviarMensaje(txtMensaje("anyo", null, anyo.value));
+            sendmensaje(txtMensaje("anyo", null, anyo.value));
             boton.style.backgroundColor = "green";
             botonAnyo = true;
         }
     }
-}          
+}
+
