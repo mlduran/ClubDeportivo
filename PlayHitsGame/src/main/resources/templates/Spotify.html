@@ -14,6 +14,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     <body>
         <div>
             
+             <form method="post" th:action="@{/spotifyMostrarDatos}">                
+                <input type="text" placeholder="Id de PlayList" name="idplaylist" required="required"/>
+                <input type="submit" value="Ver Datos"/>                
+            </form>            
+            
             <form method="post" th:action="@{/spotifyServicios}">                
                 <input type="text" placeholder="Id de PlayList" name="idplaylist" required="required"/>
                 <input type="text" placeholder="Año de la PlayList" name="anyoplaylist" required="required"/>

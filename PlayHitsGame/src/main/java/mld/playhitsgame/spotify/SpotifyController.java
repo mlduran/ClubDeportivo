@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
-import mld.playhitsgame.exemplars.Cancion;
 import org.apache.hc.core5.http.ParseException;
+import org.json.JSONArray;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
@@ -163,6 +163,15 @@ public class SpotifyController {
             return object.getAccessToken();
             
         }
+        
+        @GetMapping(value = "datosPlayList")
+	public String datosPlayList(@RequestParam String idPlayList) {                          
+            
+            JSONArray datos= utiles.obtenerDatosLista(idPlayList, token());        
+                               
+            return datos.toString();	
+		
+	}
         
         @GetMapping(value = "playList")
 	public String playList(@RequestParam String idPlayList, @RequestParam String anyoPlayList) {   

@@ -7,6 +7,11 @@ package mld.playhitsgame.web;
 import mld.playhitsgame.seguridad.CrearUsuarioDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -15,6 +20,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import mld.playhitsgame.exemplars.Cancion;
@@ -65,6 +72,10 @@ public class ControladorVista {
 
     @Value("${custom.server.websocket}")
     private String serverWebsocket;
+
+    @Value("${custom.server.ip}")
+    private String customIp;
+
     @Autowired
     CancionServicioMetodos servCancion;
     @Autowired
@@ -84,6 +95,22 @@ public class ControladorVista {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    private String urlSpotify() {
+
+        String urlLogin = null;
+        try {
+            URL url = new URL(customIp + "/api/spotify/login");
+            BufferedReader urlLectura = new BufferedReader(new InputStreamReader(url.openStream()));
+            urlLogin = urlLectura.readLine();
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(ControladorSpotify.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ControladorSpotify.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return urlLogin;
+    }
 
     private Usuario usuarioModelo(Model modelo) {
 
@@ -137,7 +164,8 @@ public class ControladorVista {
 
         //String passEncrip = passwordEncoder.encode(laContrasenya);       
         //Optional<Usuario> usuLogin = servUsuario.usuarioLogin(elUsuario, passEncrip);
-        Optional<Usuario> usuLogin = servUsuario.findByUsuario(elUsuario);
+        String usu = elUsuario.toLowerCase();
+        Optional<Usuario> usuLogin = servUsuario.findByUsuario(usu);
 
         if (usuLogin.isEmpty()) {
             modelo.addAttribute("error", "Usuario o password incorrectos");
@@ -154,6 +182,7 @@ public class ControladorVista {
 
             usuarioSesion.getPartidasInvitado();
             usuarioSesion.getPartidasMaster();
+            modelo.addAttribute("urlSpotify", urlSpotify());
             modelo.addAttribute("id_usuarioSesion", usuarioSesion.getId());
             informarUsuarioModelo(modelo, usuarioSesion);
             return "Panel";
@@ -167,6 +196,8 @@ public class ControladorVista {
         if (usu == null) {
             return "redirect:/";
         }
+
+        modelo.addAttribute("urlSpotify", urlSpotify());
         informarUsuarioModelo(modelo, usu);
 
         return "Panel";
@@ -256,6 +287,9 @@ public class ControladorVista {
             passwOK = false;
             err = ex.getMessage();
         }
+        
+        String usu = usuario.getUsuario().toLowerCase();
+        usuario.setUsuario(usu);
 
         if (passwOK) {
             Optional<Usuario> usuLogin = servUsuario.findByUsuario(usuario.getUsuario());
@@ -342,7 +376,7 @@ public class ControladorVista {
             @ModelAttribute("pws2") String pws2, Model modelo) {
 
         String resp = "";
-        String err = "";        
+        String err = "";
 
         boolean passwOK = true;
         String newPassw = "";
@@ -357,17 +391,18 @@ public class ControladorVista {
                 passwOK = false;
                 err = ex.getMessage();
             }
-        } 
+        }
         if (passwOK) {
             try {
                 Usuario usuSesion = usuarioModelo(modelo);
-                if (!"".equals(newPassw))
+                if (!"".equals(newPassw)) {
                     usuSesion.setContrasenya(newPassw);
+                }
                 usuSesion.setAlias(usuario.getAlias());
-                usuSesion.setGrupo(usuario.getGrupo());                
+                usuSesion.setGrupo(usuario.getGrupo());
                 servUsuario.update(usuSesion.getId(), usuSesion);
                 resp = "Se han modificado los datos";
-            } catch (Exception ex) {               
+            } catch (Exception ex) {
                 err = "ERROR " + ex.getMessage();
             }
         }
@@ -428,17 +463,17 @@ public class ControladorVista {
 
     @PostMapping("/crearPartida")
     public String crearPartida(@ModelAttribute("newpartida") Partida partida,
-             Model modelo, HttpServletRequest req) {
+            Model modelo, HttpServletRequest req) {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/";
         }
         Calendar cal = Calendar.getInstance();
-        int anyoActual = cal.get(Calendar.YEAR);        
-       
+        int anyoActual = cal.get(Calendar.YEAR);
+
         try {
-        int nrondas = Integer.parseInt(req.getParameter("nrondas"));
+            int nrondas = Integer.parseInt(req.getParameter("nrondas"));
 
             // Validaciones
             if (!usu.sePuedeCrearPartidaMaster()) {

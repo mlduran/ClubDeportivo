@@ -84,6 +84,10 @@ function inicializar(){
     
 };
 
+function desconectar(){
+    stompClient.deactivate();    
+};
+
 async function sleep(t){
     await new Promise(resolve => setTimeout(resolve, t));
 }                                    
@@ -100,8 +104,7 @@ async function altaWS(){
         try {
             sendmensaje(txtMensaje("alta", null, null));
             break;
-        } catch (e) {
-            window.alert("Temporal para quitar!!!, problema evio a socket: " + e.toString());
+        } catch (e) {            
             if (i === intentos){
                 window.alert("No hay conexion al socket " + dirSocket +
                         " despues de " + i.toString() + " intentos");
@@ -113,6 +116,11 @@ async function altaWS(){
 
 document.addEventListener("DOMContentLoaded", inicializar);
 window.addEventListener('load', altaWS);
+window.addEventListener('unload', desconectar);
+
+function forzarAcabarRonda(){
+    sendmensaje(txtMensaje("acabaronda", null, null));
+}
 
 function respuestaTitulo(codCancion) {
     if (botonTitulo === false) {

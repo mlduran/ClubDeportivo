@@ -9,7 +9,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -33,6 +32,67 @@ public class Utilidades {
     
     @Autowired
     CancionDAO DAO;  
+    
+    public JSONArray obtenerDatosSpotify(String datos){
+        
+        JSONArray lista = new JSONArray();
+        JSONObject track, grupo, album, imagen; 
+        JSONArray artists, imagenes;
+  
+        JSONObject obJson = new JSONObject(datos);
+        JSONArray elems;
+        
+        try {
+            elems = obJson.getJSONArray("items");
+        }catch(JSONException ex){
+            elems = new JSONArray();// No hay elementos
+        }
+       
+        for (Object elem: elems) {   
+       
+            try {
+                
+                JSONObject cancion = new JSONObject();
+                
+                JSONObject elemJson = (JSONObject) elem;
+                track = elemJson.getJSONObject("track");
+                artists = track.getJSONArray("artists");
+                album = track.getJSONObject("album");
+                int anyo = 0;
+                String elAlbum="";
+                String laImagen="";
+                if (!album.isEmpty()){
+                    String anyoAlbum =album.getString("release_date").substring(0, 4);
+                    anyo = Integer.parseInt(anyoAlbum);                    
+                    imagenes = album.getJSONArray("images");
+                    elAlbum = album.getString("name");
+                    if (!imagenes.isEmpty()){
+                        imagen = imagenes.getJSONObject(0);
+                        laImagen = imagen.getString("url");
+                    }
+                }
+                grupo = artists.getJSONObject(0);
+                
+                cancion.append("id", track.getString("id"));
+                cancion.append("titulo", track.getString("name"));
+                cancion.append("interprete", grupo.getString("name"));
+                cancion.append("anyo", anyo);                
+                cancion.append("album", elAlbum);
+                cancion.append("imagen", laImagen);
+                String urlPlay = track.getString("preview_url");
+                cancion.append("preview_url", urlPlay);
+                  
+                lista.put(cancion);
+                
+            }catch(JSONException ex){
+                System.out.println("Error al obtener cancion json: " + ex);
+            }
+           
+        }
+               
+       return lista; 
+        
+    }    
     
     public List<Cancion> obtenerDatosJson(String datos, String anyo, Genero genero){
         
@@ -149,6 +209,44 @@ public class Utilidades {
         }
         
     }
+    
+    public JSONArray obtenerDatosLista(String idPlayList, String token){
+        
+        // {'Authorization': 'Bearer {}'.format(access_token), 'Accept': 'application/json', 'Content-Type': 'application/json'}
+        boolean acabar = false;
+        int offset = 0;
+        HttpResponse<String> response = null; 
+        JSONArray canciones;
+        JSONArray listaCanciones = new JSONArray();
+        while ( acabar == false) {
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.spotify.com/v1/playlists/" + idPlayList + "/tracks?offset=" + Integer.toString(offset))) //&limit=1000")) para mas registros
+                .header("Authorization", "Bearer " + token)	
+                .header("Accept", "application/json")  
+                .header("Content-Type", "application/json") 
+                .method("GET", HttpRequest.BodyPublishers.noBody())
+                .build();            
+
+            try {
+                response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (IOException | InterruptedException ex) {
+                Logger.getLogger(SpotifyController.class.getName()).log(
+                        Level.SEVERE, "Error al procesar lista " + idPlayList, ex);
+            }
+
+            canciones = obtenerDatosSpotify(response.body());               
+
+            if (!canciones.isEmpty()){
+                listaCanciones.put(canciones);
+                offset = offset + 100;
+            }
+            else{
+                acabar = true;
+            }
+
+        }
+        return listaCanciones;       
+    }     
     
     public String procesarLista(String idPlayList, String anyoPlayList, String token){
         

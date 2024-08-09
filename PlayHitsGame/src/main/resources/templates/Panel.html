@@ -19,21 +19,27 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <img th:src="@{'/images/playhitsgame.png'}" class="img-fluid" alt="PLAYHITSGAME" />
                         </div>
                         <div class="card shadow-lg">
-                            <div class="card-body p-5" >
+                            <div class="card-body p-4" >
                                 <h1 class="fs-4 card-title fw-bold mb-4" th:text="#{general.jugador} + ' : ' + *{nombre}"/>
                                 <h1 class="fs-4 card-title fw-bold mb-4" th:text="#{general.puntos} + ' : ' + *{puntos}"/>
                                 <a href="/modificarUsuario" class="text-dark">
                                     <p th:text="#{general.modificardatos}"/>  
                                 </a>
                             </div>
-                            <div th:if="*{admin} == true or *{colaborador} == true" class="card-body p-5">
+                            <div th:if="*{admin} == true or *{colaborador} == true" class="text-center my-2">
                                 <a href="/gestionCanciones" class="btn btn-primary" role="button" th:text="#{general.gestioncanciones}"/>
+                                <a th:href="${urlSpotify}" class="btn btn-primary" role="button" th:text="#{general.servicioSpoty}"/>
                             </div>
-                            <div th:if="*{partidaMasterEnCurso()} != null" class="card-body p-5">
+                            <div th:if="*{partidaMasterEnCurso()} != null" class="text-center my-2">
                                 <a href="/partidaMaster" class="btn btn-primary" role="button" th:text="#{general.partidamasterpendiente}"/>
                             </div>
-                            <div th:if="*{hayPartidasInvitadoPendientes()} == true" class="card-body p-5">
-
+                            <div th:if="*{sinGrupo()} == false and *{hayPartidasInvitadoPendientes()} == false" class="text-center my-5">
+                                <p class="text-center" th:text='#{general.nohaypartinv}'/>
+                                <a href="/panel"  class="text-dark">
+                                    <p th:text="#{general.verificapartinv}"/>
+                                </a>
+                            </div>
+                            <div th:if="*{hayPartidasInvitadoPendientes()} == true" class="text-center my-2">
                                 <div class="table-responsive-lg">
                                     <table class="table" > 
                                         <thead>
@@ -53,10 +59,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </table>
                                 </div>
                             </div>  
-                            <div th:if="*{sePuedeCrearPartidaMaster()} == true" class="card-body p-5">
+                            <div th:if="*{sePuedeCrearPartidaMaster()} == true" class="text-center my-2">
                                 <a href="/crearPartida" class="btn btn-primary" role="button" th:text="#{general.crearpartida}"/>
                             </div>
-                            <div th:if="*{hayPartidasTerminadas()} == true" class="card-body p-5" >
+                            <div th:if="*{hayPartidasTerminadas()} == true" class="text-center my-2" >
 
                                 <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#tablapartidas" 
                                         aria-expanded="false" aria-controls="tablapartidas" th:text="#{general.partidasterminadas}"/>                                       

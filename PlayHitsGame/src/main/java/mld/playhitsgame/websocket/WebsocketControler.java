@@ -185,6 +185,10 @@ public class WebsocketControler {
             // luego la consulta a BD del usuario
             return "";
         }
+        if ("acabaronda".equals(obJson.getString("op"))) {
+            
+            return pasarSiguienteRonda(obJson.getLong("idPartida"));            
+        }
 
         if ("titulo".equals(obJson.getString("op"))) {
             responderTitulo(
@@ -276,12 +280,6 @@ public class WebsocketControler {
         Respuesta resp = obtenerRespuesta(idPartida, idUsuario);
         resp.setAnyo(anyo);
         servRespuesta.updateRespuesta(resp.getId(), resp);
-    }
-
-    @GetMapping("/forzarAcabarRonda/{idPartida}")
-    public void acabarRonda(@PathVariable Long idPartida, Model modelo) {
-        // esto es para poder llamarse desde el master para forzar acabar la ronda
-        pasarSiguienteRonda(idPartida);
     }
 
     private String pasarSiguienteRonda(Long idPartida) {

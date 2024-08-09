@@ -74,6 +74,10 @@ public class Usuario{
     private List<Partida> partidasInvitado;
     
     
+    public boolean sinGrupo(){
+        return this.getGrupo() == null || "".equals(this.getGrupo());
+    }
+    
     public boolean isAdmin(){
         
         boolean adm = false;
