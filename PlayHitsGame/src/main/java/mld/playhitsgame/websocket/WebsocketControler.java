@@ -32,9 +32,6 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 
 @Slf4j
@@ -410,7 +407,7 @@ public class WebsocketControler {
         Partida p = partida.get();
 
         for (Usuario usu : p.usuariosPartida()) {
-            int pts = Utilidades.calcularPtsUsuario(usu, p);
+            int pts = Utilidades.calcularPtsUsuario(usu, p, true);
             if (pts > usu.getPuntos()) {
                 usu.setPuntos(pts);
                 servUsuario.update(usu.getId(), usu);

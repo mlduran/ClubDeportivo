@@ -41,7 +41,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             </td>
                             <td>
                                 <p th:text="#{general.participantes}" />
-                                <p th:each="usu : ${partidaSesion.usuariosPartida()}" th:text="${usu.nombre}" />
+                                <p th:each="usu : ${ptsUsuario}" 
+                                   th:text="${usu.usuario.nombre} + ' : ' + ${usu.puntos}" />
                             </td>
                         </tr>
                         <tr th:each="ronda : ${partidaSesion.rondas}">
@@ -152,7 +153,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             </td>
                             <div th:each="resp : ${respuestas}">
                                 <td th:if="${resp.ronda.numero == ronda.numero}">
-                                    <p th:text="#{general.respondido}" />
+                                    <p th:text="#{general.respondido} + ' ' + ${resp.puntosTxt}" />
                                     <p th:text="${resp.titulo}" />
                                     <p th:text="${resp.interprete}" />
                                     <p th:text="${resp.anyo}" />

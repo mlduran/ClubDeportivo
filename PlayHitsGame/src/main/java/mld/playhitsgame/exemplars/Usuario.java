@@ -17,6 +17,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import mld.playhitsgame.seguridad.Roles;
+import mld.playhitsgame.utilidades.Utilidades;
 import org.hibernate.annotations.CreationTimestamp;
 
 /**
@@ -71,9 +72,8 @@ public class Usuario{
             joinColumns = @JoinColumn(name="usuario_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name="partida_id", referencedColumnName = "id")
     )
-    private List<Partida> partidasInvitado;
-    
-    
+    private List<Partida> partidasInvitado;    
+  
     public boolean sinGrupo(){
         return this.getGrupo() == null || "".equals(this.getGrupo());
     }
@@ -187,6 +187,12 @@ public class Usuario{
             return this.getGrupo();
     }
     
+    public String getTxtPuntosPartida(Partida partida){
+        
+        int pts = Utilidades.calcularPtsUsuario(this, partida, false); 
+        
+        return String.valueOf(pts) + " Pts" ;
+    }    
 
 }
 

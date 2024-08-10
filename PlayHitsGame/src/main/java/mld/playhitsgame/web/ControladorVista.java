@@ -42,6 +42,7 @@ import static mld.playhitsgame.utilidades.Utilidades.*;
 import mld.playhitsgame.exemplars.Idioma;
 import mld.playhitsgame.exemplars.OpcionInterpreteTmp;
 import mld.playhitsgame.exemplars.OpcionTituloTmp;
+import mld.playhitsgame.exemplars.PtsUsuario;
 import mld.playhitsgame.seguridad.Roles;
 import mld.playhitsgame.seguridad.UsuarioRol;
 import mld.playhitsgame.services.OpcionInterpreteTmpServicioMetodos;
@@ -251,11 +252,19 @@ public class ControladorVista {
                 = servOpTitulo.findByPartidaRonda(partida.getId(), rondaActual.getId());
         List<OpcionInterpreteTmp> opcInterpretes
                 = servOpInterprete.findByPartidaRonda(partida.getId(), rondaActual.getId());
+        List<PtsUsuario> ptsUsuarios = new ArrayList();
+        for (Usuario usuPartida : partida.usuariosPartida()){
+            PtsUsuario ptsUsuario = new PtsUsuario();
+            ptsUsuario.setUsuario(usuPartida);
+            ptsUsuario.setPuntos(usuPartida.getTxtPuntosPartida(partida));
+            ptsUsuarios.add(ptsUsuario);
+        }
         modelo.addAttribute("serverWebsocket", this.serverWebsocket);
         modelo.addAttribute("opcTitulos", opcTitulos);
         modelo.addAttribute("opcInterpretes", opcInterpretes);
         modelo.addAttribute("id_partidaSesion", partida.getId());
         modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
+        modelo.addAttribute("ptsUsuario", ptsUsuarios);
         return "Partida";
     }
 

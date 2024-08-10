@@ -23,16 +23,16 @@ import mld.playhitsgame.exemplars.Usuario;
  * @author miguel
  */
 public class Utilidades {
-    
+
     private static final int NUMERO_OPCIONES = 5;
-    
+
     public static int calcularPtsPorAnyo(int anyo, Cancion cancion) {
-        
+
         int anyoCancion = cancion.getAnyo();
         int pts = 0;
-        
+
         int x = Math.abs(anyo - anyoCancion);
-        
+
         if (x == 0) {
             pts = 30;
         }
@@ -48,66 +48,66 @@ public class Utilidades {
         if (pts < 0) {
             pts = 0;
         }
-        
-        return pts;        
+
+        return pts;
     }
-    
+
     public static int calcularPtsPorTitulo(String titulo, Cancion cancion) {
-        
+
         if (titulo != null && titulo.equals(cancion.getTitulo())) {
             return 15;
         } else {
             return 0;
         }
     }
-    
+
     public static int calcularPtsPorInterprete(String interprete, Cancion cancion) {
-        
+
         if (interprete != null && interprete.equals(cancion.getInterprete())) {
             return 15;
         } else {
             return 0;
         }
     }
-    
+
     private static Cancion cancionRandom(List<Cancion> lista) {
-        int i;        
+        int i;
         i = (int) (Math.floor(Math.random() * lista.size()));
-        
-        return lista.get(i);        
-    }    
-    
+
+        return lista.get(i);
+    }
+
     public static void asignarCancionesAleatorias(Partida partida, List<Cancion> canciones) {
-        
-        HashMap<Long, Cancion> listaCanciones = new HashMap();        
-        
+
+        HashMap<Long, Cancion> listaCanciones = new HashMap();
+
         while (listaCanciones.size() < partida.getRondas().size() + 1) {
-            
+
             Cancion cancion = cancionRandom(canciones);
-            listaCanciones.put(cancion.getId(), cancion);            
+            listaCanciones.put(cancion.getId(), cancion);
         }
-        
+
         ArrayList<Cancion> lista = new ArrayList();
         for (HashMap.Entry<Long, Cancion> elem : listaCanciones.entrySet()) {
             lista.add(elem.getValue());
         }
-        
+
         int i = 0;
         for (Ronda ronda : partida.getRondas()) {
             ronda.setCancion(lista.get(i));
             i = i + 1;
-        }        
-        
-    }    
-    
+        }
+
+    }
+
     private static List<Cancion> cancionesParaListaOpciones(List<Cancion> canciones,
             Cancion cancionCorrecta, int numero) {
-        
+
         Map<Long, Cancion> lista = new HashMap();
         lista.put(cancionCorrecta.getId(), cancionCorrecta);
         while (lista.size() < numero) {
             Cancion aleatoria = cancionRandom(canciones);
-            lista.put(aleatoria.getId(), aleatoria);            
+            lista.put(aleatoria.getId(), aleatoria);
         }
         ArrayList<Cancion> listaFinal = new ArrayList();
         for (Map.Entry<Long, Cancion> elem : lista.entrySet()) {
@@ -122,16 +122,16 @@ public class Utilidades {
             listaDesordenada.add(listaFinal.get(i));
             listaFinal.remove(i);
         }
-        
-        return listaDesordenada;        
+
+        return listaDesordenada;
     }
-    
+
     private static String encriptarString(String txt) {
 
         // Subtituimos la mitad aleatoria de letras por *
-        int x = txt.replace(" ", "").length() / 2;        
+        int x = txt.replace(" ", "").length() / 2;
         StringBuilder newText = new StringBuilder(txt);
-        
+
         double s;
         for (int i = 0; i < x; i++) {
             s = Math.floor(Math.random() * txt.length());
@@ -141,18 +141,18 @@ public class Utilidades {
             }
             newText.setCharAt((int) s, '*');
         }
-        
-        return newText.toString();        
-    }    
-    
+
+        return newText.toString();
+    }
+
     public static List<OpcionTituloTmp> opcionesTitulosCanciones(Ronda ronda) {
 
         // de las canciones elije aleatoriamente que une a la correcta y 
         // devuelve una lista con las canciones encriptadas
-        ArrayList<OpcionTituloTmp> opciones = new ArrayList();        
+        ArrayList<OpcionTituloTmp> opciones = new ArrayList();
         List<Cancion> cancionesParaOpciones
                 = cancionesParaListaOpciones(ronda.getPartida().canciones(), ronda.getCancion(), NUMERO_OPCIONES);
-        
+
         OpcionTituloTmp newObj;
         for (Cancion cancion : cancionesParaOpciones) {
             newObj = new OpcionTituloTmp();
@@ -162,19 +162,19 @@ public class Utilidades {
             newObj.setOpTitulo(encriptarString(cancion.getTitulo()));
             opciones.add(newObj);
         }
-        
-        return opciones;        
+
+        return opciones;
     }
-    
+
     public static List<OpcionInterpreteTmp> opcionesInterpretesCanciones(Ronda ronda) {
 
         // de las canciones elije aleatoriamente que une a la correcta y 
         // devuelve una lista con las canciones encriptadas
-        ArrayList<OpcionInterpreteTmp> opciones = new ArrayList();        
+        ArrayList<OpcionInterpreteTmp> opciones = new ArrayList();
         List<Cancion> cancionesParaOpciones
                 = cancionesParaListaOpciones(ronda.getPartida().canciones(),
                         ronda.getCancion(), NUMERO_OPCIONES);
-        
+
         OpcionInterpreteTmp newObj;
         for (Cancion cancion : cancionesParaOpciones) {
             newObj = new OpcionInterpreteTmp();
@@ -184,26 +184,26 @@ public class Utilidades {
             newObj.setOpInterprete(encriptarString(cancion.getInterprete()));
             opciones.add(newObj);
         }
-        
-        return opciones;        
+
+        return opciones;
     }
-    
-    public static String nombreServidor() {        
-        
+
+    public static String nombreServidor() {
+
         InetAddress ip;
         String host = null;
         try {
             ip = InetAddress.getLocalHost();
-            host = ip.getHostName();            
+            host = ip.getHostName();
         } catch (UnknownHostException ex) {
             System.out.println("No se puede obtener nombre del host");
         }
-        
+
         return host;
     }
-    
+
     public static void validarPassword(String pw1, String pw2) throws Exception {
-        
+
         if (pw1 == null || pw2 == null) {
             throw new Exception("Alguna contraseña esta en blanco");
         }
@@ -215,45 +215,49 @@ public class Utilidades {
         }
         if (pw1.length() < 4) {
             throw new Exception("Los contraseña debe tener al menos 4 caracteres");
-        }        
-        
+        }
+
     }
-    
-    public static int calcularPtsUsuario(Usuario usuario, Partida partida) {
-        
+
+    public static int calcularPtsUsuario(Usuario usuario, Partida partida, boolean isGeneral) {
+
         List<Respuesta> respuestas = new ArrayList();
-        
+
         for (Ronda ronda : partida.getRondas()) {
-            for (Respuesta respuesta : ronda.getRespuestas()) {                
+            for (Respuesta respuesta : ronda.getRespuestas()) {
                 if (respuesta.getUsuario().equals(usuario)) {
                     respuestas.add(respuesta);
                 }
             }
-        }        
-        
-        return calcularPts(respuestas, partida);
+        }
+
+        return calcularPts(respuestas, partida, isGeneral);
     }
     
-    public static int calcularPts(List<Respuesta> respuestas, Partida partida) {
-        
+
+    public static int calcularPts(List<Respuesta> respuestas, Partida partida, boolean isGeneral) {
+
         int pts = 0;
-        
+
         for (Respuesta resp : respuestas) {
             pts = pts + resp.getPuntos();
         }
 
-        // factor correccion por numero canciones posibles    
-        int n = partida.getNCanciones();
-        pts = pts * n / 1000;
+        if (isGeneral) {
 
-        // factor correccion por el numero de años
-        int anyoIni = partida.getAnyoInicial();
-        int anyoFin = partida.getAnyoFinal();
-        pts = pts * (anyoFin - anyoIni + 1);
+            // factor correccion por numero canciones posibles    
+            int n = partida.getNCanciones();
+            pts = pts * n / 1000;
 
-        // factor rondas
-        pts = pts / partida.getRondas().size();        
-        
+            // factor correccion por el numero de años
+            int anyoIni = partida.getAnyoInicial();
+            int anyoFin = partida.getAnyoFinal();
+            pts = pts * (anyoFin - anyoIni + 1);
+
+            // factor rondas
+            pts = pts / partida.getRondas().size();
+        }
+
         return pts;
     }
 }

@@ -37,6 +37,10 @@ public class Respuesta{
     private Usuario usuario;
 
 
+    public String getPuntosTxt(){
+        return " (Pts ".concat(String.valueOf(puntos) + ")");
+        
+    }
     
     
 }
