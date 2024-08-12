@@ -11,11 +11,14 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mld.playhitsgame.DAO.CancionDAO;
+import mld.playhitsgame.DAO.TemaDAO;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.Genero;
+import mld.playhitsgame.exemplars.Tema;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,6 +35,8 @@ public class Utilidades {
     
     @Autowired
     CancionDAO DAO;  
+    @Autowired
+    TemaDAO DAOtema;
     
     public JSONArray obtenerDatosSpotify(String datos){
         
@@ -313,11 +318,16 @@ public class Utilidades {
                 Logger.getLogger(SpotifyController.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            List<Cancion> canciones = obtenerDatosJson(response.body());               
+            List<Cancion> canciones = obtenerDatosJson(response.body()); 
+            
+            altaTema(temaPlayList);
 
             if (!canciones.isEmpty()){
-                for (Cancion cancion : canciones)
+                for (Cancion cancion : canciones){
                     cancion.setTema(temaPlayList);
+                    cancion.setGenero(Genero.Generico);
+                    cancion.setRevisar(true);
+                }
                 grabarListaCanciones(canciones);
                 offset = offset + 100;
             }
@@ -333,6 +343,18 @@ public class Utilidades {
         return err;        
         
     }  
+
+    private void altaTema(String temaPlayList) {
+        
+        Optional<Tema> tema = DAOtema.findBytema(temaPlayList);
+        
+        if (tema.isEmpty()){
+            Tema newTema = new Tema();
+            newTema.setTema(temaPlayList);
+            DAOtema.save(newTema);
+        }
+        
+    }
                
     
     

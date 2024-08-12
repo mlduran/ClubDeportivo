@@ -59,8 +59,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         <td>
                             <input type="submit" value="Buscar"/>   
                         </td>
-                    </tr>         
-
+                    </tr>  
+                </table>
             </form> 
             <a th:href="@{/altaCancion}" class="button" id="altaCancion"> ALTA CANCION </a>
             <p th:text="${result}"></p>
@@ -68,7 +68,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <div th:if="${canciones != null and !canciones.empty}">
 
             <form method="post" th:action="@{/marcarRevision}" >
-                <input type="submit" value="Marcar la seleccion para pendiente de validar"/>  
+                <input type="checkbox" name="validar" id="validar">Verificar?</<input>
+                <input type="submit" value="Actualizar"/>  
                 <table border="2">
                     <tr> 
                         <th>Sel</th>

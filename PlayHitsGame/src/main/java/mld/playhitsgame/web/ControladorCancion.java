@@ -194,20 +194,21 @@ public class ControladorCancion {
         if (!usuarioCorrecto(modelo)) 
             return "redirect:/";
         
+        String validar = req.getParameter("validar");
+        boolean isValidar = false;
+        if ("on".equals(validar))
+            isValidar = true;
+        
         FiltroCanciones filtro = (FiltroCanciones) modelo.getAttribute("filtro");
         List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);
-        String a = "";
         for (Cancion cancion : canciones) {
             if (req.getParameter(cancion.selId()) != null) {
                 if ("on".equals(req.getParameter(cancion.selId()))) {
-                    cancion.setRevisar(true);
+                    cancion.setRevisar(isValidar);
                     servCancion.updateCancion(cancion.getId(), cancion);
                 }
             }
         }
-
         return "redirect:/gestionCanciones";
-
     }
-
 }
