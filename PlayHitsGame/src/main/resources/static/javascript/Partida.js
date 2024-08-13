@@ -19,25 +19,44 @@ function sendmensaje(mensaje) {
         body: mensaje});
 }
 
+var txtPrimeros = function (datosJson) {
+    
+    txt = "";
+    if (datosJson["primeroCancion"] !== undefined && datosJson["primeroCancion"] !== "")
+        txt = txt + "El jugador mas rapido acertando la cancion ha sido " + datosJson["primeroCancion"] + "\n";
+    if (datosJson["primeroInterprete"] !== undefined &&  datosJson["primeroInterprete"] !== "")
+        txt = txt + "El jugador mas rapido acertando el interprete ha sido " + datosJson["primeroInterprete"];
+    
+    return txt;
+};
+
 var procesar = function (mensaje) {
 
     if (mensaje === null)
         return;
-    data = mensaje.body;
-    if (data === null || data === "")
-        return;
-    if (data === '#nueva#')
+    dataJson = JSON.parse(mensaje.body);
+    if (dataJson === null || dataJson === "")
+        return;    
+    if (dataJson["op"] === "nueva"){
+        txtmensaje = txtPrimeros(dataJson);
+        if (txtmensaje !== "")
+            window.alert(txtmensaje);        
         location.reload();
-    if (data === '#acabar#')
+    }
+    if (dataJson["op"] === "acabar")
+        txtmensaje = txtPrimeros(dataJson);
+        if (txtmensaje !== "")
+            window.alert(txtmensaje); 
         location.reload(); // ahora hacemos lo mismo, pero se deja por si hubiese otra cosa que hacer
 
-    let mensajesSockets = document.getElementById("mensajesSockets");
-    let usuarios = data.split(",");
-    let txtHtml = '';
-    for (let i = 0; i < usuarios.length; i++)
-        txtHtml = txtHtml + '<p>' + usuarios[i] + '</p>';
-
-    mensajesSockets.innerHTML = txtHtml;
+    if (dataJson["op"] === "respuestas"){
+        let mensajesSockets = document.getElementById("mensajesSockets");
+        let usuarios = dataJson["usuarios"].split(",");
+        let txtHtml = '';
+        for (let i = 0; i < usuarios.length; i++)
+            txtHtml = txtHtml + '<p>' + usuarios[i] + '</p>';
+        mensajesSockets.innerHTML = txtHtml;
+    }
 };
 
 var botonAnyo = false;

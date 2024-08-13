@@ -33,7 +33,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
-
 @Slf4j
 @Controller
 public class WebsocketControler {
@@ -51,13 +50,18 @@ public class WebsocketControler {
 
     private static final HashMap<Long, Set<UsuarioWS>> partidas = new HashMap();
     private static final HashMap<Long, Integer> nRespuestas = new HashMap();
-    
+
     @MessageMapping("/partida/{id_partida}/usuario/{id_usuario}")
     @SendTo("/tema/partida/{id_partida}")
-    public String getMessage(@DestinationVariable String id_usuario, 
-            @DestinationVariable String id_partida, String message ){
-        
+    public String getMessage(@DestinationVariable String id_usuario,
+            @DestinationVariable String id_partida, String message) {
+
+        // Respuestas en op : 
+        // "respuestas" --> "usuarios" lista usuarios que han respondido
+        // "acabar" -->     "primeroCancion" y "primeroInterprete"
+        // "nueva" -->      "primeroCancion" y "primeroInterprete"
         JSONObject obJson = null;
+        JSONObject obJsonSalida = new JSONObject();
         try {
             obJson = new JSONObject(message);
         } catch (JSONException jSONException) {
@@ -65,15 +69,15 @@ public class WebsocketControler {
         }
 
         if (obJson == null || obJson.isEmpty()) {
-            return "";
+            return obJsonSalida.toString();
         }
-        
-        String resp = tratarEntradaWS(obJson);
-        
-        return resp;
-        
+
+        obJsonSalida = tratarEntradaWS(obJson, obJsonSalida);
+
+        return obJsonSalida.toString();
+
     }
-    
+
     public static Set<UsuarioWS> usuariosPartida(Long idPartida) {
 
         return partidas.get(idPartida);
@@ -124,7 +128,7 @@ public class WebsocketControler {
 
     }
 
-    public static String usuariosRespuestasCompletadas(long partida) {
+    public static JSONObject usuariosRespuestasCompletadas(long partida, JSONObject obJsonSalida) {
 
         String usuarios = "";
         boolean primero = true;
@@ -139,7 +143,9 @@ public class WebsocketControler {
             }
         }
 
-        return usuarios;
+        obJsonSalida.put("op", "respuestas");
+        obJsonSalida.put("Usuarios", usuarios);
+        return obJsonSalida;
     }
 
     public static boolean isTodoCompletado(long partida) {
@@ -172,7 +178,7 @@ public class WebsocketControler {
         return usuWS;
     }
 
-    private String tratarEntradaWS(JSONObject obJson) {
+    private JSONObject tratarEntradaWS(JSONObject obJson, JSONObject obJsonSalida) {
 
         UsuarioWS usuarioWS = registrarPeticionWS(obJson);
 
@@ -180,11 +186,11 @@ public class WebsocketControler {
             // De momento no hacemos nada, lo mantemos para 
             // hacer el alta en lacarga de la pagina y ahorrarnos
             // luego la consulta a BD del usuario
-            return "";
+
         }
         if ("acabaronda".equals(obJson.getString("op"))) {
-            
-            return pasarSiguienteRonda(obJson.getLong("idPartida"));            
+
+            pasarSiguienteRonda(obJson.getLong("idPartida"), obJsonSalida);
         }
 
         if ("titulo".equals(obJson.getString("op"))) {
@@ -217,13 +223,13 @@ public class WebsocketControler {
             nRespuestas.put(obJson.getLong("idPartida"), nr + 1);
         }
 
-        String respuesta = usuariosRespuestasCompletadas(obJson.getLong("idPartida"));
-        
         if (isTodoCompletado(obJson.getLong("idPartida"))) {
-            respuesta = pasarSiguienteRonda(obJson.getLong("idPartida"));
+            obJsonSalida = pasarSiguienteRonda(obJson.getLong("idPartida"), obJsonSalida);
+        } else {
+            obJsonSalida = usuariosRespuestasCompletadas(obJson.getLong("idPartida"), obJsonSalida);
         }
-        
-        return respuesta;
+
+        return obJsonSalida;
     }
 
     private Usuario obtenerUsuario(Long idUsuario) {
@@ -279,7 +285,7 @@ public class WebsocketControler {
         servRespuesta.updateRespuesta(resp.getId(), resp);
     }
 
-    private String pasarSiguienteRonda(Long idPartida) {
+    private JSONObject pasarSiguienteRonda(Long idPartida, JSONObject obJsonSalida) {
         // A este metodo llegamos si todos los usuarios conectados
         // han respondido, eso no quiere decir que todos esten
         // eso se tendra que tratar mas adelante pero de momento
@@ -292,7 +298,7 @@ public class WebsocketControler {
         boolean acabar;
         //if (rondaActiva.isTodasLasRespuestasOK()){
         if (true) { // de momento lo damos por bueno 
-            asignarPuntuacion(rondaActiva);
+            obJsonSalida = asignarPuntuacion(rondaActiva, obJsonSalida);
             rondaActiva.setCompletada(true);
             servRonda.updateRonda(rondaActiva.getId(), rondaActiva);
 
@@ -306,21 +312,16 @@ public class WebsocketControler {
             servPartida.updatePartida(partida.getId(), partida);
         }
 
-        String messageResp;
-        if (acabar) {
-            messageResp = "#acabar#";
-        } else {
-            messageResp = "#nueva#";
-        }       
-
         if (acabar) {
             asignarPuntuacionesUsuario(idPartida);
             limpiarPartida(idPartida);
+            obJsonSalida.put("op", "acabar");
         } else {
             limpiarDatos(idPartida);
+            obJsonSalida.put("op", "nueva");
         }
-        
-        return messageResp;
+
+        return obJsonSalida;
     }
 
     private Usuario primerUsuarioAcertarTitulo(Ronda rondaActiva) {
@@ -330,20 +331,22 @@ public class WebsocketControler {
         List<UsuarioWS> usuariosWS = new ArrayList<>(listaUsuariosWS);
         Collections.sort(usuariosWS);
         Usuario usuarioAcertante = null;
-        for (UsuarioWS usuWS : usuariosWS) {
-            for (Respuesta res : respuestas) {
-                if (res.getTitulo() == null) {
-                    continue;
-                }
-                if (res.getTitulo().equals(rondaActiva.getCancion().getTitulo())) {
-                    if (res.getUsuario().getId().equals(usuWS.getId())) {
-                        usuarioAcertante = res.getUsuario();
-                        break;
+        if (!usuariosWS.isEmpty()) {
+            for (UsuarioWS usuWS : usuariosWS) {
+                for (Respuesta res : respuestas) {
+                    if (res.getTitulo() == null) {
+                        continue;
+                    }
+                    if (res.getTitulo().equals(rondaActiva.getCancion().getTitulo())) {
+                        if (res.getUsuario().getId().equals(usuWS.getId())) {
+                            usuarioAcertante = res.getUsuario();
+                            break;
+                        }
                     }
                 }
-            }
-            if (usuarioAcertante != null) {
-                break;
+                if (usuarioAcertante != null) {
+                    break;
+                }
             }
         }
         return usuarioAcertante;
@@ -356,26 +359,28 @@ public class WebsocketControler {
         List<UsuarioWS> usuariosWS = new ArrayList<>(listaUsuariosWS);
         Collections.sort(usuariosWS);
         Usuario usuarioAcertante = null;
-        for (UsuarioWS usuWS : usuariosWS) {
-            for (Respuesta res : respuestas) {
-                if (res.getInterprete() == null) {
-                    continue;
-                }
-                if (res.getInterprete().equals(rondaActiva.getCancion().getInterprete())) {
-                    if (res.getUsuario().getId().equals(usuWS.getId())) {
-                        usuarioAcertante = res.getUsuario();
-                        break;
+        if (usuariosWS.size() > 1) {
+            for (UsuarioWS usuWS : usuariosWS) {
+                for (Respuesta res : respuestas) {
+                    if (res.getInterprete() == null) {
+                        continue;
+                    }
+                    if (res.getInterprete().equals(rondaActiva.getCancion().getInterprete())) {
+                        if (res.getUsuario().getId().equals(usuWS.getId())) {
+                            usuarioAcertante = res.getUsuario();
+                            break;
+                        }
                     }
                 }
-            }
-            if (usuarioAcertante != null) {
-                break;
+                if (usuarioAcertante != null) {
+                    break;
+                }
             }
         }
         return usuarioAcertante;
     }
 
-    private void asignarPuntuacion(Ronda rondaActiva) {
+    private JSONObject asignarPuntuacion(Ronda rondaActiva, JSONObject jsonRespuesta) {
 
         Cancion cancion = rondaActiva.getCancion();
         int totalPts;
@@ -383,6 +388,14 @@ public class WebsocketControler {
         int ptsInterp;
         Usuario primerAcertanteTitulo = primerUsuarioAcertarTitulo(rondaActiva);
         Usuario primerAcertanteInterprete = primerUsuarioAcertarInterprete(rondaActiva);
+
+        if (primerAcertanteTitulo != null) {
+            jsonRespuesta.put("primeroCancion", primerAcertanteTitulo.getNombre());
+        }
+        if (primerAcertanteInterprete != null) {
+            jsonRespuesta.put("primeroInterprete", primerAcertanteInterprete.getNombre());
+        }
+
         for (Respuesta resp : rondaActiva.getRespuestas()) {
             totalPts = Utilidades.calcularPtsPorAnyo(resp.getAnyo(), cancion);
             ptsTitulo = Utilidades.calcularPtsPorTitulo(resp.getTitulo(), cancion);
@@ -398,7 +411,7 @@ public class WebsocketControler {
             resp.setPuntos(totalPts);
             servRespuesta.updateRespuesta(resp.getId(), resp);
         }
-
+        return jsonRespuesta;
     }
 
     private void asignarPuntuacionesUsuario(Long idPartida) {

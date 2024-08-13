@@ -31,10 +31,10 @@ public class UsuarioWS implements Comparable<UsuarioWS>{
     public int compareTo(UsuarioWS otroUsuarioWS) {
         
         if (this.orden > otroUsuarioWS.getOrden()) {
-           return -1; 
+           return 1; 
         } 
         if (this.orden < otroUsuarioWS.getOrden()) {
-           return 1; 
+           return -1; 
         } 
         return 0; 
     }
