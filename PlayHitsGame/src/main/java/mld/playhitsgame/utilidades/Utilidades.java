@@ -4,12 +4,19 @@
  */
 package mld.playhitsgame.utilidades;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.OpcionInterpreteTmp;
 import mld.playhitsgame.exemplars.OpcionTituloTmp;
@@ -233,7 +240,6 @@ public class Utilidades {
 
         return calcularPts(respuestas, partida, isGeneral);
     }
-    
 
     public static int calcularPts(List<Respuesta> respuestas, Partida partida, boolean isGeneral) {
 
@@ -260,4 +266,38 @@ public class Utilidades {
 
         return pts;
     }
+
+    public static ArrayList<String> leerAyuda(String fich) {
+
+        ArrayList<String> lineas = new ArrayList();
+        String ruta = "";
+
+        BufferedReader objReader = null;
+        try {
+            String strCurrentLine;
+            
+            File f = new File(fich);            
+            ruta = f.getCanonicalPath();
+            FileReader fr = new FileReader(f);
+            objReader = new BufferedReader(fr);
+
+            while ((strCurrentLine = objReader.readLine()) != null) {
+
+                lineas.add(strCurrentLine);
+            }
+
+        } catch (IOException e) {
+            System.out.println("Error al obtener ayuda " +  ruta + " : " + e.getMessage());
+        } finally {
+
+            try {
+                if (objReader != null) {
+                    objReader.close();
+                }
+            } catch (IOException ex) {               
+            }
+        }
+        return lineas;
+    }
+
 }

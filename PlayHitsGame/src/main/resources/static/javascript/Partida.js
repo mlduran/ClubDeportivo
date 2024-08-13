@@ -20,42 +20,46 @@ function sendmensaje(mensaje) {
 }
 
 var txtPrimeros = function (datosJson) {
-    
-    txt = "";
+
+    var txt = "";
     if (datosJson["primeroCancion"] !== undefined && datosJson["primeroCancion"] !== "")
         txt = txt + "El jugador mas rapido acertando la cancion ha sido " + datosJson["primeroCancion"] + "\n";
-    if (datosJson["primeroInterprete"] !== undefined &&  datosJson["primeroInterprete"] !== "")
+    if (datosJson["primeroInterprete"] !== undefined && datosJson["primeroInterprete"] !== "")
         txt = txt + "El jugador mas rapido acertando el interprete ha sido " + datosJson["primeroInterprete"];
-    
+
     return txt;
 };
 
 var procesar = function (mensaje) {
 
+    var txt;
+
     if (mensaje === null)
         return;
     dataJson = JSON.parse(mensaje.body);
     if (dataJson === null || dataJson === "")
-        return;    
-    if (dataJson["op"] === "nueva"){
-        txtmensaje = txtPrimeros(dataJson);
-        if (txtmensaje !== "")
-            window.alert(txtmensaje);        
+        return;
+    if (dataJson["op"] === "nueva") {
+        txt = txtPrimeros(dataJson);
+        if (txt !== undefined && txt !== "")
+            window.alert(txt);
         location.reload();
     }
-    if (dataJson["op"] === "acabar")
-        txtmensaje = txtPrimeros(dataJson);
-        if (txtmensaje !== "")
-            window.alert(txtmensaje); 
+    if (dataJson["op"] === "acabar") {
+        txt = txtPrimeros(dataJson);
+        if (txt !== undefined && txt !== "")
+            window.alert(txt);
         location.reload(); // ahora hacemos lo mismo, pero se deja por si hubiese otra cosa que hacer
-
-    if (dataJson["op"] === "respuestas"){
-        let mensajesSockets = document.getElementById("mensajesSockets");
-        let usuarios = dataJson["usuarios"].split(",");
-        let txtHtml = '';
-        for (let i = 0; i < usuarios.length; i++)
-            txtHtml = txtHtml + '<p>' + usuarios[i] + '</p>';
-        mensajesSockets.innerHTML = txtHtml;
+    }
+    if (dataJson["op"] === "respuestas") {
+        if (dataJson["usuarios"] !== undefined) {
+            let mensajesSockets = document.getElementById("mensajesSockets");
+            let usuarios = dataJson["usuarios"].split(",");
+            let txtHtml = '';
+            for (let i = 0; i < usuarios.length; i++)
+                txtHtml = txtHtml + '<p>' + usuarios[i] + '</p>';
+            mensajesSockets.innerHTML = txtHtml;
+        }
     }
 };
 
@@ -79,7 +83,7 @@ function txtMensaje(op, idCancion, anyo) {
     return mensaje;
 }
 
-function inicializar(){
+function inicializar() {
     stompClient.activate();
     //stompClient.deactivate();
     stompClient.onConnect = (frame) => {
@@ -100,21 +104,23 @@ function inicializar(){
         console.error('Broker reported error: ' + frame.headers['ḿessage']);
         console.error('Additional details: ' + frame.body);
     };
-    
-};
 
-function desconectar(){
-    stompClient.deactivate();    
-};
+}
+;
 
-async function sleep(t){
+function desconectar() {
+    stompClient.deactivate();
+}
+;
+
+async function sleep(t) {
     await new Promise(resolve => setTimeout(resolve, t));
-}                                    
+}
 
 // Hacemos el alta para dar de alta el usuario el el WS
 // y hacer la consulta de BD en el momento de carga de 
 // la pagina
-async function altaWS(){
+async function altaWS() {
     // si no hacemos esto el usuario no se registra y por ejemplo
     // el ultimo no se tendria en cuenta
     let intentos = 10;
@@ -123,21 +129,22 @@ async function altaWS(){
         try {
             sendmensaje(txtMensaje("alta", null, null));
             break;
-        } catch (e) {            
-            if (i === intentos){
+        } catch (e) {
+            if (i === intentos) {
                 window.alert("No hay conexion al socket " + dirSocket +
                         " despues de " + i.toString() + " intentos");
             }
             await sleep(1000);// Esperamos 1 seg        
         }
-    };    
+    }
+    ;
 }
 
 document.addEventListener("DOMContentLoaded", inicializar);
 window.addEventListener('load', altaWS);
 window.addEventListener('unload', desconectar);
 
-function forzarAcabarRonda(){
+function forzarAcabarRonda() {
     sendmensaje(txtMensaje("acabaronda", null, null));
 }
 

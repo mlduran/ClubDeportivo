@@ -40,9 +40,31 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                 <p th:each="txt : ${partidaSesion.descripcion}" th:text="${txt}" />
                             </td>
                             <td>
-                                <p th:text="#{general.participantes}" />
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <p th:text="#{general.participantes}" /> 
+                                        </td>
+                                        <td>
+                                            <input type="image" class="btn" id="imageInfo" alt="Info"  data-bs-toggle="modal" data-bs-target="#ayuda" th:src="@{'/images/info.png'}"  width="60" height="60" /> 
+                                        </td>
+                                    </tr>
+                                </table>
                                 <p th:each="usu : ${ptsUsuario}" 
-                                   th:text="${usu.usuario.nombre} + ' : ' + ${usu.puntos}" />
+                                   th:text="${usu.usuario.nombre} + ' : ' + ${usu.puntos}" />                                                                
+                                <div class="modal fade" id="ayuda" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="ayudaModalLabel">Info</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p th:each="lin : ${ayuda}" th:text="${lin}" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                         <tr th:each="ronda : ${partidaSesion.rondas}">
@@ -185,6 +207,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             </div>
         </section>
         <script type="text/javascript" th:src="@{/javascript/Partida.js}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     </body>
 
 </html>

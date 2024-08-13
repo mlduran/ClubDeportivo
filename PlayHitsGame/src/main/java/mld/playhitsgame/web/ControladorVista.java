@@ -253,18 +253,21 @@ public class ControladorVista {
         List<OpcionInterpreteTmp> opcInterpretes
                 = servOpInterprete.findByPartidaRonda(partida.getId(), rondaActual.getId());
         List<PtsUsuario> ptsUsuarios = new ArrayList();
-        for (Usuario usuPartida : partida.usuariosPartida()){
+        for (Usuario usuPartida : partida.usuariosPartida()) {
             PtsUsuario ptsUsuario = new PtsUsuario();
             ptsUsuario.setUsuario(usuPartida);
             ptsUsuario.setPuntos(usuPartida.getTxtPuntosPartida(partida));
             ptsUsuarios.add(ptsUsuario);
         }
+
         modelo.addAttribute("serverWebsocket", this.serverWebsocket);
         modelo.addAttribute("opcTitulos", opcTitulos);
         modelo.addAttribute("opcInterpretes", opcInterpretes);
         modelo.addAttribute("id_partidaSesion", partida.getId());
         modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
         modelo.addAttribute("ptsUsuario", ptsUsuarios);
+        ArrayList<String> ayuda = Utilidades.leerAyuda("src/main/resources/static/ayuda/partida");
+        modelo.addAttribute("ayuda", ayuda);
         return "Partida";
     }
 
@@ -296,7 +299,7 @@ public class ControladorVista {
             passwOK = false;
             err = ex.getMessage();
         }
-        
+
         String usu = usuario.getUsuario().toLowerCase();
         usuario.setUsuario(usu);
 
