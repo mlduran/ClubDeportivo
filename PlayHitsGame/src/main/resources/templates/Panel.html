@@ -27,6 +27,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                 </a>
                             </div>
                             <div th:if="*{admin} == true or *{colaborador} == true" class="text-center my-2">
+                                <a href="/administracion" class="btn btn-primary" role="button" th:text="#{general.administracion}"/>
                                 <a href="/gestionCanciones" class="btn btn-primary" role="button" th:text="#{general.gestioncanciones}"/>
                                 <a th:href="${urlSpotify}" class="btn btn-primary" role="button" th:text="#{general.servicioSpoty}"/>
                             </div>

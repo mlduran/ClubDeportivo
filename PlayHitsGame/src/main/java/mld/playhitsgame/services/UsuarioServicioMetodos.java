@@ -4,10 +4,12 @@
  */
 package mld.playhitsgame.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import mld.playhitsgame.DAO.UsuarioDAO;
+import mld.playhitsgame.exemplars.FiltroUsuarios;
 import mld.playhitsgame.exemplars.Usuario;
 import mld.playhitsgame.projections.ampliada.UsuarioAmpliadaView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +73,7 @@ public class UsuarioServicioMetodos implements UsuarioServicio {
         obj.setEstrellas(usuario.getEstrellas());
         obj.setActivo(usuario.isActivo());
         obj.setAlta(usuario.getAlta());
+        obj.setRoles(usuario.getRoles());        
 
         return DAO.save(obj);
     }
@@ -90,6 +93,17 @@ public class UsuarioServicioMetodos implements UsuarioServicio {
     public List<Usuario> usuariosGrupo(String grupo) {
 
         return DAO.usuariosGrupo(grupo);
+    }
+
+    public List<Usuario> findByFiltroBasico(FiltroUsuarios filtroUsuario) {
+
+        List<Usuario> usuarios = DAO.findAll();
+        List<Usuario> usuariosFiltro = new ArrayList();
+        for (Usuario usu : usuarios){
+            if (usu.isActivo() == filtroUsuario.isActivo())
+                usuariosFiltro.add(usu);
+        }
+        return usuariosFiltro;
     }
 
 }

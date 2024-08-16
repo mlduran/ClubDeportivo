@@ -33,5 +33,6 @@ public interface UsuarioDAO extends JpaRepository<Usuario, Long>{
     
     @Query(value = "SELECT * FROM usuarios WHERE grupo=:grupo ;", nativeQuery=true)
     List<Usuario> usuariosGrupo(String grupo);
+
     
 }

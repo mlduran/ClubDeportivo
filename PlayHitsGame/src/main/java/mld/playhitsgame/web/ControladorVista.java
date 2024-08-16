@@ -4,9 +4,7 @@
  */
 package mld.playhitsgame.web;
 
-import mld.playhitsgame.seguridad.CrearUsuarioDTO;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -22,9 +20,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import mld.playhitsgame.exemplars.Cancion;
+import mld.playhitsgame.exemplars.FiltroUsuarios;
 import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.Respuesta;
 import mld.playhitsgame.exemplars.Rol;
@@ -47,27 +45,24 @@ import mld.playhitsgame.seguridad.Roles;
 import mld.playhitsgame.seguridad.UsuarioRol;
 import mld.playhitsgame.services.OpcionInterpreteTmpServicioMetodos;
 import mld.playhitsgame.services.OpcionTituloTmpServicioMetodos;
+import mld.playhitsgame.services.UsuarioRolServicioMetodos;
 import mld.playhitsgame.utilidades.Utilidades;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 @Controller
 // rol puede ser master o invitado
 // utilizamos los ids para usuario y partida de sesion, para no cargar tantos datos de
 // persistencia en sesion y no usar tanta memoria
-@SessionAttributes({"id_usuarioSesion", "id_partidaSesion", "posiblesinvitados", "rol"})
+@SessionAttributes({"id_usuarioSesion", "id_partidaSesion", "posiblesinvitados", "rol", "filtro"})
 @Slf4j
 public class ControladorVista {
 
@@ -81,6 +76,8 @@ public class ControladorVista {
     CancionServicioMetodos servCancion;
     @Autowired
     UsuarioServicioMetodos servUsuario;
+    @Autowired
+    UsuarioRolServicioMetodos servRolUsuario;
     @Autowired
     PartidaServicioMetodos servPartida;
     @Autowired
@@ -313,7 +310,6 @@ public class ControladorVista {
 
         if (usuOK && passwOK) {
 
-            resp = "Se ha creado el usuario ".concat(usuario.getUsuario());
             String passEncrip = passwordEncoder.encode(usuario.getContrasenya());
 
             Set<UsuarioRol> roles = new HashSet();
@@ -327,6 +323,7 @@ public class ControladorVista {
                 usuario.setContrasenya(passEncrip);
                 usuario.setPreferencias("");
                 servUsuario.save(usuario);
+                resp = "Se ha creado el usuario ".concat(usuario.getUsuario());
             } catch (Exception ex) {
                 err = "ERROR " + ex;
             }
@@ -337,38 +334,22 @@ public class ControladorVista {
         return "AltaUsuario";
     }
 
-    @PostMapping("/crearUsuario")
-    public ResponseEntity<?> crearUsuario(@Valid
-            @RequestBody CrearUsuarioDTO crearUsuarioDTO
-    ) {
+    @GetMapping("/eliminarUsuario/{id}")
+    public String eliminarUsuario(@ModelAttribute("id") Long id, Model modelo) {
 
-        Set<UsuarioRol> roles = crearUsuarioDTO.getRoles().stream()
-                .map(role -> UsuarioRol.builder()
-                .name(Roles.valueOf(role))
-                .build())
-                .collect(Collectors.toSet());
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/";
+        }
 
-        Usuario usuario = Usuario.builder()
-                .usuario(crearUsuarioDTO.getUsuario())
-                .contrasenya(passwordEncoder.encode(crearUsuarioDTO.getContrasenya()))
-                .alias(crearUsuarioDTO.getAlias())
-                .grupo(crearUsuarioDTO.getGrupo())
-                .idioma(crearUsuarioDTO.getIdioma())
-                .preferencias(crearUsuarioDTO.getPreferencias())
-                .roles(roles)
-                .build();
-        servUsuario.save(usuario);
-
-        return ResponseEntity.ok(usuario);
-    }
-
-    @DeleteMapping("/borrarUsuario")
-    public String borrarUsuario(@RequestParam String id
-    ) {
-
-        servUsuario.deleteById(Long.valueOf(id));
-        return "Se borra usuario id".concat(id);
-
+        try {
+            Optional<Usuario> usuDelete = servUsuario.findById(id);
+            servUsuario.deleteById(id);
+            
+        } catch (Exception e) {
+            Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return "redirect:/administracion";
     }
 
     @GetMapping("/modificarUsuario")
@@ -649,5 +630,99 @@ public class ControladorVista {
             }
         }
         return invitados;
+    }
+
+    @GetMapping("/administracion")
+    public String administracion(Model modelo) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/";
+        }
+
+        FiltroUsuarios filtro;
+        if (modelo.getAttribute("filtro") == null) {
+            filtro = new FiltroUsuarios();
+            modelo.addAttribute("filtro", filtro);
+        } else {
+            filtro = (FiltroUsuarios) modelo.getAttribute("filtro");
+        }
+
+        List<Usuario> usuarios = servUsuario.findByFiltroBasico(filtro);
+        modelo.addAttribute("usuarios", usuarios);
+
+        return "Administracion";
+    }
+
+    @PostMapping("/administracion")
+    public String administracion(Model modelo, @ModelAttribute("filtro") FiltroUsuarios filtro) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/";
+        }
+
+        List<Usuario> usuarios = servUsuario.findByFiltroBasico(filtro);
+        modelo.addAttribute("usuarios", usuarios);
+
+        return "Administracion";
+    }
+
+    @PostMapping("/accionesUsuarios")
+    public String accionesUsuarios(Model modelo, HttpServletRequest req) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/";
+        }
+
+        String activo = req.getParameter("activo");
+        boolean isActivo = false;
+        if ("on".equals(activo)) {
+            isActivo = true;
+        }
+
+        Set<UsuarioRol> roles = new HashSet();
+        UsuarioRol usurol;
+
+        String user = req.getParameter("user");
+        if ("on".equals(user)) {
+            usurol = new UsuarioRol();
+            usurol.setName(Roles.USER);
+            roles.add(usurol);
+        }
+
+        String admin = req.getParameter("admin");
+        if ("on".equals(admin)) {
+            usurol = new UsuarioRol();
+            usurol.setName(Roles.ADMIN);
+            roles.add(usurol);
+        }
+
+        String colaborador = req.getParameter("colaborador");
+        if ("on".equals(colaborador)) {
+            usurol = new UsuarioRol();
+            usurol.setName(Roles.COLABORADOR);
+            roles.add(usurol);
+        }
+
+        FiltroUsuarios filtro = (FiltroUsuarios) modelo.getAttribute("filtro");
+        List<Usuario> usuarios = servUsuario.findByFiltroBasico(filtro);
+        for (Usuario usuario : usuarios) {
+            if (req.getParameter(usuario.selId()) != null) {
+                if ("on".equals(req.getParameter(usuario.selId()))) {
+                    for (UsuarioRol usuRol : usuario.getRoles()){
+                        servRolUsuario.deleteById(usuRol.getId());
+                    }
+                    usuario.setActivo(isActivo);
+                    usuario.setRoles(roles);
+                    for (UsuarioRol usuRol : usuario.getRoles()){
+                        servRolUsuario.save(usuRol);
+                    }
+                    servUsuario.update(usuario.getId(), usuario);
+                }
+            }
+        }
+        return "redirect:/administracion";
     }
 }

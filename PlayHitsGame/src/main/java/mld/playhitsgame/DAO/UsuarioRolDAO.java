@@ -13,7 +13,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author miguel
  */
 
-public interface UsusarioRolDAO extends JpaRepository<UsuarioRol, Long>{
+public interface UsuarioRolDAO extends JpaRepository<UsuarioRol, Long>{
  
     
 }

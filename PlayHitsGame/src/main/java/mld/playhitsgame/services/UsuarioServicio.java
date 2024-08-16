@@ -6,6 +6,7 @@ package mld.playhitsgame.services;
 
 import java.util.List;
 import java.util.Optional;
+import mld.playhitsgame.exemplars.FiltroUsuarios;
 import mld.playhitsgame.exemplars.Usuario;
 import mld.playhitsgame.projections.ampliada.UsuarioAmpliadaView;
 

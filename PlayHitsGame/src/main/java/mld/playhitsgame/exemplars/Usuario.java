@@ -74,6 +74,35 @@ public class Usuario{
     )
     private List<Partida> partidasInvitado;    
   
+    
+    public String getActivoTxt(){
+        
+        if (this.activo)
+            return "Si";
+        else
+            return "No";        
+    }
+    
+     public String getRolesTxt(){
+        
+        String txt = "";
+        boolean primero = true;
+        for (UsuarioRol rol : this.getRoles()){
+            if (primero)
+                primero = false;
+            else
+                txt = txt + ",";
+            if (rol.getName() != null)
+                txt = txt + rol.getName().name();                
+        }
+        return txt;
+    }
+    
+     public String selId(){
+        
+        return "sel_" + String.valueOf(this.getId());
+    }
+            
     public boolean sinGrupo(){
         return this.getGrupo() == null || "".equals(this.getGrupo());
     }

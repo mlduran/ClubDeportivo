@@ -4,7 +4,6 @@
  */
 package mld.playhitsgame.seguridad;
 
-import mld.playhitsgame.seguridad.Roles;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
