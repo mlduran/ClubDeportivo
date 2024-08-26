@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    </head>
+    <body>
+        <section class="h-100">
+            <div class="container h-100">
+                <div class="row justify-content-sm-center h-100">
+                    <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
+                        <div class="text-center my-5">
+                            <img src="/images/playhitsgame.png" class="img-fluid" alt="PLAYHITSGAME" />
+                        </div>
+                        <div class="card shadow-lg">
+                            <p th:text="#{mail.alta}"/>
+                        </div>
+                         <div class="card shadow-lg">
+                            <a th:href="${mensaje}">
+                                <p th:text="#{mail.activar}"/>
+                            </a>
+                        </div>
+                        <div class="text-center mt-5 text-muted">
+                            <p th:text="#{general.version}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </body>
+</html>

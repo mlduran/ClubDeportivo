@@ -4,6 +4,7 @@
  */
 package mld.playhitsgame.web;
 
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,6 +22,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import lombok.extern.slf4j.Slf4j;
+import mld.playhitsgame.correo.EmailServicioMetodos;
+import mld.playhitsgame.correo.Mail;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.FiltroUsuarios;
 import mld.playhitsgame.exemplars.Partida;
@@ -90,9 +93,10 @@ public class ControladorVista {
     OpcionTituloTmpServicioMetodos servOpTitulo;
     @Autowired
     OpcionInterpreteTmpServicioMetodos servOpInterprete;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    EmailServicioMetodos servMail;
 
     private String urlSpotify() {
 
@@ -177,7 +181,11 @@ public class ControladorVista {
                 modelo.addAttribute("error", "Usuario o password incorrectos");
                 return "Inicio";
             }
-
+            
+            if (!usuarioSesion.isActivo()) {
+                modelo.addAttribute("error", "Debes activar tu cuenta con el enlace que se envió a tu cuenta de correo, comprueba la carpeta de spawn");
+                return "Inicio";
+            }
             usuarioSesion.getPartidasInvitado();
             usuarioSesion.getPartidasMaster();
             modelo.addAttribute("urlSpotify", urlSpotify());
@@ -324,6 +332,12 @@ public class ControladorVista {
                 usuario.setPreferencias("");
                 servUsuario.save(usuario);
                 resp = "Se ha creado el usuario ".concat(usuario.getUsuario());
+                String token = passwordEncoder.encode(usuario.getUsuario());
+                String enlace = customIp + "/validarUsuario?id=" + String.valueOf(usuario.getId()) + 
+                        "&token=" + token ;
+               
+                enviarMail(usuario.getUsuario(), "Alta en PlayHitsGame",
+                        enlace, "CorreoAlta");
             } catch (Exception ex) {
                 err = "ERROR " + ex;
             }
@@ -332,6 +346,20 @@ public class ControladorVista {
         modelo.addAttribute("result", resp);
         modelo.addAttribute("error", err);
         return "AltaUsuario";
+    }
+    
+   
+    private void enviarMail(String des, String asunto, String txt, String plantilla) {
+        Mail mail = new Mail();
+        mail.setAsunto(asunto);
+        mail.setDestinatario(des);
+        mail.setMensaje(txt);
+        mail.setPlantilla(plantilla);
+        try {
+            servMail.enviarCorreo(mail);
+        } catch (MessagingException ex) {
+            Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @GetMapping("/eliminarUsuario/{id}")
@@ -344,8 +372,9 @@ public class ControladorVista {
 
         try {
             Optional<Usuario> usuDelete = servUsuario.findById(id);
-            servUsuario.deleteById(id);
-            
+            if (usuDelete.isPresent())
+                servUsuario.deleteById(id);
+
         } catch (Exception e) {
             Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, e);
         }
@@ -711,12 +740,12 @@ public class ControladorVista {
         for (Usuario usuario : usuarios) {
             if (req.getParameter(usuario.selId()) != null) {
                 if ("on".equals(req.getParameter(usuario.selId()))) {
-                    for (UsuarioRol usuRol : usuario.getRoles()){
+                    for (UsuarioRol usuRol : usuario.getRoles()) {
                         servRolUsuario.deleteById(usuRol.getId());
                     }
                     usuario.setActivo(isActivo);
                     usuario.setRoles(roles);
-                    for (UsuarioRol usuRol : usuario.getRoles()){
+                    for (UsuarioRol usuRol : usuario.getRoles()) {
                         servRolUsuario.save(usuRol);
                     }
                     servUsuario.update(usuario.getId(), usuario);
