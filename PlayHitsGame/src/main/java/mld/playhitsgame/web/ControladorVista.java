@@ -181,7 +181,7 @@ public class ControladorVista {
                 modelo.addAttribute("error", "Usuario o password incorrectos");
                 return "Inicio";
             }
-            
+
             if (!usuarioSesion.isActivo()) {
                 modelo.addAttribute("error", "Debes activar tu cuenta con el enlace que se envió a tu cuenta de correo, comprueba la carpeta de spawn");
                 return "Inicio";
@@ -333,9 +333,9 @@ public class ControladorVista {
                 servUsuario.save(usuario);
                 resp = "Se ha creado el usuario ".concat(usuario.getUsuario());
                 String token = passwordEncoder.encode(usuario.getUsuario());
-                String enlace = customIp + "/validarUsuario?id=" + String.valueOf(usuario.getId()) + 
-                        "&token=" + token ;
-               
+                String enlace = customIp + "/validarUsuario?id=" + String.valueOf(usuario.getId())
+                        + "&token=" + token;
+
                 enviarMail(usuario.getUsuario(), "Alta en PlayHitsGame",
                         enlace, "CorreoAlta");
             } catch (Exception ex) {
@@ -347,8 +347,7 @@ public class ControladorVista {
         modelo.addAttribute("error", err);
         return "AltaUsuario";
     }
-    
-   
+
     private void enviarMail(String des, String asunto, String txt, String plantilla) {
         Mail mail = new Mail();
         mail.setAsunto(asunto);
@@ -372,8 +371,9 @@ public class ControladorVista {
 
         try {
             Optional<Usuario> usuDelete = servUsuario.findById(id);
-            if (usuDelete.isPresent())
+            if (usuDelete.isPresent()) {
                 servUsuario.deleteById(id);
+            }
 
         } catch (Exception e) {
             Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, e);
@@ -754,4 +754,108 @@ public class ControladorVista {
         }
         return "redirect:/administracion";
     }
+
+    @GetMapping("/validarUsuario")
+    public String validarUsuario(Model modelo, HttpServletRequest req) {
+
+        Long id = Long.valueOf(req.getParameter("id"));
+        String token = (String) req.getParameter("token");
+
+        Optional<Usuario> usu = servUsuario.findById(id);
+        if (usu.isPresent()) {
+            Usuario usuario = usu.get();
+            if (passwordEncoder.matches(usuario.getUsuario(), token)) {
+                usuario.setActivo(true);
+                servUsuario.update(id, usuario);
+                return "redirect:/";
+            } else {
+                return "error";
+            }
+        } else {
+            return "error";
+        }
+    }
+
+    @GetMapping("/recuperarContrasenya")
+    public String recuperarContrasenya(Model modelo) {
+
+        return "PasswordOlvidado";
+
+    }
+
+    @PostMapping("/codigoRecuperacionPassw")
+    public String codigoRecuperacionPassw(@ModelAttribute("mail") String mail, Model modelo) {
+
+        String usu = mail.toLowerCase();
+        Optional<Usuario> usuario = servUsuario.findByUsuario(usu);
+
+        if (usuario.isEmpty()) {
+            modelo.addAttribute("error", "Este usuario no existe");
+            return "PasswordOlvidado";
+        } else {
+            String token = usuario.get().getContrasenya();
+            String enlace = "El codigo de recuperacion para el cambio de contraseña es : " + token;
+
+            enviarMail(usuario.get().getUsuario(), "Recuperación de Contraseña PlayHitsGame",
+                    enlace, "Correo");
+
+            modelo.addAttribute("result", "Se ha enviado un codigo de recuperacion a tu cuenta de correo");
+            modelo.addAttribute("mail", mail);
+        }
+        return "PasswordOlvidado";
+    }
+
+    @PostMapping("/recuperarContrasenya")
+    public String recuperarContrasenya(
+            @ModelAttribute("usuario") String usuario,
+            @ModelAttribute("token") String token,
+            @ModelAttribute("pws1") String pws1,
+            @ModelAttribute("pws2") String pws2,
+            Model modelo) {
+
+        String usu = null;
+        if (usuario != null) {
+            usu = usuario.toLowerCase();
+        }
+        Optional<Usuario> usuarioCambio = servUsuario.findByUsuario(usu);
+        if (usuarioCambio.isEmpty()) {
+            modelo.addAttribute("error", "Este usuario no existe");
+            return "PasswordOlvidado";
+        }
+        Usuario usuCambio = usuarioCambio.get();
+        if (!token.equals(usuCambio.getContrasenya())) {
+            modelo.addAttribute("error", "El codigo de recuperación no es correto");
+            return "PasswordOlvidado";
+        } else {
+            boolean passwOK = true;
+            String newPassw = "";
+            String err = null;
+            String resp = null;
+
+            try {
+                Utilidades.validarPassword(pws1, pws2);
+                newPassw = passwordEncoder.encode(pws2);
+            } catch (Exception ex) {
+                passwOK = false;
+                err = ex.getMessage();
+            }
+
+            if (passwOK) {
+                try {
+                    if (!"".equals(newPassw)) {
+                        usuCambio.setContrasenya(newPassw);
+                    }
+                    servUsuario.update(usuCambio.getId(), usuCambio);
+                    resp = "Se ha modificado la contraseña correctamente";
+                } catch (Exception ex) {
+                    err = "ERROR " + ex.getMessage();
+                }
+            }
+            modelo.addAttribute("error", err);
+            modelo.addAttribute("result", resp);
+        }
+
+        return "PasswordOlvidado";
+    }
+
 }
