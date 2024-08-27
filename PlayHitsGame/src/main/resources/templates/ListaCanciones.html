@@ -32,12 +32,14 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                     <th>Titulo</th>
                     <th>Interprete</th>
                     <th>Año</th>
+                    <th>Temas</th>  
                     <th>Spotify</th>
                 </tr>
                 <tr th:each="elem : ${lista}">
                     <td th:text="${elem.titulo}"></td>
                     <td th:text="${elem.interprete}"></td>
                     <td th:text="${elem.anyo}"></td>
+                    <td th:text="${elem.tematicasTxt}"></td>
                     <td th:text="${elem.spotifyid}"></td>
                 </tr>
             </table>
