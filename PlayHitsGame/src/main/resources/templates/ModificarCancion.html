@@ -27,22 +27,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     <p>Titulo<input type="text" th:field="*{titulo}" required="required" /></p>
                                     <p>Interprete<input type="text" th:field="*{interprete}" required="required"/></p>
                                     <p>Album<input type="text" th:field="*{album}"/></p>
-                                    <p>Año<input type="number" th:field="*{anyo}" required="required"/></p>
-                                    <p>Genero
-                                        <select th:field="*{genero}" title="Genero">
-                                            <option th:each="generoOpt : ${T(mld.playhitsgame.exemplars.Genero).values()}" 
-                                                    th:value="${generoOpt}" th:text="${generoOpt}"></option>
-                                        </select></p>
-                                    <p>Idioma
-                                        <select th:field="*{idioma}" title="Idioma">
-                                            <option th:each="idiomaOpt : ${T(mld.playhitsgame.exemplars.Idioma).values()}" 
-                                                    th:value="${idiomaOpt}" th:text="${idiomaOpt}"></option>
-                                        </select></p>
-                                    <p>Tema
-                                        <select th:field="*{tema}" title="Tema">
-                                            <option th:each="elem : ${temas}" 
-                                                    th:value="${elem}" th:text="${elem}"></option>
-                                        </select></p>
+                                    <p>Año<input type="number" th:field="*{anyo}" required="required"/></p>                                   
                                     <p>spotifyid<input type="text" th:field="*{spotifyid}" required="required"/></p>
                                     <p>spotifyplay<input type="text" th:field="*{spotifyplay}" required="required"/></p>
                                     <p>spotifyimagen<input type="text" th:field="*{spotifyimagen}" required="required" /></p>

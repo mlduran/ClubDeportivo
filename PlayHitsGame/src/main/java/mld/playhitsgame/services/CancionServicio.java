@@ -6,8 +6,6 @@ package mld.playhitsgame.services;
 
 import java.util.List;
 import java.util.Optional;
-import mld.playhitsgame.exemplars.SearchCriteria;
-import mld.playhitsgame.exemplars.SearchSpecifications;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.projections.ampliada.CancionAmpliadaView;
 
@@ -26,8 +24,11 @@ public interface CancionServicio {
     //Optional<Cancion> findCancionById(Long id); //si retorna solo 1 reg, sino poner list
     Optional<Cancion> findById(Long id);
     
+    Optional<Cancion> findByIdSpotify(String id);
+    
     Cancion saveCancion(Cancion cancion);    
     Cancion updateCancion(Long id, Cancion cancion);
+    Cancion updateTemasCancion(Long id, Cancion cancion);
     void deleteCancion(Long id);
     
 

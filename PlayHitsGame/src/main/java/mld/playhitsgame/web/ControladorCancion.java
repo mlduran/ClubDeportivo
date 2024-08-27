@@ -6,6 +6,7 @@ package mld.playhitsgame.web;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -53,15 +54,19 @@ public class ControladorCancion {
     @GetMapping("/listaCanciones")
     public String listaCanciones(Model model) {
 
-        if (!usuarioCorrecto(model)) 
+        if (!usuarioCorrecto(model)) {
             return "redirect:/";
-        
+        }
+
         List<Cancion> lista = servCancion.findAll();
 
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
         TreeMap<Integer, Integer> estadistica = new TreeMap();
-        for (int i = 1950; i <= 2023; i++) {
+        for (int i = 1950; i <= year; i++) {
             estadistica.put(i, 0);
         }
+        
         for (Cancion obj : lista) {
             estadistica.put(obj.getAnyo(), estadistica.get(obj.getAnyo()) + 1);
         }
@@ -74,8 +79,9 @@ public class ControladorCancion {
     @GetMapping("/altaCancion")
     public String altaCancion(Model modelo) {
 
-        if (!usuarioCorrecto(modelo)) 
+        if (!usuarioCorrecto(modelo)) {
             return "redirect:/";
+        }
         modelo.addAttribute("newcancion", new Cancion());
         return "AltaCancion";
     }
@@ -83,9 +89,10 @@ public class ControladorCancion {
     @PostMapping("/altaCancion")
     public String altaCancion(@ModelAttribute("newcancion") Cancion cancion, Model modelo) {
 
-        if (!usuarioCorrecto(modelo)) 
+        if (!usuarioCorrecto(modelo)) {
             return "redirect:/";
-        
+        }
+
         String resp = "OK";
 
         try {
@@ -102,9 +109,10 @@ public class ControladorCancion {
     @GetMapping("/modificarCancion/{id}")
     public String modificarCancion(@ModelAttribute("id") Long id, Model modelo) {
 
-        if (!usuarioCorrecto(modelo)) 
+        if (!usuarioCorrecto(modelo)) {
             return "redirect:/";
-        
+        }
+
         Optional<Cancion> cancion = servCancion.findById(id);
         temasBD(modelo);
 
@@ -115,9 +123,10 @@ public class ControladorCancion {
     @PostMapping("/modificarCancion")
     public String modificarCancion(@ModelAttribute("cancion") Cancion cancion, Model modelo) {
 
-        if (!usuarioCorrecto(modelo)) 
+        if (!usuarioCorrecto(modelo)) {
             return "redirect:/";
-        
+        }
+
         String resp = "OK";
 
         try {
@@ -135,9 +144,10 @@ public class ControladorCancion {
     @GetMapping("/eliminarCancion/{id}")
     public String eliminarCancion(@ModelAttribute("id") Long id, Model modelo) {
 
-        if (!usuarioCorrecto(modelo)) 
+        if (!usuarioCorrecto(modelo)) {
             return "redirect:/";
-        
+        }
+
         servCancion.deleteCancion(id);
         return "redirect:/gestionCanciones";
     }
@@ -156,8 +166,9 @@ public class ControladorCancion {
     @GetMapping("/gestionCanciones")
     public String revisionCanciones(Model modelo) {
 
-        if (!usuarioCorrecto(modelo)) 
+        if (!usuarioCorrecto(modelo)) {
             return "redirect:/";
+        }
         temasBD(modelo);
 
         FiltroCanciones filtro;
@@ -178,8 +189,9 @@ public class ControladorCancion {
     @PostMapping("/gestionCanciones")
     public String revisionCanciones(Model modelo, @ModelAttribute("filtro") FiltroCanciones filtro) {
 
-        if (!usuarioCorrecto(modelo)) 
+        if (!usuarioCorrecto(modelo)) {
             return "redirect:/";
+        }
         temasBD(modelo);
         List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);
         modelo.addAttribute("canciones", canciones);
@@ -191,14 +203,16 @@ public class ControladorCancion {
     @PostMapping("/marcarRevision")
     public String marcarRevision(Model modelo, HttpServletRequest req) {
 
-        if (!usuarioCorrecto(modelo)) 
+        if (!usuarioCorrecto(modelo)) {
             return "redirect:/";
-        
+        }
+
         String validar = req.getParameter("validar");
         boolean isValidar = false;
-        if ("on".equals(validar))
+        if ("on".equals(validar)) {
             isValidar = true;
-        
+        }
+
         FiltroCanciones filtro = (FiltroCanciones) modelo.getAttribute("filtro");
         List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);
         for (Cancion cancion : canciones) {

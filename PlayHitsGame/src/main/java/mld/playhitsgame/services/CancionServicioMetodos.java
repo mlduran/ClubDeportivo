@@ -4,9 +4,11 @@
  */
 package mld.playhitsgame.services;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import mld.playhitsgame.DAO.CancionDAO;
 import mld.playhitsgame.exemplars.SearchCriteria;
 import mld.playhitsgame.exemplars.SearchOperation;
@@ -14,38 +16,44 @@ import mld.playhitsgame.exemplars.SearchSpecifications;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.FiltroCanciones;
 import mld.playhitsgame.exemplars.Partida;
+import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.projections.ampliada.CancionAmpliadaView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CancionServicioMetodos implements CancionServicio{
-    
+public class CancionServicioMetodos implements CancionServicio {
+
     @Autowired
     CancionDAO DAO;
 
     @Override
-    public List<Cancion> findAll(){
-        
-        return DAO.findAll();        
-        
+    public List<Cancion> findAll() {
+
+        return DAO.findAll();
+
     }
-        
-   // @Override
-   // public List<Cancion> findAllSpecificaciones(SearchSpecifications<SearchCriteria> searchSpecifications){
-   //     return DAO.findAllSpecificaciones(searchSpecifications);           
-   //}
-    
+
+    // @Override
+    // public List<Cancion> findAllSpecificaciones(SearchSpecifications<SearchCriteria> searchSpecifications){
+    //     return DAO.findAllSpecificaciones(searchSpecifications);           
+    //}
     @Override
     public List<CancionAmpliadaView> findBy() {
         return DAO.findBy();
-        
-    }  
-  
+
+    }
+
+    @Override
+    public Optional<Cancion> findByIdSpotify(String Id) {
+        return DAO.findByIdSpotify(Id);
+
+    }
+
     @Override
     public Optional<Cancion> findById(Long id) {
         return DAO.findById(id);
-        
+
     }
 
     @Override
@@ -56,96 +64,94 @@ public class CancionServicioMetodos implements CancionServicio{
     @Override
     public Cancion updateCancion(Long id, Cancion cancion) {
         Cancion cancionObj = DAO.findById(id).get();
-        if(Objects.nonNull(cancion.getTitulo()) && !"".equalsIgnoreCase(cancion.getTitulo())){
+        if (Objects.nonNull(cancion.getTitulo()) && !"".equalsIgnoreCase(cancion.getTitulo())) {
             cancionObj.setTitulo(cancion.getTitulo());
         }
-        
-        if(Objects.nonNull(cancion.getInterprete()) && !"".equalsIgnoreCase(cancion.getInterprete())){
+
+        if (Objects.nonNull(cancion.getInterprete()) && !"".equalsIgnoreCase(cancion.getInterprete())) {
             cancionObj.setInterprete(cancion.getInterprete());
         }
-        
-        if(Objects.nonNull(cancion.getAlbum()) && !"".equalsIgnoreCase(cancion.getAlbum())){
+
+        if (Objects.nonNull(cancion.getAlbum()) && !"".equalsIgnoreCase(cancion.getAlbum())) {
             cancionObj.setAlbum(cancion.getAlbum());
         }
-        
-        if(Objects.nonNull(cancion.getTema()) && !"".equalsIgnoreCase(cancion.getTema())){
-            cancionObj.setTema(cancion.getTema());
-        }
-        
-        if(Objects.nonNull(cancion.getGenero())){
-            cancionObj.setGenero(cancion.getGenero());
-        }
-        
+
         cancionObj.setAnyo(cancion.getAnyo());
-        
-        if(Objects.nonNull(cancion.getIdioma())){
-            cancionObj.setIdioma(cancion.getIdioma());
-        }
-        
-        if(Objects.nonNull(cancion.getSpotifyid()) && !"".equalsIgnoreCase(cancion.getSpotifyid())){
+
+        if (Objects.nonNull(cancion.getSpotifyid()) && !"".equalsIgnoreCase(cancion.getSpotifyid())) {
             cancionObj.setSpotifyid(cancion.getSpotifyid());
         }
-        
+
         cancionObj.setRevisar(cancion.pendienteRevision());
-        
-        
+
+        return DAO.save(cancionObj);
+    }
+
+    @Override
+    public Cancion updateTemasCancion(Long id, Cancion cancion) {
+
+        Cancion cancionObj = DAO.findById(id).get();
+
+        // Eliminamos posibles duplicados
+        Set<Tema> hashSet = new HashSet(cancion.getTematicas());
+        cancion.getTematicas().clear();
+        cancion.getTematicas().addAll(hashSet);
+
+        cancionObj.setTematicas(cancion.getTematicas());
+
         return DAO.save(cancionObj);
     }
 
     @Override
     public void deleteCancion(Long id) {
         DAO.deleteById(id);
-    } 
+    }
 
-    
-    public List<Cancion> buscarCancionesPorCriterios(List<String> generos, List<String> idiomas, 
-            List <String> temas, int anyoInicial, int anyofinal ){
-        
-        
+    public List<Cancion> buscarCancionesPorCriterios(List<String> generos, List<String> idiomas,
+            List<String> temas, int anyoInicial, int anyofinal) {
+
         SearchSpecifications searchSpecifications = new SearchSpecifications();
-        
-        if(!generos.isEmpty())
-            searchSpecifications.add(new SearchCriteria("genero",generos, SearchOperation.IN));
-        if(!idiomas.isEmpty())
-            searchSpecifications.add(new SearchCriteria("idioma",idiomas, SearchOperation.IN));
-        if(!temas.isEmpty())
-            searchSpecifications.add(new SearchCriteria("tema",temas, SearchOperation.IN));
+
+        if (!generos.isEmpty()) {
+            searchSpecifications.add(new SearchCriteria("genero", generos, SearchOperation.IN));
+        }
+        if (!idiomas.isEmpty()) {
+            searchSpecifications.add(new SearchCriteria("idioma", idiomas, SearchOperation.IN));
+        }
+        if (!temas.isEmpty()) {
+            searchSpecifications.add(new SearchCriteria("tema", temas, SearchOperation.IN));
+        }
         searchSpecifications.add(new SearchCriteria("anyo", anyoInicial, SearchOperation.GREATER_THAN_EQUAL));
         searchSpecifications.add(new SearchCriteria("anyo", anyofinal, SearchOperation.LESS_THAN_EQUAL));
-         
+
         //return findAll(searchSpecifications);
         return DAO.findAll();
     }
-    
-    public List<Cancion> buscarCancionesPorFiltro(FiltroCanciones filtro ){
-        
-        if (!"".equals(filtro.getTema()))  
-            return DAO.findByFiltroConTema(filtro.getTema(), filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar());  
-        else
-            return DAO.findByFiltroBasico(filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar());
-        
-                  
-          
-    }
-    
-    public List<Cancion> obtenerCanciones(Partida partida){        
-        
-        List<Cancion> canciones;
-       
-        if (!partida.getTema().isBlank())
-            canciones = DAO.findByFiltroConTema(partida.getTema(), partida.getAnyoInicial(), 
-                    partida.getAnyoFinal(), false);            
-        else 
-            canciones = DAO.findByFiltroBasico(partida.getAnyoInicial(), 
-                    partida.getAnyoFinal(), false);       
-        
-        return canciones;
-        
-    }  
 
-    
-    
-    
-    
- 
+    public List<Cancion> buscarCancionesPorFiltro(FiltroCanciones filtro) {
+
+        if (!"".equals(filtro.getTema())) {
+            return DAO.findByFiltroConTema(filtro.getTema(), filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar());
+        } else {
+            return DAO.findByFiltroBasico(filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar());
+        }
+
+    }
+
+    public List<Cancion> obtenerCanciones(Partida partida) {
+
+        List<Cancion> canciones;
+
+        if (!partida.getTema().isBlank()) {
+            canciones = DAO.findByFiltroConTema(partida.getTema(), partida.getAnyoInicial(),
+                    partida.getAnyoFinal(), false);
+        } else {
+            canciones = DAO.findByFiltroBasico(partida.getAnyoInicial(),
+                    partida.getAnyoFinal(), false);
+        }
+
+        return canciones;
+
+    }
+
 }

@@ -30,12 +30,9 @@ public class Cancion{
     private String titulo;
     private String interprete;
     private String album;
-    private Integer anyo;
-    @Enumerated(EnumType.STRING)
-    private Genero genero;
-    @Enumerated(EnumType.STRING)
-    private Idioma idioma;
-    private String tema; // por ejemplo Numeros 1 40 principales
+    private Integer anyo; 
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch=FetchType.EAGER )
+    private List<Tema> tematicas;
     @Column(unique = true)
     private String spotifyid;
     private String spotifyplay;
@@ -62,6 +59,21 @@ public class Cancion{
         else 
             return "NO";
         
+    }
+    
+    public String getTematicasTxt(){
+        
+        String txt = "";
+        boolean primero = true;
+        for (Tema elTema : this.getTematicas()){
+            if (primero)
+                primero = false;
+            else
+                txt = txt.concat(", ");
+            txt = txt.concat(elTema.getTema());
+        }
+        
+        return txt;
     }
      
     

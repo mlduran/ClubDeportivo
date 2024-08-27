@@ -30,7 +30,10 @@ public interface CancionDAO extends JpaRepository<Cancion, Long>{
     //Optional<Cancion> findCancionById(long id);
     
     @Override
-    Optional<Cancion> findById(Long id);   
+    Optional<Cancion> findById(Long id); 
+    
+    @Query(value = "SELECT * FROM canciones WHERE spotifyid=:id ;", nativeQuery = true)
+    Optional<Cancion> findByIdSpotify(String id);
     
     @Query(value = "SELECT * FROM canciones WHERE anyo>=:anyoinicial AND anyo<=:anyofinal AND revisar=:revisar ;", nativeQuery = true)
     List<Cancion> findByFiltroBasico(int anyoinicial, int anyofinal, boolean revisar);

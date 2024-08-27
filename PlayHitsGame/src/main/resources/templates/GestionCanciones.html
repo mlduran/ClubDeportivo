@@ -14,31 +14,17 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     <body>
         <header th:insert="~{plantillas/playhitsgame :: encabezado}"></header>
 
-
+        <a href="/panel" class="button" id="volver">VOLVER</a>
         <div>
             <form method="post" th:action="@{/gestionCanciones}" th:object="${filtro}" > 
                 <table border="2">
                     <tr>
-                        <th>Genero</th>
-                        <th>Idioma</th>
                         <th>Tema</th>
                         <th>Año Inicial</th>
                         <th>Año Final</th>
                         <th>Verificar</th>
                     </tr>
                     <tr>
-                        <td>
-                            <select th:field="*{genero}" title="Genero">
-                                <option th:each="generoOpt : ${T(mld.playhitsgame.exemplars.Genero).values()}" 
-                                        th:value="${generoOpt}" th:text="${generoOpt}"></option>
-                            </select>
-                        </td>
-                        <td>
-                            <select th:field="*{idioma}" title="Idioma">
-                                <option th:each="idiomaOpt : ${T(mld.playhitsgame.exemplars.Idioma).values()}" 
-                                        th:value="${idiomaOpt}" th:text="${idiomaOpt}"></option>
-                            </select>
-                        </td>
                         <td>
                             <select th:field="*{tema}" title="Tema">
                                 <option th:each="elem : ${temas}" 
@@ -63,6 +49,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 </table>
             </form> 
             <a th:href="@{/altaCancion}" class="button" id="altaCancion"> ALTA CANCION </a>
+            <a th:href="@{/listaCanciones}" class="button" id="listaCanciones"> LISTA CANCIONES </a>
             <p th:text="${result}"></p>
         </div>
         <div th:if="${canciones != null and !canciones.empty}">
@@ -76,9 +63,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         <th>Titulo</th>
                         <th>Interprete</th>
                         <th>Album</th>
-                        <th>Genero</th>
-                        <th>Idioma</th>
-                        <th>Tema</th>                   
+                        <th>Temas</th>                   
                         <th>Año</th>
                         <th>Spotifyid</th>                   
                         <th>Verificar?</th>
@@ -89,9 +74,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         <td th:text="${elem.titulo}"></td>
                         <td th:text="${elem.interprete}"></td>
                         <td th:text="${elem.album}"></td>
-                        <td th:text="${elem.genero}"></td>
-                        <td th:text="${elem.idioma}"></td>
-                        <td th:text="${elem.tema}"></td>
+                        <td th:text="${elem.tematicasTxt}"></td>
                         <td th:text="${elem.anyo}"></td>
                         <td th:text="${elem.spotifyid}"></td>
                         <td th:text="${elem.txtRevision()}"></td>

@@ -5,6 +5,7 @@
 package mld.playhitsgame.exemplars;
 
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,8 +23,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "temas")
-public class Tema{
-    
+public class Tema{    
    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +31,12 @@ public class Tema{
     @Column(unique = true)
     private String tema;
     private String descripcion;
+    @Enumerated(EnumType.STRING)
+    private Idioma idioma;
+    @Enumerated(EnumType.STRING)
+    private Genero genero;
+    @ManyToMany(mappedBy = "tematicas")
+    private List<Cancion> canciones;
 
 }
 

@@ -11,44 +11,42 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     </head>
     <body>
         <header th:insert="~{plantillas/playhitsgame :: encabezado}"></header>
-        
-        
+
+        <a href="/gestionCanciones" class="button" id="volver">VOLVER</a>
         <div th:if="${lista != null and !lista.empty}">
-            
+
             <table border="2">
                 <tr>
                     <th>Año</th>
                     <th>Canciones</th>                    
                 </tr>            
-           
+
                 <tr th:each="dato : ${estadistica}">
                     <td th:text="${dato.key}"></td>
                     <td th:text="${dato.value}"></td>
                 </tr>
             </table>
-            
+
             <table border="2">
                 <tr>
                     <th>Titulo</th>
                     <th>Interprete</th>
                     <th>Año</th>
-                    <th>Genero</th>
                     <th>Spotify</th>
                 </tr>
                 <tr th:each="elem : ${lista}">
                     <td th:text="${elem.titulo}"></td>
                     <td th:text="${elem.interprete}"></td>
                     <td th:text="${elem.anyo}"></td>
-                    <td th:text="${elem.genero}"></td>
                     <td th:text="${elem.spotifyid}"></td>
                 </tr>
             </table>
         </div>   
-        
+
         <div th:if="${lista == null or lista.empty}">
             <p>NO HAY NINGUNA CANCION PARA LISTAR</p>
         </div>
-        
+
         <footer th:insert="~{plantillas/playhitsgame :: pie}"></footer>
     </body>
 </html>
