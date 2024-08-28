@@ -10,6 +10,7 @@ package mld.playhitsgame.exemplars;
  */
 public enum Idioma {
     
+    International,
     English,
     Spanish    
 

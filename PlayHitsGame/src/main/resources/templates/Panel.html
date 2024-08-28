@@ -33,6 +33,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <div th:if="*{colaborador} == true" class="text-center my-2">
                                 <a href="/gestionCanciones" class="btn btn-primary" role="button" th:text="#{general.gestioncanciones}"/>
                             </div>
+                            <div th:if="*{colaborador} == true" class="text-center my-2">
+                                <a href="/gestionTemas" class="btn btn-primary" role="button" th:text="#{general.gestiontemas}"/>
+                            </div>
                             <div th:if="*{partidaMasterEnCurso()} != null" class="text-center my-2">
                                 <a href="/partidaMaster" class="btn btn-primary" role="button" th:text="#{general.partidamasterpendiente}"/>
                             </div>

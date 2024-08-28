@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Gestion Temas</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+
+    </head>
+    <body>
+        <header th:insert="~{plantillas/playhitsgame :: encabezado}"></header>
+       
+        <div th:if="${temas != null and !temas.empty}" style="align-content: center">
+            
+             <a href="/panel" class="button" id="volver">VOLVER</a>     
+ 
+                <table border="2">
+                    <tr> 
+                        <th>Tema</th>
+                        <th>Descripción</th>
+                        <th>Idioma</th>
+                        <th>Genero</th>                   
+                        <th>Canciones</th>
+                    </tr>
+                    <tr th:each="elem : ${temas}">  
+                        <td th:text="${elem.tema}"></td>
+                        <td th:text="${elem.descripcion}"></td>
+                        <td th:text="${elem.idioma}"></td>
+                        <td th:text="${elem.genero}"></td>
+                        <td th:text="${elem.numCanciones}"></td>
+                        <td>
+                            <a th:href="@{'/modificarTema/' + ${elem.id}}">Editar</a>
+                            <a th:href="@{'/eliminarTema/' + ${elem.id}}">Eliminar</a>
+                        </td>
+                    </tr>
+                </table>
+        </div>          
+        
+        <p th:text="${result}"></p>
+
+        <div class="text-center">
+            <a href="/panel" class="text-dark">
+                <p th:text="#{general.volver}" />
+            </a>
+        </div>
+
+        <footer th:insert="~{plantillas/playhitsgame :: pie}"></footer>
+    </body>
+</html>

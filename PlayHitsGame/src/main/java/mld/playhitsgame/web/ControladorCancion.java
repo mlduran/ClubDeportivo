@@ -66,7 +66,7 @@ public class ControladorCancion {
         for (int i = 1950; i <= year; i++) {
             estadistica.put(i, 0);
         }
-        
+
         for (Cancion obj : lista) {
             estadistica.put(obj.getAnyo(), estadistica.get(obj.getAnyo()) + 1);
         }
@@ -141,6 +141,38 @@ public class ControladorCancion {
         return "ModificarCancion";
     }
 
+    @GetMapping("/modificarTema/{id}")
+    public String modificarTema(@ModelAttribute("id") Long id, Model modelo) {
+
+        if (!usuarioCorrecto(modelo)) {
+            return "redirect:/";
+        }
+
+        Optional<Tema> tema = servTema.findById(id);
+        modelo.addAttribute("tema", tema);
+        return "ModificarTema";
+    }
+
+    @PostMapping("/modificarTema")
+    public String modificarCancion(@ModelAttribute("tema") Tema tema, Model modelo) {
+
+        if (!usuarioCorrecto(modelo)) {
+            return "redirect:/";
+        }
+
+        String resp = "OK";
+
+        try {
+            servTema.update(tema.getId(), tema);
+        } catch (Exception ex) {
+            resp = "ERROR " + ex;
+        }
+
+        modelo.addAttribute("result", resp);
+
+        return "ModificarTema";
+    }
+
     @GetMapping("/eliminarCancion/{id}")
     public String eliminarCancion(@ModelAttribute("id") Long id, Model modelo) {
 
@@ -150,6 +182,28 @@ public class ControladorCancion {
 
         servCancion.deleteCancion(id);
         return "redirect:/gestionCanciones";
+    }
+
+    @GetMapping("/eliminarTema/{id}")
+    public String eliminarTema(@ModelAttribute("id") Long id, Model modelo) {
+
+        if (!usuarioCorrecto(modelo)) {
+            return "redirect:/";
+        }
+
+        Optional<Tema> tema = servTema.findById(id);
+
+        if (tema.isPresent() && tema.get().getCanciones().isEmpty()) {
+            servCancion.deleteCancion(id);
+            return "redirect:/gestionTemas";
+        }
+        
+        ArrayList<Tema> temas = (ArrayList<Tema>) servTema.findAll();
+        modelo.addAttribute("temas", temas);
+        modelo.addAttribute("result", "No se puede eliminar un tema con canciones");
+        
+        return "GestionTemas";
+
     }
 
     private void temasBD(Model modelo) {
@@ -184,6 +238,18 @@ public class ControladorCancion {
         modelo.addAttribute("canciones", canciones);
 
         return "GestionCanciones";
+    }
+
+    @GetMapping("/gestionTemas")
+    public String revisionTemas(Model modelo) {
+
+        if (!usuarioCorrecto(modelo)) {
+            return "redirect:/";
+        }
+        ArrayList<Tema> temas = (ArrayList<Tema>) servTema.findAll();
+        modelo.addAttribute("temas", temas);
+
+        return "GestionTemas";
     }
 
     @PostMapping("/gestionCanciones")

@@ -5,6 +5,7 @@
 package mld.playhitsgame.services;
 
 import java.util.List;
+import java.util.Optional;
 import mld.playhitsgame.exemplars.Tema;
 
 
@@ -16,6 +17,9 @@ import mld.playhitsgame.exemplars.Tema;
 public interface TemaServicio {
     
     List<Tema> findAll();   
+    
+    Optional<Tema> findById(Long id);
 
+    Tema update(Long id, Tema tema);
     
 }

@@ -10,21 +10,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-
 /**
  *
  * @author miguel
  */
-
-
 @Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "temas")
-public class Tema{    
-   
+public class Tema {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -37,7 +33,11 @@ public class Tema{
     private Genero genero;
     @ManyToMany(mappedBy = "tematicas")
     private List<Cancion> canciones;
+    
+
+    public String getNumCanciones() {
+
+        return String.valueOf(this.getCanciones().size());
+    }
 
 }
-
-

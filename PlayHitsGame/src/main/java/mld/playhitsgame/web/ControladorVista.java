@@ -289,6 +289,18 @@ public class ControladorVista {
         modelo.addAttribute("newusuario", new Usuario());
         return "AltaUsuario";
     }
+    
+    @GetMapping("/altaUsuarioAdm")
+    public String altaUsuarioAdm(Model modelo) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/";
+        }
+        
+        modelo.addAttribute("newusuario", new Usuario());
+        return "AltaUsuarioAdm";
+    }
 
     @PostMapping("/altaUsuario")
     public String altaUsuario(@ModelAttribute("newusuario") Usuario usuario,
@@ -346,6 +358,60 @@ public class ControladorVista {
         modelo.addAttribute("result", resp);
         modelo.addAttribute("error", err);
         return "AltaUsuario";
+    }
+    
+    @PostMapping("/altaUsuarioAdm")
+    public String altaUsuarioAdm(@ModelAttribute("newusuario") Usuario usuario,
+            @ModelAttribute("pws2") String pws2, Model modelo) {
+
+        String resp = "";
+        String err = "";
+        boolean passwOK = true;
+        boolean usuOK = true;
+        try {
+            if (!usuario.getContrasenya().equals(pws2))
+                throw new Exception("Las Contraseñas no son iguales");
+        } catch (Exception ex) {
+            passwOK = false;
+            err = ex.getMessage();
+        }
+
+        String usu = usuario.getUsuario().toLowerCase();
+        usuario.setUsuario(usu);
+
+        if (passwOK) {
+            Optional<Usuario> usuLogin = servUsuario.findByUsuario(usuario.getUsuario());
+            if (!usuLogin.isEmpty()) {
+                usuOK = false;
+                err = "El usuario " + usuario.getUsuario() + " ya existe";
+            }
+        }
+
+        if (usuOK && passwOK) {
+
+            String passEncrip = passwordEncoder.encode(usuario.getContrasenya());
+
+            Set<UsuarioRol> roles = new HashSet();
+            UsuarioRol usurol = new UsuarioRol();
+            usurol.setName(Roles.USER);
+            roles.add(usurol);
+
+            try {
+                usuario.setRoles(roles);
+                usuario.setActivo(false);
+                usuario.setContrasenya(passEncrip);
+                usuario.setPreferencias("");
+                usuario.setActivo(true);
+                servUsuario.save(usuario);
+                resp = "Se ha creado el usuario ".concat(usuario.getUsuario());                
+            } catch (Exception ex) {
+                err = "ERROR " + ex;
+            }
+        }
+
+        modelo.addAttribute("result", resp);
+        modelo.addAttribute("error", err);
+        return "AltaUsuarioAdm";
     }
 
     private void enviarMail(String des, String asunto, String txt, String plantilla) {

@@ -19,6 +19,9 @@ public interface TemaDAO extends JpaRepository<Tema, Long>{
     
     List<Tema> findBy();  
     Optional<Tema> findBytema(String tema);
+    @Override
+    Optional<Tema> findById(Long id);
+    
  
     
 }
