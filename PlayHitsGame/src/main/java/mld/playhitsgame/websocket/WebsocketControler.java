@@ -144,7 +144,7 @@ public class WebsocketControler {
         }
 
         obJsonSalida.put("op", "respuestas");
-        obJsonSalida.put("Usuarios", usuarios);
+        obJsonSalida.put("usuarios", usuarios);
         return obJsonSalida;
     }
 

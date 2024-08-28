@@ -16,6 +16,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <header th:insert="~{plantillas/playhitsgame :: encabezado}"></header>
 
         <div class="container ">
+            <a href="/altaUsuarioAdm" class="text-dark">
+                <p th:text="#{general.altaususario}" />
+            </a>
 
             <div>
                 <form class="justify-content-sm-center" method="post" th:action="@{/administracion}" th:object="${filtro}" > 
