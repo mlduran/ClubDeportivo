@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -24,6 +26,8 @@ import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.Respuesta;
 import mld.playhitsgame.exemplars.Ronda;
 import mld.playhitsgame.exemplars.Usuario;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 /**
  *
@@ -270,33 +274,21 @@ public class Utilidades {
     public static ArrayList<String> leerAyuda(String fich) {
 
         ArrayList<String> lineas = new ArrayList();
-        String ruta = "";
 
-        BufferedReader objReader = null;
+        Resource resource = new ClassPathResource(fich);
+
         try {
-            String strCurrentLine;
-            
-            File f = new File(fich);            
-            ruta = f.getCanonicalPath();
-            FileReader fr = new FileReader(f);
-            objReader = new BufferedReader(fr);
+            InputStream inputStream = resource.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 
-            while ((strCurrentLine = objReader.readLine()) != null) {
-
-                lineas.add(strCurrentLine);
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lineas.add(line);
             }
-
         } catch (IOException e) {
-            System.out.println("Error al obtener ayuda " +  ruta + " : " + e.getMessage());
-        } finally {
-
-            try {
-                if (objReader != null) {
-                    objReader.close();
-                }
-            } catch (IOException ex) {               
-            }
+            System.out.println("Error al obtener ayuda " + fich + " : " + e.getMessage());
         }
+
         return lineas;
     }
 

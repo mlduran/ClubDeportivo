@@ -191,8 +191,15 @@ public class ControladorVista {
             modelo.addAttribute("urlSpotify", urlSpotify());
             modelo.addAttribute("id_usuarioSesion", usuarioSesion.getId());
             informarUsuarioModelo(modelo, usuarioSesion);
-            return "Panel";
+            return "redirect:/panel";
         }
+    }
+    
+    private void ayuda(Model modelo, String nomFich){
+        
+        ArrayList<String> ayuda = Utilidades.leerAyuda("static/ayuda/" + nomFich);
+        modelo.addAttribute("ayuda", ayuda);
+        
     }
 
     @GetMapping("/panel")
@@ -205,6 +212,8 @@ public class ControladorVista {
 
         modelo.addAttribute("urlSpotify", urlSpotify());
         informarUsuarioModelo(modelo, usu);
+
+        ayuda(modelo, "panel.txt");
 
         return "Panel";
     }
@@ -271,8 +280,7 @@ public class ControladorVista {
         modelo.addAttribute("id_partidaSesion", partida.getId());
         modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
         modelo.addAttribute("ptsUsuario", ptsUsuarios);
-        ArrayList<String> ayuda = Utilidades.leerAyuda("src/main/resources/static/ayuda/partida");
-        modelo.addAttribute("ayuda", ayuda);
+        ayuda(modelo, "partida.txt");
         return "Partida";
     }
 

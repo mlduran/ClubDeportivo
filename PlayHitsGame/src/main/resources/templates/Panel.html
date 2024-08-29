@@ -20,11 +20,41 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         </div>
                         <div class="card shadow-lg">
                             <div class="card-body p-4" >
-                                <h1 class="fs-4 card-title fw-bold mb-4" th:text="#{general.jugador} + ' : ' + *{nombre}"/>
-                                <h1 class="fs-4 card-title fw-bold mb-4" th:text="#{general.puntos} + ' : ' + *{puntos}"/>
-                                <a href="/modificarUsuario" class="text-dark">
-                                    <p th:text="#{general.modificardatos}"/>  
-                                </a>
+                                <table class="table">
+                                    <tr>
+                                        <td>
+                                            <p class="fs-4 card-title fw-bold mb-4" th:text="#{general.jugador} + ' : ' + *{nombre}"/>
+                                        </td>
+                                        <td class="text-e">
+                                            <input type="image" class="btn" id="imageInfo" alt="Info"  data-bs-toggle="modal" data-bs-target="#ayuda" th:src="@{'/images/info.png'}"  width="60" height="60" /> 
+                                            <div class="modal fade" id="ayuda" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h1 class="modal-title fs-5" id="ayudaModalLabel">Info</h1>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p th:each="lin : ${ayuda}" th:text="${lin}" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <p class="fs-4 card-title fw-bold mb-4" th:text="#{general.puntos} + ' : ' + *{puntos}"/>
+                                        </td>
+                                    </tr>   
+                                    <tr>
+                                        <td colspan="2">
+                                            <a href="/modificarUsuario" class="text-dark">
+                                                <p th:text="#{general.modificardatos}"/>  
+                                            </a>                                            
+                                        </td>                                    
+                                    </tr>
+                                </table> 
                             </div>
                             <div th:if="*{admin} == true" class="text-center my-2">
                                 <a href="/administracion" class="btn btn-primary" role="button" th:text="#{general.administracion}"/>
