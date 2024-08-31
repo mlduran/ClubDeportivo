@@ -16,7 +16,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 
         <a href="/panel" class="button" id="volver">VOLVER</a>
         <div>
-            <form method="post" th:action="@{/gestionCanciones}" th:object="${filtro}" > 
+            <form method="post" th:action="@{/gestionCanciones}" th:object="${filtroCanciones}" > 
                 <table border="2">
                     <tr>
                         <th>Tema</th>
@@ -48,8 +48,15 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                     </tr>  
                 </table>
             </form> 
-            <a th:href="@{/altaCancion}" class="button" id="altaCancion"> ALTA CANCION </a>
-            <a th:href="@{/listaCanciones}" class="button" id="listaCanciones"> LISTA CANCIONES </a>
+            <p>
+                <a th:href="@{/altaCancion}" class="button" id="altaCancion"> ALTA CANCION </a>
+            </p>
+            <p>
+                <a th:href="@{/listaCanciones}" class="button" id="listaCanciones"> LISTA CANCIONES </a>
+            </p>
+             <p>
+                <a th:href="@{/exportarCanciones}" class="button" id="exportarCanciones"> EXPORTAR CANCIONES </a>
+            </p>
             <p th:text="${result}"></p>
         </div>
         <div th:if="${canciones != null and !canciones.empty}">

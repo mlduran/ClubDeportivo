@@ -65,7 +65,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 // rol puede ser master o invitado
 // utilizamos los ids para usuario y partida de sesion, para no cargar tantos datos de
 // persistencia en sesion y no usar tanta memoria
-@SessionAttributes({"id_usuarioSesion", "id_partidaSesion", "posiblesinvitados", "rol", "filtro"})
+@SessionAttributes({"id_usuarioSesion", "id_partidaSesion", "posiblesinvitados", "rol", "filtroUsuarios"})
 @Slf4j
 public class ControladorVista {
 
@@ -74,6 +74,8 @@ public class ControladorVista {
 
     @Value("${custom.server.ip}")
     private String customIp;
+
+    private final int[] numeroRondas = {10, 15, 20, 25, 30};
 
     @Autowired
     CancionServicioMetodos servCancion;
@@ -194,12 +196,12 @@ public class ControladorVista {
             return "redirect:/panel";
         }
     }
-    
-    private void ayuda(Model modelo, String nomFich){
-        
+
+    private void ayuda(Model modelo, String nomFich) {
+
         ArrayList<String> ayuda = Utilidades.leerAyuda("static/ayuda/" + nomFich);
         modelo.addAttribute("ayuda", ayuda);
-        
+
     }
 
     @GetMapping("/panel")
@@ -297,7 +299,7 @@ public class ControladorVista {
         modelo.addAttribute("newusuario", new Usuario());
         return "AltaUsuario";
     }
-    
+
     @GetMapping("/altaUsuarioAdm")
     public String altaUsuarioAdm(Model modelo) {
 
@@ -305,7 +307,7 @@ public class ControladorVista {
         if (usu == null) {
             return "redirect:/";
         }
-        
+
         modelo.addAttribute("newusuario", new Usuario());
         return "AltaUsuarioAdm";
     }
@@ -367,7 +369,7 @@ public class ControladorVista {
         modelo.addAttribute("error", err);
         return "AltaUsuario";
     }
-    
+
     @PostMapping("/altaUsuarioAdm")
     public String altaUsuarioAdm(@ModelAttribute("newusuario") Usuario usuario,
             @ModelAttribute("pws2") String pws2, Model modelo) {
@@ -377,8 +379,9 @@ public class ControladorVista {
         boolean passwOK = true;
         boolean usuOK = true;
         try {
-            if (!usuario.getContrasenya().equals(pws2))
+            if (!usuario.getContrasenya().equals(pws2)) {
                 throw new Exception("Las Contraseñas no son iguales");
+            }
         } catch (Exception ex) {
             passwOK = false;
             err = ex.getMessage();
@@ -411,7 +414,7 @@ public class ControladorVista {
                 usuario.setPreferencias("");
                 usuario.setActivo(true);
                 servUsuario.save(usuario);
-                resp = "Se ha creado el usuario ".concat(usuario.getUsuario());                
+                resp = "Se ha creado el usuario ".concat(usuario.getUsuario());
             } catch (Exception ex) {
                 err = "ERROR " + ex;
             }
@@ -551,7 +554,8 @@ public class ControladorVista {
         } else {
             modelo.addAttribute("posiblesinvitados", null);
         }
-        modelo.addAttribute("nrondas", 10);
+        modelo.addAttribute("oprondas", numeroRondas);
+        modelo.addAttribute("nronda", 10);
 
         informarUsuarioModelo(modelo, usu);
         return "CrearPartida";
@@ -567,9 +571,9 @@ public class ControladorVista {
         }
         Calendar cal = Calendar.getInstance();
         int anyoActual = cal.get(Calendar.YEAR);
+        int nrondas = Integer.parseInt(req.getParameter("nrondas"));
 
         try {
-            int nrondas = Integer.parseInt(req.getParameter("nrondas"));
 
             // Validaciones
             if (!usu.sePuedeCrearPartidaMaster()) {
@@ -584,8 +588,8 @@ public class ControladorVista {
             if (partida.getAnyoInicial() < 1950) {
                 throw new Exception("El año inicial es erroneo");
             }
-            if (nrondas < 5 || nrondas > 30) {
-                throw new Exception("Las rondas deben estar entre 5 y 30");
+            if (nrondas < 10 || nrondas > 30) {
+                throw new Exception("Las rondas deben estar entre 10 y 30");
             }
 
             List<Cancion> canciones = servCancion.obtenerCanciones(partida);
@@ -664,6 +668,7 @@ public class ControladorVista {
             modelo.addAttribute("result", resp);
             anyadirTemas(modelo);
             informarUsuarioModelo(modelo, usu);
+            modelo.addAttribute("oprondas", numeroRondas);
             return "CrearPartida";
         }
         modelo.addAttribute("id_partidaSesion", partida.getId());
@@ -744,11 +749,11 @@ public class ControladorVista {
         }
 
         FiltroUsuarios filtro;
-        if (modelo.getAttribute("filtro") == null) {
+        if (modelo.getAttribute("filtroUsuarios") == null) {
             filtro = new FiltroUsuarios();
-            modelo.addAttribute("filtro", filtro);
+            modelo.addAttribute("filtroUsuarios", filtro);
         } else {
-            filtro = (FiltroUsuarios) modelo.getAttribute("filtro");
+            filtro = (FiltroUsuarios) modelo.getAttribute("filtroUsuarios");
         }
 
         List<Usuario> usuarios = servUsuario.findByFiltroBasico(filtro);
@@ -758,7 +763,7 @@ public class ControladorVista {
     }
 
     @PostMapping("/administracion")
-    public String administracion(Model modelo, @ModelAttribute("filtro") FiltroUsuarios filtro) {
+    public String administracion(Model modelo, @ModelAttribute("filtroUsuarios") FiltroUsuarios filtro) {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
@@ -809,7 +814,7 @@ public class ControladorVista {
             roles.add(usurol);
         }
 
-        FiltroUsuarios filtro = (FiltroUsuarios) modelo.getAttribute("filtro");
+        FiltroUsuarios filtro = (FiltroUsuarios) modelo.getAttribute("filtroUsuarios");
         List<Usuario> usuarios = servUsuario.findByFiltroBasico(filtro);
         for (Usuario usuario : usuarios) {
             if (req.getParameter(usuario.selId()) != null) {

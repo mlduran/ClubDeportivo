@@ -70,7 +70,7 @@ public class SpotifyController {
 	private ListasSpotifyRepository listasDAO;
         
         @Autowired
-	private Utilidades utiles;
+	private UtilidadesSpotify utiles;
 	
 	@GetMapping("login")
 	public String spotifyLogin() {

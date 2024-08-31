@@ -316,6 +316,7 @@ public class WebsocketControler {
             asignarPuntuacionesUsuario(idPartida);
             limpiarPartida(idPartida);
             obJsonSalida.put("op", "acabar");
+            obJsonSalida.put("idPartida", idPartida);
         } else {
             limpiarDatos(idPartida);
             obJsonSalida.put("op", "nueva");
@@ -331,7 +332,7 @@ public class WebsocketControler {
         List<UsuarioWS> usuariosWS = new ArrayList<>(listaUsuariosWS);
         Collections.sort(usuariosWS);
         Usuario usuarioAcertante = null;
-        if (!usuariosWS.isEmpty()) {
+        if (usuariosWS.size() > 1) {
             for (UsuarioWS usuWS : usuariosWS) {
                 for (Respuesta res : respuestas) {
                     if (res.getTitulo() == null) {

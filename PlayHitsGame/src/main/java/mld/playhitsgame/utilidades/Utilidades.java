@@ -5,20 +5,20 @@
 package mld.playhitsgame.utilidades;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.OpcionInterpreteTmp;
 import mld.playhitsgame.exemplars.OpcionTituloTmp;
@@ -26,6 +26,7 @@ import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.Respuesta;
 import mld.playhitsgame.exemplars.Ronda;
 import mld.playhitsgame.exemplars.Usuario;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -290,6 +291,36 @@ public class Utilidades {
         }
 
         return lineas;
+    }
+
+    public static void exportarCanciones(List<Cancion> canciones, String ruta) {
+
+        StringBuilder buffer = new StringBuilder();
+        char sep = '\t';
+
+        for (Cancion cancion : canciones) {
+            buffer.append(String.valueOf(cancion.getId())).append(sep);
+            buffer.append(cancion.getTitulo()).append(sep);
+            buffer.append(cancion.getInterprete()).append(sep);
+            buffer.append(String.valueOf(cancion.getAnyo())).append("\n");
+        }
+
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd_MM_yyyy");
+        String nomfich = ruta + "/canciones_validar_" + currentDate.format(formatter) + ".csv";
+
+        escribirFichero(buffer, nomfich);
+    } 
+
+    public static void escribirFichero(StringBuilder txt, String nomfich) {
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(nomfich))) {
+            writer.write(txt.toString());
+            System.out.println("Contenido escrito en el archivo: " + nomfich);
+        } catch (IOException e) {
+            System.err.println("Error al escribir en el archivo: " + e.getMessage());
+        }
+
     }
 
 }

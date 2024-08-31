@@ -56,7 +56,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </div>
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="nrondas" th:text="#{general.nrondas}"/>
-                                        <input th:name="nrondas" id="nrondas" type="number" th:value="${nrondas}" />
+                                        <select th:name="nrondas"  title="nrondas" id="nrondas">
+                                            <option th:each="n : ${oprondas}" 
+                                                    th:value="${nronda}" th:text="${n}"></option>
+                                        </select>
                                     </div>
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" th:text="#{general.grup} + ' ' + ${usuarioSesion.txtGrupo}"/>

@@ -31,7 +31,7 @@ import org.springframework.stereotype.Service;
  * @author miguel
  */
 @Service
-public class Utilidades {
+public class UtilidadesSpotify {
 
     @Autowired
     CancionServicioMetodos servCancion;
