@@ -224,8 +224,6 @@ public class ControladorCancion {
 
     private void gestionCanciones(Model modelo) {
 
-        temasBD(modelo);
-
         FiltroCanciones filtro;
         if (modelo.getAttribute("filtroCanciones") == null) {
             filtro = new FiltroCanciones();
@@ -246,8 +244,53 @@ public class ControladorCancion {
         if (!usuarioCorrecto(modelo)) {
             return "redirect:/";
         }
+        temasBD(modelo);
         gestionCanciones(modelo);
         return "GestionCanciones";
+    }
+
+    @GetMapping("/editarCanciones")
+    public String editarCanciones(Model modelo) {
+
+        if (!usuarioCorrecto(modelo)) {
+            return "redirect:/";
+        }
+        gestionCanciones(modelo);
+        return "EditarCanciones";
+    }
+
+    @PostMapping("/editarCanciones")
+    public String editarCanciones(Model modelo, HttpServletRequest req) {
+
+        if (!usuarioCorrecto(modelo)) {
+            return "redirect:/";
+        }
+
+        FiltroCanciones filtro = (FiltroCanciones) modelo.getAttribute("filtroCanciones");
+        List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);
+        for (Cancion cancion : canciones) {
+            boolean isCambio = false;
+            if (req.getParameter(cancion.selId()) != null) {
+                if (!cancion.getTitulo().equals(req.getParameter("titulo_" + cancion.selId()))){
+                    cancion.setTitulo(req.getParameter("titulo_" + cancion.selId()));
+                    isCambio = true;
+                }
+                if (!cancion.getInterprete().equals(req.getParameter("interprete_" + cancion.selId()))){
+                    cancion.setInterprete(req.getParameter("interprete_" + cancion.selId()));
+                    isCambio = true;
+                }
+                int anyo = Integer.parseInt(req.getParameter("anyo_" + cancion.selId()));
+                if (cancion.getAnyo() != anyo){
+                    cancion.setAnyo(anyo);
+                    isCambio = true;
+                }
+                if (isCambio){
+                    cancion.setRevisar(false);
+                    servCancion.updateCancion(cancion.getId(), cancion);
+                }                
+            }
+        }
+        return "redirect:/editarCanciones";
     }
 
     @GetMapping("/exportarCanciones")
@@ -258,6 +301,7 @@ public class ControladorCancion {
         }
 
         gestionCanciones(modelo);
+        temasBD(modelo);
         List<Cancion> canciones = (List<Cancion>) modelo.getAttribute("canciones");
         Utilidades.exportarCanciones(canciones, rutaexportfiles);
 

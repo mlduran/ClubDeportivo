@@ -5,7 +5,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
     <head>
-        <title>Lista Canciones</title>
+        <title>Editar Canciones</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
@@ -54,51 +54,47 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <header th:insert="~{plantillas/playhitsgame :: encabezado}"></header>
 
         <a href="/gestionCanciones" class="button" id="volver">VOLVER</a>
-        <div th:if="${lista != null and !lista.empty}">
+        <div th:if="${canciones != null and !canciones.empty}">
+            <form method="post" th:action="@{/editarCanciones}" >
+                <input type="submit" value="Actualizar"/> 
+                <table border="2">
+                    <tr>
+                        <th>Id</th>
+                        <th>Titulo</th>
+                        <th>Interprete</th>
+                        <th>Año</th>
+                        <th>Play</th>
+                    </tr>
+                    <tr th:each="elem : ${canciones}">                        
+                        <td>
+                            <input type="text" th:name="${elem.selId()}" th:id="${elem.selId()}" th:value="${elem.id}" readonly />
+                        </td>
+                        <td>
+                            <input type="text" th:id="'titulo_' + ${elem.selId()}" th:name="'titulo_' + ${elem.selId()}" th:value="${elem.titulo}">
+                        </td>
+                        <td>
+                            <input type="text" th:id="'interprete_' + ${elem.selId()}" th:name="'interprete_' + ${elem.selId()}" th:value="${elem.interprete}">
+                        </td>
+                        <td>
+                            <input type="text" th:id="'anyo_' + ${elem.selId()}" th:name="'anyo_' + ${elem.selId()}" th:value="${elem.anyo}">
+                        </td>
+                        <td>
+                            <img id="play" src="images/play.png" alt="Play" style="width: 20px; cursor: pointer;" th:onclick='abrirPlay("${elem.spotifyplay}")' >
+                            <div id="reproductor" class="modal">
+                                <div class="modal-contenido">
+                                    <span class="cerrar">&times;</span>
+                                    <div id="controlPlayer">
 
-            <table border="2">
-                <tr>
-                    <th>Año</th>
-                    <th>Canciones</th>                    
-                </tr>            
-
-                <tr th:each="dato : ${estadistica}">
-                    <td th:text="${dato.key}"></td>
-                    <td th:text="${dato.value}"></td>
-                </tr>
-            </table>
-
-            <table border="2">
-                <tr>
-                    <th>Titulo</th>
-                    <th>Interprete</th>
-                    <th>Año</th>
-                    <th>Temas</th>  
-                    <th>Spotify</th>
-                    <th>Play</th>
-                </tr>
-                <tr th:each="elem : ${lista}">
-                    <td th:text="${elem.titulo}"></td>
-                    <td th:text="${elem.interprete}"></td>
-                    <td th:text="${elem.anyo}"></td>
-                    <td th:text="${elem.tematicasTxt}"></td>
-                    <td th:text="${elem.spotifyid}"></td>
-                    <td>
-                        <img id="play" src="images/play.png" alt="Play" style="width: 20px; cursor: pointer;" th:onclick='abrirPlay("${elem.spotifyplay}")' >
-                        <div id="reproductor" class="modal">
-                            <div class="modal-contenido">
-                                <span class="cerrar">&times;</span>
-                                <div id="controlPlayer">
-
-                                </div>                                
+                                    </div>                                
+                                </div>
                             </div>
-                        </div>
-                    </td>                    
-                </tr>
-            </table>
+                        </td>                    
+                    </tr>
+                </table>
+            </form>
         </div>   
 
-        <div th:if="${lista == null or lista.empty}">
+        <div th:if="${canciones == null or canciones.empty}">
             <p>NO HAY NINGUNA CANCION PARA LISTAR</p>
         </div>
 
@@ -111,9 +107,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 
             // Abrir el modal al hacer clic en el botón
             function abrirPlay(elem) {
-                control.innerHTML ='<audio controls><source src="' + elem + '" type="audio/mpeg" /></audio>';
+                control.innerHTML = '<audio controls><source src="' + elem + '" type="audio/mpeg" /></audio>';
                 modal.style.display = "block";
-            };
+            }
+            ;
 
             // Cerrar el modal al hacer clic en la "x"
             span.onclick = function () {
