@@ -521,16 +521,6 @@ public class ControladorVista {
         modelo.addAttribute("temas", temas);
     }
 
-    private void anyadirIdiomas(Model modelo) {
-
-        ArrayList<String> elems = new ArrayList();
-        elems.add("");
-        for (Idioma elem : Idioma.values()) {
-            elems.add(elem.toString());
-        }
-        modelo.addAttribute("idiomas", elems);
-    }
-
     @GetMapping("/crearPartida")
     public String crearPartida(Model modelo) {
 
@@ -546,7 +536,6 @@ public class ControladorVista {
         newPartida.setGrupo(usu.getGrupo());
         modelo.addAttribute("newpartida", newPartida);
         anyadirTemas(modelo);
-        anyadirIdiomas(modelo);
         ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) usuariosGrupo(usu);
 
         if (!posiblesInvitados.isEmpty()) {
@@ -669,6 +658,7 @@ public class ControladorVista {
             anyadirTemas(modelo);
             informarUsuarioModelo(modelo, usu);
             modelo.addAttribute("oprondas", numeroRondas);
+            modelo.addAttribute("nronda", nrondas);
             return "CrearPartida";
         }
         modelo.addAttribute("id_partidaSesion", partida.getId());

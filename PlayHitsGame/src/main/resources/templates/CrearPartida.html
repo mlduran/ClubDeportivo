@@ -56,9 +56,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </div>
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="nrondas" th:text="#{general.nrondas}"/>
-                                        <select th:name="nrondas"  title="nrondas" id="nrondas">
+                                        <select th:name="nrondas"  title="nrondas" th:id="nrondas">
                                             <option th:each="n : ${oprondas}" 
-                                                    th:value="${nronda}" th:text="${n}"></option>
+                                                    th:value="${n}" th:text="${n}"></option>
                                         </select>
                                     </div>
                                     <div class="mb-3">

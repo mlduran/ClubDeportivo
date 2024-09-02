@@ -91,13 +91,11 @@ public class CancionServicioMetodos implements CancionServicio {
     public Cancion updateTemasCancion(Long id, Cancion cancion) {
 
         Cancion cancionObj = DAO.findById(id).get();
-
+        cancionObj.getTematicas().addAll(cancion.getTematicas());
         // Eliminamos posibles duplicados
-        Set<Tema> hashSet = new HashSet(cancion.getTematicas());
-        cancion.getTematicas().clear();
-        cancion.getTematicas().addAll(hashSet);
-
-        cancionObj.setTematicas(cancion.getTematicas());
+        Set<Tema> hashSet = new HashSet(cancionObj.getTematicas());
+        cancionObj.getTematicas().clear();
+        cancionObj.getTematicas().addAll(hashSet);
 
         return DAO.save(cancionObj);
     }
