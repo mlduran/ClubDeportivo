@@ -64,6 +64,7 @@ public class ControladorCancion {
         }
 
         List<Cancion> lista = servCancion.findAll();
+        List errores = new ArrayList();
 
         Calendar cal = Calendar.getInstance();
         int year = cal.get(Calendar.YEAR);
@@ -73,11 +74,18 @@ public class ControladorCancion {
         }
 
         for (Cancion obj : lista) {
-            estadistica.put(obj.getAnyo(), estadistica.get(obj.getAnyo()) + 1);
+            try{
+                estadistica.put(obj.getAnyo(), estadistica.get(obj.getAnyo()) + 1);
+            }catch (Exception e){
+                errores.add(String.valueOf(obj.getId()) +  "\t" + obj.getTitulo() + "\t" + 
+                        obj.getInterprete() + "\t" + String.valueOf(obj.getAnyo()));
+            }
         }
 
         model.addAttribute("estadistica", estadistica);
         model.addAttribute("lista", lista);
+        model.addAttribute("errores", errores);
+        
         return "ListaCanciones";
     }
 

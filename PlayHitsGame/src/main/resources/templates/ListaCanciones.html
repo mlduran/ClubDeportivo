@@ -54,6 +54,12 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <header th:insert="~{plantillas/playhitsgame :: encabezado}"></header>
 
         <a href="/gestionCanciones" class="button" id="volver">VOLVER</a>
+        
+        <div th:if="${errores != null and errores.empty == false}">
+             <p>ERRORES DETECTADOS :</p>
+             <p th:each="txt : ${errores}" th:text="${txt}" />
+        </div>       
+        
         <div th:if="${lista != null and !lista.empty}">
 
             <table border="2">
