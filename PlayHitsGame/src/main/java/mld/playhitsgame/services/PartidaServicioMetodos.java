@@ -43,19 +43,14 @@ public class PartidaServicioMetodos implements PartidaServicio{
         if(Objects.nonNull(partida.getStatus())){
             obj.setStatus(partida.getStatus());
         }
-        
-        if(Objects.nonNull(partida.getGenero())){
-            obj.setGenero(partida.getGenero());
-        }
-        
-        if(Objects.nonNull(partida.getIdioma())){
-            obj.setIdioma(partida.getIdioma());
+
+        if(Objects.nonNull(partida.getTipo())){
+            obj.setTipo(partida.getTipo());
         } 
         
         if(Objects.nonNull(partida.getTema()) && !"".equalsIgnoreCase(partida.getTema())){
             obj.setTema(partida.getTema());
-        }
-        
+        }        
 
         if(Objects.nonNull(partida.getGrupo()) && !"".equalsIgnoreCase(partida.getGrupo())){
             obj.setGrupo(partida.getGrupo());

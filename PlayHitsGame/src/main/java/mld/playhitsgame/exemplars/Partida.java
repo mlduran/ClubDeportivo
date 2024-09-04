@@ -41,11 +41,12 @@ public class Partida{
     
     @Enumerated(EnumType.STRING)
     private StatusPartida status;
-    
+
+    @Enumerated(EnumType.STRING)
+    private TipoPartida tipo;
     
     @ManyToOne// poner LAZY para no cargar hasta hacer un get
-    private Usuario master;
-    
+    private Usuario master;    
     
     @ManyToMany(mappedBy = "partidasInvitado", fetch=FetchType.EAGER)
     private List<Usuario> invitados;
@@ -54,8 +55,6 @@ public class Partida{
     private List<Ronda> rondas;    
   
     private int rondaActual;
-    private Genero genero;
-    private Idioma idioma;
     private String tema; // por ejemplo Descripciones genericas 
     @Min(1950)
     private int anyoInicial;
@@ -65,6 +64,19 @@ public class Partida{
     private String grupo;
     private String ganador;
     
+    
+    public boolean isTipoGrupo(){
+        
+        return this.getTipo().equals(TipoPartida.grupo);
+        
+    }
+    
+     public boolean isTipoPersonal(){
+        
+        return this.getTipo().equals(TipoPartida.personal);
+        
+    }
+     
     public boolean isTerminada(){
         
         return this.status == StatusPartida.Terminada;
@@ -117,10 +129,6 @@ public class Partida{
             txt.add("Grupo: ".concat(this.getGrupo()));
         if (this.getTema()!= null && !this.getTema().isEmpty())
             txt.add("Tema: ".concat(this.getTema()));
-        if (this.getGenero()!= null && this.getGenero() != null)
-            txt.add("Genero: ".concat(this.getGenero().toString()));
-        if (this.getIdioma()!= null && this.getIdioma()!= null)
-            txt.add("Idioma: ".concat(this.getIdioma().toString()));
         txt.add("Canciones Seleccionadas: " + String.valueOf(this.nCanciones));
         txt.add("Año inicial: " + String.valueOf(this.getAnyoInicial()));
         txt.add("Año final: " + String.valueOf(this.getAnyoFinal()));

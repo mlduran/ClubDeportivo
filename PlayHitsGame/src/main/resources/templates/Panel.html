@@ -95,21 +95,67 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </table>
                                 </div>
                             </div>  
-                            <div th:if="*{sePuedeCrearPartidaMaster()} == true" class="text-center my-2">
-                                <a href="/crearPartida" class="btn btn-primary" role="button" th:text="#{general.crearpartida}"/>
+                            <div th:if="*{sePuedeCrearPartidaMaster()} == true" class="text-center my-2">                                
+                                <p>
+                                    <a href="/crearPartidaPersonal" class="btn btn-primary" role="button" th:text="#{general.crearpartidapersonal}"/>
+                                </p> 
+                                <p>
+                                    <a href="/crearPartida" class="btn btn-primary" role="button" th:text="#{general.crearpartidagrupo}"/>
+                                </p>
                             </div>
-                            <div th:if="*{hayPartidasTerminadas()} == true" class="text-center my-2" >
+                            <div th:if="*{hayPartidasTerminadasPersonales()} == true" class="text-center my-2" >
 
-                                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#tablapartidas" 
-                                        aria-expanded="false" aria-controls="tablapartidas" th:text="#{general.partidasterminadas}"/>                                       
+                                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#tablapartidaspersonales" 
+                                        aria-expanded="false" aria-controls="tablapartidaspersonales" th:text="#{general.partidasterminadasgrupo}"/>                                       
                                 </button>
-                                <div class="collapse" id="tablapartidas">
+                                <div class="collapse" id="tablapartidaspersonales">
+                                    <div class="table-responsive-lg ">
+                                        <table class="table table-sm table-striped table-bordered" > 
+                                            <thead class="table-light" style="text-align:center;">
+                                                <tr>
+                                                    <th colspan="2">
+                                                        <p th:text="#{general.partidasterminadaspersonales}"/>
+                                                    </th>                   
+                                                </tr> 
+                                                <tr>
+                                                    <th>
+                                                        <p th:text="#{general.fecha}"/> 
+                                                    </th>
+                                                    <th>
+                                                        <p th:text="#{general.configuracion}"/> 
+                                                    </th>
+                                                </tr>                                            
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="unapartida : *{partidasTerminadasPersonales()}">
+                                                    <td>
+                                                        <a th:href="'/partidaConsultaPersonales/' + ${unapartida.id}" class="button"> 
+                                                            <p th:text="${unapartida.fechaFormateada}"/>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <a th:href="'/partidaConsultaPersonales/' + ${unapartida.id}" class="button"> 
+                                                            <p th:text="${unapartida.descripcion}"/>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div th:if="*{hayPartidasTerminadasGrupo()} == true" class="text-center my-2" >
+
+                                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#tablapartidasgrupo" 
+                                        aria-expanded="false" aria-controls="tablapartidasgrupo" th:text="#{general.partidasterminadasgrupo}"/>                                       
+                                </button>
+                                <div class="collapse" id="tablapartidasgrupo">
                                     <div class="table-responsive-lg ">
                                         <table class="table table-sm table-striped table-bordered" > 
                                             <thead class="table-light" style="text-align:center;">
                                                 <tr>
                                                     <th colspan="3">
-                                                        <p th:text="#{general.partidasterminadas}"/>
+                                                        <p th:text="#{general.partidasterminadasgrupo}"/>
                                                     </th>                   
                                                 </tr> 
                                                 <tr>
@@ -125,19 +171,19 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                 </tr>                                            
                                             </thead>
                                             <tbody>
-                                                <tr th:each="unapartida : *{partidasTerminadas()}">
+                                                <tr th:each="unapartida : *{partidasTerminadasGrupo()}">
                                                     <td>
-                                                        <a th:href="'/partidaConsulta/' + ${unapartida.id}" class="button"> 
+                                                        <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
                                                             <p th:text="${unapartida.fechaFormateada}"/>
                                                         </a>
                                                     </td>
                                                     <td>
-                                                        <a th:href="'/partidaConsulta/' + ${unapartida.id}" class="button"> 
+                                                        <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
                                                             <p th:text="${unapartida.descripcion}"/>
                                                         </a>
                                                     </td>
                                                     <td>
-                                                        <a th:href="'/partidaConsulta/' + ${unapartida.id}" class="button"> 
+                                                        <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
                                                             <p th:text="${unapartida.usuariosTxT}"/>
                                                         </a>
                                                     </td>

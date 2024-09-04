@@ -185,11 +185,13 @@ public class Usuario{
         return !partidasInvitadoPendientes().isEmpty();        
     }    
     
-    public List<Partida> partidasTerminadas(){
+    public List<Partida> partidasTerminadasGrupo(){
         
         List<Partida>  result = new ArrayList<>();
         
         for (Partida elem : this.getPartidasMaster()){
+            if (elem.getTipo() != TipoPartida.grupo)
+                continue;
             if (elem.getStatus() == StatusPartida.Terminada){
                 result.add(elem);
             }
@@ -203,9 +205,29 @@ public class Usuario{
         return result;        
     }
     
-    public boolean hayPartidasTerminadas(){
+    public boolean hayPartidasTerminadasGrupo(){
         
-        return !partidasTerminadas().isEmpty();        
+        return !partidasTerminadasGrupo().isEmpty();        
+    }
+    
+    public List<Partida> partidasTerminadasPersonales(){
+        
+        List<Partida>  result = new ArrayList<>();
+        
+        for (Partida elem : this.getPartidasMaster()){
+            if (elem.getTipo() != TipoPartida.personal)
+                continue;
+            if (elem.getStatus() == StatusPartida.Terminada){
+                result.add(elem);
+            }
+        } 
+        
+        return result;        
+    }
+    
+    public boolean hayPartidasTerminadasPersonales(){
+        
+        return !partidasTerminadasPersonales().isEmpty();        
     }
     
     public String getTxtGrupo(){

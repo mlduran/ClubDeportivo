@@ -49,7 +49,7 @@ var procesar = function (mensaje) {
         txt = txtPrimeros(dataJson);
         if (txt !== undefined && txt !== "")
             window.alert(txt);
-        location.href = '/partidaConsulta/' + dataJson["idPartida"];
+        location.href = '/partidaConsultaGrupo/' + dataJson["idPartida"];
         //location.reload(); // ahora hacemos lo mismo, pero se deja por si hubiese otra cosa que hacer
     }
     if (dataJson["op"] === "respuestas") {

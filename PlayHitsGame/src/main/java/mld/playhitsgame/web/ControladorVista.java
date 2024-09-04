@@ -44,6 +44,7 @@ import mld.playhitsgame.exemplars.Idioma;
 import mld.playhitsgame.exemplars.OpcionInterpreteTmp;
 import mld.playhitsgame.exemplars.OpcionTituloTmp;
 import mld.playhitsgame.exemplars.PtsUsuario;
+import mld.playhitsgame.exemplars.TipoPartida;
 import mld.playhitsgame.seguridad.Roles;
 import mld.playhitsgame.seguridad.UsuarioRol;
 import mld.playhitsgame.services.OpcionInterpreteTmpServicioMetodos;
@@ -521,21 +522,32 @@ public class ControladorVista {
         modelo.addAttribute("temas", temas);
     }
 
-    @GetMapping("/crearPartida")
-    public String crearPartida(Model modelo) {
+    private void crearPartida(Model modelo, Partida newPartida, Usuario usu) {
 
         Calendar fecha = Calendar.getInstance();
-
-        Usuario usu = usuarioModelo(modelo);
-        if (usu == null) {
-            return "redirect:/";
-        }
-        Partida newPartida = new Partida();
         newPartida.setAnyoInicial(1950);
         newPartida.setAnyoFinal(fecha.get(Calendar.YEAR) - 1);
         newPartida.setGrupo(usu.getGrupo());
         modelo.addAttribute("newpartida", newPartida);
         anyadirTemas(modelo);
+        modelo.addAttribute("oprondas", numeroRondas);
+        modelo.addAttribute("nronda", 10);
+        informarUsuarioModelo(modelo, usu);
+
+    }
+
+    @GetMapping("/crearPartida")
+    public String crearPartida(Model modelo) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/";
+        }
+
+        Partida newPartida = new Partida();
+        newPartida.setTipo(TipoPartida.grupo);
+        crearPartida(modelo, newPartida, usu);
+
         ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) usuariosGrupo(usu);
 
         if (!posiblesInvitados.isEmpty()) {
@@ -543,10 +555,21 @@ public class ControladorVista {
         } else {
             modelo.addAttribute("posiblesinvitados", null);
         }
-        modelo.addAttribute("oprondas", numeroRondas);
-        modelo.addAttribute("nronda", 10);
+        return "CrearPartida";
+    }
 
-        informarUsuarioModelo(modelo, usu);
+    @GetMapping("/crearPartidaPersonal")
+    public String crearPartidaPersonal(Model modelo) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/";
+        }
+
+        Partida newPartida = new Partida();
+        newPartida.setTipo(TipoPartida.personal);
+        crearPartida(modelo, newPartida, usu);
+        modelo.addAttribute("posiblesinvitados", null);
         return "CrearPartida";
     }
 
@@ -589,17 +612,19 @@ public class ControladorVista {
 
             partida.setInvitados(new ArrayList());
 
-            ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) modelo.getAttribute("posiblesinvitados");
-            if (posiblesInvitados != null) {
-                for (Usuario usuarioInv : posiblesInvitados) {
+            if (partida.isTipoGrupo()) {
+                ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) modelo.getAttribute("posiblesinvitados");
+                if (posiblesInvitados != null) {
+                    for (Usuario usuarioInv : posiblesInvitados) {
 
-                    String valor = req.getParameter(usuarioInv.nombreId());
-                    if ("on".equals(valor)) {
+                        String valor = req.getParameter(usuarioInv.nombreId());
+                        if ("on".equals(valor)) {
 
-                        Optional<Usuario> usuario = servUsuario.findById(usuarioInv.getId());
-                        if (!usuario.isEmpty()) {
-                            usuario.get().getPartidasInvitado().add(partida);
-                            partida.getInvitados().add(usuario.get());
+                            Optional<Usuario> usuario = servUsuario.findById(usuarioInv.getId());
+                            if (!usuario.isEmpty()) {
+                                usuario.get().getPartidasInvitado().add(partida);
+                                partida.getInvitados().add(usuario.get());
+                            }
                         }
                     }
                 }
@@ -610,8 +635,11 @@ public class ControladorVista {
             partida.setRondaActual(1);
             Partida newPartida = servPartida.savePartida(partida);
             usu.getPartidasMaster().add(newPartida);
-            for (Usuario usuPartida : partida.getInvitados()) {
-                servUsuario.update(usuPartida.getId(), usuPartida);
+
+            if (partida.isTipoGrupo()) {
+                for (Usuario usuPartida : partida.getInvitados()) {
+                    servUsuario.update(usuPartida.getId(), usuPartida);
+                }
             }
 
             //crear las rondas con nrondas
@@ -662,8 +690,13 @@ public class ControladorVista {
             return "CrearPartida";
         }
         modelo.addAttribute("id_partidaSesion", partida.getId());
-        modelo.addAttribute("rol", Rol.master);
-        return "redirect:/partida";
+
+        if (partida.isTipoGrupo()) {
+            modelo.addAttribute("rol", Rol.master);
+            return "redirect:/partida";
+        } else {
+            return "redirect:/partidaPersonal";
+        }
     }
 
     private void resultadosPartida(Partida partidaSesion, Model modelo) {
@@ -697,8 +730,8 @@ public class ControladorVista {
         modelo.addAttribute("resultados", resultadosPartida);
     }
 
-    @GetMapping("/partidaConsulta/{id}")
-    public String partidaConsulta(@PathVariable Long id, Model modelo) {
+    @GetMapping("/partidaConsultaGrupo/{id}")
+    public String partidaConsultaGrupo(@PathVariable Long id, Model modelo) {
 
         Partida partidaSesion = null;
         try {
