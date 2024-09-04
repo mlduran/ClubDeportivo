@@ -189,8 +189,8 @@ public class WebsocketControler {
 
         }
         if ("acabaronda".equals(obJson.getString("op"))) {
-
             pasarSiguienteRonda(obJson.getLong("idPartida"), obJsonSalida);
+            return obJsonSalida;
         }
 
         if ("titulo".equals(obJson.getString("op"))) {

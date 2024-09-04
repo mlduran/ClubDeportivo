@@ -38,15 +38,15 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="anyofin" th:text="#{general.anyofin}"/>
                                         <input id="anyofin" type="number" th:field="*{anyoFinal}" th:value="${newpartida.anyoFinal}" required="required"/>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="mb-2 text-muted" for="nrondas" th:text="#{general.nrondas}"/>
-                                        <select th:name="nrondas"  title="nrondas" th:id="nrondas">
-                                            <option th:each="n : ${oprondas}" 
-                                                    th:value="${n}" th:text="${n}"></option>
-                                        </select>
-                                    </div>
+                                    </div>                                    
                                     <div th:if="${newpartida.tipoGrupo}">
+                                        <div class="mb-3">
+                                            <label class="mb-2 text-muted" for="nrondas" th:text="#{general.nrondas}"/>
+                                            <select th:name="nrondas"  title="nrondas" th:id="nrondas">
+                                                <option th:each="n : ${oprondas}" 
+                                                        th:value="${n}" th:text="${n}"></option>
+                                            </select>
+                                        </div>
                                         <div class="mb-3">
                                             <label class="mb-2 text-muted" th:text="#{general.grup} + ' ' + ${usuarioSesion.txtGrupo}"/>
                                         </div>
@@ -85,52 +85,5 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 </div>
             </div>
         </section>
-        <!--    
-        <div>           
-            <form method="post" th:action="@{/partida/crear}" th:object="${newpartida}"> 
-                <p>Genero
-                <select th:field="*{genero}" title="Genero">
-                    <option th:each="generoOpt : ${T(mld.playhitsgame.exemplars.Genero).values()}" 
-                    th:value="${generoOpt}" th:text="${generoOpt}"></option>
-                </select></p>
-                <p>Idioma
-                <select th:field="*{idioma}" title="Idioma">
-                    <option th:each="idiomaOpt : ${idiomas}" 
-                    th:value="${idiomaOpt}" th:text="${idiomaOpt}"></option>
-                </select></p>
-                <p>Tema
-                <select th:field="*{tema}" title="Tema">
-                    <option th:each="elem : ${temas}" 
-                    th:value="${elem}" th:text="${elem}"></option>
-                </select></p>                
-                
-                <p>Año Inicial<input type="number" th:field="*{anyoInicial}" th:value="${newpartida.anyoInicial}" required="required"/></p>
-                <p>Año Final<input type="number" th:field="*{anyoFinal}" th:value="${newpartida.anyoFinal}" required="required"/></p>
-                <p>Numero Rondas<input value="10" type="number" name="nrondas" requied="required"/></p>
-                
-                <p th:text="${'GRUPO '+ usuarioSesion.txtGrupo}"></p>
-                
-                <div th:if="${posiblesinvitados != null}">
-                    <table border="2">
-                        <tr th:each="elem : ${posiblesinvitados}">
-                            <td><input type="checkbox" th:name="${elem.nombreId}" id="${elem.nombreId}" checked /></td>
-                            <td th:text="${elem.nombre}"></td>                    
-                        </tr>
-                    </table>
-                </div>
-                <div th:if="${posiblesinvitados == null}">
-                    <p th:text="'LA PARTIDA SERA PARA TI SOLO, YA QUE NO HAY NINGUN USUARIO QUE ESTE EN TU GRUPO PARA AÑADIR COMO INVITADO'"/>
-                </div>              
-            
-            <p th:text="${result}"></p>
-        </div>
-
-                <input type="submit" value="Crear"/>                
-            </form>
-            
-            <p th:text="${result}"></p>
-        </div>
-        -->
-
     </body>
 </html>

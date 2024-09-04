@@ -231,7 +231,7 @@ public class ControladorVista {
         modelo.addAttribute("rol", Rol.master);
         Partida partida = usu.partidaMasterEnCurso();
 
-        return partida(modelo, partida);
+        return partidaGrupo(modelo, partida);
     }
 
     @GetMapping("/partidaInvitado/{id}")
@@ -250,10 +250,10 @@ public class ControladorVista {
             }
         }
 
-        return partida(modelo, partida);
+        return partidaGrupo(modelo, partida);
     }
 
-    public String partida(Model modelo, Partida partida) {
+    public String partidaGrupo(Model modelo, Partida partida) {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
@@ -283,15 +283,15 @@ public class ControladorVista {
         modelo.addAttribute("id_partidaSesion", partida.getId());
         modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
         modelo.addAttribute("ptsUsuario", ptsUsuarios);
-        ayuda(modelo, "partida.txt");
-        return "Partida";
+        ayuda(modelo, "partidaGrupo.txt");
+        return "PartidaGrupo";
     }
 
-    @GetMapping("/partida")
-    public String partida(Model modelo) {
+    @GetMapping("/partidaGrupo")
+    public String partidaGrupo(Model modelo) {
 
         Partida partida = partidaModelo(modelo);
-        return partida(modelo, partida);
+        return partidaGrupo(modelo, partida);
     }
 
     @GetMapping("/altaUsuario")
@@ -573,14 +573,9 @@ public class ControladorVista {
         return "CrearPartida";
     }
 
-    @PostMapping("/crearPartida")
-    public String crearPartida(@ModelAttribute("newpartida") Partida partida,
-            Model modelo, HttpServletRequest req) {
+    private String crearPartidaGrupo(Partida partida,
+            Model modelo, HttpServletRequest req, Usuario usu) {
 
-        Usuario usu = usuarioModelo(modelo);
-        if (usu == null) {
-            return "redirect:/";
-        }
         Calendar cal = Calendar.getInstance();
         int anyoActual = cal.get(Calendar.YEAR);
         int nrondas = Integer.parseInt(req.getParameter("nrondas"));
@@ -612,19 +607,17 @@ public class ControladorVista {
 
             partida.setInvitados(new ArrayList());
 
-            if (partida.isTipoGrupo()) {
-                ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) modelo.getAttribute("posiblesinvitados");
-                if (posiblesInvitados != null) {
-                    for (Usuario usuarioInv : posiblesInvitados) {
+            ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) modelo.getAttribute("posiblesinvitados");
+            if (posiblesInvitados != null) {
+                for (Usuario usuarioInv : posiblesInvitados) {
 
-                        String valor = req.getParameter(usuarioInv.nombreId());
-                        if ("on".equals(valor)) {
+                    String valor = req.getParameter(usuarioInv.nombreId());
+                    if ("on".equals(valor)) {
 
-                            Optional<Usuario> usuario = servUsuario.findById(usuarioInv.getId());
-                            if (!usuario.isEmpty()) {
-                                usuario.get().getPartidasInvitado().add(partida);
-                                partida.getInvitados().add(usuario.get());
-                            }
+                        Optional<Usuario> usuario = servUsuario.findById(usuarioInv.getId());
+                        if (!usuario.isEmpty()) {
+                            usuario.get().getPartidasInvitado().add(partida);
+                            partida.getInvitados().add(usuario.get());
                         }
                     }
                 }
@@ -689,14 +682,35 @@ public class ControladorVista {
             modelo.addAttribute("nronda", nrondas);
             return "CrearPartida";
         }
-        modelo.addAttribute("id_partidaSesion", partida.getId());
 
-        if (partida.isTipoGrupo()) {
-            modelo.addAttribute("rol", Rol.master);
-            return "redirect:/partida";
-        } else {
-            return "redirect:/partidaPersonal";
+        return "redirect:/partidaMaster";
+
+    }
+    
+    private String crearPartidaPersonal(Partida partida,
+            Model modelo, HttpServletRequest req, Usuario usu) {
+        
+        return "redirect:/partidaPersonal";
+    }
+
+    @PostMapping("/crearPartida")
+    public String crearPartida(@ModelAttribute("newpartida") Partida partida,
+            Model modelo, HttpServletRequest req) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/";
         }
+        modelo.addAttribute("id_partidaSesion", partida.getId());
+        if (partida.isTipoGrupo()) {
+            return crearPartidaGrupo(partida, modelo, req, usu);
+        }
+        if (partida.isTipoPersonal()) {
+            return crearPartidaPersonal(partida, modelo, req, usu);
+        }       
+        modelo.addAttribute("result", "Error en el tipo de partida");
+        return "CrearPartida";
+
     }
 
     private void resultadosPartida(Partida partidaSesion, Model modelo) {
