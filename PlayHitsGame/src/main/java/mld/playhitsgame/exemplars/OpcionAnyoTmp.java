@@ -5,7 +5,6 @@
 package mld.playhitsgame.exemplars;
 
 import jakarta.persistence.*;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,28 +17,16 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "temas")
-public class Tema {
+@Table(name = "opcionesanyotmp")
+public class OpcionAnyoTmp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true)
-    private String tema;
-    private String descripcion;
-    @Enumerated(EnumType.STRING)
-    private Idioma idioma;
-    @Enumerated(EnumType.STRING)
-    private Genero genero;
-    @ManyToMany(mappedBy = "tematicas")
-    private List<Cancion> canciones;    
-    
-    private Long usuarioRecord;
-    private int puntos;     
 
-    public String getNumCanciones() {
-
-        return String.valueOf(this.getCanciones().size());
-    }
+    private Long partida;
+    private Long ronda;
+    private Long cancion;
+    private int opAnyo;
 
 }

@@ -6,7 +6,6 @@ package mld.playhitsgame.utilidades;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,13 +19,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import mld.playhitsgame.exemplars.Cancion;
+import mld.playhitsgame.exemplars.OpcionAnyoTmp;
 import mld.playhitsgame.exemplars.OpcionInterpreteTmp;
 import mld.playhitsgame.exemplars.OpcionTituloTmp;
 import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.Respuesta;
 import mld.playhitsgame.exemplars.Ronda;
 import mld.playhitsgame.exemplars.Usuario;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -82,7 +81,7 @@ public class Utilidades {
         }
     }
 
-    private static Cancion cancionRandom(List<Cancion> lista) {
+    public static Cancion cancionRandom(List<Cancion> lista) {
         int i;
         i = (int) (Math.floor(Math.random() * lista.size()));
 
@@ -156,15 +155,18 @@ public class Utilidades {
 
         return newText.toString();
     }
-
-    public static List<OpcionTituloTmp> opcionesTitulosCanciones(Ronda ronda) {
-
-        // de las canciones elije aleatoriamente que une a la correcta y 
-        // devuelve una lista con las canciones encriptadas
-        ArrayList<OpcionTituloTmp> opciones = new ArrayList();
+    
+    public static List<OpcionTituloTmp> opcionesTitulosCanciones(Ronda ronda, List<Cancion> canciones) {
+        
         List<Cancion> cancionesParaOpciones
-                = cancionesParaListaOpciones(ronda.getPartida().canciones(), ronda.getCancion(), NUMERO_OPCIONES);
+                = cancionesParaListaOpciones(canciones, ronda.getCancion(), NUMERO_OPCIONES);
+        
+        return  obtenerOpcionesTitulosCanciones(ronda, cancionesParaOpciones);     
+    }    
 
+    private static List<OpcionTituloTmp> obtenerOpcionesTitulosCanciones(Ronda ronda, List<Cancion> cancionesParaOpciones) {
+
+        ArrayList<OpcionTituloTmp> opciones = new ArrayList();
         OpcionTituloTmp newObj;
         for (Cancion cancion : cancionesParaOpciones) {
             newObj = new OpcionTituloTmp();
@@ -178,14 +180,29 @@ public class Utilidades {
         return opciones;
     }
 
-    public static List<OpcionInterpreteTmp> opcionesInterpretesCanciones(Ronda ronda) {
+    public static List<OpcionTituloTmp> opcionesTitulosCanciones(Ronda ronda) {
 
         // de las canciones elije aleatoriamente que une a la correcta y 
         // devuelve una lista con las canciones encriptadas
-        ArrayList<OpcionInterpreteTmp> opciones = new ArrayList();
         List<Cancion> cancionesParaOpciones
-                = cancionesParaListaOpciones(ronda.getPartida().canciones(),
-                        ronda.getCancion(), NUMERO_OPCIONES);
+                = cancionesParaListaOpciones(ronda.getPartida().canciones(), ronda.getCancion(), NUMERO_OPCIONES);
+
+        return obtenerOpcionesTitulosCanciones(ronda, cancionesParaOpciones);
+    }
+    
+    public static List<OpcionInterpreteTmp> opcionesInterpretesCanciones(Ronda ronda, List<Cancion> canciones) {
+        
+        List<Cancion> cancionesParaOpciones
+                = cancionesParaListaOpciones(canciones, ronda.getCancion(), NUMERO_OPCIONES);
+        
+        return  obtenerOpcionesInterpretesCanciones(ronda, cancionesParaOpciones);     
+    }    
+
+    private static List<OpcionInterpreteTmp> obtenerOpcionesInterpretesCanciones(Ronda ronda, List<Cancion> cancionesParaOpciones) {
+
+        // de las canciones elije aleatoriamente que une a la correcta y 
+        // devuelve una lista con las canciones encriptadas
+        ArrayList<OpcionInterpreteTmp> opciones = new ArrayList();        
 
         OpcionInterpreteTmp newObj;
         for (Cancion cancion : cancionesParaOpciones) {
@@ -194,6 +211,62 @@ public class Utilidades {
             newObj.setRonda(ronda.getId());
             newObj.setCancion(cancion.getId());
             newObj.setOpInterprete(encriptarString(cancion.getInterprete()));
+            opciones.add(newObj);
+        }
+
+        return opciones;
+    }
+
+    public static List<OpcionInterpreteTmp> opcionesInterpretesCanciones(Ronda ronda) {
+
+        List<Cancion> cancionesParaOpciones
+                = cancionesParaListaOpciones(ronda.getPartida().canciones(),
+                        ronda.getCancion(), NUMERO_OPCIONES);
+        
+        return obtenerOpcionesInterpretesCanciones(ronda, cancionesParaOpciones);
+        
+    }
+
+    public static List<OpcionAnyoTmp> opcionesAnyosCanciones(Ronda ronda) {
+
+        // de las canciones elije aleatoriamente que une a la correcta y 
+        // devuelve una lista con las canciones encriptadas
+        ArrayList<OpcionAnyoTmp> opciones = new ArrayList();
+        int anyoOk = ronda.getCancion().getAnyo();
+        int anyoIni = ronda.getPartida().getAnyoInicial();
+        int anyoFin = ronda.getPartida().getAnyoFinal();
+        int[] anyos = new int[NUMERO_OPCIONES + 1];
+
+        for (int i = 1; i <= NUMERO_OPCIONES; i++) {
+            anyos[i] = (int) (Math.random() * (anyoFin - anyoIni)) + anyoIni;
+            for (int ii = 1; ii < i; ii++) {
+                if (anyos[i] == anyos[ii]) {
+                    i = i - 1;
+                    break;
+                }
+            }
+        }
+
+        boolean opOk = false;
+        for (int i = 1; i <= NUMERO_OPCIONES; i++) {
+            if (anyos[i] == anyoOk) {
+                opOk = true;
+                break;
+            }
+        }
+        // insertamos la correcta aleatoriamente entre las opciones
+        if (!opOk) {
+            int n = (int) (Math.random() * NUMERO_OPCIONES) + 1;
+            anyos[n] = anyoOk;
+        }
+
+        OpcionAnyoTmp newObj;
+        for (int i = 1; i <= NUMERO_OPCIONES; i++) {
+            newObj = new OpcionAnyoTmp();
+            newObj.setPartida(ronda.getPartida().getId());
+            newObj.setRonda(ronda.getId());
+            newObj.setCancion(ronda.getCancion().getId());
+            newObj.setOpAnyo(anyos[i]);
             opciones.add(newObj);
         }
 
@@ -310,7 +383,7 @@ public class Utilidades {
         String nomfich = ruta + "/canciones_validar_" + currentDate.format(formatter) + ".csv";
 
         escribirFichero(buffer, nomfich);
-    } 
+    }
 
     public static void escribirFichero(StringBuilder txt, String nomfich) {
 

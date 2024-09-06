@@ -141,6 +141,16 @@ public class Partida{
         return this.rondas.get(this.rondaActual - 1);  
     }
     
+    public Ronda ultimaRonda(){
+        
+        Ronda ultima = null;
+        List<Ronda> lasRondas = this.getRondas();
+        if (lasRondas != null && !lasRondas.isEmpty() )
+            ultima = lasRondas.get(lasRondas.size() - 1);
+        
+        return ultima;        
+    }
+    
     public List<Usuario> usuariosPartida(){
         
         ArrayList<Usuario> lista = new ArrayList();

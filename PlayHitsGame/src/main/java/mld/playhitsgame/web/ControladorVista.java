@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import mld.playhitsgame.correo.EmailServicioMetodos;
 import mld.playhitsgame.correo.Mail;
 import mld.playhitsgame.exemplars.Cancion;
+import mld.playhitsgame.exemplars.FiltroCanciones;
 import mld.playhitsgame.exemplars.FiltroUsuarios;
 import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.Respuesta;
@@ -41,12 +42,14 @@ import mld.playhitsgame.services.TemaServicioMetodos;
 import mld.playhitsgame.services.UsuarioServicioMetodos;
 import static mld.playhitsgame.utilidades.Utilidades.*;
 import mld.playhitsgame.exemplars.Idioma;
+import mld.playhitsgame.exemplars.OpcionAnyoTmp;
 import mld.playhitsgame.exemplars.OpcionInterpreteTmp;
 import mld.playhitsgame.exemplars.OpcionTituloTmp;
 import mld.playhitsgame.exemplars.PtsUsuario;
 import mld.playhitsgame.exemplars.TipoPartida;
 import mld.playhitsgame.seguridad.Roles;
 import mld.playhitsgame.seguridad.UsuarioRol;
+import mld.playhitsgame.services.OpcionAnyoTmpServicioMetodos;
 import mld.playhitsgame.services.OpcionInterpreteTmpServicioMetodos;
 import mld.playhitsgame.services.OpcionTituloTmpServicioMetodos;
 import mld.playhitsgame.services.UsuarioRolServicioMetodos;
@@ -96,6 +99,8 @@ public class ControladorVista {
     OpcionTituloTmpServicioMetodos servOpTitulo;
     @Autowired
     OpcionInterpreteTmpServicioMetodos servOpInterprete;
+    @Autowired
+    OpcionAnyoTmpServicioMetodos servOpAnyo;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -287,8 +292,104 @@ public class ControladorVista {
         return "PartidaGrupo";
     }
 
-    @GetMapping("/partidaGrupo")
-    public String partidaGrupo(Model modelo) {
+    private Ronda darDeAltaRonda(Partida partida) {
+
+        Ronda newRonda = new Ronda();
+        newRonda.setNumero(partida.getRondaActual());
+        newRonda.setCompletada(false);
+        newRonda.setPartida(partida);
+        FiltroCanciones filtro = new FiltroCanciones();
+        filtro.setAnyoInicial(partida.getAnyoInicial());
+        filtro.setAnyoFinal(partida.getAnyoFinal());
+        filtro.setTema(partida.getTema());
+        List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);
+        if (partida.getNCanciones() == 0) {
+            partida.setNCanciones(canciones.size());
+            servPartida.updatePartida(partida.getId(), partida);
+        }
+        Cancion cancionSel = null;
+        boolean isOK = false;
+        while (!isOK) {
+            try {
+                cancionSel = cancionRandom(canciones);
+                boolean isExiste = false;
+                for (Cancion cancionPart : partida.canciones()) {
+                    if (cancionPart.equals(cancionSel)) {
+                        isExiste = true;
+                        break;
+                    }
+                }
+                if (!isExiste) {
+                    isOK = true;
+                }
+                canciones.remove(cancionSel);
+                if (canciones.isEmpty()) // TODO Aqui se deberia de acabar la partida
+                {
+                    throw new Exception("Ya no hay mas canciones");
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        newRonda.setCancion(cancionSel);
+        newRonda.setRespuestas(new ArrayList());
+        Ronda ronda = servRonda.saveRonda(newRonda);
+        
+        
+
+        // Crear las opciones para las respuestas
+        for (OpcionTituloTmp op : opcionesTitulosCanciones(ronda, canciones)) {
+            servOpTitulo.saveOpcionTituloTmp(op);
+        }
+        for (OpcionInterpreteTmp op : opcionesInterpretesCanciones(ronda, canciones)) {
+            servOpInterprete.saveOpcionInterpreteTmp(op);
+        }
+        for (OpcionAnyoTmp op : opcionesAnyosCanciones(ronda)) {
+            servOpAnyo.saveOpcionAnyoTmp(op);
+        }
+
+        return ronda;
+    }
+
+    @GetMapping("/partidaPersonal")
+    public String partidaPersonal(Model modelo) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/";
+        }
+        informarUsuarioModelo(modelo, usu);
+
+        Partida partida = usu.partidaPersonalEnCurso();
+        if (partida == null) {
+            return "redirect:/panel";
+        }
+        informarPartidaModelo(modelo, partida);
+
+        Ronda ultimaRonda;
+        if (partida.ultimaRonda() == null || partida.ultimaRonda().isCompletada()) {
+            ultimaRonda = darDeAltaRonda(partida);
+        } else {
+            ultimaRonda = partida.ultimaRonda();
+        }
+
+        List<OpcionTituloTmp> opcTitulos
+                = servOpTitulo.findByPartidaRonda(partida.getId(), ultimaRonda.getId());
+        List<OpcionInterpreteTmp> opcInterpretes
+                = servOpInterprete.findByPartidaRonda(partida.getId(), ultimaRonda.getId());
+        List<OpcionAnyoTmp> opcAnyos
+                = servOpAnyo.findByPartidaRonda(partida.getId(), ultimaRonda.getId());
+        
+        modelo.addAttribute("ronda", ultimaRonda);
+        modelo.addAttribute("opcTitulos", opcTitulos);
+        modelo.addAttribute("opcInterpretes", opcInterpretes);
+        modelo.addAttribute("opcAnyos", opcAnyos);
+
+        return "PartidaPersonal";
+    }
+
+    @GetMapping("/partidaGrupo_borrar")
+    public String partidaGrupo_borrar(Model modelo) {
 
         Partida partida = partidaModelo(modelo);
         return partidaGrupo(modelo, partida);
@@ -626,13 +727,12 @@ public class ControladorVista {
             partida.setNCanciones(canciones.size());
             partida.setMaster(usu);
             partida.setRondaActual(1);
+            partida.setGrupo(usu.getGrupo());
             Partida newPartida = servPartida.savePartida(partida);
             usu.getPartidasMaster().add(newPartida);
 
-            if (partida.isTipoGrupo()) {
-                for (Usuario usuPartida : partida.getInvitados()) {
-                    servUsuario.update(usuPartida.getId(), usuPartida);
-                }
+            for (Usuario usuPartida : partida.getInvitados()) {
+                servUsuario.update(usuPartida.getId(), usuPartida);
             }
 
             //crear las rondas con nrondas
@@ -686,16 +786,55 @@ public class ControladorVista {
         return "redirect:/partidaMaster";
 
     }
-    
+
     private String crearPartidaPersonal(Partida partida,
             Model modelo, HttpServletRequest req, Usuario usu) {
-        
+
+        Calendar cal = Calendar.getInstance();
+        int anyoActual = cal.get(Calendar.YEAR);
+
+        try {
+
+            // Validaciones
+            if (!usu.sePuedeCrearPartidaMaster()) {
+                throw new Exception("Ya tienes una partida creada, no se pueden crear mas");
+            }
+            if (partida.getAnyoFinal() <= partida.getAnyoInicial()) {
+                throw new Exception("Las Fechas Iniciales y Finales no son correctas");
+            }
+            if (partida.getAnyoFinal() > anyoActual) {
+                throw new Exception("El año final es erroneo");
+            }
+            if (partida.getAnyoInicial() < 1950) {
+                throw new Exception("El año inicial es erroneo");
+            }
+            if ((partida.getAnyoFinal() - partida.getAnyoInicial()) < 5) {
+                throw new Exception("El peridodo de años, debe ser de al menos 5 años");
+            }
+
+            partida.setInvitados(new ArrayList());
+            partida.setMaster(usu);
+            partida.setRondaActual(1);
+            partida.setStatus(StatusPartida.EnCurso);
+            Partida newPartida = servPartida.savePartida(partida);
+            usu.getPartidasMaster().add(newPartida);
+            servUsuario.update(usu.getId(), usu);
+        } catch (Exception ex) {
+            String resp = "ERROR " + ex.getMessage();
+            modelo.addAttribute("result", resp);
+            anyadirTemas(modelo);
+            informarUsuarioModelo(modelo, usu);
+            return "CrearPartida";
+        }
+
         return "redirect:/partidaPersonal";
     }
 
     @PostMapping("/crearPartida")
     public String crearPartida(@ModelAttribute("newpartida") Partida partida,
-            Model modelo, HttpServletRequest req) {
+            Model modelo,
+            HttpServletRequest req
+    ) {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
@@ -707,7 +846,7 @@ public class ControladorVista {
         }
         if (partida.isTipoPersonal()) {
             return crearPartidaPersonal(partida, modelo, req, usu);
-        }       
+        }
         modelo.addAttribute("result", "Error en el tipo de partida");
         return "CrearPartida";
 

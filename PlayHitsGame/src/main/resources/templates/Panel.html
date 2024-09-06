@@ -66,6 +66,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <div th:if="*{colaborador} == true" class="text-center my-2">
                                 <a href="/gestionTemas" class="btn btn-primary" role="button" th:text="#{general.gestiontemas}"/>
                             </div>
+                            <div th:if="*{partidaPersonalEnCurso()} != null" class="text-center my-2">
+                                <a href="/partidaPersonal" class="btn btn-primary" role="button" th:text="#{general.partidapersonalpendiente}"/>
+                            </div>
                             <div th:if="*{partidaMasterEnCurso()} != null" class="text-center my-2">
                                 <a href="/partidaMaster" class="btn btn-primary" role="button" th:text="#{general.partidamasterpendiente}"/>
                             </div>
@@ -106,7 +109,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <div th:if="*{hayPartidasTerminadasPersonales()} == true" class="text-center my-2" >
 
                                 <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#tablapartidaspersonales" 
-                                        aria-expanded="false" aria-controls="tablapartidaspersonales" th:text="#{general.partidasterminadasgrupo}"/>                                       
+                                        aria-expanded="false" aria-controls="tablapartidaspersonales" th:text="#{general.partidasterminadaspersonales}"/>                                       
                                 </button>
                                 <div class="collapse" id="tablapartidaspersonales">
                                     <div class="table-responsive-lg ">

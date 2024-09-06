@@ -155,6 +155,23 @@ public class Usuario{
         Partida result = null;
         
         for (Partida elem : this.getPartidasMaster()){
+            if (elem.getTipo() != TipoPartida.grupo)
+                continue;
+            if (elem.getStatus() == StatusPartida.EnCurso){
+                result = elem;
+                break;
+            }
+        }        
+        return result;        
+    }
+    
+     public Partida partidaPersonalEnCurso(){
+        
+        Partida result = null;
+        
+        for (Partida elem : this.getPartidasMaster()){
+            if (elem.getTipo() != TipoPartida.personal)
+                continue;
             if (elem.getStatus() == StatusPartida.EnCurso){
                 result = elem;
                 break;
@@ -165,7 +182,8 @@ public class Usuario{
     
     public boolean sePuedeCrearPartidaMaster(){
         
-        return partidaMasterEnCurso() == null;
+        return partidaMasterEnCurso() == null &&
+                partidaPersonalEnCurso() == null;
         
     }
         
