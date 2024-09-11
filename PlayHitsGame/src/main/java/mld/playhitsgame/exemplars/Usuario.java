@@ -19,20 +19,20 @@ import lombok.NoArgsConstructor;
 import mld.playhitsgame.seguridad.Roles;
 import mld.playhitsgame.utilidades.Utilidades;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author miguel
  */
-
 @Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Table(name = "usuarios")
-public class Usuario{    
-   
+public class Usuario {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -49,220 +49,225 @@ public class Usuario{
     private int puntos;
     private int estrellas;
     private String preferencias;
-    
+
     @ManyToMany(fetch = FetchType.EAGER, targetEntity = UsuarioRol.class, cascade = CascadeType.PERSIST)
     @JoinTable(name = "usuario_roles", joinColumns = @JoinColumn(name = "usuario_id"),
             inverseJoinColumns = @JoinColumn(name = "rol_id"))
     private Set<UsuarioRol> roles;
-    
-    @Temporal(TemporalType.DATE) 
-    @Column( nullable = false, updatable = false)
-    @CreationTimestamp 
+
+    @Temporal(TemporalType.DATE)
+    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
     private Date alta;
-    
+
     @OneToMany(mappedBy = "master")
     private List<Partida> partidasMaster;
-    
+
     @OneToMany(mappedBy = "usuario")
     private List<Respuesta> respuestas;
-    
+
     @ManyToMany
     @JoinTable(
-            name = "usuario_partida", 
-            joinColumns = @JoinColumn(name="usuario_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name="partida_id", referencedColumnName = "id")
+            name = "usuario_partida",
+            joinColumns = @JoinColumn(name = "usuario_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "partida_id", referencedColumnName = "id")
     )
-    private List<Partida> partidasInvitado;    
-  
-    
-    public String getActivoTxt(){
-        
-        if (this.activo)
+    private List<Partida> partidasInvitado;
+
+    public String getActivoTxt() {
+
+        if (this.activo) {
             return "Si";
-        else
-            return "No";        
+        } else {
+            return "No";
+        }
     }
-    
-     public String getRolesTxt(){
-        
+
+    public String getRolesTxt() {
+
         String txt = "";
         boolean primero = true;
-        for (UsuarioRol rol : this.getRoles()){
-            if (primero)
+        for (UsuarioRol rol : this.getRoles()) {
+            if (primero) {
                 primero = false;
-            else
+            } else {
                 txt = txt + ",";
-            if (rol.getName() != null)
-                txt = txt + rol.getName().name();                
+            }
+            if (rol.getName() != null) {
+                txt = txt + rol.getName().name();
+            }
         }
         return txt;
     }
-    
-     public String selId(){
-        
+
+    public String selId() {
+
         return "sel_" + String.valueOf(this.getId());
     }
-            
-    public boolean sinGrupo(){
+
+    public boolean sinGrupo() {
         return this.getGrupo() == null || "".equals(this.getGrupo());
     }
-    
-    public boolean isAdmin(){
-        
+
+    public boolean isAdmin() {
+
         boolean adm = false;
-        for (UsuarioRol rol :this.roles){
-            if (rol.getName().equals(Roles.ADMIN)){
+        for (UsuarioRol rol : this.roles) {
+            if (rol.getName().equals(Roles.ADMIN)) {
                 adm = true;
                 break;
             }
-        }       
-        return adm;        
+        }
+        return adm;
     }
-    
-    public boolean isColaborador(){
-        
+
+    public boolean isColaborador() {
+
         boolean adm = false;
-        for (UsuarioRol rol :this.roles){
-            if (rol.getName().equals(Roles.COLABORADOR)){
+        for (UsuarioRol rol : this.roles) {
+            if (rol.getName().equals(Roles.COLABORADOR)) {
                 adm = true;
                 break;
             }
-        }       
-        return adm;        
+        }
+        return adm;
     }
-    
-    public String getNombre(){
-        
-        String nombre; 
-        
-        if (this.getAlias() == null || this.getAlias().isBlank()){
+
+    public String getNombre() {
+
+        String nombre;
+
+        if (this.getAlias() == null || this.getAlias().isBlank()) {
             String[] x = this.getUsuario().split("@");
             nombre = x[0];
-        }
-        else 
+        } else {
             nombre = this.getAlias();
-        
-        return nombre;        
+        }
+
+        return nombre;
     }
-    
-    public String nombreId(){
-        
-        return this.getNombre() + this.getClass().toString();        
-    }        
-    
-    public Partida partidaMasterEnCurso(){
-        
+
+    public String nombreId() {
+
+        return this.getNombre() + this.getClass().toString();
+    }
+
+    public Partida partidaMasterEnCurso() {
+
         Partida result = null;
-        
-        for (Partida elem : this.getPartidasMaster()){
-            if (elem.getTipo() != TipoPartida.grupo)
+
+        for (Partida elem : this.getPartidasMaster()) {
+            if (elem.getTipo() != TipoPartida.grupo) {
                 continue;
-            if (elem.getStatus() == StatusPartida.EnCurso){
+            }
+            if (elem.getStatus() == StatusPartida.EnCurso) {
                 result = elem;
                 break;
             }
-        }        
-        return result;        
+        }
+        return result;
     }
-    
-     public Partida partidaPersonalEnCurso(){
-        
+
+    public Partida partidaPersonalEnCurso() {
+
         Partida result = null;
-        
-        for (Partida elem : this.getPartidasMaster()){
-            if (elem.getTipo() != TipoPartida.personal)
+
+        for (Partida elem : this.getPartidasMaster()) {
+            if (elem.getTipo() != TipoPartida.personal) {
                 continue;
-            if (elem.getStatus() == StatusPartida.EnCurso){
+            }
+            if (elem.getStatus() == StatusPartida.EnCurso) {
                 result = elem;
                 break;
             }
-        }        
-        return result;        
+        }
+        return result;
     }
-    
-    public boolean sePuedeCrearPartidaMaster(){
-        
-        return partidaMasterEnCurso() == null &&
-                partidaPersonalEnCurso() == null;
-        
+
+    public boolean sePuedeCrearPartidaMaster() {
+
+        return partidaMasterEnCurso() == null
+                && partidaPersonalEnCurso() == null;
+
     }
-        
-    public List<Partida> partidasInvitadoPendientes(){
-        
-        List<Partida>  result = new ArrayList<>();
-        
-        for (Partida elem : this.getPartidasInvitado()){
-            if (elem.getStatus() == StatusPartida.EnCurso){
+
+    public List<Partida> partidasInvitadoPendientes() {
+
+        List<Partida> result = new ArrayList<>();
+
+        for (Partida elem : this.getPartidasInvitado()) {
+            if (elem.getStatus() == StatusPartida.EnCurso) {
                 result.add(elem);
             }
-        }        
-        return result;        
+        }
+        return result;
     }
-    
-    public boolean hayPartidasInvitadoPendientes(){       
-        return !partidasInvitadoPendientes().isEmpty();        
-    }    
-    
-    public List<Partida> partidasTerminadasGrupo(){
-        
-        List<Partida>  result = new ArrayList<>();
-        
-        for (Partida elem : this.getPartidasMaster()){
-            if (elem.getTipo() != TipoPartida.grupo)
+
+    public boolean hayPartidasInvitadoPendientes() {
+        return !partidasInvitadoPendientes().isEmpty();
+    }
+
+    public List<Partida> partidasTerminadasGrupo() {
+
+        List<Partida> result = new ArrayList<>();
+
+        for (Partida elem : this.getPartidasMaster()) {
+            if (elem.getTipo() != TipoPartida.grupo) {
                 continue;
-            if (elem.getStatus() == StatusPartida.Terminada){
+            }
+            if (elem.getStatus() == StatusPartida.Terminada) {
                 result.add(elem);
             }
-        }        
-        
-        for (Partida elem : this.getPartidasInvitado()){
-            if (elem.getStatus() == StatusPartida.Terminada){
+        }
+
+        for (Partida elem : this.getPartidasInvitado()) {
+            if (elem.getStatus() == StatusPartida.Terminada) {
                 result.add(elem);
             }
-        }        
-        return result;        
+        }
+        return result;
     }
-    
-    public boolean hayPartidasTerminadasGrupo(){
-        
-        return !partidasTerminadasGrupo().isEmpty();        
+
+    public boolean hayPartidasTerminadasGrupo() {
+
+        return !partidasTerminadasGrupo().isEmpty();
     }
-    
-    public List<Partida> partidasTerminadasPersonales(){
-        
-        List<Partida>  result = new ArrayList<>();
-        
-        for (Partida elem : this.getPartidasMaster()){
-            if (elem.getTipo() != TipoPartida.personal)
+
+    public List<Partida> partidasTerminadasPersonales() {
+
+        List<Partida> result = new ArrayList<>();
+
+        for (Partida elem : this.getPartidasMaster()) {
+            if (elem.getTipo() != TipoPartida.personal) {
                 continue;
-            if (elem.getStatus() == StatusPartida.Terminada){
+            }
+            if (elem.getStatus() == StatusPartida.Terminada) {
                 result.add(elem);
             }
-        } 
-        
-        return result;        
+        }
+
+        return result;
     }
-    
-    public boolean hayPartidasTerminadasPersonales(){
-        
-        return !partidasTerminadasPersonales().isEmpty();        
+
+    public boolean hayPartidasTerminadasPersonales() {
+
+        return !partidasTerminadasPersonales().isEmpty();
     }
-    
-    public String getTxtGrupo(){
-        
-        if (this.getGrupo() == null || this.getGrupo().isBlank())
+
+    public String getTxtGrupo() {
+
+        if (this.getGrupo() == null || this.getGrupo().isBlank()) {
             return "Sin Informar";
-        else
+        } else {
             return this.getGrupo();
+        }
     }
-    
-    public String getTxtPuntosPartida(Partida partida){
-        
-        int pts = Utilidades.calcularPtsUsuario(this, partida, false); 
-        
-        return String.valueOf(pts) + " Pts" ;
-    }    
+
+    public String getTxtPuntosPartida(Partida partida) {
+
+        int pts = Utilidades.calcularPtsUsuario(this, partida, false);
+
+        return String.valueOf(pts) + " Pts";
+    }
 
 }
-
-

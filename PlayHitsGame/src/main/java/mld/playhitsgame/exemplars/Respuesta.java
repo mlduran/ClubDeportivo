@@ -26,8 +26,11 @@ public class Respuesta{
     private Long id;
     
     private int anyo;
+    private boolean anyoOk;
     private String titulo;
+    private boolean tituloOk;
     private String interprete;
+    private boolean interpreteOk;
     private int puntos;
     
     @ManyToOne(fetch=FetchType.EAGER)

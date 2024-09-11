@@ -181,3 +181,39 @@ function respuestaAnyo() {
     }
 }
 
+function activarDesactivarPlay() {
+
+    if (reproductor.paused) {
+        reproductor.play(); // Reproducir el audio si está pausado
+    } else {
+        reproductor.pause(); // Pausar el audio si está reproduciéndose
+    }
+
+}
+
+document.addEventListener("keydown", function (event) {
+    // Verificar si la tecla presionada es la barra espaciadora (código 32)
+    if (event.code === "Space") {
+        event.preventDefault(); // Evitar el scroll al presionar la barra espaciadora
+
+        activarDesactivarPlay();
+    }
+});
+
+let lastTouchTime = 0;
+const doubleTapDelay = 1000; // 1 segundo
+
+document.addEventListener("touchstart", function (event) {
+    // Al tocar la pantalla inicio el play
+    event.preventDefault();
+    const currentTime = new Date().getTime(); // Tiempo actual
+    const timeSinceLastTouch = currentTime - lastTouchTime; // Diferencia entre el toque actual y el anterior
+
+    // Si el tiempo entre toques es menor a 1 segundo, se considera un doble toque
+    if (timeSinceLastTouch < doubleTapDelay && timeSinceLastTouch > 0) {
+        activarDesactivarPlay();
+    }
+
+    // Actualizar el tiempo del último toque
+    lastTouchTime = currentTime;
+});

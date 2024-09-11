@@ -57,8 +57,14 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                 </table> 
                             </div>
                             <div th:if="*{admin} == true" class="text-center my-2">
-                                <a href="/administracion" class="btn btn-primary" role="button" th:text="#{general.administracion}"/>
-                                <a th:href="${urlSpotify}" class="btn btn-primary" role="button" th:text="#{general.servicioSpoty}"/>
+                                <p>
+                                    <a href="/administracion" class="btn btn-primary" role="button" th:text="#{general.administracion}"/>
+                                </p>                                
+                                <div  th:if="${urlSpotify} != null"> 
+                                    <p>
+                                        <a th:href="${urlSpotify}" class="btn btn-primary" role="button" th:text="#{general.servicioSpoty}"/>
+                                    </p>
+                                </div>
                             </div>
                             <div th:if="*{colaborador} == true" class="text-center my-2">
                                 <a href="/gestionCanciones" class="btn btn-primary" role="button" th:text="#{general.gestioncanciones}"/>

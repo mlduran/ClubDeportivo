@@ -48,6 +48,9 @@ public class RespuestaServicioMetodos implements RespuestaServicio{
         if (obj.getTitulo() == null && respuesta.getTitulo() != null)
             obj.setTitulo(respuesta.getTitulo());
         
+        obj.setAnyoOk(respuesta.isAnyoOk());
+        obj.setInterpreteOk(respuesta.isInterpreteOk());
+        obj.setTituloOk(respuesta.isTituloOk());
         obj.setPuntos(respuesta.getPuntos());
         
         return DAO.save(obj);

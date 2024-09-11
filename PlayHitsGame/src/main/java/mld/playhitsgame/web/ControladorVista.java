@@ -63,13 +63,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 @Controller
 // rol puede ser master o invitado
 // utilizamos los ids para usuario y partida de sesion, para no cargar tantos datos de
 // persistencia en sesion y no usar tanta memoria
-@SessionAttributes({"id_usuarioSesion", "id_partidaSesion", "posiblesinvitados", "rol", "filtroUsuarios"})
+@SessionAttributes({"id_usuarioSesion", "id_partidaSesion", "posiblesinvitados",
+    "rol", "filtroUsuarios", "mensajeRespuesta", "respuestaOK", "todoFallo"})
 @Slf4j
 public class ControladorVista {
 
@@ -109,6 +111,13 @@ public class ControladorVista {
     private String urlSpotify() {
 
         String urlLogin = null;
+
+        if (customIp == null || customIp.equals("")) {
+            Logger.getLogger(ControladorVista.class.getName()).log(Level.WARNING, null,
+                    "No se ha informado la variable customIp");
+            return null;
+        }
+
         try {
             URL url = new URL(customIp + "/api/spotify/login");
             BufferedReader urlLectura = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -153,7 +162,7 @@ public class ControladorVista {
 
     private void informarPartidaModelo(Model modelo, Partida partida) {
 
-        modelo.addAttribute("partidaSesion", partida);
+        modelo.addAttribute("id_partidaSesion", partida.getId());
     }
 
     @GetMapping("/")
@@ -196,7 +205,9 @@ public class ControladorVista {
             }
             usuarioSesion.getPartidasInvitado();
             usuarioSesion.getPartidasMaster();
-            modelo.addAttribute("urlSpotify", urlSpotify());
+            if (usuarioSesion.isAdmin()) {
+                modelo.addAttribute("urlSpotify", urlSpotify());
+            }
             modelo.addAttribute("id_usuarioSesion", usuarioSesion.getId());
             informarUsuarioModelo(modelo, usuarioSesion);
             return "redirect:/panel";
@@ -218,7 +229,9 @@ public class ControladorVista {
             return "redirect:/";
         }
 
-        modelo.addAttribute("urlSpotify", urlSpotify());
+        if (usu.isAdmin()) {
+            modelo.addAttribute("urlSpotify", urlSpotify());
+        }
         informarUsuarioModelo(modelo, usu);
 
         ayuda(modelo, "panel.txt");
@@ -334,8 +347,6 @@ public class ControladorVista {
         newRonda.setCancion(cancionSel);
         newRonda.setRespuestas(new ArrayList());
         Ronda ronda = servRonda.saveRonda(newRonda);
-        
-        
 
         // Crear las opciones para las respuestas
         for (OpcionTituloTmp op : opcionesTitulosCanciones(ronda, canciones)) {
@@ -360,26 +371,47 @@ public class ControladorVista {
         }
         informarUsuarioModelo(modelo, usu);
 
-        Partida partida = usu.partidaPersonalEnCurso();
+        Partida partida = partidaModelo(modelo);
+
+        if (partida == null) {
+            Optional<Partida> partidaUsuarioMaster = servPartida.partidaUsuarioMaster(usu.getId());
+            if (partidaUsuarioMaster.isPresent() && partidaUsuarioMaster.get().isTipoPersonal()) {
+                partida = partidaUsuarioMaster.get();
+            }
+        }
         if (partida == null) {
             return "redirect:/panel";
         }
         informarPartidaModelo(modelo, partida);
 
         Ronda ultimaRonda;
-        if (partida.ultimaRonda() == null || partida.ultimaRonda().isCompletada()) {
+        boolean todoFallo = false;
+        if (modelo.getAttribute("todoFallo") != null) {
+            todoFallo = (boolean) modelo.getAttribute("todoFallo");
+        }
+
+        if ((partida.ultimaRonda() == null || partida.ultimaRonda().isCompletada())
+                && todoFallo == false) {
             ultimaRonda = darDeAltaRonda(partida);
         } else {
             ultimaRonda = partida.ultimaRonda();
         }
+        ultimaRonda.getRespuestas();
 
-        List<OpcionTituloTmp> opcTitulos
-                = servOpTitulo.findByPartidaRonda(partida.getId(), ultimaRonda.getId());
-        List<OpcionInterpreteTmp> opcInterpretes
-                = servOpInterprete.findByPartidaRonda(partida.getId(), ultimaRonda.getId());
-        List<OpcionAnyoTmp> opcAnyos
-                = servOpAnyo.findByPartidaRonda(partida.getId(), ultimaRonda.getId());
-        
+        List<OpcionTituloTmp> opcTitulos;
+        List<OpcionInterpreteTmp> opcInterpretes;
+        List<OpcionAnyoTmp> opcAnyos;
+        if (!todoFallo) {
+            opcTitulos = servOpTitulo.findByPartidaRonda(partida.getId(), ultimaRonda.getId());
+            opcInterpretes = servOpInterprete.findByPartidaRonda(partida.getId(), ultimaRonda.getId());
+            opcAnyos = servOpAnyo.findByPartidaRonda(partida.getId(), ultimaRonda.getId());
+        } else {
+            opcTitulos = new ArrayList();
+            opcInterpretes = new ArrayList();
+            opcAnyos = new ArrayList();
+        }
+        modelo.addAttribute("partidaSesion", partida);
+        modelo.addAttribute("pts", partida.ptsUsuario(usu));
         modelo.addAttribute("ronda", ultimaRonda);
         modelo.addAttribute("opcTitulos", opcTitulos);
         modelo.addAttribute("opcInterpretes", opcInterpretes);
@@ -388,11 +420,98 @@ public class ControladorVista {
         return "PartidaPersonal";
     }
 
-    @GetMapping("/partidaGrupo_borrar")
-    public String partidaGrupo_borrar(Model modelo) {
+    @PostMapping("/partidaPersonal")
+    public String partidaPersonal(Model modelo,
+            @RequestParam("titulo") String titulo,
+            @RequestParam("interprete") String interprete,
+            @RequestParam("anyo") String anyo) {
 
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/";
+        }
         Partida partida = partidaModelo(modelo);
-        return partidaGrupo(modelo, partida);
+        if (partida == null) {
+            return "redirect:/panel";
+        }
+        ArrayList<String> mensajeRespuesta = new ArrayList();
+        boolean respuestaOK = false;
+        boolean todoFallo = false;
+        try {
+            Ronda ronda = partida.ultimaRonda();
+
+            if (ronda.isCompletada()) {
+                throw new Exception("La ronda no es correcta");
+            }
+
+            Cancion cancion = ronda.getCancion();
+            Respuesta resp = new Respuesta();
+
+            int ptsTitulo = 0, ptsInterp = 0;
+
+            resp.setAnyo(Integer.parseInt(anyo));
+            int ptsAnyo = Utilidades.calcularPtsPorAnyo(Integer.parseInt(anyo), cancion);
+            if (Objects.equals(Integer.valueOf(anyo), cancion.getAnyo())) {
+                resp.setAnyoOk(true);
+            } else {
+                mensajeRespuesta.add("El año correcto era "
+                        + String.valueOf(cancion.getAnyo()) + " tu respondiste " + anyo);
+            }
+            Optional<Cancion> canInt = servCancion.findById(Long.valueOf(interprete));
+            if (canInt.isPresent()) {
+                resp.setInterprete(canInt.get().getInterprete());
+                ptsInterp = Utilidades.calcularPtsPorInterprete(canInt.get().getInterprete(), cancion);
+                if (Objects.equals(Long.valueOf(interprete), cancion.getId())) {
+                    resp.setInterpreteOk(true);
+                } else {
+                    mensajeRespuesta.add("El interprete correcto era "
+                            + cancion.getInterprete() + " tu respondiste " + canInt.get().getInterprete());
+                }
+            }
+            Optional<Cancion> canTit = servCancion.findById(Long.valueOf(titulo));
+            if (canTit.isPresent()) {
+                resp.setTitulo(canTit.get().getTitulo());
+                ptsTitulo = Utilidades.calcularPtsPorTitulo(canTit.get().getTitulo(), cancion);
+                if (Objects.equals(Long.valueOf(titulo), cancion.getId())) {
+                    resp.setTituloOk(true);
+                } else {
+                    mensajeRespuesta.add("El titulo correcto era "
+                            + cancion.getTitulo() + " tu respondiste " + canTit.get().getTitulo());
+                }
+            }
+            if (mensajeRespuesta.size() == 3) {
+                mensajeRespuesta.add("Lo siento!!!!, se acabo la partida, puedes iniciar otra cuando lo desees");
+                todoFallo = true;
+            }
+            if (mensajeRespuesta.isEmpty()) {
+                mensajeRespuesta.add("Fantastico!!!! has acertado todo");
+                respuestaOK = true;
+            }
+
+            resp.setPuntos(ptsAnyo + ptsTitulo + ptsInterp);
+            resp.setRonda(ronda);
+            resp.setUsuario(usu);
+            Respuesta newResp = servRespuesta.saveRespuesta(resp);
+            ronda.getRespuestas().add(newResp);
+
+            ronda.setCompletada(true);
+            servRonda.updateRonda(ronda.getId(), ronda);
+
+            partida.setRondaActual(partida.getRondaActual() + 1);
+            servPartida.updatePartida(partida.getId(), partida);
+
+            // si por ejemplo no se acierta nada, podemos finalizar partida
+            if (todoFallo) {
+                partida.setStatus(StatusPartida.Terminada);
+                servPartida.updatePartida(partida.getId(), partida);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        modelo.addAttribute("mensajeRespuesta", mensajeRespuesta);
+        modelo.addAttribute("respuestaOK", respuestaOK);
+        modelo.addAttribute("todoFallo", todoFallo);
+        return "redirect:/partidaPersonal";
     }
 
     @GetMapping("/altaUsuario")
