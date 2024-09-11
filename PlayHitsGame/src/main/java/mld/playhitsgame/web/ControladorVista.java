@@ -41,7 +41,6 @@ import mld.playhitsgame.services.RondaServicioMetodos;
 import mld.playhitsgame.services.TemaServicioMetodos;
 import mld.playhitsgame.services.UsuarioServicioMetodos;
 import static mld.playhitsgame.utilidades.Utilidades.*;
-import mld.playhitsgame.exemplars.Idioma;
 import mld.playhitsgame.exemplars.OpcionAnyoTmp;
 import mld.playhitsgame.exemplars.OpcionInterpreteTmp;
 import mld.playhitsgame.exemplars.OpcionTituloTmp;
@@ -416,6 +415,12 @@ public class ControladorVista {
         modelo.addAttribute("opcTitulos", opcTitulos);
         modelo.addAttribute("opcInterpretes", opcInterpretes);
         modelo.addAttribute("opcAnyos", opcAnyos);
+        if (modelo.getAttribute("mensajeRespuesta") == null)
+            modelo.addAttribute("mensajeRespuesta", "");
+        if (modelo.getAttribute("respuestaOK") == null)
+            modelo.addAttribute("respuestaOK", true);
+        if (modelo.getAttribute("todoFallo") == null)
+            modelo.addAttribute("todoFallo", false);
 
         return "PartidaPersonal";
     }
@@ -848,6 +853,7 @@ public class ControladorVista {
             partida.setRondaActual(1);
             partida.setGrupo(usu.getGrupo());
             Partida newPartida = servPartida.savePartida(partida);
+            modelo.addAttribute("id_partidaSesion", partida.getId());
             usu.getPartidasMaster().add(newPartida);
 
             for (Usuario usuPartida : partida.getInvitados()) {
@@ -931,11 +937,21 @@ public class ControladorVista {
                 throw new Exception("El peridodo de años, debe ser de al menos 5 años");
             }
 
+            FiltroCanciones filtro = new FiltroCanciones();
+            filtro.setAnyoInicial(partida.getAnyoInicial());
+            filtro.setAnyoFinal(partida.getAnyoFinal());
+            filtro.setTema(partida.getTema());
+            List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);
+            if (canciones.size() <= 5) {
+                throw new Exception("No hay suficientes canciones para iniciar la partida");
+            }
+
             partida.setInvitados(new ArrayList());
             partida.setMaster(usu);
             partida.setRondaActual(1);
             partida.setStatus(StatusPartida.EnCurso);
             Partida newPartida = servPartida.savePartida(partida);
+            modelo.addAttribute("id_partidaSesion", partida.getId());
             usu.getPartidasMaster().add(newPartida);
             servUsuario.update(usu.getId(), usu);
         } catch (Exception ex) {
@@ -959,11 +975,13 @@ public class ControladorVista {
         if (usu == null) {
             return "redirect:/";
         }
-        modelo.addAttribute("id_partidaSesion", partida.getId());
         if (partida.isTipoGrupo()) {
             return crearPartidaGrupo(partida, modelo, req, usu);
         }
         if (partida.isTipoPersonal()) {
+            modelo.addAttribute("mensajeRespuesta", "");
+            modelo.addAttribute("respuestaOK", true);
+            modelo.addAttribute("todoFallo", false);
             return crearPartidaPersonal(partida, modelo, req, usu);
         }
         modelo.addAttribute("result", "Error en el tipo de partida");

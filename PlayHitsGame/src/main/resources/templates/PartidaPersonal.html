@@ -53,6 +53,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <td>                                
                                 <p th:text="#{general.tiempo}" />    
                                 <p th:text="#{general.puntos} + ' ' + ${pts}" />
+                                 <p th:text="#{general.nrondas} + ' ' + ${#lists.size(partidaSesion.rondas)}" />
                                 <div class="modal fade" id="ayuda" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
@@ -85,8 +86,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                         </tr> 
                                         <tr>
                                             <td colspan='3' id="verificacion">  
-                                                <div th:if="${mensajeRespuesta} != null">
+                                                <div th:if="${mensajeRespuesta} != null and ${mensajeRespuesta} != ''">
                                                     <p th:each="txt : ${mensajeRespuesta}" th:text="${txt}" style="font-size: 25px;"/>
+                                                </div>
+                                                <div th:if="${mensajeRespuesta} == null or ${mensajeRespuesta} == ''">
+                                                    <p th:text="#{general.puedesresponder}" style="font-size: 25px;"/>
                                                 </div>
                                                 <div th:if="${todoFallo} == true">
                                                     <a href="/panel" class="text-dark">
