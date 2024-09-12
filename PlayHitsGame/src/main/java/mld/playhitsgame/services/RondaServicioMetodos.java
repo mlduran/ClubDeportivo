@@ -41,6 +41,9 @@ public class RondaServicioMetodos implements RondaServicio{
         
         obj.setNumero(ronda.getNumero());
         obj.setCompletada(ronda.isCompletada());  
+        if (ronda.getInicio() != null)
+            obj.setInicio(ronda.getInicio());
+        
        
         
         return DAO.save(obj);

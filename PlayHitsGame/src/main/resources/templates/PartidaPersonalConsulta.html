@@ -28,8 +28,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <section>
             <input type="hidden" id="idusuario" th:value="${usuarioSesion.id}" />
             <input type="hidden" id="idpartida" th:value="${partidaSesion.id}" />
-            <input type="hidden" id="respuestaOK" th:value="${respuestaOK}" />
-            <input type="hidden" id="todoFallo" th:value="${todoFallo}" />
             <div class="container-sm">
                 <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-12">
                     <table class="table-responsive table-bordered">
@@ -54,10 +52,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                 <table>
                                     <tr>
                                         <td>
-                                            <label for="contador" th:text="#{general.tiempo}"/>
+                                            
                                         </td>
                                         <td>
-                                            <input type="text" id="contador" th:value="${contador}" disabled/>
+                                            
                                         </td>
                                     </tr>
                                     <tr>
@@ -91,96 +89,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </div>
                                 </div>
                             </td>
-                        </tr>
-                        <tr>                        
-                            <td style="text-align:center;">
-                                <p th:text="#{general.ronda}" />
-                                <p th:text="${ronda.numero}" />
-                            </td>
-                            <td colspan="2">
-                                <form method="post" id="respuestas" th:action="@{/partidaPersonal}"> 
-                                    <table class="table table-sm" style="text-align:center;">
-                                        <tr>
-                                            <td colspan='3'>
-                                                <audio controls id="reproductor">
-                                                    <source th:src="${ronda.cancion.spotifyplay}" type="audio/mpeg" />
-                                                </audio>
-                                            </td>
-                                        </tr> 
-                                        <tr>
-                                            <td colspan='3' id="verificacion">  
-                                                <div th:if="${mensajeRespuesta} != null and ${mensajeRespuesta} != ''">
-                                                    <p th:each="txt : ${mensajeRespuesta}" th:text="${txt}" style="font-size: 25px;"/>
-                                                </div>
-                                                <div th:if="${mensajeRespuesta} == null or ${mensajeRespuesta} == ''">
-                                                    <p th:text="#{general.puedesresponder}" style="font-size: 25px;"/>
-                                                </div>
-                                                <div th:if="${todoFallo} == true">
-                                                    <a href="/panel" class="text-dark">
-                                                        <p th:text="#{general.volver}" />
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>
-                                                <p th:text="#{general.titulo}" /> 
-                                            </th>
-                                            <th>
-                                                <p th:text="#{general.interprete}" /> 
-                                            </th>
-                                            <th>
-                                                <p th:text="#{general.anyo}" /> 
-                                            </th>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <input type="hidden" name="titulo" id="titulo" value=""/>
-                                                <table class="table" border='none'>
-                                                    <div th:each="opTitulo : ${opcTitulos}">
-                                                        <tr>
-                                                            <td border='none'>                                                                
-                                                                <button type="button" class="btn btn-outline-primary" th:data-name="${opTitulo.cancion}" th:onclick="respuestaTitulo(this.getAttribute('data-name'))" th:id="'titulo_' + ${opTitulo.cancion}">
-                                                                    <p th:text="${opTitulo.opTitulo}" />
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    </div>
-                                                </table>
-                                            </td>
-                                            <td>
-                                                <input type="hidden" name="interprete" id="interprete" value=""/>
-                                                <table class="table" border='none'>
-                                                    <div th:each="opcInterprete : ${opcInterpretes}">
-                                                        <tr>
-                                                            <td border='none'>                                                                
-                                                                <button type="button" class="btn btn-outline-primary" th:data-name="${opcInterprete.cancion}" th:onclick="respuestaInterprete(this.getAttribute('data-name'))" th:id="'interprete_' + ${opcInterprete.cancion}">
-                                                                    <p th:text="${opcInterprete.opInterprete}" />
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    </div>
-                                                </table>
-                                            </td>
-                                            <td>  
-                                                <input type="hidden" name="anyo" id="anyo" value=""/>
-                                                <table class="table" border='none'>
-                                                    <div th:each="opAnyo : ${opcAnyos}">
-                                                        <tr>
-                                                            <td border='none'>                                                                
-                                                                <button type="button" class="btn btn-outline-primary" th:data-name="${opAnyo.opAnyo}" th:onclick="respuestaAnyo(this.getAttribute('data-name'))" th:id="'anyo_' + ${opAnyo.opAnyo}">
-                                                                    <p th:text="${opAnyo.opAnyo}" />
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    </div>
-                                                </table>
-                                            </td>
-                                        </tr>                                          
-                                    </table>
-                                </form>
-                            </td>
-                        </tr>
+                        </tr>                        
                         <tr>
                             <th style="text-align:center;">
                                 <p th:text="#{general.ronda}" />
@@ -193,7 +102,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             </th>
                         </tr>
                         <tr th:each="rondaPart : ${partidaSesion.rondas}">
-                        <div th:if="${rondaPart.id} != ${ronda.id}">
                             <td style="text-align:center;">                                
                                 <p th:text="${rondaPart.numero}" />
                             </td>
@@ -214,7 +122,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </tr>
                                 </table>
                             </td>
-                        </div>
                         </tr>
                         <tr>
                             <td colspan="3">
@@ -236,7 +143,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 </div>              
             </div>
         </section>
-        <script type="text/javascript" th:src="@{/javascript/PartidaPersonal.js}"></script>        
+        <script type="text/javascript" th:src="@{/javascript/PartidaPersonalConsulta.js}"></script>        
     </body>
 
 </html>

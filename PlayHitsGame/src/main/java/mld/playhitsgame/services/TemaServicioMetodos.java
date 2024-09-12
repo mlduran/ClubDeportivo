@@ -29,6 +29,11 @@ public class TemaServicioMetodos implements TemaServicio {
         
         return DAO.findById(id);
     }
+    
+    @Override
+    public Optional<Tema> findBytema(String tema){
+        return DAO.findBytema(tema);
+    }
 
     @Override
     public Tema update(Long id, Tema tema) {

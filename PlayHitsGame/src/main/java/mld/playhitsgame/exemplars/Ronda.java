@@ -5,6 +5,7 @@
 package mld.playhitsgame.exemplars;
 
 import jakarta.persistence.*;
+import java.time.LocalTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,6 +32,7 @@ public class Ronda{
     
     private int numero;
     private boolean completada;
+    private LocalTime inicio;
     
     @ManyToOne(fetch=FetchType.EAGER)
     private Partida partida;

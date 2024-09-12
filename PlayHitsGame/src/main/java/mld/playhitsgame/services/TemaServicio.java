@@ -8,18 +8,18 @@ import java.util.List;
 import java.util.Optional;
 import mld.playhitsgame.exemplars.Tema;
 
-
-
 /**
  *
  * @author miguel
  */
 public interface TemaServicio {
-    
-    List<Tema> findAll();   
-    
+
+    List<Tema> findAll();
+
     Optional<Tema> findById(Long id);
 
+    Optional<Tema> findBytema(String tema);
+
     Tema update(Long id, Tema tema);
-    
+
 }

@@ -143,7 +143,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                         </a>
                                                     </td>
                                                     <td>
-                                                        <a th:href="'/partidaConsultaPersonales/' + ${unapartida.id}" class="button"> 
+                                                        <a th:href="'/partidaConsultaPersonal/' + ${unapartida.id}" class="button"> 
                                                             <p th:text="${unapartida.descripcion}"/>
                                                         </a>
                                                     </td>
@@ -200,7 +200,12 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                             </tbody>
                                         </table>
                                     </div>
-                                </div>
+                                </div>                                
+                            </div> 
+                            <div  class="text-center my-2">
+                                <p>
+                                    <a href="/records" class="btn btn-primary" role="button" th:text="#{general.records}"/>
+                                </p>  
                             </div>
                             <div class="card-footer py-3 border-0">
                                 <div class="text-center">                       

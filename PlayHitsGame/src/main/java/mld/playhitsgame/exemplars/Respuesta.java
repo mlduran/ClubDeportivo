@@ -5,6 +5,8 @@
 package mld.playhitsgame.exemplars;
 
 import jakarta.persistence.*;
+import java.time.Duration;
+import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,6 +34,7 @@ public class Respuesta{
     private String interprete;
     private boolean interpreteOk;
     private int puntos;
+    private LocalTime inicio;
     
     @ManyToOne(fetch=FetchType.EAGER)
     private Ronda ronda;
@@ -41,9 +44,25 @@ public class Respuesta{
 
 
     public String getPuntosTxt(){
-        return " (Pts ".concat(String.valueOf(puntos) + ")");
+        return " (Pts ".concat(String.valueOf(puntos) + ")");        
+    }    
+    
+    public String getTiempoEmpleado(){
         
+        String tiempo = "";
+        
+        if (this.getInicio() != null &&
+                this.getRonda() != null &&
+                this.getRonda().getInicio() != null
+                ){
+            Duration duration = Duration.between(this.getRonda().getInicio(), this.getInicio());
+            Long segundos = duration.getSeconds();
+            tiempo = segundos.toString(); 
+        }        
+        
+        return tiempo;
     }
+    
     
     
 }

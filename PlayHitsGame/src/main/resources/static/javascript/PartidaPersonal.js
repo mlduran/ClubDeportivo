@@ -122,3 +122,17 @@ document.addEventListener("touchstart", function (event) {
     // Actualizar el tiempo del último toque
     lastTouchTime = currentTime;
 });
+
+
+// Obtenemos el elemento HTML donde se mostrará el contador
+const secondsCounter = document.getElementById("contador");
+let secondsElapsed = secondsCounter.value;
+
+// Creamos el intervalo que incrementa el contador cada segundo (1000 ms)
+const intervalId = setInterval(() => {
+    // Incrementamos el número de segundos
+    secondsElapsed++;
+
+    // Actualizamos el contenido del elemento HTML
+    secondsCounter.value = secondsElapsed;
+}, 1000);

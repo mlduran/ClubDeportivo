@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -34,6 +36,7 @@ import mld.playhitsgame.exemplars.Ronda;
 import mld.playhitsgame.exemplars.StatusPartida;
 import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.exemplars.Usuario;
+import mld.playhitsgame.exemplars.Record;
 import mld.playhitsgame.services.CancionServicioMetodos;
 import mld.playhitsgame.services.PartidaServicioMetodos;
 import mld.playhitsgame.services.RespuestaServicioMetodos;
@@ -322,29 +325,28 @@ public class ControladorVista {
         Cancion cancionSel = null;
         boolean isOK = false;
         while (!isOK) {
-            try {
-                cancionSel = cancionRandom(canciones);
-                boolean isExiste = false;
-                for (Cancion cancionPart : partida.canciones()) {
-                    if (cancionPart.equals(cancionSel)) {
-                        isExiste = true;
-                        break;
-                    }
+
+            cancionSel = cancionRandom(canciones);
+            boolean isExiste = false;
+            for (Cancion cancionPart : partida.canciones()) {
+                if (cancionPart.equals(cancionSel)) {
+                    isExiste = true;
+                    break;
                 }
-                if (!isExiste) {
-                    isOK = true;
-                }
-                canciones.remove(cancionSel);
-                if (canciones.isEmpty()) // TODO Aqui se deberia de acabar la partida
-                {
-                    throw new Exception("Ya no hay mas canciones");
-                }
-            } catch (Exception ex) {
-                Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);
             }
+            if (!isExiste) {
+                isOK = true;
+            }
+            canciones.remove(cancionSel);
+            if (canciones.isEmpty()) // TODO Aqui se deberia de acabar la partida
+            {
+                throw new IndexOutOfBoundsException("Ya no hay mas canciones");
+            }
+
         }
         newRonda.setCancion(cancionSel);
         newRonda.setRespuestas(new ArrayList());
+        newRonda.setInicio(LocalTime.now());
         Ronda ronda = servRonda.saveRonda(newRonda);
 
         // Crear las opciones para las respuestas
@@ -391,7 +393,13 @@ public class ControladorVista {
 
         if ((partida.ultimaRonda() == null || partida.ultimaRonda().isCompletada())
                 && todoFallo == false) {
-            ultimaRonda = darDeAltaRonda(partida);
+            try {
+                ultimaRonda = darDeAltaRonda(partida);
+            } catch (IndexOutOfBoundsException ex) {
+                finalizarPartidaPersonal(partida, usu);
+                ultimaRonda = partida.ultimaRonda();
+                modelo.getAttribute(ex.getMessage());
+            }
         } else {
             ultimaRonda = partida.ultimaRonda();
         }
@@ -415,14 +423,40 @@ public class ControladorVista {
         modelo.addAttribute("opcTitulos", opcTitulos);
         modelo.addAttribute("opcInterpretes", opcInterpretes);
         modelo.addAttribute("opcAnyos", opcAnyos);
-        if (modelo.getAttribute("mensajeRespuesta") == null)
+        if (modelo.getAttribute("mensajeRespuesta") == null) {
             modelo.addAttribute("mensajeRespuesta", "");
-        if (modelo.getAttribute("respuestaOK") == null)
+        }
+        if (modelo.getAttribute("respuestaOK") == null) {
             modelo.addAttribute("respuestaOK", true);
-        if (modelo.getAttribute("todoFallo") == null)
+        }
+        if (modelo.getAttribute("todoFallo") == null) {
             modelo.addAttribute("todoFallo", false);
+        }
+
+        Duration duration = Duration.between(ultimaRonda.getInicio(), LocalTime.now());
+        modelo.addAttribute("contador", duration.getSeconds());
 
         return "PartidaPersonal";
+    }
+
+    private void finalizarPartidaPersonal(Partida partida, Usuario usuario) {
+
+        partida.setStatus(StatusPartida.Terminada);
+        servPartida.updatePartida(partida.getId(), partida);
+        int pts = partida.ptsUsuario(usuario);
+        if (partida.getTema() != null && !"".equals(partida.getTema())) {
+            Optional<Tema> tema = servTema.findBytema(partida.getTema());
+            if (tema.isPresent()) {
+                Tema elTema = tema.get();
+                if (elTema.getPuntos() < pts) {
+                    elTema.setPuntos(pts);
+                    elTema.setUsuarioRecord(usuario.getId());
+                    servTema.update(elTema.getId(), elTema);
+                    usuario.setEstrellas(usuario.getEstrellas() + 1);
+                    servUsuario.update(usuario.getId(), usuario);
+                }
+            }
+        }
     }
 
     @PostMapping("/partidaPersonal")
@@ -493,7 +527,18 @@ public class ControladorVista {
                 respuestaOK = true;
             }
 
-            resp.setPuntos(ptsAnyo + ptsTitulo + ptsInterp);
+            resp.setInicio(LocalTime.now());
+            Duration duration = Duration.between(ronda.getInicio(), LocalTime.now());
+            Long segundos = duration.getSeconds();
+            Long pts = (long) (ptsAnyo + ptsTitulo + ptsInterp);
+            if (segundos < pts) {
+                pts = pts - segundos;
+            } else {
+                pts = 0L;
+            }
+            int ptsFinales = pts.intValue();
+
+            resp.setPuntos(ptsFinales);
             resp.setRonda(ronda);
             resp.setUsuario(usu);
             Respuesta newResp = servRespuesta.saveRespuesta(resp);
@@ -507,9 +552,9 @@ public class ControladorVista {
 
             // si por ejemplo no se acierta nada, podemos finalizar partida
             if (todoFallo) {
-                partida.setStatus(StatusPartida.Terminada);
-                servPartida.updatePartida(partida.getId(), partida);
+                finalizarPartidaPersonal(partida, usu);
             }
+
         } catch (Exception ex) {
             Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1023,6 +1068,11 @@ public class ControladorVista {
     @GetMapping("/partidaConsultaGrupo/{id}")
     public String partidaConsultaGrupo(@PathVariable Long id, Model modelo) {
 
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/";
+        }
+
         Partida partidaSesion = null;
         try {
             Optional<Partida> partida = servPartida.findById(id);
@@ -1031,12 +1081,37 @@ public class ControladorVista {
         }
 
         if (partidaSesion == null) {
-            return "redirect:/";
+            return "redirect:/panel";
         }
         resultadosPartida(partidaSesion, modelo);
         informarPartidaModelo(modelo, partidaSesion);
 
         return "ResultadosPartida";
+    }
+
+    @GetMapping("/partidaConsultaPersonal/{id}")
+    public String partidaConsultaPersonal(@PathVariable Long id, Model modelo) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/";
+        }
+        informarUsuarioModelo(modelo, usu);
+        Partida partidaSesion = null;
+        try {
+            Optional<Partida> partida = servPartida.findById(id);
+            partidaSesion = partida.get();
+        } catch (Exception e) {
+        }
+
+        if (partidaSesion == null) {
+            return "redirect:/panel";
+        }
+        informarPartidaModelo(modelo, partidaSesion);
+        modelo.addAttribute("partidaSesion", partidaSesion);
+        modelo.addAttribute("pts", partidaSesion.ptsUsuario(partidaSesion.getMaster()));
+
+        return "PartidaPersonalConsulta";
     }
 
     private List<Usuario> usuariosGrupo(Usuario usu) {
@@ -1248,6 +1323,42 @@ public class ControladorVista {
         }
 
         return "PasswordOlvidado";
+    }
+
+    @GetMapping("/records")
+    public String records(Model modelo) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/";
+        }
+        ArrayList<Tema> temas = (ArrayList<Tema>) servTema.findAll();
+
+        ArrayList<Record> records = new ArrayList();
+
+        for (Tema tema : temas) {
+
+            Record newObj = new Record();
+            newObj.setTema(tema.getTema());
+            newObj.setDescripcion(tema.getDescripcion());
+            newObj.setGenero(tema.getGenero());
+            newObj.setIdioma(tema.getIdioma());
+            newObj.setCanciones(tema.getCanciones().size());
+            newObj.setPuntos(tema.getPuntos());
+            String usuRecord = "";
+            if (tema.getUsuarioRecord() != null) {
+                Optional<Usuario> usuario = servUsuario.findById(tema.getUsuarioRecord());
+                if (usuario.isPresent()) {
+                    usuRecord = usuario.get().getNombre();
+                }
+            }
+            newObj.setUsuarioRecord(usuRecord);
+            records.add(newObj);
+        }
+
+        modelo.addAttribute("temas", records);
+
+        return "Records";
     }
 
 }
