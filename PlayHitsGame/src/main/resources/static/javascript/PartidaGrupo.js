@@ -25,7 +25,9 @@ var txtPrimeros = function (datosJson) {
     if (datosJson["primeroCancion"] !== undefined && datosJson["primeroCancion"] !== "")
         txt = txt + "El jugador mas rapido acertando la cancion ha sido " + datosJson["primeroCancion"] + "\n";
     if (datosJson["primeroInterprete"] !== undefined && datosJson["primeroInterprete"] !== "")
-        txt = txt + "El jugador mas rapido acertando el interprete ha sido " + datosJson["primeroInterprete"];
+        txt = txt + "El jugador mas rapido acertando el interprete ha sido " + datosJson["primeroInterprete"] + "\n";
+    if (datosJson["primeroAnyo"] !== undefined && datosJson["primeroAnyo"] !== "")
+        txt = txt + "El jugador mas rapido acertando el año ha sido " + datosJson["primeroAnyo"];
 
     return txt;
 };
@@ -68,17 +70,12 @@ var botonAnyo = false;
 var botonTitulo = false;
 var botonInterprete = false;
 
-function txtMensaje(op, idCancion, anyo) {
+function txtMensaje(op, valor) {
 
     let mensaje = "{'op' : '" + op + "',";
     mensaje = mensaje + "'idUsuario' : " + userId + ",";
     mensaje = mensaje + "'idPartida' : " + partidaId;
-    if (idCancion !== null) {
-        mensaje = mensaje + ",'idCancion' : " + idCancion;
-    }
-    if (anyo !== null) {
-        mensaje = mensaje + ",'anyo' : " + anyo;
-    }
+    mensaje = mensaje + ",'valor' : " + valor;
     mensaje = mensaje + "}";
     //window.alert(mensaje);
     return mensaje;
@@ -151,7 +148,7 @@ function forzarAcabarRonda() {
 
 function respuestaTitulo(codCancion) {
     if (botonTitulo === false) {
-        sendmensaje(txtMensaje("titulo", codCancion, null));
+        sendmensaje(txtMensaje("titulo", codCancion));
         let boton = document.getElementById("titulo_" + codCancion);
         boton.style.backgroundColor = "green";
         botonTitulo = true;
@@ -160,24 +157,19 @@ function respuestaTitulo(codCancion) {
 
 function respuestaInterprete(codCancion) {
     if (botonInterprete === false) {
-        sendmensaje(txtMensaje("interprete", codCancion, null));
+        sendmensaje(txtMensaje("interprete", codCancion));
         let boton = document.getElementById("interprete_" + codCancion);
         boton.style.backgroundColor = "green";
         botonInterprete = true;
     }
 }
 
-function respuestaAnyo() {
+function respuestaAnyo(anyo) {
     if (botonAnyo === false) {
-        let anyo = document.getElementById("anyo");
-        let boton = document.getElementById("botonAnyo");
-        if (anyo.value === "" || anyo.value === 0)
-            window.alert("Se ha de informar un año");
-        else {
-            sendmensaje(txtMensaje("anyo", null, anyo.value));
-            boton.style.backgroundColor = "green";
-            botonAnyo = true;
-        }
+        sendmensaje(txtMensaje("anyo", anyo));
+        let boton = document.getElementById("anyo_" + anyo);
+        boton.style.backgroundColor = "green";
+        botonAnyo = true;
     }
 }
 

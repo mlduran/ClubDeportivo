@@ -39,28 +39,11 @@ public class Utilidades {
 
     public static int calcularPtsPorAnyo(int anyo, Cancion cancion) {
 
-        int anyoCancion = cancion.getAnyo();
-        int pts = 0;
-
-        int x = Math.abs(anyo - anyoCancion);
-
-        if (x == 0) {
-            pts = 30;
+        if (anyo == cancion.getAnyo()) {
+            return 15;
+        } else {
+            return 0;
         }
-        if (x == 1) {
-            pts = 20;
-        }
-        if (x == 2) {
-            pts = 10;
-        }
-        if (x > 2) {
-            pts = 10 - x;
-        }
-        if (pts < 0) {
-            pts = 0;
-        }
-
-        return pts;
     }
 
     public static int calcularPtsPorTitulo(String titulo, Cancion cancion) {

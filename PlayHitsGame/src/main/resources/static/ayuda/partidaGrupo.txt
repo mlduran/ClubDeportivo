@@ -1,15 +1,6 @@
 
 Puntos por acertar año:
-Pleno : 30 pts
-+-1   : 20 pts
-+-2   : 10 pts
-+-3   : 7 pts
-+-4   : 6 pts
-+-5   : 5 pts
-+-6   : 4 pts
-+-7   : 3 pts
-+-8   : 2 pts
-+-9   : 1 pt
+15 pts - Si eres el primer acertante 30 pts
 
 Puntos por acertar titulo:
 15 pts - Si eres el primer acertante 30 pts

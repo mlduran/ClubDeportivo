@@ -35,6 +35,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         <tr>
                             <td style="text-align:center;">
                                 <p th:text="#{general.partida}" />
+                                <p th:text="#{general.grupo}" />
                             </td>
                             <td>
                                 <p th:each="txt : ${partidaSesion.descripcion}" th:text="${txt}" />
@@ -80,21 +81,14 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                 <td>
                                     <table class="table table-sm" style="text-align:center;">
                                         <tr>
-                                            <td colspan='2'>
+                                            <td colspan='3'>
                                                 <audio controls>
                                                     <source th:src="${ronda.cancion.spotifyplay}" type="audio/mpeg" />
                                                 </audio>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td>
-                                                <label class="mb-2 text-muted" for="anyo" th:text="#{general.anyo}"/>
-                                                <input type="number" name="anyo" id="anyo" min="1" max="2050" />
-                                                <button class="btn btn-outline-primary" th:onclick="respuestaAnyo()" id="botonAnyo">
-                                                    <h6 th:text="#{general.enviar}" />
-                                                </button>
-                                            </td>
-                                            <td style="align-content: center">
+                                        <tr>                                            
+                                            <td colspan='3'>
                                                 <input type="image" th:src="@{'/images/actualizar.png'}" width="40" height="40" onclick="document.location.reload();" />
                                             </td>
                                         </tr>
@@ -103,6 +97,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                 <p th:text="#{general.titulo}" /> </th>
                                             <th>
                                                 <p th:text="#{general.interprete}" /> </th>
+                                            <th>
+                                                <p th:text="#{general.anyo}" /> </th>
                                         </tr>
                                         <tr>
                                             <td>
@@ -125,6 +121,19 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                             <td border='none'>
                                                                 <button class="btn btn-outline-primary" th:data-name="${opcInterprete.cancion}" th:onclick="respuestaInterprete(this.getAttribute('data-name'))" th:id="'interprete_' + ${opcInterprete.cancion}">
                                                                     <p th:text="${opcInterprete.opInterprete}" />
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </div>
+                                                </table>
+                                            </td>
+                                            <td>                                                
+                                                <table class="table" border='none'>
+                                                    <div th:each="opAnyo : ${opcAnyos}">
+                                                        <tr>
+                                                            <td border='none'>                                                                
+                                                                <button type="button" class="btn btn-outline-primary" th:data-name="${opAnyo.opAnyo}" th:onclick="respuestaAnyo(this.getAttribute('data-name'))" th:id="'anyo_' + ${opAnyo.opAnyo}">
+                                                                    <p th:text="${opAnyo.opAnyo}" />
                                                                 </button>
                                                             </td>
                                                         </tr>

@@ -197,7 +197,7 @@ public class WebsocketControler {
             responderTitulo(
                     obJson.getLong("idPartida"),
                     obJson.getLong("idUsuario"),
-                    obJson.getLong("idCancion"));
+                    obJson.getLong("valor"));
             usuarioWS.setRespTitulo(true);
         }
 
@@ -205,7 +205,7 @@ public class WebsocketControler {
             responderInterprete(
                     obJson.getLong("idPartida"),
                     obJson.getLong("idUsuario"),
-                    obJson.getLong("idCancion"));
+                    obJson.getLong("valor"));
             usuarioWS.setRespInterprete(true);
         }
 
@@ -213,7 +213,7 @@ public class WebsocketControler {
             responderAnyo(
                     obJson.getLong("idPartida"),
                     obJson.getLong("idUsuario"),
-                    obJson.getInt("anyo"));
+                    obJson.getInt("valor"));
             usuarioWS.setRespAnyo(true);
         }
 
@@ -325,6 +325,34 @@ public class WebsocketControler {
         return obJsonSalida;
     }
 
+    private Usuario primerUsuarioAcertarAnyo(Ronda rondaActiva) {
+
+        List<Respuesta> respuestas = rondaActiva.getRespuestas();
+        Set<UsuarioWS> listaUsuariosWS = partidas.get(rondaActiva.getPartida().getId());
+        List<UsuarioWS> usuariosWS = new ArrayList<>(listaUsuariosWS);
+        Collections.sort(usuariosWS);
+        Usuario usuarioAcertante = null;
+        if (usuariosWS.size() > 1) {
+            for (UsuarioWS usuWS : usuariosWS) {
+                for (Respuesta res : respuestas) {
+                    if (res.getAnyo() == 0) {
+                        continue;
+                    }
+                    if (res.getAnyo() == rondaActiva.getCancion().getAnyo()) {
+                        if (res.getUsuario().getId().equals(usuWS.getId())) {
+                            usuarioAcertante = res.getUsuario();
+                            break;
+                        }
+                    }
+                }
+                if (usuarioAcertante != null) {
+                    break;
+                }
+            }
+        }
+        return usuarioAcertante;
+    }
+
     private Usuario primerUsuarioAcertarTitulo(Ronda rondaActiva) {
 
         List<Respuesta> respuestas = rondaActiva.getRespuestas();
@@ -385,10 +413,13 @@ public class WebsocketControler {
 
         Cancion cancion = rondaActiva.getCancion();
         int totalPts;
+        int ptsAnyo;
         int ptsTitulo;
         int ptsInterp;
+
         Usuario primerAcertanteTitulo = primerUsuarioAcertarTitulo(rondaActiva);
         Usuario primerAcertanteInterprete = primerUsuarioAcertarInterprete(rondaActiva);
+        Usuario primerAcertanteAnyo = primerUsuarioAcertarAnyo(rondaActiva);
 
         if (primerAcertanteTitulo != null) {
             jsonRespuesta.put("primeroCancion", primerAcertanteTitulo.getNombre());
@@ -396,19 +427,24 @@ public class WebsocketControler {
         if (primerAcertanteInterprete != null) {
             jsonRespuesta.put("primeroInterprete", primerAcertanteInterprete.getNombre());
         }
+        if (primerAcertanteAnyo != null) {
+            jsonRespuesta.put("primeroAnyo", primerAcertanteAnyo.getNombre());
+        }
 
         for (Respuesta resp : rondaActiva.getRespuestas()) {
-            totalPts = Utilidades.calcularPtsPorAnyo(resp.getAnyo(), cancion);
+            ptsAnyo = Utilidades.calcularPtsPorAnyo(resp.getAnyo(), cancion);
+            if (resp.getUsuario().equals(primerAcertanteAnyo)) {
+                ptsAnyo = ptsAnyo * 2;
+            }
             ptsTitulo = Utilidades.calcularPtsPorTitulo(resp.getTitulo(), cancion);
             if (resp.getUsuario().equals(primerAcertanteTitulo)) {
                 ptsTitulo = ptsTitulo * 2;
-            }
-            totalPts = totalPts + ptsTitulo;
+            }            
             ptsInterp = Utilidades.calcularPtsPorInterprete(resp.getInterprete(), cancion);
             if (resp.getUsuario().equals(primerAcertanteInterprete)) {
                 ptsInterp = ptsInterp * 2;
             }
-            totalPts = totalPts + ptsInterp;
+            totalPts = ptsAnyo + ptsInterp + ptsTitulo;
             resp.setPuntos(totalPts);
             servRespuesta.updateRespuesta(resp.getId(), resp);
         }

@@ -285,6 +285,8 @@ public class ControladorVista {
         }
         informarUsuarioModelo(modelo, usu);
         Ronda rondaActual = partida.getRondas().get(partida.getRondaActual() - 1);
+        List<OpcionAnyoTmp> opcAnyos
+                = servOpAnyo.findByPartidaRonda(partida.getId(), rondaActual.getId());
         List<OpcionTituloTmp> opcTitulos
                 = servOpTitulo.findByPartidaRonda(partida.getId(), rondaActual.getId());
         List<OpcionInterpreteTmp> opcInterpretes
@@ -298,9 +300,11 @@ public class ControladorVista {
         }
 
         modelo.addAttribute("serverWebsocket", this.serverWebsocket);
+        modelo.addAttribute("opcAnyos", opcAnyos);
         modelo.addAttribute("opcTitulos", opcTitulos);
         modelo.addAttribute("opcInterpretes", opcInterpretes);
         modelo.addAttribute("id_partidaSesion", partida.getId());
+        modelo.addAttribute("partidaSesion", partida);
         modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
         modelo.addAttribute("ptsUsuario", ptsUsuarios);
         ayuda(modelo, "partidaGrupo.txt");
@@ -940,6 +944,9 @@ public class ControladorVista {
                 for (OpcionInterpreteTmp op : opcionesInterpretesCanciones(ronda)) {
                     servOpInterprete.saveOpcionInterpreteTmp(op);
                 }
+                for (OpcionAnyoTmp op : opcionesAnyosCanciones(ronda)){
+                    servOpAnyo.saveOpcionAnyoTmp(op);
+                }
             }
 
         } catch (Exception ex) {
@@ -1083,6 +1090,7 @@ public class ControladorVista {
             return "redirect:/panel";
         }
         resultadosPartida(partidaSesion, modelo);
+        modelo.addAttribute("partidaSesion", partidaSesion);
         informarPartidaModelo(modelo, partidaSesion);
 
         return "ResultadosPartida";
