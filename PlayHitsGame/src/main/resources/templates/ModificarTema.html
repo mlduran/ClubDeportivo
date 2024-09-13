@@ -35,6 +35,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                             <option th:each="idiomaOpt : ${T(mld.playhitsgame.exemplars.Idioma).values()}" 
                                                     th:value="${idiomaOpt}" th:text="${idiomaOpt}"></option>
                                         </select></p>
+                                    <p>Listas Spotify<input type="text" th:field="*{listasSpotify}"/></p>
                                     <input type="submit" value="Modificar Tema"/>    
                                     <p th:text="${result}"></p>
                                 </form>

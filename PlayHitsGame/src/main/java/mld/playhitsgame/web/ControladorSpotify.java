@@ -9,14 +9,20 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import lombok.extern.slf4j.Slf4j;
+import mld.playhitsgame.exemplars.Tema;
+import mld.playhitsgame.services.TemaServicioMetodos;
 import mld.playhitsgame.spotify.SpotifyController;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 /**
@@ -27,16 +33,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Slf4j
 public class ControladorSpotify {
 
+    @Autowired
+    TemaServicioMetodos servTema;
+
     @Value("${custom.server.ip}")
     private String customIp;
 
     @GetMapping("/spotifyServicios")
     public String spotifyServicios(Model modelo) {
 
+        ArrayList<Tema> temas = (ArrayList<Tema>) servTema.findAll();
+        modelo.addAttribute("temas", temas);
+
         return "Spotify";
     }
-    
-    
+
     @PostMapping("/spotifyMostrarDatos")
     public String spotifyMostrarDatos(String idplaylist, Model modelo) {
 
@@ -64,7 +75,7 @@ public class ControladorSpotify {
 
         return "Spotify";
     }
-    
+
     @PostMapping("/spotifyServicios")
     public String respuestaServicios(String idplaylist, String anyoplaylist, Model modelo) {
 
@@ -121,8 +132,52 @@ public class ControladorSpotify {
         return "Spotify";
     }
 
+    @GetMapping("/spotifyServiciosTema/{idTema}")
+    public String respuestaServiciosActualizarTemas(@ModelAttribute("idTema") String idTema, Model modelo) {
+
+        String info = "";
+
+        Optional<Tema> tema = servTema.findById(Long.getLong(idTema));
+
+        String playList = null;
+
+        if (tema.isPresent()) {
+            playList = tema.get().getListasSpotify();
+        }
+
+        if (playList != null) {
+            for (String lista : playList.split(playList)) {
+
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(customIp + "/api/spotify/playListTema?idPlayList="
+                                + lista + "&temaPlayList=" + tema.get().getTema()))
+                        .method("GET", HttpRequest.BodyPublishers.noBody())
+                        .build();
+
+                HttpResponse<String> response = null;
+                try {
+                    response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+                } catch (IOException | InterruptedException ex) {
+                    Logger.getLogger(SpotifyController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (response != null) {
+                    info = info.concat(response.body());
+                } else {
+                    info = info.concat("ERROR la lista " + lista);
+                }
+            }
+        }
+
+        ArrayList<Tema> temas = (ArrayList<Tema>) servTema.findAll();
+        modelo.addAttribute("temas", temas);
+        modelo.addAttribute("info", info);
+
+        return "Spotify";
+    }
+
     @PostMapping("/spotifyServiciosBD")
-    public String respuestaServiciosBD(Model modelo) {
+    public String respuestaServiciosBD(Model modelo
+    ) {
 
         String info;
 

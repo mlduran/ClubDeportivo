@@ -25,6 +25,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         <th>Idioma</th>
                         <th>Genero</th>                   
                         <th>Canciones</th>
+                        <th>Validadas</th>
+                        <th>Listas Spotify</th>
                     </tr>
                     <tr th:each="elem : ${temas}">  
                         <td th:text="${elem.tema}"></td>
@@ -32,6 +34,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         <td th:text="${elem.idioma}"></td>
                         <td th:text="${elem.genero}"></td>
                         <td th:text="${elem.numCanciones}"></td>
+                        <td th:text="${elem.numCancionesValidadas}"></td>
+                        <td th:text="${elem.listasSpotify}"></td>
                         <td>
                             <a th:href="@{'/modificarTema/' + ${elem.id}}">Editar</a>
                             <a th:href="@{'/eliminarTema/' + ${elem.id}}">Eliminar</a>

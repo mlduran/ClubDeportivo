@@ -32,14 +32,26 @@ public class Tema {
     @Enumerated(EnumType.STRING)
     private Genero genero;
     @ManyToMany(mappedBy = "tematicas")
-    private List<Cancion> canciones;    
-    
+    private List<Cancion> canciones;
+
+    private String listasSpotify;
     private Long usuarioRecord;
-    private int puntos;     
+    private int puntos;
 
     public String getNumCanciones() {
 
         return String.valueOf(this.getCanciones().size());
+    }
+
+    public String getNumCancionesValidadas() {
+
+        int n = 0;
+        for (Cancion cancion : this.getCanciones()) {
+            if (!cancion.isRevisar()) {
+                n = n + 1;
+            }
+        }
+        return String.valueOf(n);
     }
 
 }

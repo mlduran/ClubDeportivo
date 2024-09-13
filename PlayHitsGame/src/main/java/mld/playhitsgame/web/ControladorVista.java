@@ -785,7 +785,6 @@ public class ControladorVista {
     private void anyadirTemas(Model modelo) {
 
         ArrayList<String> temas = new ArrayList();
-        temas.add("");
         for (Tema tema : servTema.findAll()) {
             temas.add(tema.getTema());
         }
@@ -1337,7 +1336,6 @@ public class ControladorVista {
         ArrayList<Record> records = new ArrayList();
 
         for (Tema tema : temas) {
-
             Record newObj = new Record();
             newObj.setTema(tema.getTema());
             newObj.setDescripcion(tema.getDescripcion());

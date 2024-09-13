@@ -51,6 +51,13 @@ public class TemaServicioMetodos implements TemaServicio {
         if (Objects.nonNull(tema.getGenero())) {
             obj.setGenero(tema.getGenero());
         }
+        
+        if (Objects.nonNull(tema.getListasSpotify()))
+                obj.setListasSpotify(tema.getListasSpotify());
+                
+        obj.setPuntos(tema.getPuntos());
+        obj.setUsuarioRecord(tema.getUsuarioRecord());
+        
 
         return DAO.save(obj);
     }
