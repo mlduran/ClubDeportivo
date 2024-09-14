@@ -137,7 +137,7 @@ public class ControladorSpotify {
 
         String info = "";
 
-        Optional<Tema> tema = servTema.findById(Long.getLong(idTema));
+        Optional<Tema> tema = servTema.findById(Long.valueOf(idTema));
 
         String playList = null;
 
@@ -146,7 +146,7 @@ public class ControladorSpotify {
         }
 
         if (playList != null) {
-            for (String lista : playList.split(playList)) {
+            for (String lista : playList.split(",")) {
 
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create(customIp + "/api/spotify/playListTema?idPlayList="
@@ -161,7 +161,7 @@ public class ControladorSpotify {
                     Logger.getLogger(SpotifyController.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 if (response != null) {
-                    info = info.concat(response.body());
+                    info = info.concat("Lista " + lista + " " + response.body());
                 } else {
                     info = info.concat("ERROR la lista " + lista);
                 }
