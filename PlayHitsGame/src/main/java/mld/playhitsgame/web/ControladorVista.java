@@ -447,6 +447,7 @@ public class ControladorVista {
 
         partida.setStatus(StatusPartida.Terminada);
         servPartida.updatePartida(partida.getId(), partida);
+        eliminarOpcionesPartida(partida);
         int pts = partida.ptsUsuario(usuario);
         if (partida.getTema() != null && !"".equals(partida.getTema())) {
             Optional<Tema> tema = servTema.findBytema(partida.getTema());
@@ -1365,6 +1366,14 @@ public class ControladorVista {
         modelo.addAttribute("temas", records);
 
         return "Records";
+    }
+    
+    private void eliminarOpcionesPartida(Partida partida){
+        
+        servOpTitulo.deleteByPartida(partida.getId());
+        servOpInterprete.deleteByPartida(partida.getId());
+        servOpAnyo.deleteByPartida(partida.getId());        
+        
     }
 
 }

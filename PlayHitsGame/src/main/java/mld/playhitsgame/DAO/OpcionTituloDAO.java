@@ -22,5 +22,7 @@ public interface OpcionTituloDAO extends JpaRepository<OpcionTituloTmp, Long>{
     @Query(value = "SELECT * FROM opcionestitulotmp WHERE partida=:partida AND ronda=:ronda ;", nativeQuery = true)
     List<OpcionTituloTmp> findByPartidaRonda(Long partida, Long ronda);
     
+    @Query(value = "DELETE FROM opcionestitulotmp WHERE partida=:partida ;", nativeQuery = true)
+    List<OpcionTituloTmp> deleteByPartida(Long partida);
     
 }

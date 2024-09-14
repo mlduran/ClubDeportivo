@@ -20,6 +20,11 @@ public class OpcionInterpreteTmpServicioMetodos implements OpcionInterpreteTmpSe
     public List<OpcionInterpreteTmp> findByPartidaRonda(Long partida, Long ronda) {
         return DAO.findByPartidaRonda(partida, ronda);
     } 
+    
+    @Override
+    public List<OpcionInterpreteTmp> deleteByPartida(Long partida) {
+        return DAO.deleteByPartida(partida);
+    } 
  
     @Override
     public OpcionInterpreteTmp saveOpcionInterpreteTmp(OpcionInterpreteTmp opcionInterpreteTmp) {

@@ -11,16 +11,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OpcionTituloTmpServicioMetodos implements OpcionTituloTmpServicio{
-    
+public class OpcionTituloTmpServicioMetodos implements OpcionTituloTmpServicio {
+
     @Autowired
     OpcionTituloDAO DAO;
 
     @Override
     public List<OpcionTituloTmp> findByPartidaRonda(Long partida, Long ronda) {
         return DAO.findByPartidaRonda(partida, ronda);
-    } 
-  
+    }
+
+    @Override
+    public List<OpcionTituloTmp> deleteByPartida(Long partida) {
+        return DAO.deleteByPartida(partida);
+    }
+
     @Override
     public OpcionTituloTmp saveOpcionTituloTmp(OpcionTituloTmp opcionTituloTmp) {
         return DAO.save(opcionTituloTmp);
@@ -29,6 +34,6 @@ public class OpcionTituloTmpServicioMetodos implements OpcionTituloTmpServicio{
     @Override
     public void deleteOpcionTituloTmp(Long id) {
         DAO.deleteById(id);
-    }    
- 
+    }
+
 }

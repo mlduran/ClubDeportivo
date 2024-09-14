@@ -16,6 +16,8 @@ import mld.playhitsgame.exemplars.OpcionTituloTmp;
 public interface OpcionTituloTmpServicio {
     
     List<OpcionTituloTmp> findByPartidaRonda(Long partida, Long ronda);  
+    
+    List<OpcionTituloTmp> deleteByPartida(Long partida);  
 
     OpcionTituloTmp saveOpcionTituloTmp(OpcionTituloTmp opcionTituloTmp);    
     void deleteOpcionTituloTmp(Long id);

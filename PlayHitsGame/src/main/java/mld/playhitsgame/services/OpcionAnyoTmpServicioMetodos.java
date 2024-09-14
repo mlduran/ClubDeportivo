@@ -11,16 +11,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OpcionAnyoTmpServicioMetodos implements OpcionAnyoTmpServicio{
-    
+public class OpcionAnyoTmpServicioMetodos implements OpcionAnyoTmpServicio {
+
     @Autowired
     OpcionAnyoDAO DAO;
 
     @Override
     public List<OpcionAnyoTmp> findByPartidaRonda(Long partida, Long ronda) {
         return DAO.findByPartidaRonda(partida, ronda);
-    } 
-  
+    }
+
+    @Override
+    public List<OpcionAnyoTmp> deleteByPartida(Long partida) {
+        return DAO.deleteByPartida(partida);
+    }
+
     @Override
     public OpcionAnyoTmp saveOpcionAnyoTmp(OpcionAnyoTmp opcionAnyoTmp) {
         return DAO.save(opcionAnyoTmp);
@@ -29,6 +34,6 @@ public class OpcionAnyoTmpServicioMetodos implements OpcionAnyoTmpServicio{
     @Override
     public void deleteOpcionAnyoTmp(Long id) {
         DAO.deleteById(id);
-    }    
- 
+    }
+
 }

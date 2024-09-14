@@ -21,6 +21,9 @@ import mld.playhitsgame.exemplars.Ronda;
 import mld.playhitsgame.exemplars.StatusPartida;
 import mld.playhitsgame.exemplars.Usuario;
 import mld.playhitsgame.services.CancionServicioMetodos;
+import mld.playhitsgame.services.OpcionAnyoTmpServicioMetodos;
+import mld.playhitsgame.services.OpcionInterpreteTmpServicioMetodos;
+import mld.playhitsgame.services.OpcionTituloTmpServicioMetodos;
 import mld.playhitsgame.services.PartidaServicioMetodos;
 import mld.playhitsgame.services.RespuestaServicioMetodos;
 import mld.playhitsgame.services.RondaServicioMetodos;
@@ -47,6 +50,12 @@ public class WebsocketControler {
     RespuestaServicioMetodos servRespuesta;
     @Autowired
     RondaServicioMetodos servRonda;
+    @Autowired
+    OpcionTituloTmpServicioMetodos servOpTitulo;
+    @Autowired
+    OpcionInterpreteTmpServicioMetodos servOpInterprete;
+    @Autowired
+    OpcionAnyoTmpServicioMetodos servOpAnyo;
 
     private static final HashMap<Long, Set<UsuarioWS>> partidas = new HashMap();
     private static final HashMap<Long, Integer> nRespuestas = new HashMap();
@@ -307,6 +316,7 @@ public class WebsocketControler {
                 acabar = false;
             } else {
                 partida.setStatus(StatusPartida.Terminada);
+                eliminarOpcionesPartida(partida);
                 acabar = true;
             }
             servPartida.updatePartida(partida.getId(), partida);
@@ -439,7 +449,7 @@ public class WebsocketControler {
             ptsTitulo = Utilidades.calcularPtsPorTitulo(resp.getTitulo(), cancion);
             if (resp.getUsuario().equals(primerAcertanteTitulo)) {
                 ptsTitulo = ptsTitulo * 2;
-            }            
+            }
             ptsInterp = Utilidades.calcularPtsPorInterprete(resp.getInterprete(), cancion);
             if (resp.getUsuario().equals(primerAcertanteInterprete)) {
                 ptsInterp = ptsInterp * 2;
@@ -463,6 +473,14 @@ public class WebsocketControler {
                 servUsuario.update(usu.getId(), usu);
             }
         }
+
+    }
+
+    private void eliminarOpcionesPartida(Partida partida) {
+
+        servOpTitulo.deleteByPartida(partida.getId());
+        servOpInterprete.deleteByPartida(partida.getId());
+        servOpAnyo.deleteByPartida(partida.getId());
 
     }
 }
