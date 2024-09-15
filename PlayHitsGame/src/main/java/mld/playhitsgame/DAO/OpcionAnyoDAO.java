@@ -8,7 +8,9 @@ import java.util.List;
 import mld.playhitsgame.exemplars.OpcionAnyoTmp;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -18,8 +20,10 @@ public interface OpcionAnyoDAO extends JpaRepository<OpcionAnyoTmp, Long> {
 
     @Query(value = "SELECT * FROM opcionesanyotmp WHERE partida=:partida AND ronda=:ronda ;", nativeQuery = true)
     List<OpcionAnyoTmp> findByPartidaRonda(Long partida, Long ronda);
-        
-    @Query(value = "DETETE FROM opcionesanyotmp WHERE partida=:partida ;", nativeQuery = true)
+    
+    @Modifying   
+    @Transactional
+    @Query(value = "DELETE FROM opcionesanyotmp WHERE partida=:partida ;", nativeQuery = true)
     void deleteByPartida(Long partida);
 
 }
