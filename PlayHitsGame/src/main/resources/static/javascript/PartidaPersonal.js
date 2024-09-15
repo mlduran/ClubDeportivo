@@ -134,5 +134,8 @@ const intervalId = setInterval(() => {
     secondsElapsed++;
 
     // Actualizamos el contenido del elemento HTML
-    secondsCounter.value = secondsElapsed;
+    if (secondsElapsed > 0)
+        secondsCounter.value = secondsElapsed;
+    else
+        secondsCounter.value = "Cuenta atras .... " + Math.abs(secondsElapsed);
 }, 1000);
