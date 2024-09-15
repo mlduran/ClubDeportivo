@@ -20,6 +20,6 @@ public interface OpcionAnyoDAO extends JpaRepository<OpcionAnyoTmp, Long> {
     List<OpcionAnyoTmp> findByPartidaRonda(Long partida, Long ronda);
         
     @Query(value = "DETETE FROM opcionesanyotmp WHERE partida=:partida ;", nativeQuery = true)
-    List<OpcionAnyoTmp> deleteByPartida(Long partida);
+    void deleteByPartida(Long partida);
 
 }

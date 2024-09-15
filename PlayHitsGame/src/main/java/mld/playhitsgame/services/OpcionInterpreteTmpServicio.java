@@ -15,7 +15,7 @@ public interface OpcionInterpreteTmpServicio {
 
     List<OpcionInterpreteTmp> findByPartidaRonda(Long partida, Long ronda);
 
-    List<OpcionInterpreteTmp> deleteByPartida(Long partida);
+    void deleteByPartida(Long partida);
 
     OpcionInterpreteTmp saveOpcionInterpreteTmp(OpcionInterpreteTmp opcionInterpreteTmp);
 

@@ -209,15 +209,30 @@ public class Utilidades {
         return obtenerOpcionesInterpretesCanciones(ronda, cancionesParaOpciones);
         
     }
+    
+    
+    public static int[] rangoAnyosCanciones(ArrayList<Cancion> canciones){
+        
+        int ini = 9999;
+        int fin = 0;
+        
+        for (Cancion elem : canciones){
+            if (elem.getAnyo() < ini)
+                ini = elem.getAnyo();
+            if (elem.getAnyo() > fin)
+                fin = elem.getAnyo();
+        }
+        
+        return new int[]{ini,fin};        
+    }
+    
 
-    public static List<OpcionAnyoTmp> opcionesAnyosCanciones(Ronda ronda) {
+    public static List<OpcionAnyoTmp> opcionesAnyosCanciones(Ronda ronda, int anyoIni, int anyoFin) {
 
         // de las canciones elije aleatoriamente que une a la correcta y 
         // devuelve una lista con las canciones encriptadas
         ArrayList<OpcionAnyoTmp> opciones = new ArrayList();
         int anyoOk = ronda.getCancion().getAnyo();
-        int anyoIni = ronda.getPartida().getAnyoInicial();
-        int anyoFin = ronda.getPartida().getAnyoFinal();
         int[] anyos = new int[NUMERO_OPCIONES + 1];
 
         for (int i = 1; i <= NUMERO_OPCIONES; i++) {

@@ -94,8 +94,13 @@ function inicializar() {
         //sendmensaje(txtMensaje("alta", null, null));
     });
 
+    let avisoErrorWS = true;
     stompClient.onWebSocketError = (error) => {
         console.error('Error websocket ', error);
+        if (avisoErrorWS){
+            window.alert("No hay conexion al socket " + dirSocket);
+            avisoErrorWS = false;
+        }
     };
 
     stompClient.onStompError = (frame) => {
@@ -172,6 +177,8 @@ function respuestaAnyo(anyo) {
         botonAnyo = true;
     }
 }
+
+var reproductor = document.getElementById("reproductor");
 
 function activarDesactivarPlay() {
 

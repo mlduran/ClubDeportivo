@@ -23,5 +23,5 @@ public interface OpcionInterpreteDAO extends JpaRepository<OpcionInterpreteTmp, 
     List<OpcionInterpreteTmp> findByPartidaRonda(Long partida, Long ronda);
     
     @Query(value = "DELETE FROM opcionesinterpretetmp WHERE partida=:partida  ;", nativeQuery = true)
-    List<OpcionInterpreteTmp> deleteByPartida(Long partida);
+    void deleteByPartida(Long partida);
 }

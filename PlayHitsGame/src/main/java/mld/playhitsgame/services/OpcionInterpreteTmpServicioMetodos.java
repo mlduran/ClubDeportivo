@@ -22,8 +22,8 @@ public class OpcionInterpreteTmpServicioMetodos implements OpcionInterpreteTmpSe
     } 
     
     @Override
-    public List<OpcionInterpreteTmp> deleteByPartida(Long partida) {
-        return DAO.deleteByPartida(partida);
+    public void deleteByPartida(Long partida) {
+        DAO.deleteByPartida(partida);
     } 
  
     @Override

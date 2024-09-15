@@ -360,7 +360,8 @@ public class ControladorVista {
         for (OpcionInterpreteTmp op : opcionesInterpretesCanciones(ronda, canciones)) {
             servOpInterprete.saveOpcionInterpreteTmp(op);
         }
-        for (OpcionAnyoTmp op : opcionesAnyosCanciones(ronda)) {
+        int[] rangoAnyos = rangoAnyosCanciones((ArrayList<Cancion>) canciones);
+        for (OpcionAnyoTmp op : opcionesAnyosCanciones(ronda, rangoAnyos[0], rangoAnyos[1])) {
             servOpAnyo.saveOpcionAnyoTmp(op);
         }
 
@@ -869,6 +870,9 @@ public class ControladorVista {
             if (partida.getAnyoInicial() < 1950) {
                 throw new Exception("El año inicial es erroneo");
             }
+            if ((partida.getAnyoFinal() - partida.getAnyoInicial()) < 5) {
+                throw new Exception("El peridodo de años, debe ser de al menos 5 años");
+            }
             if (nrondas < 10 || nrondas > 30) {
                 throw new Exception("Las rondas deben estar entre 10 y 30");
             }
@@ -937,6 +941,7 @@ public class ControladorVista {
             partida.setStatus(StatusPartida.EnCurso);
             servPartida.updatePartida(partida.getId(), partida);
 
+            int[] rangoAnyos = rangoAnyosCanciones((ArrayList<Cancion>) canciones);
             // Crear las opciones para las respuestas
             for (Ronda ronda : partida.getRondas()) {
                 for (OpcionTituloTmp op : opcionesTitulosCanciones(ronda)) {
@@ -945,7 +950,8 @@ public class ControladorVista {
                 for (OpcionInterpreteTmp op : opcionesInterpretesCanciones(ronda)) {
                     servOpInterprete.saveOpcionInterpreteTmp(op);
                 }
-                for (OpcionAnyoTmp op : opcionesAnyosCanciones(ronda)){
+                for (OpcionAnyoTmp op
+                        : opcionesAnyosCanciones(ronda, rangoAnyos[0], rangoAnyos[1])) {
                     servOpAnyo.saveOpcionAnyoTmp(op);
                 }
             }
@@ -1367,13 +1373,13 @@ public class ControladorVista {
 
         return "Records";
     }
-    
-    private void eliminarOpcionesPartida(Partida partida){
-        
+
+    private void eliminarOpcionesPartida(Partida partida) {
+
         servOpTitulo.deleteByPartida(partida.getId());
         servOpInterprete.deleteByPartida(partida.getId());
-        servOpAnyo.deleteByPartida(partida.getId());        
-        
+        servOpAnyo.deleteByPartida(partida.getId());
+
     }
 
 }

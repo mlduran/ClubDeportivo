@@ -22,8 +22,8 @@ public class OpcionAnyoTmpServicioMetodos implements OpcionAnyoTmpServicio {
     }
 
     @Override
-    public List<OpcionAnyoTmp> deleteByPartida(Long partida) {
-        return DAO.deleteByPartida(partida);
+    public void deleteByPartida(Long partida) {
+        DAO.deleteByPartida(partida);
     }
 
     @Override

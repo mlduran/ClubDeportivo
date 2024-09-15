@@ -15,7 +15,7 @@ public interface OpcionAnyoTmpServicio {
 
     List<OpcionAnyoTmp> findByPartidaRonda(Long partida, Long ronda);
     
-    List<OpcionAnyoTmp> deleteByPartida(Long partida);
+    void deleteByPartida(Long partida);
 
     OpcionAnyoTmp saveOpcionAnyoTmp(OpcionAnyoTmp opcionAnyoTmp);
 

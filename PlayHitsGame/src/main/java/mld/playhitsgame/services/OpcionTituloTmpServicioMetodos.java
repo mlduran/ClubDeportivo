@@ -22,8 +22,8 @@ public class OpcionTituloTmpServicioMetodos implements OpcionTituloTmpServicio {
     }
 
     @Override
-    public List<OpcionTituloTmp> deleteByPartida(Long partida) {
-        return DAO.deleteByPartida(partida);
+    public void deleteByPartida(Long partida) {
+        DAO.deleteByPartida(partida);
     }
 
     @Override
