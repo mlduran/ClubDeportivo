@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import mld.playhitsgame.DAO.CancionDAO;
 import mld.playhitsgame.DAO.TemaDAO;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.Tema;
@@ -316,7 +315,7 @@ public class UtilidadesSpotify {
 
             List<Cancion> canciones = obtenerDatosJson(response.body());
 
-            Tema tema = altaTema(temaPlayList);
+            Tema tema = altaTema(temaPlayList, idPlayList);
 
             if (!canciones.isEmpty()) {
                 for (Cancion cancion : canciones) {
@@ -340,7 +339,7 @@ public class UtilidadesSpotify {
 
     }
 
-    private Tema altaTema(String temaPlayList) {
+    private Tema altaTema(String temaPlayList, String idPlayList) {
 
         Tema unTema;
         Optional<Tema> tema = DAOtema.findBytema(temaPlayList);
@@ -348,6 +347,7 @@ public class UtilidadesSpotify {
         if (tema.isEmpty()) {
             Tema newTema = new Tema();
             newTema.setTema(temaPlayList);
+            newTema.setListasSpotify(idPlayList);
             unTema = DAOtema.save(newTema);
         } else {
             unTema = tema.get();

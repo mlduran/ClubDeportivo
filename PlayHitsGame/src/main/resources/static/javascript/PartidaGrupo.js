@@ -5,7 +5,7 @@
 
 
 let serverWS = document.getElementById("serverWS").value;
-let dirSocket = "ws:" + serverWS + "/websocket";
+let dirSocket = serverWS + "/websocket";
 let userId = document.getElementById("idusuario").value;
 let partidaId = document.getElementById("idpartida").value;
 var stompClient = new StompJs.Client({
