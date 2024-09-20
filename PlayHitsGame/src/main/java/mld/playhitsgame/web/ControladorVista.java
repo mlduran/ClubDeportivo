@@ -15,6 +15,8 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import static java.util.Collections.sort;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -439,8 +441,12 @@ public class ControladorVista {
             modelo.addAttribute("todoFallo", false);
         }
         
-        Duration duration = Duration.between(ultimaRonda.getInicio(), LocalTime.now());
-        modelo.addAttribute("contador", duration.getSeconds() - SEG_PARA_INICIO_RESPUESTA);
+        long seconds = 0;
+        if (ultimaRonda.getInicio() != null){
+            Duration duration = Duration.between(ultimaRonda.getInicio(), LocalTime.now());
+            seconds = duration.getSeconds();
+        }
+        modelo.addAttribute("contador", seconds - SEG_PARA_INICIO_RESPUESTA);
         
         return "PartidaPersonal";
     }
@@ -802,6 +808,7 @@ public class ControladorVista {
         for (Tema tema : servTema.findAll()) {
             temas.add(tema.getTema());
         }
+        Collections.sort(temas);
         modelo.addAttribute("temas", temas);
     }
     

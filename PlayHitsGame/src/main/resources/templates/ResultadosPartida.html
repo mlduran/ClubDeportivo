@@ -8,6 +8,15 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <title>Partida</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            td[data-value='true'] {
+                background-color: lightgreen;
+            }
+            td[data-value='false'] {
+                background-color: lightgrey;
+            }
+
+        </style>
     </head>
     <body>           
             
@@ -61,21 +70,21 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                     </tr>
                     <tr th:each="elem : ${resultados}">
                         <td th:text="${elem.key}"></td>
-                        <td th:each="resp : ${elem.value}" th:text="${resp.anyo}"/> 
+                        <td th:each="resp : ${elem.value}" th:text="${resp.anyo}" th:data-value="${resp.anyoOk}" /> 
                     </tr> 
                     <tr>
                        <th>RESPUESTA TITULO</th>
                     </tr>
                     <tr th:each="elem : ${resultados}">
                         <td th:text="${elem.key}"></td>
-                        <td th:each="resp : ${elem.value}" th:text="${resp.titulo}"/> 
+                        <td th:each="resp : ${elem.value}" th:text="${resp.titulo}" th:data-value="${resp.tituloOk}"/> 
                     </tr>   
                     <tr>
                        <th>RESPUESTA INTERPRETE</th>
                     </tr>
                     <tr th:each="elem : ${resultados}">
                         <td th:text="${elem.key}"></td>
-                        <td th:each="resp : ${elem.value}" th:text="${resp.interprete}"/> 
+                        <td th:each="resp : ${elem.value}" th:text="${resp.interprete}" th:data-value="${resp.interpreteOk}"/> 
                     </tr>   
                 </table>
             </div>

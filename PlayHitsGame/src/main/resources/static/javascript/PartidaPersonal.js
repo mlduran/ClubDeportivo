@@ -106,7 +106,7 @@ document.addEventListener("keydown", function (event) {
 });
 
 let lastTouchTime = 0;
-const doubleTapDelay = 1000; // 1 segundo
+const doubleTapDelay = 500; // medio segundo
 
 document.addEventListener("touchstart", function (event) {
     // Al tocar la pantalla inicio el play
@@ -137,5 +137,5 @@ const intervalId = setInterval(() => {
     if (secondsElapsed > 0)
         secondsCounter.value = secondsElapsed;
     else
-        secondsCounter.value = "Cuenta atras .... " + Math.abs(secondsElapsed);
+        secondsCounter.value = "... " + Math.abs(secondsElapsed);
 }, 1000);

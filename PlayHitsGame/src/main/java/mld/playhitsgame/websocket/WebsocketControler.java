@@ -446,14 +446,20 @@ public class WebsocketControler {
             if (resp.getUsuario().equals(primerAcertanteAnyo)) {
                 ptsAnyo = ptsAnyo * 2;
             }
+            if (ptsAnyo > 0)
+                resp.setAnyoOk(true);
             ptsTitulo = Utilidades.calcularPtsPorTitulo(resp.getTitulo(), cancion);
             if (resp.getUsuario().equals(primerAcertanteTitulo)) {
                 ptsTitulo = ptsTitulo * 2;
             }
+            if (ptsTitulo > 0)
+                resp.setTituloOk(true);
             ptsInterp = Utilidades.calcularPtsPorInterprete(resp.getInterprete(), cancion);
             if (resp.getUsuario().equals(primerAcertanteInterprete)) {
                 ptsInterp = ptsInterp * 2;
             }
+            if (ptsInterp > 0)
+                resp.setInterpreteOk(true);
             totalPts = ptsAnyo + ptsInterp + ptsTitulo;
             resp.setPuntos(totalPts);
             servRespuesta.updateRespuesta(resp.getId(), resp);
