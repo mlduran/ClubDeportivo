@@ -65,6 +65,7 @@ public class PartidaServicioMetodos implements PartidaServicio{
         obj.setAnyoFinal(partida.getAnyoFinal());
         obj.setNCanciones(partida.getNCanciones());
         obj.setRondaActual(partida.getRondaActual());
+        obj.setActivarPlay(partida.isActivarPlay());
         
         return DAO.save(obj);
     }

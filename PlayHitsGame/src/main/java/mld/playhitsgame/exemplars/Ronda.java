@@ -31,7 +31,7 @@ public class Ronda{
     private Long id;
     
     private int numero;
-    private boolean completada;
+    private boolean completada;    
     private LocalTime inicio;
     
     @ManyToOne(fetch=FetchType.EAGER)

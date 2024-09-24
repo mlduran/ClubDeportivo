@@ -146,7 +146,7 @@ public class WebsocketControler {
                 if (primero) {
                     primero = false;
                 } else {
-                    usuarios = usuarios + ",";
+                    usuarios = usuarios + ", ";
                 }
                 usuarios = usuarios + usu.getUsuario();
             }
@@ -196,6 +196,16 @@ public class WebsocketControler {
             // hacer el alta en lacarga de la pagina y ahorrarnos
             // luego la consulta a BD del usuario
 
+        }
+        if ("playerOFF".equals(obJson.getString("op"))) {
+            obJsonSalida.put("op", "playerOFF");  
+            actualizarPlay(obJson.getLong("idPartida"), false);
+            return obJsonSalida;
+        }
+        if ("playerON".equals(obJson.getString("op"))) {
+            obJsonSalida.put("op", "playerON");
+            actualizarPlay(obJson.getLong("idPartida"), true);
+            return obJsonSalida;
         }
         if ("acabaronda".equals(obJson.getString("op"))) {
             pasarSiguienteRonda(obJson.getLong("idPartida"), obJsonSalida);
@@ -446,20 +456,23 @@ public class WebsocketControler {
             if (resp.getUsuario().equals(primerAcertanteAnyo)) {
                 ptsAnyo = ptsAnyo * 2;
             }
-            if (ptsAnyo > 0)
+            if (ptsAnyo > 0) {
                 resp.setAnyoOk(true);
+            }
             ptsTitulo = Utilidades.calcularPtsPorTitulo(resp.getTitulo(), cancion);
             if (resp.getUsuario().equals(primerAcertanteTitulo)) {
                 ptsTitulo = ptsTitulo * 2;
             }
-            if (ptsTitulo > 0)
+            if (ptsTitulo > 0) {
                 resp.setTituloOk(true);
+            }
             ptsInterp = Utilidades.calcularPtsPorInterprete(resp.getInterprete(), cancion);
             if (resp.getUsuario().equals(primerAcertanteInterprete)) {
                 ptsInterp = ptsInterp * 2;
             }
-            if (ptsInterp > 0)
+            if (ptsInterp > 0) {
                 resp.setInterpreteOk(true);
+            }
             totalPts = ptsAnyo + ptsInterp + ptsTitulo;
             resp.setPuntos(totalPts);
             servRespuesta.updateRespuesta(resp.getId(), resp);
@@ -489,4 +502,15 @@ public class WebsocketControler {
         servOpAnyo.deleteByPartida(partida.getId());
 
     }
+    
+    private void actualizarPlay(Long idPartida, boolean valor){
+        
+        Optional<Partida> partida = servPartida.findById(idPartida);
+        if (partida.isPresent()){
+            partida.get().setActivarPlay(valor);
+            servPartida.updatePartida(idPartida, partida.get());
+        }
+        
+    }
+    
 }

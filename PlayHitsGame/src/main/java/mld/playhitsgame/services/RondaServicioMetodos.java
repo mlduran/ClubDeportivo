@@ -40,7 +40,7 @@ public class RondaServicioMetodos implements RondaServicio{
         Ronda obj = DAO.findById(id).get();
         
         obj.setNumero(ronda.getNumero());
-        obj.setCompletada(ronda.isCompletada());  
+        obj.setCompletada(ronda.isCompletada());        
         if (ronda.getInicio() != null)
             obj.setInicio(ronda.getInicio());
         
