@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import mld.playhitsgame.correo.EmailServicioMetodos;
 import mld.playhitsgame.correo.Mail;
 import mld.playhitsgame.exemplars.Cancion;
+import mld.playhitsgame.exemplars.Dificultad;
 import mld.playhitsgame.exemplars.FiltroCanciones;
 import mld.playhitsgame.exemplars.FiltroUsuarios;
 import mld.playhitsgame.exemplars.Partida;
@@ -78,16 +79,16 @@ import org.springframework.web.bind.annotation.SessionAttributes;
     "rol", "filtroUsuarios", "mensajeRespuesta", "respuestaOK", "todoFallo"})
 @Slf4j
 public class ControladorVista {
-    
+
     @Value("${custom.server.websocket}")
     private String serverWebsocket;
-    
+
     @Value("${custom.server.ip}")
     private String customIp;
-    
+
     private final int[] NUMERO_RONDAS = {10, 15, 20, 25, 30};
     private final int SEG_PARA_INICIO_RESPUESTA = 15;
-    
+
     @Autowired
     CancionServicioMetodos servCancion;
     @Autowired
@@ -112,17 +113,17 @@ public class ControladorVista {
     private PasswordEncoder passwordEncoder;
     @Autowired
     EmailServicioMetodos servMail;
-    
+
     private String urlSpotify() {
-        
+
         String urlLogin = null;
-        
+
         if (customIp == null || customIp.equals("")) {
             Logger.getLogger(ControladorVista.class.getName()).log(Level.WARNING, null,
                     "No se ha informado la variable customIp");
             return null;
         }
-        
+
         try {
             URL url = new URL(customIp + "/api/spotify/login");
             BufferedReader urlLectura = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -132,56 +133,56 @@ public class ControladorVista {
         } catch (IOException ex) {
             Logger.getLogger(ControladorSpotify.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return urlLogin;
     }
-    
+
     private Usuario usuarioModelo(Model modelo) {
-        
+
         Long id_usu = (Long) modelo.getAttribute("id_usuarioSesion");
         Usuario usuarioSesion = null;
         try {
             usuarioSesion = servUsuario.findById(id_usu).get();
         } catch (Exception ex) {
         }
-        
+
         return usuarioSesion;
     }
-    
+
     private void informarUsuarioModelo(Model modelo, Usuario usuario) {
-        
+
         modelo.addAttribute("usuarioSesion", usuario);
     }
-    
+
     private Partida partidaModelo(Model modelo) {
-        
+
         Long id_part = (Long) modelo.getAttribute("id_partidaSesion");
         Partida partidaSesion = null;
         try {
             partidaSesion = servPartida.findById(id_part).get();
         } catch (Exception ex) {
         }
-        
+
         return partidaSesion;
     }
-    
+
     private void informarPartidaModelo(Model modelo, Partida partida) {
-        
+
         modelo.addAttribute("id_partidaSesion", partida.getId());
     }
-    
+
     @GetMapping("/")
     public String inicio(Model modelo) {
         return "Inicio";
     }
-    
+
     @GetMapping("/logout")
     public String logout(Model modelo) {
         modelo.addAttribute("id_usuarioSesion", "");
         modelo.addAttribute("id_partidaSesion", "");
         return "Inicio";
     }
-    
+
     @PostMapping("/login")
     public String login(@ModelAttribute("elUsuario") String elUsuario,
             @ModelAttribute("laContrasenya") String laContrasenya, Model modelo) {
@@ -190,20 +191,20 @@ public class ControladorVista {
         //Optional<Usuario> usuLogin = servUsuario.usuarioLogin(elUsuario, passEncrip);
         String usu = elUsuario.toLowerCase();
         Optional<Usuario> usuLogin = servUsuario.findByUsuario(usu);
-        
+
         if (usuLogin.isEmpty()) {
             modelo.addAttribute("error", "Usuario o password incorrectos");
             return "Inicio";
         } else {
             Usuario usuarioSesion = usuLogin.get();
-            
+
             boolean ok = passwordEncoder.matches(laContrasenya, usuarioSesion.getContrasenya());
-            
+
             if (!ok) {
                 modelo.addAttribute("error", "Usuario o password incorrectos");
                 return "Inicio";
             }
-            
+
             if (!usuarioSesion.isActivo()) {
                 modelo.addAttribute("error", "Debes activar tu cuenta con el enlace que se envió a tu cuenta de correo, comprueba la carpeta de spawn");
                 return "Inicio";
@@ -218,66 +219,66 @@ public class ControladorVista {
             return "redirect:/panel";
         }
     }
-    
+
     private void ayuda(Model modelo, String nomFich) {
-        
+
         ArrayList<String> ayuda = Utilidades.leerAyuda("static/ayuda/" + nomFich);
         modelo.addAttribute("ayuda", ayuda);
-        
+
     }
-    
+
     @GetMapping("/panel")
     public String panel(Model modelo) {
-        
+
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/";
         }
-        
+
         if (usu.isAdmin()) {
             modelo.addAttribute("urlSpotify", urlSpotify());
         }
         informarUsuarioModelo(modelo, usu);
-        
+
         ayuda(modelo, "panel.txt");
-        
+
         return "Panel";
     }
-    
+
     @GetMapping("/partidaMaster")
     public String partidaMaster(Model modelo) {
-        
+
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/";
         }
         modelo.addAttribute("rol", Rol.master);
         Partida partida = usu.partidaMasterEnCurso();
-        
+
         return partidaGrupo(modelo, partida);
     }
-    
+
     @GetMapping("/partidaInvitado/{id}")
     public String partidaInvitado(Model modelo, @PathVariable Long id) {
-        
+
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/";
         }
         modelo.addAttribute("rol", Rol.invitado);
-        
+
         Partida partida = null;
         for (Partida p : usu.getPartidasInvitado()) {
             if (p.getId().equals(id)) {
                 partida = p;
             }
         }
-        
+
         return partidaGrupo(modelo, partida);
     }
-    
+
     public String partidaGrupo(Model modelo, Partida partida) {
-        
+
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/";
@@ -301,7 +302,7 @@ public class ControladorVista {
             ptsUsuario.setPuntos(usuPartida.getTxtPuntosPartida(partida));
             ptsUsuarios.add(ptsUsuario);
         }
-        
+
         modelo.addAttribute("serverWebsocket", this.serverWebsocket);
         modelo.addAttribute("opcAnyos", opcAnyos);
         modelo.addAttribute("opcTitulos", opcTitulos);
@@ -313,9 +314,9 @@ public class ControladorVista {
         ayuda(modelo, "partidaGrupo.txt");
         return "PartidaGrupo";
     }
-    
+
     private Ronda darDeAltaRonda(Partida partida) {
-        
+
         Ronda newRonda = new Ronda();
         newRonda.setNumero(partida.getRondaActual());
         newRonda.setCompletada(false);
@@ -332,7 +333,7 @@ public class ControladorVista {
         Cancion cancionSel = null;
         boolean isOK = false;
         while (!isOK) {
-            
+
             cancionSel = cancionRandom(canciones);
             boolean isExiste = false;
             for (Cancion cancionPart : partida.canciones()) {
@@ -349,7 +350,7 @@ public class ControladorVista {
             {
                 throw new IndexOutOfBoundsException("Ya no hay mas canciones");
             }
-            
+
         }
         newRonda.setCancion(cancionSel);
         newRonda.setRespuestas(new ArrayList());
@@ -367,21 +368,21 @@ public class ControladorVista {
         for (OpcionAnyoTmp op : opcionesAnyosCanciones(ronda, rangoAnyos[0], rangoAnyos[1])) {
             servOpAnyo.saveOpcionAnyoTmp(op);
         }
-        
+
         return ronda;
     }
-    
+
     @GetMapping("/partidaPersonal")
     public String partidaPersonal(Model modelo) {
-        
+
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/";
         }
         informarUsuarioModelo(modelo, usu);
-        
+
         Partida partida = partidaModelo(modelo);
-        
+
         if (partida == null) {
             Optional<Partida> partidaUsuarioMaster = servPartida.partidaUsuarioMaster(usu.getId());
             if (partidaUsuarioMaster.isPresent() && partidaUsuarioMaster.get().isTipoPersonal()) {
@@ -392,13 +393,13 @@ public class ControladorVista {
             return "redirect:/panel";
         }
         informarPartidaModelo(modelo, partida);
-        
+
         Ronda ultimaRonda;
         boolean todoFallo = false;
         if (modelo.getAttribute("todoFallo") != null) {
             todoFallo = (boolean) modelo.getAttribute("todoFallo");
         }
-        
+
         if ((partida.ultimaRonda() == null || partida.ultimaRonda().isCompletada())
                 && todoFallo == false) {
             try {
@@ -412,7 +413,7 @@ public class ControladorVista {
             ultimaRonda = partida.ultimaRonda();
         }
         ultimaRonda.getRespuestas();
-        
+
         List<OpcionTituloTmp> opcTitulos;
         List<OpcionInterpreteTmp> opcInterpretes;
         List<OpcionAnyoTmp> opcAnyos;
@@ -440,23 +441,25 @@ public class ControladorVista {
         if (modelo.getAttribute("todoFallo") == null) {
             modelo.addAttribute("todoFallo", false);
         }
-        
+
         long seconds = 0;
-        if (ultimaRonda.getInicio() != null){
+        if (ultimaRonda.getInicio() != null) {
             Duration duration = Duration.between(ultimaRonda.getInicio(), LocalTime.now());
             seconds = duration.getSeconds();
         }
         modelo.addAttribute("contador", seconds - SEG_PARA_INICIO_RESPUESTA);
-        
+
         return "PartidaPersonal";
     }
-    
+
     private void finalizarPartidaPersonal(Partida partida, Usuario usuario) {
-        
+
         partida.setStatus(StatusPartida.Terminada);
         servPartida.updatePartida(partida.getId(), partida);
         eliminarOpcionesPartida(partida);
         int pts = partida.ptsUsuario(usuario);
+        
+
         if (partida.getTema() != null && !"".equals(partida.getTema())) {
             Optional<Tema> tema = servTema.findBytema(partida.getTema());
             if (tema.isPresent()) {
@@ -471,13 +474,13 @@ public class ControladorVista {
             }
         }
     }
-    
+
     @PostMapping("/partidaPersonal")
     public String partidaPersonal(Model modelo,
             @RequestParam("titulo") String titulo,
             @RequestParam("interprete") String interprete,
             @RequestParam("anyo") String anyo) {
-        
+
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/";
@@ -488,61 +491,70 @@ public class ControladorVista {
         }
         ArrayList<String> mensajeRespuesta = new ArrayList();
         boolean respuestaOK = false;
-        boolean todoFallo = false;
+        int fallos = 0;
+        boolean hasPerdido = false;
         try {
             Ronda ronda = partida.ultimaRonda();
-            
+
             if (ronda.isCompletada()) {
                 throw new Exception("La ronda no es correcta");
             }
-            
+
             Cancion cancion = ronda.getCancion();
             Respuesta resp = new Respuesta();
-            
+
             int ptsTitulo = 0, ptsInterp = 0;
-            
+
             resp.setAnyo(Integer.parseInt(anyo));
-            int ptsAnyo = Utilidades.calcularPtsPorAnyo(Integer.parseInt(anyo), cancion);
+            int ptsAnyo = Utilidades.calcularPtsPorAnyo(
+                    Integer.parseInt(anyo), cancion, partida.getDificultad());
             if (ptsAnyo > 0) {
                 resp.setAnyoOk(true);
             } else {
                 mensajeRespuesta.add("El año correcto era "
                         + String.valueOf(cancion.getAnyo()) + " tu respondiste " + anyo);
+                fallos = fallos + 1;
             }
             Optional<Cancion> canInt = servCancion.findById(Long.valueOf(interprete));
             if (canInt.isPresent()) {
                 resp.setInterprete(canInt.get().getInterprete());
-                ptsInterp = Utilidades.calcularPtsPorInterprete(canInt.get().getInterprete(), cancion);
+                ptsInterp = Utilidades.calcularPtsPorInterprete(
+                        canInt.get().getInterprete(), cancion, partida.getDificultad());
                 if (ptsInterp > 0) {
                     resp.setInterpreteOk(true);
                 } else {
                     mensajeRespuesta.add("El interprete correcto era "
                             + cancion.getInterprete() + " tu respondiste " + canInt.get().getInterprete());
+                    fallos = fallos + 1;
                 }
             }
             Optional<Cancion> canTit = servCancion.findById(Long.valueOf(titulo));
             if (canTit.isPresent()) {
                 resp.setTitulo(canTit.get().getTitulo());
-                ptsTitulo = Utilidades.calcularPtsPorTitulo(canTit.get().getTitulo(), cancion);
+                ptsTitulo = Utilidades.calcularPtsPorTitulo(
+                        canTit.get().getTitulo(), cancion, partida.getDificultad());
                 if (ptsTitulo > 0) {
                     resp.setTituloOk(true);
                 } else {
                     mensajeRespuesta.add("El titulo correcto era "
                             + cancion.getTitulo() + " tu respondiste " + canTit.get().getTitulo());
+                    fallos = fallos + 1;
                 }
             }
-            if (mensajeRespuesta.size() == 3) {
+            if ((partida.getDificultad().equals(Dificultad.Dificil) && fallos > 0)
+                    || (partida.getDificultad().equals(Dificultad.Normal) && fallos > 1)
+                    || (partida.getDificultad().equals(Dificultad.Facil) && fallos > 2)) {
                 mensajeRespuesta.add("Lo siento!!!!, se acabo la partida, puedes iniciar otra cuando lo desees");
-                todoFallo = true;
+                hasPerdido = true;
             }
-            if (mensajeRespuesta.isEmpty()) {
+            if (fallos == 0) {
                 mensajeRespuesta.add("Fantastico!!!! has acertado todo");
                 respuestaOK = true;
             }
-            
+
             LocalTime actual = LocalTime.now();
             LocalTime sinComienzo = actual.minusSeconds(SEG_PARA_INICIO_RESPUESTA);
-            
+
             if (ronda.getInicio().isAfter(sinComienzo)) {
                 resp.setInicio(ronda.getInicio());
             } else {
@@ -557,56 +569,56 @@ public class ControladorVista {
                 pts = 0L;
             }
             int ptsFinales = pts.intValue();
-            
+
             resp.setPuntos(ptsFinales);
             resp.setRonda(ronda);
             resp.setUsuario(usu);
             Respuesta newResp = servRespuesta.saveRespuesta(resp);
             ronda.getRespuestas().add(newResp);
-            
+
             ronda.setCompletada(true);
             servRonda.updateRonda(ronda.getId(), ronda);
-            
+
             partida.setRondaActual(partida.getRondaActual() + 1);
             servPartida.updatePartida(partida.getId(), partida);
 
             // si por ejemplo no se acierta nada, podemos finalizar partida
-            if (todoFallo) {
+            if (hasPerdido) {
                 finalizarPartidaPersonal(partida, usu);
             }
-            
+
         } catch (Exception ex) {
             Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);
         }
         modelo.addAttribute("mensajeRespuesta", mensajeRespuesta);
         modelo.addAttribute("respuestaOK", respuestaOK);
-        modelo.addAttribute("todoFallo", todoFallo);
+        modelo.addAttribute("todoFallo", hasPerdido);
         return "redirect:/partidaPersonal";
     }
-    
+
     @GetMapping("/altaUsuario")
     public String altaUsuario(Model modelo) {
-        
+
         modelo.addAttribute("newusuario", new Usuario());
         return "AltaUsuario";
     }
-    
+
     @GetMapping("/altaUsuarioAdm")
     public String altaUsuarioAdm(Model modelo) {
-        
+
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/";
         }
-        
+
         modelo.addAttribute("newusuario", new Usuario());
         return "AltaUsuarioAdm";
     }
-    
+
     @PostMapping("/altaUsuario")
     public String altaUsuario(@ModelAttribute("newusuario") Usuario usuario,
             @ModelAttribute("pws2") String pws2, Model modelo) {
-        
+
         String resp = "";
         String err = "";
         boolean passwOK = true;
@@ -617,10 +629,10 @@ public class ControladorVista {
             passwOK = false;
             err = ex.getMessage();
         }
-        
+
         String usu = usuario.getUsuario().toLowerCase();
         usuario.setUsuario(usu);
-        
+
         if (passwOK) {
             Optional<Usuario> usuLogin = servUsuario.findByUsuario(usuario.getUsuario());
             if (!usuLogin.isEmpty()) {
@@ -628,16 +640,16 @@ public class ControladorVista {
                 err = "El usuario " + usuario.getUsuario() + " ya existe";
             }
         }
-        
+
         if (usuOK && passwOK) {
-            
+
             String passEncrip = passwordEncoder.encode(usuario.getContrasenya());
-            
+
             Set<UsuarioRol> roles = new HashSet();
             UsuarioRol usurol = new UsuarioRol();
             usurol.setName(Roles.USER);
             roles.add(usurol);
-            
+
             try {
                 usuario.setRoles(roles);
                 usuario.setActivo(false);
@@ -648,23 +660,23 @@ public class ControladorVista {
                 String token = passwordEncoder.encode(usuario.getUsuario());
                 String enlace = customIp + "/validarUsuario?id=" + String.valueOf(usuario.getId())
                         + "&token=" + token;
-                
+
                 enviarMail(usuario.getUsuario(), "Alta en PlayHitsGame",
                         enlace, "CorreoAlta");
             } catch (Exception ex) {
                 err = "ERROR " + ex;
             }
         }
-        
+
         modelo.addAttribute("result", resp);
         modelo.addAttribute("error", err);
         return "AltaUsuario";
     }
-    
+
     @PostMapping("/altaUsuarioAdm")
     public String altaUsuarioAdm(@ModelAttribute("newusuario") Usuario usuario,
             @ModelAttribute("pws2") String pws2, Model modelo) {
-        
+
         String resp = "";
         String err = "";
         boolean passwOK = true;
@@ -677,10 +689,10 @@ public class ControladorVista {
             passwOK = false;
             err = ex.getMessage();
         }
-        
+
         String usu = usuario.getUsuario().toLowerCase();
         usuario.setUsuario(usu);
-        
+
         if (passwOK) {
             Optional<Usuario> usuLogin = servUsuario.findByUsuario(usuario.getUsuario());
             if (!usuLogin.isEmpty()) {
@@ -688,16 +700,16 @@ public class ControladorVista {
                 err = "El usuario " + usuario.getUsuario() + " ya existe";
             }
         }
-        
+
         if (usuOK && passwOK) {
-            
+
             String passEncrip = passwordEncoder.encode(usuario.getContrasenya());
-            
+
             Set<UsuarioRol> roles = new HashSet();
             UsuarioRol usurol = new UsuarioRol();
             usurol.setName(Roles.USER);
             roles.add(usurol);
-            
+
             try {
                 usuario.setRoles(roles);
                 usuario.setActivo(false);
@@ -710,12 +722,12 @@ public class ControladorVista {
                 err = "ERROR " + ex;
             }
         }
-        
+
         modelo.addAttribute("result", resp);
         modelo.addAttribute("error", err);
         return "AltaUsuarioAdm";
     }
-    
+
     private void enviarMail(String des, String asunto, String txt, String plantilla) {
         Mail mail = new Mail();
         mail.setAsunto(asunto);
@@ -728,31 +740,31 @@ public class ControladorVista {
             Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     @GetMapping("/eliminarUsuario/{id}")
     public String eliminarUsuario(@ModelAttribute("id") Long id, Model modelo) {
-        
+
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/";
         }
-        
+
         try {
             Optional<Usuario> usuDelete = servUsuario.findById(id);
             if (usuDelete.isPresent()) {
                 servUsuario.deleteById(id);
             }
-            
+
         } catch (Exception e) {
             Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, e);
         }
         return "redirect:/administracion";
     }
-    
+
     @GetMapping("/modificarUsuario")
     public String modificarUsuario(Model modelo
     ) {
-        
+
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/";
@@ -760,17 +772,17 @@ public class ControladorVista {
         informarUsuarioModelo(modelo, usu);
         return "ModificarUsuario";
     }
-    
+
     @PostMapping("/modificarUsuario")
     public String modificarUsuario(@ModelAttribute("usuarioSesion") Usuario usuario,
             @ModelAttribute("pws2") String pws2, Model modelo) {
-        
+
         String resp = "";
         String err = "";
-        
+
         boolean passwOK = true;
         String newPassw = "";
-        
+
         if (pws2 != null && !"".equals(pws2)
                 && usuario.getContrasenya() != null
                 && !"".equals(usuario.getContrasenya())) {
@@ -796,14 +808,14 @@ public class ControladorVista {
                 err = "ERROR " + ex.getMessage();
             }
         }
-        
+
         modelo.addAttribute("result", resp);
         modelo.addAttribute("error", err);
         return "ModificarUsuario";
     }
-    
+
     private void anyadirTemas(Model modelo) {
-        
+
         ArrayList<String> temas = new ArrayList();
         for (Tema tema : servTema.findAll()) {
             temas.add(tema.getTema());
@@ -811,9 +823,9 @@ public class ControladorVista {
         Collections.sort(temas);
         modelo.addAttribute("temas", temas);
     }
-    
+
     private void crearPartida(Model modelo, Partida newPartida, Usuario usu) {
-        
+
         Calendar fecha = Calendar.getInstance();
         newPartida.setAnyoInicial(1950);
         newPartida.setAnyoFinal(fecha.get(Calendar.YEAR) - 1);
@@ -823,23 +835,23 @@ public class ControladorVista {
         modelo.addAttribute("oprondas", NUMERO_RONDAS);
         modelo.addAttribute("nronda", 10);
         informarUsuarioModelo(modelo, usu);
-        
+
     }
-    
+
     @GetMapping("/crearPartida")
     public String crearPartida(Model modelo) {
-        
+
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/";
         }
-        
+
         Partida newPartida = new Partida();
         newPartida.setTipo(TipoPartida.grupo);
         crearPartida(modelo, newPartida, usu);
-        
+
         ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) usuariosGrupo(usu);
-        
+
         if (!posiblesInvitados.isEmpty()) {
             modelo.addAttribute("posiblesinvitados", posiblesInvitados);
         } else {
@@ -847,29 +859,29 @@ public class ControladorVista {
         }
         return "CrearPartida";
     }
-    
+
     @GetMapping("/crearPartidaPersonal")
     public String crearPartidaPersonal(Model modelo) {
-        
+
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/";
         }
-        
+
         Partida newPartida = new Partida();
         newPartida.setTipo(TipoPartida.personal);
         crearPartida(modelo, newPartida, usu);
         modelo.addAttribute("posiblesinvitados", null);
         return "CrearPartida";
     }
-    
+
     private String crearPartidaGrupo(Partida partida,
             Model modelo, HttpServletRequest req, Usuario usu) {
-        
+
         Calendar cal = Calendar.getInstance();
         int anyoActual = cal.get(Calendar.YEAR);
         int nrondas = Integer.parseInt(req.getParameter("nrondas"));
-        
+
         try {
 
             // Validaciones
@@ -891,22 +903,22 @@ public class ControladorVista {
             if (nrondas < 10 || nrondas > 30) {
                 throw new Exception("Las rondas deben estar entre 10 y 30");
             }
-            
+
             List<Cancion> canciones = servCancion.obtenerCanciones(partida);
-            
+
             if (canciones.size() < nrondas) {
                 throw new Exception("No hay suficientes canciones, cambia la seleccion");
             }
-            
+
             partida.setInvitados(new ArrayList());
-            
+
             ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) modelo.getAttribute("posiblesinvitados");
             if (posiblesInvitados != null) {
                 for (Usuario usuarioInv : posiblesInvitados) {
-                    
+
                     String valor = req.getParameter(usuarioInv.nombreId());
                     if ("on".equals(valor)) {
-                        
+
                         Optional<Usuario> usuario = servUsuario.findById(usuarioInv.getId());
                         if (!usuario.isEmpty()) {
                             usuario.get().getPartidasInvitado().add(partida);
@@ -915,7 +927,7 @@ public class ControladorVista {
                     }
                 }
             }
-            
+
             partida.setNCanciones(canciones.size());
             partida.setMaster(usu);
             partida.setRondaActual(1);
@@ -923,7 +935,7 @@ public class ControladorVista {
             Partida newPartida = servPartida.savePartida(partida);
             modelo.addAttribute("id_partidaSesion", partida.getId());
             usu.getPartidasMaster().add(newPartida);
-            
+
             for (Usuario usuPartida : partida.getInvitados()) {
                 servUsuario.update(usuPartida.getId(), usuPartida);
             }
@@ -944,10 +956,10 @@ public class ControladorVista {
                     newResp.setUsuario(usuario);
                     servRespuesta.saveRespuesta(newResp);
                 }
-                
+
                 servRonda.updateRonda(ronda.getId(), ronda);
                 partida.getRondas().add(ronda);
-                
+
             }
             asignarCancionesAleatorias(partida, canciones);
             for (Ronda ronda : partida.getRondas()) {
@@ -955,7 +967,7 @@ public class ControladorVista {
             }
             partida.setStatus(StatusPartida.EnCurso);
             servPartida.updatePartida(partida.getId(), partida);
-            
+
             int[] rangoAnyos = rangoAnyosCanciones((ArrayList<Cancion>) canciones);
             // Crear las opciones para las respuestas
             for (Ronda ronda : partida.getRondas()) {
@@ -970,7 +982,7 @@ public class ControladorVista {
                     servOpAnyo.saveOpcionAnyoTmp(op);
                 }
             }
-            
+
         } catch (Exception ex) {
             String resp = "ERROR " + ex.getMessage();
             modelo.addAttribute("result", resp);
@@ -980,17 +992,17 @@ public class ControladorVista {
             modelo.addAttribute("nronda", nrondas);
             return "CrearPartida";
         }
-        
+
         return "redirect:/partidaMaster";
-        
+
     }
-    
+
     private String crearPartidaPersonal(Partida partida,
             Model modelo, HttpServletRequest req, Usuario usu) {
-        
+
         Calendar cal = Calendar.getInstance();
         int anyoActual = cal.get(Calendar.YEAR);
-        
+
         try {
 
             // Validaciones
@@ -1009,7 +1021,7 @@ public class ControladorVista {
             if ((partida.getAnyoFinal() - partida.getAnyoInicial()) < 5) {
                 throw new Exception("El peridodo de años, debe ser de al menos 5 años");
             }
-            
+
             FiltroCanciones filtro = new FiltroCanciones();
             filtro.setAnyoInicial(partida.getAnyoInicial());
             filtro.setAnyoFinal(partida.getAnyoFinal());
@@ -1018,7 +1030,7 @@ public class ControladorVista {
             if (canciones.size() <= 5) {
                 throw new Exception("No hay suficientes canciones para iniciar la partida");
             }
-            
+
             partida.setInvitados(new ArrayList());
             partida.setMaster(usu);
             partida.setRondaActual(1);
@@ -1034,16 +1046,16 @@ public class ControladorVista {
             informarUsuarioModelo(modelo, usu);
             return "CrearPartida";
         }
-        
+
         return "redirect:/partidaPersonal";
     }
-    
+
     @PostMapping("/crearPartida")
     public String crearPartida(@ModelAttribute("newpartida") Partida partida,
             Model modelo,
             HttpServletRequest req
     ) {
-        
+
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/";
@@ -1059,16 +1071,16 @@ public class ControladorVista {
         }
         modelo.addAttribute("result", "Error en el tipo de partida");
         return "CrearPartida";
-        
+
     }
-    
+
     private void resultadosPartida(Partida partidaSesion, Model modelo) {
-        
+
         HashMap<String, List<Respuesta>> resultadosPartida = new HashMap();
         HashMap<String, Integer> totales = new HashMap();
         String nomUsu;
         ArrayList lista;
-        
+
         for (Ronda ronda : partidaSesion.getRondas()) {
             for (Respuesta respuesta : ronda.getRespuestas()) {
                 nomUsu = respuesta.getUsuario().getNombre();
@@ -1088,39 +1100,39 @@ public class ControladorVista {
             }
             totales.put(usu, total);
         }
-        
+
         modelo.addAttribute("ptstotales", totales);
         modelo.addAttribute("resultados", resultadosPartida);
     }
-    
+
     @GetMapping("/partidaConsultaGrupo/{id}")
     public String partidaConsultaGrupo(@PathVariable Long id, Model modelo) {
-        
+
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/";
         }
-        
+
         Partida partidaSesion = null;
         try {
             Optional<Partida> partida = servPartida.findById(id);
             partidaSesion = partida.get();
         } catch (Exception e) {
         }
-        
+
         if (partidaSesion == null) {
             return "redirect:/panel";
         }
         resultadosPartida(partidaSesion, modelo);
         modelo.addAttribute("partidaSesion", partidaSesion);
         informarPartidaModelo(modelo, partidaSesion);
-        
+
         return "ResultadosPartida";
     }
-    
+
     @GetMapping("/partidaConsultaPersonal/{id}")
     public String partidaConsultaPersonal(@PathVariable Long id, Model modelo) {
-        
+
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/";
@@ -1132,19 +1144,19 @@ public class ControladorVista {
             partidaSesion = partida.get();
         } catch (Exception e) {
         }
-        
+
         if (partidaSesion == null) {
             return "redirect:/panel";
         }
         informarPartidaModelo(modelo, partidaSesion);
         modelo.addAttribute("partidaSesion", partidaSesion);
         modelo.addAttribute("pts", partidaSesion.ptsUsuario(partidaSesion.getMaster()));
-        
+
         return "PartidaPersonalConsulta";
     }
-    
+
     private List<Usuario> usuariosGrupo(Usuario usu) {
-        
+
         ArrayList<Usuario> usuarios = (ArrayList<Usuario>) servUsuario.usuariosGrupo(usu.getGrupo());
         ArrayList<Usuario> invitados = new ArrayList();
 
@@ -1156,15 +1168,15 @@ public class ControladorVista {
         }
         return invitados;
     }
-    
+
     @GetMapping("/administracion")
     public String administracion(Model modelo) {
-        
+
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/";
         }
-        
+
         FiltroUsuarios filtro;
         if (modelo.getAttribute("filtroUsuarios") == null) {
             filtro = new FiltroUsuarios();
@@ -1172,65 +1184,65 @@ public class ControladorVista {
         } else {
             filtro = (FiltroUsuarios) modelo.getAttribute("filtroUsuarios");
         }
-        
+
         List<Usuario> usuarios = servUsuario.findByFiltroBasico(filtro);
         modelo.addAttribute("usuarios", usuarios);
-        
+
         return "Administracion";
     }
-    
+
     @PostMapping("/administracion")
     public String administracion(Model modelo, @ModelAttribute("filtroUsuarios") FiltroUsuarios filtro) {
-        
+
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/";
         }
-        
+
         List<Usuario> usuarios = servUsuario.findByFiltroBasico(filtro);
         modelo.addAttribute("usuarios", usuarios);
-        
+
         return "Administracion";
     }
-    
+
     @PostMapping("/accionesUsuarios")
     public String accionesUsuarios(Model modelo, HttpServletRequest req) {
-        
+
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/";
         }
-        
+
         String activo = req.getParameter("activo");
         boolean isActivo = false;
         if ("on".equals(activo)) {
             isActivo = true;
         }
-        
+
         Set<UsuarioRol> roles = new HashSet();
         UsuarioRol usurol;
-        
+
         String user = req.getParameter("user");
         if ("on".equals(user)) {
             usurol = new UsuarioRol();
             usurol.setName(Roles.USER);
             roles.add(usurol);
         }
-        
+
         String admin = req.getParameter("admin");
         if ("on".equals(admin)) {
             usurol = new UsuarioRol();
             usurol.setName(Roles.ADMIN);
             roles.add(usurol);
         }
-        
+
         String colaborador = req.getParameter("colaborador");
         if ("on".equals(colaborador)) {
             usurol = new UsuarioRol();
             usurol.setName(Roles.COLABORADOR);
             roles.add(usurol);
         }
-        
+
         FiltroUsuarios filtro = (FiltroUsuarios) modelo.getAttribute("filtroUsuarios");
         List<Usuario> usuarios = servUsuario.findByFiltroBasico(filtro);
         for (Usuario usuario : usuarios) {
@@ -1250,13 +1262,13 @@ public class ControladorVista {
         }
         return "redirect:/administracion";
     }
-    
+
     @GetMapping("/validarUsuario")
     public String validarUsuario(Model modelo, HttpServletRequest req) {
-        
+
         Long id = Long.valueOf(req.getParameter("id"));
         String token = (String) req.getParameter("token");
-        
+
         Optional<Usuario> usu = servUsuario.findById(id);
         if (usu.isPresent()) {
             Usuario usuario = usu.get();
@@ -1271,36 +1283,36 @@ public class ControladorVista {
             return "error";
         }
     }
-    
+
     @GetMapping("/recuperarContrasenya")
     public String recuperarContrasenya(Model modelo) {
-        
+
         return "PasswordOlvidado";
-        
+
     }
-    
+
     @PostMapping("/codigoRecuperacionPassw")
     public String codigoRecuperacionPassw(@ModelAttribute("mail") String mail, Model modelo) {
-        
+
         String usu = mail.toLowerCase();
         Optional<Usuario> usuario = servUsuario.findByUsuario(usu);
-        
+
         if (usuario.isEmpty()) {
             modelo.addAttribute("error", "Este usuario no existe");
             return "PasswordOlvidado";
         } else {
             String token = usuario.get().getContrasenya();
             String enlace = "El codigo de recuperacion para el cambio de contraseña es : " + token;
-            
+
             enviarMail(usuario.get().getUsuario(), "Recuperación de Contraseña PlayHitsGame",
                     enlace, "Correo");
-            
+
             modelo.addAttribute("result", "Se ha enviado un codigo de recuperacion a tu cuenta de correo");
             modelo.addAttribute("mail", mail);
         }
         return "PasswordOlvidado";
     }
-    
+
     @PostMapping("/recuperarContrasenya")
     public String recuperarContrasenya(
             @ModelAttribute("usuario") String usuario,
@@ -1308,7 +1320,7 @@ public class ControladorVista {
             @ModelAttribute("pws1") String pws1,
             @ModelAttribute("pws2") String pws2,
             Model modelo) {
-        
+
         String usu = null;
         if (usuario != null) {
             usu = usuario.toLowerCase();
@@ -1327,7 +1339,7 @@ public class ControladorVista {
             String newPassw = "";
             String err = null;
             String resp = null;
-            
+
             try {
                 Utilidades.validarPassword(pws1, pws2);
                 newPassw = passwordEncoder.encode(pws2);
@@ -1335,7 +1347,7 @@ public class ControladorVista {
                 passwOK = false;
                 err = ex.getMessage();
             }
-            
+
             if (passwOK) {
                 try {
                     if (!"".equals(newPassw)) {
@@ -1350,21 +1362,21 @@ public class ControladorVista {
             modelo.addAttribute("error", err);
             modelo.addAttribute("result", resp);
         }
-        
+
         return "PasswordOlvidado";
     }
-    
+
     @GetMapping("/records")
     public String records(Model modelo) {
-        
+
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/";
         }
         ArrayList<Tema> temas = (ArrayList<Tema>) servTema.findAll();
-        
+
         ArrayList<Record> records = new ArrayList();
-        
+
         for (Tema tema : temas) {
             Record newObj = new Record();
             newObj.setTema(tema.getTema());
@@ -1383,18 +1395,18 @@ public class ControladorVista {
             newObj.setUsuarioRecord(usuRecord);
             records.add(newObj);
         }
-        
+
         modelo.addAttribute("temas", records);
-        
+
         return "Records";
     }
-    
+
     private void eliminarOpcionesPartida(Partida partida) {
-        
+
         servOpTitulo.deleteByPartida(partida.getId());
         servOpInterprete.deleteByPartida(partida.getId());
         servOpAnyo.deleteByPartida(partida.getId());
-        
+
     }
-    
+
 }

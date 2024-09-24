@@ -15,6 +15,7 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import mld.playhitsgame.utilidades.Utilidades;
 import mld.playhitsgame.exemplars.Cancion;
+import mld.playhitsgame.exemplars.Dificultad;
 import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.Respuesta;
 import mld.playhitsgame.exemplars.Ronda;
@@ -452,21 +453,21 @@ public class WebsocketControler {
         }
 
         for (Respuesta resp : rondaActiva.getRespuestas()) {
-            ptsAnyo = Utilidades.calcularPtsPorAnyo(resp.getAnyo(), cancion);
+            ptsAnyo = Utilidades.calcularPtsPorAnyo(resp.getAnyo(), cancion, Dificultad.Normal);
             if (resp.getUsuario().equals(primerAcertanteAnyo)) {
                 ptsAnyo = ptsAnyo * 2;
             }
             if (ptsAnyo > 0) {
                 resp.setAnyoOk(true);
             }
-            ptsTitulo = Utilidades.calcularPtsPorTitulo(resp.getTitulo(), cancion);
+            ptsTitulo = Utilidades.calcularPtsPorTitulo(resp.getTitulo(), cancion, Dificultad.Normal);
             if (resp.getUsuario().equals(primerAcertanteTitulo)) {
                 ptsTitulo = ptsTitulo * 2;
             }
             if (ptsTitulo > 0) {
                 resp.setTituloOk(true);
             }
-            ptsInterp = Utilidades.calcularPtsPorInterprete(resp.getInterprete(), cancion);
+            ptsInterp = Utilidades.calcularPtsPorInterprete(resp.getInterprete(), cancion, Dificultad.Normal);
             if (resp.getUsuario().equals(primerAcertanteInterprete)) {
                 ptsInterp = ptsInterp * 2;
             }

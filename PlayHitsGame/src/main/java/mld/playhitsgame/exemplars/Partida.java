@@ -16,44 +16,44 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
-
 /**
  *
  * @author miguel
  */
-
-
 @Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "partidas")
-public class Partida{
-   
+public class Partida {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Temporal(TemporalType.DATE) 
+
+    @Temporal(TemporalType.DATE)
     @Column(name = "fecha", nullable = false, updatable = false)
-    @CreationTimestamp 
+    @CreationTimestamp
     private Date fecha;
-    
+
     @Enumerated(EnumType.STRING)
     private StatusPartida status;
 
     @Enumerated(EnumType.STRING)
     private TipoPartida tipo;
-    
+
+    @Enumerated(EnumType.STRING)
+    private Dificultad dificultad;
+
     @ManyToOne// poner LAZY para no cargar hasta hacer un get
-    private Usuario master;    
-    
-    @ManyToMany(mappedBy = "partidasInvitado", fetch=FetchType.EAGER)
+    private Usuario master;
+
+    @ManyToMany(mappedBy = "partidasInvitado", fetch = FetchType.EAGER)
     private List<Usuario> invitados;
-    
-    @OneToMany(mappedBy = "partida", fetch=FetchType.EAGER) // poner LAZY para no cargar hasta hacer un get 
-    private List<Ronda> rondas;    
-  
+
+    @OneToMany(mappedBy = "partida", fetch = FetchType.EAGER) // poner LAZY para no cargar hasta hacer un get 
+    private List<Ronda> rondas;
+
     private int rondaActual;
     private String tema; // por ejemplo Descripciones genericas 
     @Min(1950)
@@ -63,155 +63,159 @@ public class Partida{
     private int nCanciones;
     private String grupo;
     private String ganador;
-    
+
     private boolean activarPlay;
-    
-    
-    public boolean isTipoGrupo(){
-        
+
+    public boolean isTipoGrupo() {
+
         return this.getTipo().equals(TipoPartida.grupo);
-        
+
     }
-    
-     public boolean isTipoPersonal(){
-        
+
+    public boolean isTipoPersonal() {
+
         return this.getTipo().equals(TipoPartida.personal);
-        
+
     }
-     
-    public boolean isTerminada(){
-        
+
+    public boolean isTerminada() {
+
         return this.status == StatusPartida.Terminada;
-        
+
     }
-    
-    public String fechaFormateada(){
-        
+
+    public String fechaFormateada() {
+
         //String strDateFormat = "hh:mm:ss a dd-MMM-yyyy"; 
         String strDateFormat = "dd/MMM/yyyy";
-        SimpleDateFormat objSDF = new SimpleDateFormat(strDateFormat); 
-        return objSDF.format(this.getFecha()); 
-        
+        SimpleDateFormat objSDF = new SimpleDateFormat(strDateFormat);
+        return objSDF.format(this.getFecha());
+
     }
-        
-    public List<Respuesta> respuestasUsuario(Usuario usuario){
-        
+
+    public List<Respuesta> respuestasUsuario(Usuario usuario) {
+
         ArrayList<Respuesta> respuestas = new ArrayList();
-        for (Ronda ronda : this.getRondas()){
-            for (Respuesta resp : ronda.getRespuestas()){
-                if (Objects.equals(usuario, resp.getUsuario()))
+        for (Ronda ronda : this.getRondas()) {
+            for (Respuesta resp : ronda.getRespuestas()) {
+                if (Objects.equals(usuario, resp.getUsuario())) {
                     respuestas.add(resp);
-            }           
+                }
+            }
         }
-        
+
         return respuestas;
     }
-    
-    public String getUsuariosTxT(){
-        
+
+    public String getUsuariosTxT() {
+
         String txt = "";
-        
+
         boolean primero = true;
-        
-        for (Usuario usu : this.usuariosPartida()){
-            if (primero)
+
+        for (Usuario usu : this.usuariosPartida()) {
+            if (primero) {
                 primero = false;
-            else 
+            } else {
                 txt = txt.concat(", ");
-            txt = txt.concat(usu.getNombre());            
-        }        
-        return txt;        
+            }
+            txt = txt.concat(usu.getNombre());
+        }
+        return txt;
     }
-    
-    public List<String> getDescripcion(){
-        
+
+    public List<String> getDescripcion() {
+
         ArrayList<String> txt = new ArrayList();
-        
-        if (this.getGrupo() != null && !this.getGrupo().isEmpty())
+
+        if (this.getGrupo() != null && !this.getGrupo().isEmpty()) {
             txt.add("Grupo: ".concat(this.getGrupo()));
-        if (this.getTema()!= null && !this.getTema().isEmpty())
+        }
+        if (this.getTema() != null && !this.getTema().isEmpty()) {
             txt.add("Tema: ".concat(this.getTema()));
+        }
         txt.add("Canciones Seleccionadas: " + String.valueOf(this.nCanciones));
         txt.add("Año inicial: " + String.valueOf(this.getAnyoInicial()));
         txt.add("Año final: " + String.valueOf(this.getAnyoFinal()));
-        
+
         return txt;
     }
-        
-    public Ronda rondaActiva(){
-        
-        return this.rondas.get(this.rondaActual - 1);  
+
+    public Ronda rondaActiva() {
+
+        return this.rondas.get(this.rondaActual - 1);
     }
-    
-    public Ronda ultimaRonda(){
-        
+
+    public Ronda ultimaRonda() {
+
         Ronda ultima = null;
         List<Ronda> lasRondas = this.getRondas();
-        if (lasRondas != null && !lasRondas.isEmpty() )
+        if (lasRondas != null && !lasRondas.isEmpty()) {
             ultima = lasRondas.get(lasRondas.size() - 1);
-        
-        return ultima;        
+        }
+
+        return ultima;
     }
-    
-    public List<Usuario> usuariosPartida(){
-        
+
+    public List<Usuario> usuariosPartida() {
+
         ArrayList<Usuario> lista = new ArrayList();
-        
+
         lista.add(this.getMaster());
-        if (!this.getInvitados().isEmpty())
+        if (!this.getInvitados().isEmpty()) {
             lista.addAll(this.getInvitados());
-        
+        }
+
         return lista;
-    }       
-    
-    public void pasarSiguienteRonda(){
+    }
+
+    public void pasarSiguienteRonda() {
         this.setRondaActual(this.getRondaActual() + 1);
     }
-    
-    public boolean hayMasRondas(){
+
+    public boolean hayMasRondas() {
         return this.getRondaActual() < this.getRondas().size();
     }
-    
-    public int ptsUsuario(Usuario usuario){
-        
+
+    public int ptsUsuario(Usuario usuario) {
+
         int pts = 0;
-        
-        for (Ronda ronda : this.getRondas()){
-            for (Respuesta resp : ronda.getRespuestas()){
-                if (Objects.equals(resp.getUsuario().getId(), usuario.getId()))
+
+        for (Ronda ronda : this.getRondas()) {
+            for (Respuesta resp : ronda.getRespuestas()) {
+                if (Objects.equals(resp.getUsuario().getId(), usuario.getId())) {
                     pts = pts + resp.getPuntos();
+                }
             }
         }
         return pts;
     }
-    
-    public void asignarGanador(){
-        
+
+    public void asignarGanador() {
+
         String ganadorPartida = "";
         int ptsGanador = 0;
-        
-        for (Usuario usuario : this.usuariosPartida()){
+
+        for (Usuario usuario : this.usuariosPartida()) {
             int ptsUsu = ptsUsuario(usuario);
-            if(ptsUsu > ptsGanador){
+            if (ptsUsu > ptsGanador) {
                 ganadorPartida = usuario.getNombre();
                 ptsGanador = ptsUsu;
             }
-        }        
-        this.setGanador(ganadorPartida);        
+        }
+        this.setGanador(ganadorPartida);
     }
-    
-    public List<Cancion> canciones(){
-        
+
+    public List<Cancion> canciones() {
+
         ArrayList<Cancion> lista = new ArrayList();
-        
-        for (Ronda ronda : this.getRondas())
+
+        for (Ronda ronda : this.getRondas()) {
             lista.add(ronda.getCancion());
-        
+        }
+
         return lista;
-        
+
     }
-    
-    
+
 }
-
-

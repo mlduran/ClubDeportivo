@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import mld.playhitsgame.exemplars.Cancion;
+import mld.playhitsgame.exemplars.Dificultad;
 import mld.playhitsgame.exemplars.OpcionAnyoTmp;
 import mld.playhitsgame.exemplars.OpcionInterpreteTmp;
 import mld.playhitsgame.exemplars.OpcionTituloTmp;
@@ -37,31 +38,59 @@ public class Utilidades {
 
     private static final int NUMERO_OPCIONES = 5;
 
-    public static int calcularPtsPorAnyo(int anyo, Cancion cancion) {
+    public static int calcularPtsPorAnyo(int anyo, Cancion cancion, Dificultad dificultad) {
 
+        int pts = 0;
         if (anyo == cancion.getAnyo()) {
-            return 15;
-        } else {
-            return 0;
+            pts = 15;
         }
+        
+        // Dependiendo de la dificultad multiplicamos o dividimos por 2
+        if (dificultad.equals(Dificultad.Facil)) {
+            pts = pts / 2;
+        }
+        if (dificultad.equals(Dificultad.Dificil)) {
+            pts = pts * 2;
+        }
+        
+        return pts;
     }
 
-    public static int calcularPtsPorTitulo(String titulo, Cancion cancion) {
+    public static int calcularPtsPorTitulo(String titulo, Cancion cancion, Dificultad dificultad) {
 
+        int pts = 0;
         if (titulo != null && titulo.equals(cancion.getTitulo())) {
-            return 15;
-        } else {
-            return 0;
+            pts = 15;
         }
+        
+        // Dependiendo de la dificultad multiplicamos o dividimos por 2
+        if (dificultad.equals(Dificultad.Facil)) {
+            pts = pts / 2;
+        }
+        if (dificultad.equals(Dificultad.Dificil)) {
+            pts = pts * 2;
+        }
+        
+        return pts;
+        
     }
 
-    public static int calcularPtsPorInterprete(String interprete, Cancion cancion) {
+    public static int calcularPtsPorInterprete(String interprete, Cancion cancion, Dificultad dificultad) {
 
+        int pts = 0;
         if (interprete != null && interprete.equals(cancion.getInterprete())) {
-            return 15;
-        } else {
-            return 0;
+            pts = 15;
         }
+        
+        // Dependiendo de la dificultad multiplicamos o dividimos por 2
+        if (dificultad.equals(Dificultad.Facil)) {
+            pts = pts / 2;
+        }
+        if (dificultad.equals(Dificultad.Dificil)) {
+            pts = pts * 2;
+        }
+        
+        return pts;
     }
 
     public static Cancion cancionRandom(List<Cancion> lista) {

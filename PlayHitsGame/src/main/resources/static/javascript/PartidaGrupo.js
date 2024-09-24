@@ -63,8 +63,7 @@ var procesar = function (mensaje) {
     if (dataJson["op"] === "respuestas") {
         if (dataJson["usuarios"] !== undefined) {
             let mensajesSockets = document.getElementById("mensajesSockets");
-            txtHtml = '<p>' + dataJson["usuarios"] + '</p>';
-            txtHtml = '<p>prueba1, prueba2, pepe, losls, herminio, informatico, lolo, patricio</p>';
+            txtHtml = '<p>' + dataJson["usuarios"] + '</p>';            
             mensajesSockets.innerHTML = txtHtml;
         }
     }

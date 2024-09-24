@@ -46,6 +46,10 @@ public class PartidaServicioMetodos implements PartidaServicio{
 
         if(Objects.nonNull(partida.getTipo())){
             obj.setTipo(partida.getTipo());
+        }
+        
+        if(Objects.nonNull(partida.getDificultad())){
+            obj.setDificultad(partida.getDificultad());
         } 
         
         if(Objects.nonNull(partida.getTema()) && !"".equalsIgnoreCase(partida.getTema())){

@@ -31,6 +31,13 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                     th:value="${elem}" th:text="${elem}"></option>
                                         </select>
                                     </div>
+                                    <div class="mb-3" th:if="${newpartida.tipoPersonal}">
+                                        <label class="mb-2 text-muted" for="dificultad" th:text="#{general.dificultad}"/>
+                                        <select th:field="*{dificultad}" title="Dificultad" id="dificultad">
+                                            <option th:each="dificultadOpt : ${T(mld.playhitsgame.exemplars.Dificultad).values()}" 
+                                                    th:value="${dificultadOpt}" th:text="${dificultadOpt}"></option>
+                                        </select>
+                                    </div>
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="anyoini" th:text="#{general.anyoini}"/>
                                         <input  id="anyoini" type="number" th:field="*{anyoInicial}" th:value="${newpartida.anyoInicial}" required="required"/>
