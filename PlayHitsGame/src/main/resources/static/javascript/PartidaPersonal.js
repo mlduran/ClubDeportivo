@@ -21,6 +21,7 @@ var respOk = document.getElementById('respuestaOK');
 var todoFallo = document.getElementById('todoFallo');
 
 var reproductor = document.getElementById("reproductor");
+var reproductorConsulta = document.getElementById("reproductorConsulta");
 
 async function enviarRespuestas() {
 
@@ -94,6 +95,22 @@ function activarDesactivarPlay() {
         reproductor.pause(); // Pausar el audio si está reproduciéndose
     }
 
+}
+
+var reproductorActivo = false;
+function reproducir(cancion){
+    
+    
+    reproductorConsulta.src = cancion;
+    
+    if (reproductorActivo) {
+        reproductorConsulta.pause(); // Pausar el audio si está reproduciéndose
+        reproductorActivo = false;
+    } else {        
+        reproductorConsulta.play(); // Reproducir el audio si está pausado
+        reproductorActivo = true;
+    }
+    
 }
 
 document.addEventListener("keydown", function (event) {

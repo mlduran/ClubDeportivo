@@ -30,6 +30,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             <input type="hidden" id="idpartida" th:value="${partidaSesion.id}" />
             <input type="hidden" id="respuestaOK" th:value="${respuestaOK}" />
             <input type="hidden" id="todoFallo" th:value="${todoFallo}" />
+            <audio controls id="reproductorConsulta" style="display: none;">
+                <source src="" type="audio/mpeg" />                                                            
+            </audio>
             <div class="container h-100">
                 <div class="row justify-content-sm-center h-100">
                     <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
@@ -90,7 +93,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                 </div>
                                             </div>
                                         </td>
-                                    </tr>                                   
+                                    </tr>  
+                                </table>
+                                <table class="table-responsive table-bordered" style="max-width: 100%; width: 100%; table-layout: fixed;">
                                     <tr>
                                         <td colspan="3">
                                             <form method="post" id="respuestas" th:action="@{/partidaPersonal}"> 
@@ -117,65 +122,67 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                             </div>
                                                         </td>
                                                     </tr>
-                                                    <tr>
-                                                        <th style="background-color: lightpink;">
-                                                            <p th:text="#{general.titulo}" /> 
-                                                        </th>
-                                                        <th style="background-color: lightpink;">
-                                                            <p th:text="#{general.interprete}" /> 
-                                                        </th>
-                                                        <th style="background-color: lightpink;">
-                                                            <p th:text="#{general.anyo}" /> 
-                                                        </th>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="background-color:#dcdcdc;">
-                                                            <input type="hidden" name="titulo" id="titulo" value=""/>
-                                                            <table class="table">
-                                                                <div th:each="opTitulo : ${opcTitulos}">
-                                                                    <tr>
-                                                                        <td style="background-color:#dcdcdc;">                                                                
-                                                                            <button style="background-color: white;" type="button" class="btn btn-outline-primary" th:data-name="${opTitulo.cancion}" 
-                                                                                    th:onclick="respuestaTitulo(this.getAttribute('data-name'))" th:id="'titulo_' + ${opTitulo.cancion}">
-                                                                                <p th:text="${opTitulo.opTitulo}" />
-                                                                            </button>
-                                                                        </td>
-                                                                    </tr>
-                                                                </div>
-                                                            </table>
-                                                        </td>
-                                                        <td style="background-color:#dcdcdc;">
-                                                            <input type="hidden" name="interprete" id="interprete" value=""/>
-                                                            <table class="table" border='none'>
-                                                                <div th:each="opcInterprete : ${opcInterpretes}">
-                                                                    <tr>
-                                                                        <td style="background-color:#dcdcdc;">                                                                
-                                                                            <button style="background-color: white;" type="button" class="btn btn-outline-primary" th:data-name="${opcInterprete.cancion}" 
-                                                                                    th:onclick="respuestaInterprete(this.getAttribute('data-name'))" th:id="'interprete_' + ${opcInterprete.cancion}">
-                                                                                <p th:text="${opcInterprete.opInterprete}" />
-                                                                            </button>
-                                                                        </td>
-                                                                    </tr>
-                                                                </div>
-                                                            </table>
-                                                        </td>
-                                                        <td style="background-color:#dcdcdc;">  
-                                                            <input type="hidden" name="anyo" id="anyo" value=""/>
-                                                            <table class="table" border='none'>
-                                                                <div th:each="opAnyo : ${opcAnyos}">
-                                                                    <tr>
-                                                                        <td style="background-color:#dcdcdc;">                                                                
-                                                                            <button style="background-color: white;" type="button" class="btn btn-outline-primary" th:data-name="${opAnyo.opAnyo}" 
-                                                                                    th:onclick="respuestaAnyo(this.getAttribute('data-name'))" th:id="'anyo_' + ${opAnyo.opAnyo}">
-                                                                                <p th:text="${opAnyo.opAnyo}" />
-                                                                            </button>
-                                                                        </td>
-                                                                    </tr>
-                                                                </div>
-                                                            </table>
-                                                        </td>
-                                                    </tr>                                          
-                                                </table>
+                                                    <table class="table-responsive table-bordered" style="max-width: 100%; width: 100%; table-layout: fixed;">
+
+                                                        <tr>
+                                                            <th style="background-color: lightpink;width: 40%;text-align:center;">
+                                                                <p th:text="#{general.titulo}" /> 
+                                                            </th>
+                                                            <th style="background-color: lightpink;width: 35%;text-align:center;">
+                                                                <p th:text="#{general.interprete}" /> 
+                                                            </th>
+                                                            <th style="background-color: lightpink;width: 25%;text-align:center;">
+                                                                <p th:text="#{general.anyo}" /> 
+                                                            </th>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="background-color:#dcdcdc;width: 40%;">
+                                                                <input type="hidden" name="titulo" id="titulo" value=""/>
+                                                                <table class="table">
+                                                                    <div th:each="opTitulo : ${opcTitulos}">
+                                                                        <tr>
+                                                                            <td style="background-color:#dcdcdc;">                                                                
+                                                                                <button style="background-color: white;" type="button" class="btn btn-outline-primary" th:data-name="${opTitulo.cancion}" 
+                                                                                        th:onclick="respuestaTitulo(this.getAttribute('data-name'))" th:id="'titulo_' + ${opTitulo.cancion}">
+                                                                                    <p th:text="${opTitulo.opTitulo}" />
+                                                                                </button>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </div>
+                                                                </table>
+                                                            </td>
+                                                            <td style="background-color:#dcdcdc;width: 35%;">
+                                                                <input type="hidden" name="interprete" id="interprete" value=""/>
+                                                                <table class="table" border='none'>
+                                                                    <div th:each="opcInterprete : ${opcInterpretes}">
+                                                                        <tr>
+                                                                            <td style="background-color:#dcdcdc;">                                                                
+                                                                                <button style="background-color: white;" type="button" class="btn btn-outline-primary" th:data-name="${opcInterprete.cancion}" 
+                                                                                        th:onclick="respuestaInterprete(this.getAttribute('data-name'))" th:id="'interprete_' + ${opcInterprete.cancion}">
+                                                                                    <p th:text="${opcInterprete.opInterprete}" />
+                                                                                </button>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </div>
+                                                                </table>
+                                                            </td>
+                                                            <td style="background-color:#dcdcdc;width: 25%;">  
+                                                                <input type="hidden" name="anyo" id="anyo" value=""/>
+                                                                <table class="table" border='none'>
+                                                                    <div th:each="opAnyo : ${opcAnyos}">
+                                                                        <tr>
+                                                                            <td style="background-color:#dcdcdc;">                                                                
+                                                                                <button style="background-color: white;" type="button" class="btn btn-outline-primary" th:data-name="${opAnyo.opAnyo}" 
+                                                                                        th:onclick="respuestaAnyo(this.getAttribute('data-name'))" th:id="'anyo_' + ${opAnyo.opAnyo}">
+                                                                                    <p th:text="${opAnyo.opAnyo}" />
+                                                                                </button>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </div>
+                                                                </table>
+                                                            </td>                                                            
+                                                        </tr>                                          
+                                                    </table>
                                             </form>
                                         </td>
                                     </tr>
@@ -189,8 +196,13 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                         <td colspan="3"> 
                                             <table style="width: 100%;">
                                                 <tr>
-                                                    <th colspan="2" style="text-align:center; background-color: lightblue">                                
+                                                    <th style="text-align:center; background-color: lightblue; width:70%;">                                
                                                         <p th:text="#{general.ronda} + ' ' + ${rondaPart.numero}" />
+                                                    </th>
+                                                    <th style="width:30%;">
+                                                        <img th:src="${rondaPart.cancion.spotifyimagen}" alt="PLAYHITSGAME" class="img-fluid"
+                                                             th:data-name="${rondaPart.cancion.spotifyplay}"
+                                                             th:onclick="reproducir(this.getAttribute('data-name'))"/>
                                                     </th>
                                                 <tr>
                                                 <tr>

@@ -40,11 +40,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </div>
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="anyoini" th:text="#{general.anyoini}"/>
-                                        <input  id="anyoini" type="number" th:field="*{anyoInicial}" th:value="${newpartida.anyoInicial}" required="required"/>
+                                        <input  id="anyoini" type="number" th:field="*{anyoInicial}" th:value="${newpartida.anyoInicial}"  size="4" required="required"/>
                                     </div>
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="anyofin" th:text="#{general.anyofin}"/>
-                                        <input id="anyofin" type="number" th:field="*{anyoFinal}" th:value="${newpartida.anyoFinal}" required="required"/>
+                                        <input id="anyofin" type="number" th:field="*{anyoFinal}" th:value="${newpartida.anyoFinal}"  size="4" required="required"/>
                                     </div>                                    
                                     <div th:if="${newpartida.tipoGrupo}">
                                         <div class="mb-3">
