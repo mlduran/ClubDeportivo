@@ -208,6 +208,14 @@ public class WebsocketControler {
             actualizarPlay(obJson.getLong("idPartida"), true);
             return obJsonSalida;
         }
+        if ("cuentaAtrasResponder".equals(obJson.getString("op"))) {
+            obJsonSalida.put("op", "cuentaAtrasResponder");
+            return obJsonSalida;
+        }
+        if ("mostrarOpciones".equals(obJson.getString("op"))) {
+            obJsonSalida.put("op", "mostrarOpciones");
+            return obJsonSalida;
+        }
         if ("acabaronda".equals(obJson.getString("op"))) {
             pasarSiguienteRonda(obJson.getLong("idPartida"), obJsonSalida);
             return obJsonSalida;

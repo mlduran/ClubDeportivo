@@ -8,9 +8,14 @@ let serverWS = document.getElementById("serverWS").value;
 let dirSocket = serverWS + "/websocket";
 let userId = document.getElementById("idusuario").value;
 let partidaId = document.getElementById("idpartida").value;
+let reproductor = document.getElementById("reproductor");
 let mostrarPlayer = document.getElementById("mostrarPlayer");
 let activarPlay = document.getElementById("activarPlay");
 let rol = document.getElementById("rol");
+let colEncabRespuestas = document.getElementById("cRespuestas");
+let colRespuestas = document.getElementById("respuestas");
+let colPreRespuestas = document.getElementById("preRespuestas");
+let mostrarRespuestas = 0;
 var stompClient = new StompJs.Client({
     brokerURL: dirSocket
 });
@@ -47,6 +52,12 @@ var procesar = function (mensaje) {
     if (dataJson["op"] === "playerOFF" || dataJson["op"] === "playerON") {
         tratarVisualizarPlayer(dataJson["op"]);
     }
+    if (dataJson["op"] === "cuentaAtrasResponder") {
+        cuentaAtrasResponder();
+    }
+    if (dataJson["op"] === "mostrarOpciones") {
+        mostrarOpciones();
+    }
     if (dataJson["op"] === "nueva") {
         txt = txtPrimeros(dataJson);
         if (txt !== undefined && txt !== "")
@@ -63,7 +74,7 @@ var procesar = function (mensaje) {
     if (dataJson["op"] === "respuestas") {
         if (dataJson["usuarios"] !== undefined) {
             let mensajesSockets = document.getElementById("mensajesSockets");
-            txtHtml = '<p>' + dataJson["usuarios"] + '</p>';            
+            txtHtml = '<p>' + dataJson["usuarios"] + '</p>';
             mensajesSockets.innerHTML = txtHtml;
         }
     }
@@ -84,7 +95,7 @@ function txtMensaje(op, valor) {
     return mensaje;
 }
 
-function inicializar() {
+function inicializarWS() {
     stompClient.activate();
     //stompClient.deactivate();
     stompClient.onConnect = (frame) => {
@@ -126,7 +137,7 @@ async function sleep(t) {
 // Hacemos el alta para dar de alta el usuario el el WS
 // y hacer la consulta de BD en el momento de carga de 
 // la pagina
-async function incializar() {
+async function inicializar() {
     // si no hacemos esto el usuario no se registra y por ejemplo
     // el ultimo no se tendria en cuenta
     let intentos = 10;
@@ -148,17 +159,45 @@ async function incializar() {
     if (rol.value === "master") {
         mostrarPlayer.style.display = 'block';
     } else {
-        if (activarPlay.value === 'true')
+        if (activarPlay.value === "true") {
             mostrarPlayer.style.display = 'block';
-        else
+        } else {
             mostrarPlayer.style.display = 'none';
+        }
     }
 
+    colPreRespuestas.style.display = 'block';
+    colEncabRespuestas.style.display = 'none';
+    colRespuestas.style.display = 'none';
 }
 
-document.addEventListener("DOMContentLoaded", inicializar);
-window.addEventListener('load', incializar);
+function activarPlayer(){
+     sendmensaje(txtMensaje("cuentaAtrasResponder"));
+    
+}
+
+async function cuentaAtrasResponder(){
+    
+    let mensaje = document.getElementById("cuentaAtras");
+    for (var i = 15; i > 0; i--) {
+        mensaje.textContent = "..." + i;
+        await sleep(1000);// Esperamos 1 seg  
+    }  
+    sendmensaje(txtMensaje("mostrarOpciones"));
+}
+
+function mostrarOpciones(){
+    
+    colPreRespuestas.style.display = 'none';
+    colEncabRespuestas.style.display = 'block';
+    colRespuestas.style.display = 'block';
+    
+}
+
+document.addEventListener("DOMContentLoaded", inicializarWS);
+window.addEventListener('load', inicializar);
 window.addEventListener('unload', desconectar);
+reproductor.addEventListener("play", activarPlayer);
 
 function forzarAcabarRonda() {
     sendmensaje(txtMensaje("acabaronda", null, null));
@@ -234,7 +273,7 @@ document.addEventListener("keydown", function (event) {
     // Verificar si la tecla presionada es la barra espaciadora (código 32)
     if (event.code === "Space") {
         event.preventDefault(); // Evitar el scroll al presionar la barra espaciadora
-        if (activarPlay.value === 'true') 
+        if (activarPlay.value === 'true')
             activarDesactivarPlay();
     }
 });
@@ -244,10 +283,10 @@ const doubleTapDelay = 1000; // 1 segundo
 
 document.addEventListener("touchstart", function (event) {
     // Al tocar la pantalla inicio el play
-    
+
     if (activarPlay.value === 'false')
         return;
-    
+
     event.preventDefault();
     const currentTime = new Date().getTime(); // Tiempo actual
     const timeSinceLastTouch = currentTime - lastTouchTime; // Diferencia entre el toque actual y el anterior

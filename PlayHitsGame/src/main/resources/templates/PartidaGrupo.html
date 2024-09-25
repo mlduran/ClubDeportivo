@@ -99,7 +99,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan='3'style="background-color: aqua;">  
+                                                    <td colspan='3' style="background-color: aqua;">  
                                                         <div id="mostrarPlayer">
                                                             <audio controls id="reproductor">
                                                                 <source th:src="${ronda.cancion.spotifyplay}" type="audio/mpeg" />                                                            
@@ -109,60 +109,76 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                             <input id="playerOnOff" type="image" th:src="@{'/images/CandadoCerrado.png'}" width="40" height="40" onclick="activarPlayer_on_off();" />
                                                         </div>
                                                     </td>
-                                                </tr>                                               
-                                                <tr>
-                                                    <th style="background-color: lightpink;">
-                                                        <p th:text="#{general.titulo}" /> 
-                                                    </th>
-                                                    <th style="background-color: lightpink;">
-                                                        <p th:text="#{general.interprete}" /> 
-                                                    </th>
-                                                    <th style="background-color: lightpink;">
-                                                        <p th:text="#{general.anyo}" /> 
-                                                    </th>
-                                                </tr>
-                                                <tr>
-                                                    <td style="background-color:#dcdcdc;">
-                                                        <table class="table" border='none'>
-                                                            <div th:each="opTitulo : ${opcTitulos}">
-                                                                <tr>
-                                                                    <td style="background-color:#dcdcdc;">  
-                                                                        <button style="background-color: white;" class="btn btn-outline-primary" th:data-name="${opTitulo.cancion}" th:onclick="respuestaTitulo(this.getAttribute('data-name'))" th:id="'titulo_' + ${opTitulo.cancion}">
-                                                                            <p th:text="${opTitulo.opTitulo}" />
-                                                                        </button>
-                                                                    </td>
-                                                                </tr>
-                                                            </div>
-                                                        </table>
-                                                    </td>
-                                                    <td style="background-color:#dcdcdc;">
-                                                        <table class="table" border='none'>
-                                                            <div th:each="opcInterprete : ${opcInterpretes}">
-                                                                <tr>
-                                                                    <td style="background-color:#dcdcdc;">  
-                                                                        <button style="background-color: white;" class="btn btn-outline-primary" th:data-name="${opcInterprete.cancion}" th:onclick="respuestaInterprete(this.getAttribute('data-name'))" th:id="'interprete_' + ${opcInterprete.cancion}">
-                                                                            <p th:text="${opcInterprete.opInterprete}" />
-                                                                        </button>
-                                                                    </td>
-                                                                </tr>
-                                                            </div>
-                                                        </table>
-                                                    </td>
-                                                    <td style="background-color:#dcdcdc;">                                               
-                                                        <table class="table" border='none'>
-                                                            <div th:each="opAnyo : ${opcAnyos}">
-                                                                <tr>
-                                                                    <td style="background-color:#dcdcdc;">                                                             
-                                                                        <button style="background-color: white;" type="button" class="btn btn-outline-primary" th:data-name="${opAnyo.opAnyo}" th:onclick="respuestaAnyo(this.getAttribute('data-name'))" th:id="'anyo_' + ${opAnyo.opAnyo}">
-                                                                            <p th:text="${opAnyo.opAnyo}" />
-                                                                        </button>
-                                                                    </td>
-                                                                </tr>
-                                                            </div>
-                                                        </table>
-                                                    </td>
                                                 </tr>
                                             </table>
+                                            <div id="preRespuestas">
+                                                <table class="table table-sm" style="text-align:center; ">
+                                                    <tr>
+                                                        <td id="cuentaAtras" th:text="#{general.playcomenzar}" 
+                                                            style="text-align:center; background-color: lightpink;"/>
+                                                    </tr>
+                                                </table>                                               
+                                            </div>
+                                            <div id="cRespuestas">
+                                                <table  class="table table-sm" style="text-align:center;">
+                                                    <tr>
+                                                        <th style="background-color: lightpink;width: 40%; ">
+                                                            <p th:text="#{general.titulo}" /> 
+                                                        </th>
+                                                        <th style="background-color: lightpink;width: 35%; ">
+                                                            <p th:text="#{general.interprete}" /> 
+                                                        </th>
+                                                        <th style="background-color: lightpink;width: 25%; ">
+                                                            <p th:text="#{general.anyo}" /> 
+                                                        </th>
+                                                    </tr> 
+                                                </table>
+                                            </div>
+                                            <div id="respuestas">
+                                                <table class="table-responsive table-bordered" style="max-width: 100%; width: 100%; table-layout: fixed;">
+                                                    <tr>
+                                                        <td style="background-color:#dcdcdc;width: 40%; ">
+                                                            <table class="table" border='none'>
+                                                                <div th:each="opTitulo : ${opcTitulos}">
+                                                                    <tr>
+                                                                        <td style="background-color:#dcdcdc;">  
+                                                                            <button style="background-color: white;" class="btn btn-outline-primary" th:data-name="${opTitulo.cancion}" th:onclick="respuestaTitulo(this.getAttribute('data-name'))" th:id="'titulo_' + ${opTitulo.cancion}">
+                                                                                <p th:text="${opTitulo.opTitulo}" />
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                </div>
+                                                            </table>
+                                                        </td>
+                                                        <td style="background-color:#dcdcdc;width: 35%; ">
+                                                            <table class="table" border='none'>
+                                                                <div th:each="opcInterprete : ${opcInterpretes}">
+                                                                    <tr>
+                                                                        <td style="background-color:#dcdcdc;">  
+                                                                            <button style="background-color: white;" class="btn btn-outline-primary" th:data-name="${opcInterprete.cancion}" th:onclick="respuestaInterprete(this.getAttribute('data-name'))" th:id="'interprete_' + ${opcInterprete.cancion}">
+                                                                                <p th:text="${opcInterprete.opInterprete}" />
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                </div>
+                                                            </table>
+                                                        </td>
+                                                        <td style="background-color:#dcdcdc;width: 25%; ">                                               
+                                                            <table class="table" border='none'>
+                                                                <div th:each="opAnyo : ${opcAnyos}">
+                                                                    <tr>
+                                                                        <td style="background-color:#dcdcdc;">                                                             
+                                                                            <button style="background-color: white;" type="button" class="btn btn-outline-primary" th:data-name="${opAnyo.opAnyo}" th:onclick="respuestaAnyo(this.getAttribute('data-name'))" th:id="'anyo_' + ${opAnyo.opAnyo}">
+                                                                                <p th:text="${opAnyo.opAnyo}" />
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                </div>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
                                         </td> 
                                     </div>  
                                     </tr>  
