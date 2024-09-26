@@ -190,6 +190,21 @@ public class Partida {
         }
         return pts;
     }
+    
+    public int getPtsUsuarioPartidaPersonal() throws Exception {
+
+        int pts = 0;
+        
+        if (!this.isTipoPersonal())
+            throw new Exception ("Este metodo solo es para partidas personales sino utilizar ptsUsuario(Usuario usuario) " );
+
+        for (Ronda ronda : this.getRondas()) {
+            for (Respuesta resp : ronda.getRespuestas()){                
+                    pts = pts + resp.getPuntos();                
+            }
+        }
+        return pts;
+    }
 
     public void asignarGanador() {
 

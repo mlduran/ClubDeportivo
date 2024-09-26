@@ -14,6 +14,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <header th:insert="~{plantillas/playhitsgame :: encabezado}"></header>
 
         <a href="/panel" class="button" id="volver">VOLVER</a>
+        <audio controls id="reproductor" style="display: none;">
+            <source src="" type="audio/mpeg" />                                                            
+        </audio>
         <div>
             <form method="post" th:action="@{/gestionCanciones}" th:object="${filtroCanciones}" > 
                 <table border="2">
@@ -77,6 +80,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         <th>Spotifyid</th>                   
                         <th>Verificar?</th>
                         <th>Acciones</th>
+                        <th>Play</th>
                     </tr>
                     <tr th:each="elem : ${canciones}">
                         <td><input type="checkbox" th:name="${elem.selId()}" th:id="${elem.selId()}" /></td>
@@ -91,6 +95,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <a th:href="@{'/modificarCancion/' + ${elem.id}}">Editar</a>
                             <a th:href="@{'/eliminarCancion/' + ${elem.id}}">Eliminar</a>
                         </td>
+                        <td>
+                            <img id="play" src="images/play.png" alt="Play" width="30" height="30" style="align-content: center"
+                                 th:data-name="${elem.spotifyplay}"
+                                 th:onclick="reproducir(this.getAttribute('data-name'))"/>
+                        </td>                        
                     </tr>
                 </table>
             </form>
@@ -106,6 +115,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             </a>
         </div>
 
-        <footer th:insert="~{plantillas/playhitsgame :: pie}"></footer>
+        <script type="text/javascript" th:src="@{/javascript/Reproductor.js}"></script>
     </body>
 </html>

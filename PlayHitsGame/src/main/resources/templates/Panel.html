@@ -41,12 +41,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                 </div>
                                             </div>
                                         </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="2">
-                                            <p class="fs-4 card-title fw-bold mb-4" th:text="#{general.puntos} + ' : ' + *{puntos}"/>
-                                        </td>
-                                    </tr>   
+                                    </tr>                                    
                                     <tr>
                                         <td colspan="2">
                                             <a href="/modificarUsuario" class="text-dark">
@@ -133,6 +128,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                     <th>
                                                         <p th:text="#{general.configuracion}"/> 
                                                     </th>
+                                                    <th>
+                                                        <p th:text="#{general.puntos}"/> 
+                                                    </th>
                                                 </tr>                                            
                                             </thead>
                                             <tbody>
@@ -145,6 +143,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                     <td>
                                                         <a th:href="'/partidaConsultaPersonal/' + ${unapartida.id}" class="button"> 
                                                             <p th:text="${unapartida.descripcion}"/>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <a th:href="'/partidaConsultaPersonal/' + ${unapartida.id}" class="button"> 
+                                                            <p th:text="${unapartida.ptsUsuarioPartidaPersonal}"/>
                                                         </a>
                                                     </td>
                                                 </tr>
@@ -163,7 +166,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                         <table class="table table-sm table-striped table-bordered" > 
                                             <thead class="table-light" style="text-align:center;">
                                                 <tr>
-                                                    <th colspan="3">
+                                                    <th colspan="4">
                                                         <p th:text="#{general.partidasterminadasgrupo}"/>
                                                     </th>                   
                                                 </tr> 
@@ -176,6 +179,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                     </th>
                                                     <th>
                                                         <p th:text="#{general.usuarios}"/> 
+                                                    </th>
+                                                    <th>
+                                                        <p th:text="#{general.ganador}"/> 
                                                     </th>
                                                 </tr>                                            
                                             </thead>
@@ -194,6 +200,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                     <td>
                                                         <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
                                                             <p th:text="${unapartida.usuariosTxT}"/>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
+                                                            <p th:text="${unapartida.ganador}"/>
                                                         </a>
                                                     </td>
                                                 </tr>

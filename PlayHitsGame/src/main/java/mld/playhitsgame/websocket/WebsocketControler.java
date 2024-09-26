@@ -199,7 +199,7 @@ public class WebsocketControler {
 
         }
         if ("playerOFF".equals(obJson.getString("op"))) {
-            obJsonSalida.put("op", "playerOFF");  
+            obJsonSalida.put("op", "playerOFF");
             actualizarPlay(obJson.getLong("idPartida"), false);
             return obJsonSalida;
         }
@@ -343,6 +343,7 @@ public class WebsocketControler {
 
         if (acabar) {
             asignarPuntuacionesUsuario(idPartida);
+            asignarGanador(idPartida);
             limpiarPartida(idPartida);
             obJsonSalida.put("op", "acabar");
             obJsonSalida.put("idPartida", idPartida);
@@ -496,11 +497,18 @@ public class WebsocketControler {
 
         for (Usuario usu : p.usuariosPartida()) {
             int pts = Utilidades.calcularPtsUsuario(usu, p, true);
-            if (pts > usu.getPuntos()) {
-                usu.setPuntos(pts);
-                servUsuario.update(usu.getId(), usu);
-            }
+            usu.setPuntos(usu.getPuntos() + pts);
+            servUsuario.update(usu.getId(), usu);
         }
+
+    }
+
+    private void asignarGanador(Long idPartida) {
+
+        Optional<Partida> partida = servPartida.findById(idPartida);
+        Partida p = partida.get();
+        p.asignarGanador();
+        servPartida.updatePartida(idPartida, p);
 
     }
 
@@ -511,15 +519,15 @@ public class WebsocketControler {
         servOpAnyo.deleteByPartida(partida.getId());
 
     }
-    
-    private void actualizarPlay(Long idPartida, boolean valor){
-        
+
+    private void actualizarPlay(Long idPartida, boolean valor) {
+
         Optional<Partida> partida = servPartida.findById(idPartida);
-        if (partida.isPresent()){
+        if (partida.isPresent()) {
             partida.get().setActivarPlay(valor);
             servPartida.updatePartida(idPartida, partida.get());
         }
-        
+
     }
-    
+
 }

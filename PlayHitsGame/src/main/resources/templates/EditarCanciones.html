@@ -9,50 +9,12 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
-    <style>
-        /* Estilos para el fondo oscuro detrás del modal */
-        .modal {
-            display: none; /* Escondido por defecto */
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4); /* Fondo oscuro semitransparente */
-        }
-
-        /* Estilos para el contenido del modal */
-        .modal-contenido {
-            background-color: #fefefe;
-            margin: 15% auto; /* Centra el modal */
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 300px; /* Ancho máximo del modal */
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Estilos para el botón de cerrar */
-        .cerrar {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .cerrar:hover,
-        .cerrar:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-    </style>
+   
     <body>
         <header th:insert="~{plantillas/playhitsgame :: encabezado}"></header>
-
+        <audio controls id="reproductor" style="display: none;">
+            <source src="" type="audio/mpeg" />                                                            
+        </audio>
         <a href="/gestionCanciones" class="button" id="volver">VOLVER</a>
         <div th:if="${canciones != null and !canciones.empty}">
             <form method="post" th:action="@{/editarCanciones}" >
@@ -79,15 +41,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <input type="text" th:id="'anyo_' + ${elem.selId()}" th:name="'anyo_' + ${elem.selId()}" th:value="${elem.anyo}">
                         </td>
                         <td>
-                            <img id="play" src="images/play.png" alt="Play" style="width: 20px; cursor: pointer;" th:onclick='abrirPlay("${elem.spotifyplay}")' >
-                            <div id="reproductor" class="modal">
-                                <div class="modal-contenido">
-                                    <span class="cerrar">&times;</span>
-                                    <div id="controlPlayer">
-
-                                    </div>                                
-                                </div>
-                            </div>
+                            <img id="play" src="images/play.png" alt="Play" width="30" height="30" style="align-content: center"
+                                 th:data-name="${elem.spotifyplay}"
+                                 th:onclick="reproducir(this.getAttribute('data-name'))"/>
                         </td>                    
                     </tr>
                 </table>
@@ -98,35 +54,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             <p>NO HAY NINGUNA CANCION PARA LISTAR</p>
         </div>
 
-        <script type="text/javascript">
-
-            var modal = document.getElementById("reproductor");
-            var btn = document.getElementById("play");
-            var span = document.getElementsByClassName("cerrar")[0];
-            var control = document.getElementById("controlPlayer");
-
-            // Abrir el modal al hacer clic en el botón
-            function abrirPlay(elem) {
-                control.innerHTML = '<audio controls><source src="' + elem + '" type="audio/mpeg" /></audio>';
-                modal.style.display = "block";
-            }
-            ;
-
-            // Cerrar el modal al hacer clic en la "x"
-            span.onclick = function () {
-                modal.style.display = "none";
-            };
-
-            // Cerrar el modal al hacer clic fuera del contenido del modal
-            window.onclick = function (event) {
-                if (event.target === modal) {
-                    modal.style.display = "none";
-                }
-            };
-
-        </script>
-
-        <footer th:insert="~{plantillas/playhitsgame :: pie}"></footer>
+        <script type="text/javascript" th:src="@{/javascript/Reproductor.js}"></script>
+        
     </body>    
 
 </html>

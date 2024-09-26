@@ -9,6 +9,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -225,6 +227,10 @@ public class Usuario {
                 result.add(elem);
             }
         }
+        
+        Collections.sort(result, (Partida e1, Partida e2) 
+                -> e2.getFecha().compareTo(e1.getFecha()));
+        
         return result;
     }
 
@@ -245,6 +251,9 @@ public class Usuario {
                 result.add(elem);
             }
         }
+        
+        Collections.sort(result, (Partida e1, Partida e2) 
+                -> e2.getFecha().compareTo(e1.getFecha()));
 
         return result;
     }
