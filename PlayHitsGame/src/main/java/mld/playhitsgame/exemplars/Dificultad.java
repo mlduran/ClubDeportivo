@@ -12,5 +12,6 @@ public enum Dificultad {
  
     Normal,
     Facil,
-    Dificil
+    Dificil,
+    Entreno
 }

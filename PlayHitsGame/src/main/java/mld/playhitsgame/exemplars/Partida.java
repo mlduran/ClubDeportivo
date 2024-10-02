@@ -134,7 +134,10 @@ public class Partida {
         if (this.getTema() != null && !this.getTema().isEmpty()) {
             txt.add("Tema: ".concat(this.getTema()));
         }
-        txt.add("Canciones Seleccionadas: " + String.valueOf(this.nCanciones));
+        if (this.isTipoPersonal() && this.getDificultad() != null) {
+            txt.add("Dificultad: ".concat(this.getDificultad().name()));
+        }
+        txt.add("Canciones: " + String.valueOf(this.nCanciones));
         txt.add("Año inicial: " + String.valueOf(this.getAnyoInicial()));
         txt.add("Año final: " + String.valueOf(this.getAnyoFinal()));
 
@@ -190,17 +193,18 @@ public class Partida {
         }
         return pts;
     }
-    
+
     public int getPtsUsuarioPartidaPersonal() throws Exception {
 
         int pts = 0;
-        
-        if (!this.isTipoPersonal())
-            throw new Exception ("Este metodo solo es para partidas personales sino utilizar ptsUsuario(Usuario usuario) " );
+
+        if (!this.isTipoPersonal()) {
+            throw new Exception("Este metodo solo es para partidas personales sino utilizar ptsUsuario(Usuario usuario) ");
+        }
 
         for (Ronda ronda : this.getRondas()) {
-            for (Respuesta resp : ronda.getRespuestas()){                
-                    pts = pts + resp.getPuntos();                
+            for (Respuesta resp : ronda.getRespuestas()) {
+                pts = pts + resp.getPuntos();
             }
         }
         return pts;
@@ -232,5 +236,12 @@ public class Partida {
         return lista;
 
     }
+    
+    public boolean isEntreno(){
+        
+        return this.getDificultad().equals(Dificultad.Entreno);        
+        
+    }
+    
 
 }

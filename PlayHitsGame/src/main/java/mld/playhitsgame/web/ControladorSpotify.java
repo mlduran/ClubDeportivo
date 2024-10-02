@@ -161,7 +161,7 @@ public class ControladorSpotify {
                     Logger.getLogger(SpotifyController.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 if (response != null) {
-                    info = info.concat("Lista " + lista + " " + response.body());
+                    info = info.concat("Lista " + lista + " " + response.body() + "[--]");
                 } else {
                     info = info.concat("ERROR la lista " + lista);
                 }

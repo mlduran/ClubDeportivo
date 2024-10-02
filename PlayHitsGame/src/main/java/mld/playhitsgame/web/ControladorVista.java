@@ -16,7 +16,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import static java.util.Collections.sort;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -220,13 +219,6 @@ public class ControladorVista {
         }
     }
 
-    private void ayuda(Model modelo, String nomFich) {
-
-        ArrayList<String> ayuda = Utilidades.leerAyuda("static/ayuda/" + nomFich);
-        modelo.addAttribute("ayuda", ayuda);
-
-    }
-
     @GetMapping("/panel")
     public String panel(Model modelo) {
 
@@ -239,8 +231,6 @@ public class ControladorVista {
             modelo.addAttribute("urlSpotify", urlSpotify());
         }
         informarUsuarioModelo(modelo, usu);
-
-        ayuda(modelo, "panel.txt");
 
         return "Panel";
     }
@@ -311,7 +301,6 @@ public class ControladorVista {
         modelo.addAttribute("partidaSesion", partida);
         modelo.addAttribute("respuestas", partida.respuestasUsuario(usu));
         modelo.addAttribute("ptsUsuario", ptsUsuarios);
-        ayuda(modelo, "partidaGrupo.txt");
         return "PartidaGrupo";
     }
 
@@ -452,13 +441,33 @@ public class ControladorVista {
         return "PartidaPersonal";
     }
 
+    @PostMapping("/acabarPartidaPersonal")
+    public String acabarPartidaPersonal(Model modelo) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/";
+        }
+        Partida partida = partidaModelo(modelo);
+        if (partida == null) {
+            return "redirect:/panel";
+        }
+
+        finalizarPartidaPersonal(partida, usu);
+        
+        return "redirect:/panel";        
+        
+    }
+
     private void finalizarPartidaPersonal(Partida partida, Usuario usuario) {
 
         partida.setStatus(StatusPartida.Terminada);
         servPartida.updatePartida(partida.getId(), partida);
         eliminarOpcionesPartida(partida);
-        int pts = partida.ptsUsuario(usuario);
         
+        if (partida.isEntreno()) return;
+        
+        int pts = partida.ptsUsuario(usuario);
 
         if (partida.getTema() != null && !"".equals(partida.getTema())) {
             Optional<Tema> tema = servTema.findBytema(partida.getTema());
@@ -828,7 +837,7 @@ public class ControladorVista {
 
         Calendar fecha = Calendar.getInstance();
         newPartida.setAnyoInicial(1950);
-        newPartida.setAnyoFinal(fecha.get(Calendar.YEAR) - 1);
+        newPartida.setAnyoFinal(fecha.get(Calendar.YEAR));
         newPartida.setGrupo(usu.getGrupo());
         modelo.addAttribute("newpartida", newPartida);
         anyadirTemas(modelo);
