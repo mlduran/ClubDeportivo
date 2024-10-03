@@ -1389,12 +1389,10 @@ public class ControladorVista {
         for (Tema tema : temas) {
             Record newObj = new Record();
             newObj.setTema(tema.getTema());
-            newObj.setDescripcion(tema.getDescripcion());
-            newObj.setGenero(tema.getGenero());
-            newObj.setIdioma(tema.getIdioma());
+            newObj.setDescripcion("(" + tema.getGenero().name() + "-" + tema.getIdioma().name() + ")");
             newObj.setCanciones(tema.getCanciones().size());
             newObj.setPuntos(tema.getPuntos());
-            String usuRecord = "";
+            String usuRecord = "PlayHitsGame";
             if (tema.getUsuarioRecord() != null) {
                 Optional<Usuario> usuario = servUsuario.findById(tema.getUsuarioRecord());
                 if (usuario.isPresent()) {

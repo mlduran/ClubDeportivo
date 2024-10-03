@@ -20,8 +20,6 @@ public class Record {
     
     private String tema;
     private String descripcion;
-    private Idioma idioma;
-    private Genero genero;
     private int canciones;   
     private String usuarioRecord;
     private int puntos;    
