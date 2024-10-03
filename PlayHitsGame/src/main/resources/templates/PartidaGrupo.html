@@ -16,6 +16,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 
     <body>
         <section>
+            <input type="hidden" id="fichAjuda" value='/ayuda/PartidaGrupo.html' />
             <input type="hidden" id="serverWS" th:value="${serverWebsocket}" />
             <input type="hidden" id="idusuario" th:value="${usuarioSesion.id}" />
             <input type="hidden" id="idpartida" th:value="${partidaSesion.id}" />
@@ -43,9 +44,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </td>
                                     </tr>
                                     <tr>
-                                        <td colspan="2">
+                                        <td colspan="2">  
                                             <p th:each="txt : ${partidaSesion.descripcion}" th:text="${txt}" />
-                                            <input type="image" class="btn" id="imageInfo" alt="Info"  data-bs-toggle="modal" data-bs-target="#ayuda" th:src="@{'/images/info.png'}"  width="60" height="60" /> 
+                                            <div class="btn text-center">                                               
+                                                <input type="image" class="btn" id="imageInfo" alt="Info"  data-bs-toggle="modal" data-bs-target="#ayuda" th:src="@{'/images/info.png'}"  width="60" height="60" /> 
+                                            </div>                            
                                             <div class="modal fade" id="ayuda" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
@@ -53,9 +56,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                             <h1 class="modal-title fs-5" id="ayudaModalLabel">Info</h1>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
-                                                        <div class="modal-body">
-                                                            <p th:each="lin : ${ayuda}" th:text="${lin}" />
-                                                        </div>
+                                                        <div id="info" class="modal-body" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -247,8 +248,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 </div>
             </div>           
         </section>
-        <script type="text/javascript" th:src="@{/javascript/PartidaGrupo.js}"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        <script type="text/javascript" th:src="@{/javascript/Info.js}"></script>
+        <script type="text/javascript" th:src="@{/javascript/PartidaGrupo.js}"></script>
     </body>
-
 </html>

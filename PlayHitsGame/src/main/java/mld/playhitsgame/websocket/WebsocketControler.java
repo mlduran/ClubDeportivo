@@ -60,6 +60,7 @@ public class WebsocketControler {
 
     private static final HashMap<Long, Set<UsuarioWS>> partidas = new HashMap();
     private static final HashMap<Long, Integer> nRespuestas = new HashMap();
+    private static final HashMap<Long, Boolean> cuentaAtras = new HashMap();
 
     @MessageMapping("/partida/{id_partida}/usuario/{id_usuario}")
     @SendTo("/tema/partida/{id_partida}")
@@ -193,10 +194,7 @@ public class WebsocketControler {
         UsuarioWS usuarioWS = registrarPeticionWS(obJson);
 
         if ("alta".equals(obJson.getString("op"))) {
-            // De momento no hacemos nada, lo mantemos para 
-            // hacer el alta en lacarga de la pagina y ahorrarnos
-            // luego la consulta a BD del usuario
-
+            cuentaAtras.put(obJson.getLong("idPartida"), false);
         }
         if ("playerOFF".equals(obJson.getString("op"))) {
             obJsonSalida.put("op", "playerOFF");
@@ -209,7 +207,10 @@ public class WebsocketControler {
             return obJsonSalida;
         }
         if ("cuentaAtrasResponder".equals(obJson.getString("op"))) {
-            obJsonSalida.put("op", "cuentaAtrasResponder");
+            if (!cuentaAtras.get(obJson.getLong("idPartida"))){
+                obJsonSalida.put("op", "cuentaAtrasResponder");
+                cuentaAtras.put(obJson.getLong("idPartida"), true);
+            }
             return obJsonSalida;
         }
         if ("mostrarOpciones".equals(obJson.getString("op"))) {
