@@ -75,6 +75,26 @@ public class Cancion{
         
         return txt;
     }
+    
+    public void eliminarTematica(Tema tema){
+        
+        Tema elim = null;
+        for (Tema elTema: this.getTematicas()){
+            if (elTema.equals(tema))
+                elim = elTema;
+        }
+        if (elim != null)
+            this.getTematicas().remove(elim);
+    }
+    
+    public void anyadirTematica(Tema tema){
+        
+        for (Tema elTema: this.getTematicas()){
+            if (elTema.equals(tema))
+                return;
+        }
+        this.getTematicas().add(tema);
+    }
      
     
 }

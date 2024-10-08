@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Record {
     
-    private String tema;
+    private Tema tema;
     private String descripcion;
     private int canciones;   
     private String usuarioRecord;

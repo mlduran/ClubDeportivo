@@ -74,18 +74,18 @@ public class ControladorCancion {
         }
 
         for (Cancion obj : lista) {
-            try{
+            try {
                 estadistica.put(obj.getAnyo(), estadistica.get(obj.getAnyo()) + 1);
-            }catch (Exception e){
-                errores.add(String.valueOf(obj.getId()) +  "\t" + obj.getTitulo() + "\t" + 
-                        obj.getInterprete() + "\t" + String.valueOf(obj.getAnyo()));
+            } catch (Exception e) {
+                errores.add(String.valueOf(obj.getId()) + "\t" + obj.getTitulo() + "\t"
+                        + obj.getInterprete() + "\t" + String.valueOf(obj.getAnyo()));
             }
         }
 
         model.addAttribute("estadistica", estadistica);
         model.addAttribute("lista", lista);
         model.addAttribute("errores", errores);
-        
+
         return "ListaCanciones";
     }
 
@@ -279,23 +279,23 @@ public class ControladorCancion {
         for (Cancion cancion : canciones) {
             boolean isCambio = false;
             if (req.getParameter(cancion.selId()) != null) {
-                if (!cancion.getTitulo().equals(req.getParameter("titulo_" + cancion.selId()))){
+                if (!cancion.getTitulo().equals(req.getParameter("titulo_" + cancion.selId()))) {
                     cancion.setTitulo(req.getParameter("titulo_" + cancion.selId()));
                     isCambio = true;
                 }
-                if (!cancion.getInterprete().equals(req.getParameter("interprete_" + cancion.selId()))){
+                if (!cancion.getInterprete().equals(req.getParameter("interprete_" + cancion.selId()))) {
                     cancion.setInterprete(req.getParameter("interprete_" + cancion.selId()));
                     isCambio = true;
                 }
                 int anyo = Integer.parseInt(req.getParameter("anyo_" + cancion.selId()));
-                if (cancion.getAnyo() != anyo){
+                if (cancion.getAnyo() != anyo) {
                     cancion.setAnyo(anyo);
                     isCambio = true;
                 }
-                if (isCambio){
+                if (isCambio) {
                     cancion.setRevisar(false);
                     servCancion.updateCancion(cancion.getId(), cancion);
-                }                
+                }
             }
         }
         return "redirect:/editarCanciones";
@@ -344,13 +344,25 @@ public class ControladorCancion {
 
     }
 
-    @PostMapping("/marcarRevision")
+
+    @PostMapping("/cambiosMasivos")
     public String marcarRevision(Model modelo, HttpServletRequest req) {
 
         if (!usuarioCorrecto(modelo)) {
             return "redirect:/";
         }
 
+        String opVerificar = req.getParameter("actualizarVerificar");
+        String opAnyadirTema = req.getParameter("anyadirTema");
+        String opEliminarTema = req.getParameter("eliminarTema");
+
+        String temaModificar = req.getParameter("temaModificar");
+        Tema tema = null;
+        if (temaModificar != null){
+            Optional<Tema> findBytema = servTema.findBytema(temaModificar);
+            if (findBytema.isPresent())
+                tema = findBytema.get();
+        }
         String validar = req.getParameter("validar");
         boolean isValidar = false;
         if ("on".equals(validar)) {
@@ -362,7 +374,16 @@ public class ControladorCancion {
         for (Cancion cancion : canciones) {
             if (req.getParameter(cancion.selId()) != null) {
                 if ("on".equals(req.getParameter(cancion.selId()))) {
-                    cancion.setRevisar(isValidar);
+                    if (opVerificar != null && opVerificar.equals("Actualizar Verificar")) {
+                        cancion.setRevisar(isValidar);
+                    }
+                    if (opAnyadirTema != null && opAnyadirTema.equals("Añadir Tema")) {
+                        cancion.anyadirTematica(tema);
+                    }
+                    if (opEliminarTema != null && opEliminarTema.equals("Eliminar Tema")) {
+                        cancion.eliminarTematica(tema);
+                    }
+                    
                     servCancion.updateCancion(cancion.getId(), cancion);
                 }
             }

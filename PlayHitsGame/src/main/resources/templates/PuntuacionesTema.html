@@ -13,7 +13,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     </head>
     <body>
         <section>
-            <div class="container h-100" th:if="${temas != null and !temas.empty}"> 
+            <div class="container h-100" th:if="${pts != null and !pts.empty}"> 
 
                 <div class="row justify-content-sm-center h-100">
                     <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
@@ -26,32 +26,23 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                             <img th:src="@{'/images/playhitsgamePresentacion.png'}" class="img-fluid" alt="PLAYHITSGAME" />
                                         </td>
                                     </tr>
-                                    <tr th:each="elem : ${temas}">  
+                                    <tr>
+                                        <th th:text="${tema.tema + ' ' + tema.datos}" colspan="2" style="background-color: lightpink;"/>
+                                    </tr>
+                                    <tr th:each="elem : ${pts}">  
                                         <td>
-                                            <table style="max-width: 100%; width: 100%; table-layout: fixed;">
-                                                <tr>
-                                                    <th  style="width: 50%;background-color: lightpink;">
-                                                        <a th:href="'/consultaPuntuacionesTema/' + ${elem.tema.id}" class="button"> 
-                                                            <p th:text="${elem.tema.tema + ' ' + elem.tema.datos}"/>
-                                                        </a>
-                                                    </th>
-                                                    <th th:text="#{general.canciones} + ' ' + ${elem.canciones}" style="width: 50%;background-color: lightpink;"/>
-                                                </tr>
-                                                <tr th:if="${elem.puntos!=0}">                                                   
-                                                    <th th:text="#{general.usu}"/> 
-                                                    <th th:text="#{general.puntos}"/>
-                                                </tr>
-                                                <tr th:if="${elem.puntos!=0}"> 
-                                                    <td th:text="${elem.usuarioRecord}"></td> 
-                                                    <td th:text="${elem.puntos}"></td>                                              
-                                                </tr>
+                                            <table style="max-width: 100%; width: 100%; table-layout: fixed;">                                             
+                                                <tr>                                                   
+                                                    <th  style="width: 75%;" th:text="${elem.usuario}"/> 
+                                                    <th  style="width: 25%;" th:text="${elem.puntos}"/>
+                                                </tr>                                                
                                             </table>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
                                             <div class="text-center">
-                                                <a href="/panel" class="text-dark">
+                                                <a href="/records" class="text-dark">
                                                     <p th:text="#{general.volver}" />
                                                 </a>
                                             </div>

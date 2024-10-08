@@ -53,4 +53,10 @@ public class Tema {
         }
         return String.valueOf(n);
     }
+    
+    public String getDatos(){
+        
+        return this.getGenero() + "-" + this.getIdioma();
+        
+    }
 }

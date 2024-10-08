@@ -50,12 +50,15 @@ import mld.playhitsgame.exemplars.OpcionAnyoTmp;
 import mld.playhitsgame.exemplars.OpcionInterpreteTmp;
 import mld.playhitsgame.exemplars.OpcionTituloTmp;
 import mld.playhitsgame.exemplars.PtsUsuario;
+import mld.playhitsgame.exemplars.Puntuacion;
+import mld.playhitsgame.exemplars.PuntuacionTMP;
 import mld.playhitsgame.exemplars.TipoPartida;
 import mld.playhitsgame.seguridad.Roles;
 import mld.playhitsgame.seguridad.UsuarioRol;
 import mld.playhitsgame.services.OpcionAnyoTmpServicioMetodos;
 import mld.playhitsgame.services.OpcionInterpreteTmpServicioMetodos;
 import mld.playhitsgame.services.OpcionTituloTmpServicioMetodos;
+import mld.playhitsgame.services.PuntuacionServicioMetodos;
 import mld.playhitsgame.services.UsuarioRolServicioMetodos;
 import mld.playhitsgame.utilidades.Utilidades;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,6 +105,8 @@ public class ControladorVista {
     RespuestaServicioMetodos servRespuesta;
     @Autowired
     TemaServicioMetodos servTema;
+    @Autowired
+    PuntuacionServicioMetodos sevrPuntuacion;
     @Autowired
     OpcionTituloTmpServicioMetodos servOpTitulo;
     @Autowired
@@ -454,9 +459,9 @@ public class ControladorVista {
         }
 
         finalizarPartidaPersonal(partida, usu);
-        
-        return "redirect:/panel";        
-        
+
+        return "redirect:/panel";
+
     }
 
     private void finalizarPartidaPersonal(Partida partida, Usuario usuario) {
@@ -464,9 +469,11 @@ public class ControladorVista {
         partida.setStatus(StatusPartida.Terminada);
         servPartida.updatePartida(partida.getId(), partida);
         eliminarOpcionesPartida(partida);
-        
-        if (partida.isEntreno()) return;
-        
+
+        if (partida.isEntreno()) {
+            return;
+        }
+
         int pts = partida.ptsUsuario(usuario);
 
         if (partida.getTema() != null && !"".equals(partida.getTema())) {
@@ -479,6 +486,13 @@ public class ControladorVista {
                     servTema.update(elTema.getId(), elTema);
                     usuario.setEstrellas(usuario.getEstrellas() + 1);
                     servUsuario.update(usuario.getId(), usuario);
+
+                    Puntuacion newPts = new Puntuacion();
+                    newPts.setTema(elTema);
+                    newPts.setPuntos(pts);
+                    newPts.setTipoPartida(TipoPartida.personal);
+                    newPts.setIdUsuario(usuario.getId());
+                    sevrPuntuacion.save(newPts);
                 }
             }
         }
@@ -1388,7 +1402,7 @@ public class ControladorVista {
 
         for (Tema tema : temas) {
             Record newObj = new Record();
-            newObj.setTema(tema.getTema());
+            newObj.setTema(tema);
             newObj.setDescripcion("(" + tema.getGenero().name() + "-" + tema.getIdioma().name() + ")");
             newObj.setCanciones(tema.getCanciones().size());
             newObj.setPuntos(tema.getPuntos());
@@ -1413,6 +1427,41 @@ public class ControladorVista {
         servOpTitulo.deleteByPartida(partida.getId());
         servOpInterprete.deleteByPartida(partida.getId());
         servOpAnyo.deleteByPartida(partida.getId());
+
+    }
+
+    @GetMapping("/consultaPuntuacionesTema/{tema_id}")
+    public String consultaPuntuacionesTema(@PathVariable Long tema_id, Model modelo) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/";
+        }
+
+        List<PuntuacionTMP> pts = new ArrayList();
+
+        List<Puntuacion> obtenerPuntuacionesPersonales = sevrPuntuacion.obtenerPuntuacionesPersonales(tema_id);
+        Optional<Tema> tema = servTema.findById(tema_id);
+
+        for (Puntuacion punt : obtenerPuntuacionesPersonales) {
+            PuntuacionTMP ptsTMP = new PuntuacionTMP();
+            Optional<Usuario> findById = servUsuario.findById(punt.getIdUsuario());
+            if (findById.isPresent()) {
+                ptsTMP.setUsuario(findById.get().getNombre());
+            } else {
+                ptsTMP.setUsuario("Desconocido");
+            }
+            ptsTMP.setPuntos(punt.getPuntos());
+            pts.add(ptsTMP);
+        }
+        
+        if (pts.isEmpty())
+            return "redirect:/records";
+
+        modelo.addAttribute("tema", tema.get());
+        modelo.addAttribute("pts", pts);
+
+        return "PuntuacionesTema";
 
     }
 

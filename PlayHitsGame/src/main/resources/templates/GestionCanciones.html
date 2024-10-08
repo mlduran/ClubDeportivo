@@ -66,9 +66,15 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         </div>
         <div th:if="${canciones != null and !canciones.empty}">
 
-            <form method="post" th:action="@{/marcarRevision}" >
+            <form method="post" th:action="@{/cambiosMasivos}" >
                 <input type="checkbox" name="validar" id="validar">Verificar?</<input>
-                <input type="submit" value="Actualizar"/>  
+                <input type="submit" th:name="actualizarVerificar" value="Actualizar Verificar"/> 
+                <select th:name="temaModificar" value="">
+                    <option th:each="elem : ${temas}" 
+                            th:value="${elem}" th:text="${elem}"></option>
+                </select>
+                <input type="submit" th:name="anyadirTema" value="Añadir Tema"/> 
+                <input type="submit" th:name="eliminarTema" value="Eliminar Tema"/> 
                 <table border="2">
                     <tr> 
                         <th>Sel</th>

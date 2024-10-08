@@ -98,19 +98,19 @@ function activarDesactivarPlay() {
 }
 
 var reproductorActivo = false;
-function reproducir(cancion){
-    
-    
+function reproducir(cancion) {
+
+
     reproductorConsulta.src = cancion;
-    
+
     if (reproductorActivo) {
         reproductorConsulta.pause(); // Pausar el audio si está reproduciéndose
         reproductorActivo = false;
-    } else {        
+    } else {
         reproductorConsulta.play(); // Reproducir el audio si está pausado
         reproductorActivo = true;
     }
-    
+
 }
 
 document.addEventListener("keydown", function (event) {
@@ -148,11 +148,16 @@ let secondsElapsed = secondsCounter.value;
 // Creamos el intervalo que incrementa el contador cada segundo (1000 ms)
 const intervalId = setInterval(() => {
     // Incrementamos el número de segundos
-    secondsElapsed++;
+    if (todoFallo.value === 'false') {
+        secondsElapsed++;
 
-    // Actualizamos el contenido del elemento HTML
-    if (secondsElapsed > 0)
-        secondsCounter.value = secondsElapsed;
-    else
-        secondsCounter.value = "... " + Math.abs(secondsElapsed);
+        // Actualizamos el contenido del elemento HTML
+        if (secondsElapsed > 0)
+            secondsCounter.value = secondsElapsed;
+        else
+            secondsCounter.value = "... " + Math.abs(secondsElapsed);
+    }else{
+        secondsCounter.value = "";
+    }
+    
 }, 1000);
