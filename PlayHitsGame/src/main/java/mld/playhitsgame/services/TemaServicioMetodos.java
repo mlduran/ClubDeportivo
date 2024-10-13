@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import mld.playhitsgame.DAO.TemaDAO;
-import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.Tema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,6 +59,11 @@ public class TemaServicioMetodos implements TemaServicio {
         
 
         return DAO.save(obj);
+    }
+
+    @Override
+    public void delete(Tema tema) {
+        DAO.delete(tema);
     }
 
 }

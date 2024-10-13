@@ -21,5 +21,6 @@ public interface TemaServicio {
     Optional<Tema> findBytema(String tema);
 
     Tema update(Long id, Tema tema);
+    void delete(Tema tema);
 
 }

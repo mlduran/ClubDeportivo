@@ -21,7 +21,9 @@ public interface TemaDAO extends JpaRepository<Tema, Long>{
     Optional<Tema> findBytema(String tema);
     @Override
     Optional<Tema> findById(Long id);
-    
+    @Override
+    void delete(Tema tema);
+
  
     
 }

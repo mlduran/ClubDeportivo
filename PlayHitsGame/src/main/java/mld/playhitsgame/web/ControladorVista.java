@@ -486,12 +486,16 @@ public class ControladorVista {
                     servTema.update(elTema.getId(), elTema);
                     usuario.setEstrellas(usuario.getEstrellas() + 1);
                     servUsuario.update(usuario.getId(), usuario);
-
+                }
+                if (pts > 0) {
                     Puntuacion newPts = new Puntuacion();
                     newPts.setTema(elTema);
                     newPts.setPuntos(pts);
                     newPts.setTipoPartida(TipoPartida.personal);
                     newPts.setIdUsuario(usuario.getId());
+                    newPts.setDificultad(partida.getDificultad());
+                    newPts.setAnyoInicial(partida.getAnyoInicial());
+                    newPts.setAnyoFinal(partida.getAnyoFinal());
                     sevrPuntuacion.save(newPts);
                 }
             }
@@ -841,9 +845,14 @@ public class ControladorVista {
 
         ArrayList<String> temas = new ArrayList();
         for (Tema tema : servTema.findAll()) {
-            temas.add(tema.getTema());
+            if (!tema.getTema().equals("PlayHitsGame"))
+                temas.add(tema.getTema());
         }
+        
         Collections.sort(temas);
+        // esto es para que salga primero
+        temas.add(0, "PlayHitsGame");
+        
         modelo.addAttribute("temas", temas);
     }
 
@@ -1454,9 +1463,10 @@ public class ControladorVista {
             ptsTMP.setPuntos(punt.getPuntos());
             pts.add(ptsTMP);
         }
-        
-        if (pts.isEmpty())
+
+        if (pts.isEmpty()) {
             return "redirect:/records";
+        }
 
         modelo.addAttribute("tema", tema.get());
         modelo.addAttribute("pts", pts);

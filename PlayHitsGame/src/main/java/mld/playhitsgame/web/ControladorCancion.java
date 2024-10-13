@@ -207,7 +207,7 @@ public class ControladorCancion {
         Optional<Tema> tema = servTema.findById(id);
 
         if (tema.isPresent() && tema.get().getCanciones().isEmpty()) {
-            servCancion.deleteCancion(id);
+            servTema.delete(tema.get());
             return "redirect:/gestionTemas";
         }
 

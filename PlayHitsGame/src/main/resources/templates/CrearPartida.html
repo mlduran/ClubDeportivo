@@ -28,9 +28,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     <input type="hidden" th:field="*{tipo}" th:value="${newpartida.tipo}"/>
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="tema" th:text="#{general.tema}"/>
-                                        <select th:field="*{tema}" title="Tema" id="tema">
+                                        <select th:field="*{tema}" title="Tema" id="tema" > 
                                             <option th:each="elem : ${temas}" 
-                                                    th:value="${elem}" th:text="${elem}"></option>
+                                                    th:value="${elem}" th:text="${elem}" ></option>
                                         </select>
                                     </div>
                                     <div class="mb-3" th:if="${newpartida.tipoPersonal}">
@@ -51,9 +51,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     <div th:if="${newpartida.tipoGrupo}">
                                         <div class="mb-3">
                                             <label class="mb-2 text-muted" for="nrondas" th:text="#{general.nrondas}"/>
-                                            <select th:name="nrondas"  title="nrondas" th:id="nrondas">
+                                            <select th:name="nrondas"  title="nrondas" th:id="nrondas" >                                                
                                                 <option th:each="n : ${oprondas}" 
-                                                        th:value="${n}" th:text="${n}"></option>
+                                                        th:value="${n}" th:text="${n}" ></option>
                                             </select>
                                         </div>
                                         <div class="mb-3">

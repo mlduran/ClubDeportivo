@@ -29,5 +29,8 @@ public final class Puntuacion {
     private int puntos;
     private Long idUsuario;
     private TipoPartida tipoPartida;
+    private Dificultad dificultad;
+    private int anyoInicial;
+    private int anyoFinal;
 
 }
