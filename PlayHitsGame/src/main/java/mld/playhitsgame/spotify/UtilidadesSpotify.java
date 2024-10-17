@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import mld.playhitsgame.DAO.TemaDAO;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.services.CancionServicioMetodos;
+import mld.playhitsgame.services.TemaServicioMetodos;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,7 +35,7 @@ public class UtilidadesSpotify {
     @Autowired
     CancionServicioMetodos servCancion;
     @Autowired
-    TemaDAO DAOtema;
+    TemaServicioMetodos servTema;
 
     public JSONArray obtenerDatosSpotify(String datos) {
 
@@ -201,14 +201,17 @@ public class UtilidadesSpotify {
 
     }
 
-    public void grabarListaCanciones(List<Cancion> lista) {
+    public void grabarListaCanciones(List<Cancion> lista, boolean isTemas) {
 
         for (Cancion cancion : lista) {
             Optional<Cancion> cancionBD = servCancion.findByIdSpotify(cancion.getSpotifyid());
             if (cancionBD.isEmpty()) {
                 servCancion.saveCancion(cancion);
             } else {
-                servCancion.updateTemasCancion(cancionBD.get().getId(), cancion);
+                if (isTemas)
+                    servCancion.updateTemasCancion(cancionBD.get().getId(), cancion);
+                else 
+                    servCancion.updateCancion(cancionBD.get().getId(), cancion);
             }
         }
 
@@ -275,8 +278,16 @@ public class UtilidadesSpotify {
 
             List<Cancion> canciones = obtenerDatosJson(response.body(), anyoPlayList);
 
+            Optional<Tema> temaPlayHitsGame = servTema.findBytema("PlayHitsGame");
             if (!canciones.isEmpty()) {
-                grabarListaCanciones(canciones);
+                for (Cancion cancion : canciones){
+                    cancion.setAnyo(Integer.valueOf(anyoPlayList));
+                    cancion.setRevisar(false); 
+                    cancion.setTematicas(new ArrayList());
+                    if (temaPlayHitsGame.isPresent())
+                    cancion.anyadirTematica(temaPlayHitsGame.get());
+                }
+                grabarListaCanciones(canciones, false);
                 offset = offset + 100;
             } else {
                 acabar = true;
@@ -324,7 +335,7 @@ public class UtilidadesSpotify {
                     cancion.getTematicas().add(tema);
                     cancion.setRevisar(true);
                 }
-                grabarListaCanciones(canciones);
+                grabarListaCanciones(canciones, true);
                 offset = offset + 100;
             } else {
                 acabar = true;
@@ -342,13 +353,13 @@ public class UtilidadesSpotify {
     private Tema altaTema(String temaPlayList, String idPlayList) {
 
         Tema unTema;
-        Optional<Tema> tema = DAOtema.findBytema(temaPlayList);
+        Optional<Tema> tema = servTema.findBytema(temaPlayList);
 
         if (tema.isEmpty()) {
             Tema newTema = new Tema();
             newTema.setTema(temaPlayList);
             newTema.setListasSpotify(idPlayList);
-            unTema = DAOtema.save(newTema);
+            unTema = servTema.save(newTema);
         } else {
             unTema = tema.get();
         }

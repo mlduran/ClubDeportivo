@@ -107,10 +107,12 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     <p>
                                         <a href="/crearPartidaPersonal" class="btn btn-primary" role="button" th:text="#{general.crearpartidapersonal}"/>
                                     </p> 
-                                    <p>
-                                        <a href="/crearPartida" class="btn btn-primary" role="button" th:text="#{general.crearpartidagrupo}"/>
-                                    </p>
-                                </div>
+                                    <div th:if="${serverWebsocket} != ''">
+                                        <p>
+                                            <a href="/crearPartida" class="btn btn-primary" role="button" th:text="#{general.crearpartidagrupo}"/>
+                                        </p>
+                                    </div>
+                                </div>                                
                                 <div th:if="*{hayPartidasTerminadasPersonales()} == true" class="text-center my-2" >
 
                                     <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#tablapartidaspersonales" 

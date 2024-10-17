@@ -236,6 +236,7 @@ public class ControladorVista {
             modelo.addAttribute("urlSpotify", urlSpotify());
         }
         informarUsuarioModelo(modelo, usu);
+        modelo.addAttribute("serverWebsocket", this.serverWebsocket);
 
         return "Panel";
     }
@@ -397,12 +398,15 @@ public class ControladorVista {
         if ((partida.ultimaRonda() == null || partida.ultimaRonda().isCompletada())
                 && todoFallo == false) {
             try {
-                ultimaRonda = darDeAltaRonda(partida);
+                 ultimaRonda = darDeAltaRonda(partida);
             } catch (IndexOutOfBoundsException ex) {
                 finalizarPartidaPersonal(partida, usu);
                 ultimaRonda = partida.ultimaRonda();
-                modelo.getAttribute(ex.getMessage());
-            }
+                todoFallo = true;
+                modelo.addAttribute("mensajeRespuesta", ex.getMessage() + 
+                        ", Felicidades!!!!, puedes iniciar partida otra cuando lo desees");
+                modelo.addAttribute("todoFallo", true);
+             }
         } else {
             ultimaRonda = partida.ultimaRonda();
         }
@@ -766,6 +770,23 @@ public class ControladorVista {
         } catch (MessagingException ex) {
             Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    @PostMapping("/enviarMailMasivo")
+    public String enviarMailMasivo(Model modelo, HttpServletRequest req) {
+        
+        String txtMail = req.getParameter("txtMail");
+        
+        List<Usuario> usuarios = servUsuario.findAll();
+        
+        for (Usuario usu : usuarios){
+            if (!usu.getUsuario().contains("."))
+                continue;
+            if (usu.isActivo())
+                enviarMail(usu.getUsuario(), "AVISO PlayHitsGame",
+                    txtMail, "Correo");
+        }
+        return "redirect:/administracion";
     }
 
     @GetMapping("/eliminarUsuario/{id}")

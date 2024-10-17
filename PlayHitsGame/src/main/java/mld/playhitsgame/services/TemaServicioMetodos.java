@@ -66,4 +66,8 @@ public class TemaServicioMetodos implements TemaServicio {
         DAO.delete(tema);
     }
 
+    @Override
+    public Tema save(Tema tema) {
+        return DAO.save(tema);        
+    }
 }

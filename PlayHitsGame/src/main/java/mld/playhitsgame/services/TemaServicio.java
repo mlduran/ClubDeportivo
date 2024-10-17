@@ -22,5 +22,6 @@ public interface TemaServicio {
 
     Tema update(Long id, Tema tema);
     void delete(Tema tema);
+    Tema save(Tema tema);
 
 }

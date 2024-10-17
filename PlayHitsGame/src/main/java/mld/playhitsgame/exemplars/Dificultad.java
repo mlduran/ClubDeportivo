@@ -10,8 +10,8 @@ package mld.playhitsgame.exemplars;
  */
 public enum Dificultad {
  
-    Normal,
     Facil,
+    Normal,    
     Dificil,
     Entreno
 }

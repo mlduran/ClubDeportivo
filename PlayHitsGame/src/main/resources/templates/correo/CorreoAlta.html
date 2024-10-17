@@ -13,8 +13,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             <div class="container h-100">
                 <div class="row justify-content-sm-center h-100">
                     <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
-                        <div class="text-center my-5">
-                            <img src="/images/playhitsgame.png" class="img-fluid" alt="PLAYHITSGAME" />
+                        <div class="text-center my-2">
+                            <img th:src="${imagen}" alt="" />
                         </div>
                         <div class="card shadow-lg">
                             <p th:text="#{mail.alta}"/>
@@ -24,9 +24,16 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                 <p th:text="#{mail.activar}"/>
                             </a>
                         </div>
+                        <hr style="border: 0; height: 2px; background-color: #333; width: 100%;"/>
+                        <div class="card shadow-lg">
+                            <a th:href="${'mailto:' + mail}">
+                                <p th:text="${mail}"/>
+                            </a>
+                        </div>
+                        
                         <div class="text-center mt-5 text-muted">
                             <p th:text="#{general.version}"/>
-                        </div>
+                        </div> 
                     </div>
                 </div>
             </div>
