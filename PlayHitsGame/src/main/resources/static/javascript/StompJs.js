@@ -750,7 +750,7 @@ var CompatClient = /** @class */ (function (_super) {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(CompatClient.prototype, "wss", {
+    Object.defineProperty(CompatClient.prototype, "ws", {
         /**
          * Available for backward compatibility, renamed to [Client#webSocket]{@link Client#webSocket}.
          *

@@ -22,18 +22,29 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 @Configuration
 public class EmailConfig {
     
+    
+    
+    @Value("${mail.smtp.auth}")
+    private String auth;    
+    @Value("${mail.smtp.starttls.enable}")
+    private String tlsEnable;    
+    @Value("${mail.smtp.host}")
+    private String host;
+    @Value("${mail.smtp.port}")
+    private String port;
     @Value("${mail.username}")
     private String mail;
-    
     @Value("${mail.password}")
     private String password;
     
+    
+    
     private Properties getMailProperties() {
         Properties properties = new Properties();
-        properties.put("mail.smtp.auth", "true");
-        properties.put("mail.smtp.starttls.enable", "true");
-        properties.put("mail.smtp.host", "smtp.gmail.com");
-        properties.put("mail.smtp.port", "587");
+        properties.put("mail.smtp.auth", auth);
+        properties.put("mail.smtp.starttls.enable", tlsEnable);
+        properties.put("mail.smtp.host", host);
+        properties.put("mail.smtp.port", port);
         return properties;        
     }
     
