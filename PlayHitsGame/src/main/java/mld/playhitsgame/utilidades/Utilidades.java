@@ -27,6 +27,7 @@ import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.Respuesta;
 import mld.playhitsgame.exemplars.Ronda;
 import mld.playhitsgame.exemplars.Usuario;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -37,6 +38,7 @@ import org.springframework.core.io.Resource;
 public class Utilidades {
 
     private static final int NUMERO_OPCIONES = 5;
+    private static final double UMBRAL_SIMILITUD = 0.90;
 
     public static int calcularPtsPorAnyo(int anyo, Cancion cancion, Dificultad dificultad) {
 
@@ -44,7 +46,7 @@ public class Utilidades {
         if (anyo == cancion.getAnyo()) {
             pts = 15;
         }
-        
+
         // Dependiendo de la dificultad multiplicamos o dividimos por 2
         if (dificultad.equals(Dificultad.Facil)) {
             pts = pts / 2;
@@ -52,7 +54,7 @@ public class Utilidades {
         if (dificultad.equals(Dificultad.Dificil)) {
             pts = pts * 2;
         }
-        
+
         return pts;
     }
 
@@ -62,7 +64,7 @@ public class Utilidades {
         if (titulo != null && titulo.equals(cancion.getTitulo())) {
             pts = 15;
         }
-        
+
         // Dependiendo de la dificultad multiplicamos o dividimos por 2
         if (dificultad.equals(Dificultad.Facil)) {
             pts = pts / 2;
@@ -70,9 +72,9 @@ public class Utilidades {
         if (dificultad.equals(Dificultad.Dificil)) {
             pts = pts * 2;
         }
-        
+
         return pts;
-        
+
     }
 
     public static int calcularPtsPorInterprete(String interprete, Cancion cancion, Dificultad dificultad) {
@@ -81,7 +83,7 @@ public class Utilidades {
         if (interprete != null && interprete.equals(cancion.getInterprete())) {
             pts = 15;
         }
-        
+
         // Dependiendo de la dificultad multiplicamos o dividimos por 2
         if (dificultad.equals(Dificultad.Facil)) {
             pts = pts / 2;
@@ -89,7 +91,7 @@ public class Utilidades {
         if (dificultad.equals(Dificultad.Dificil)) {
             pts = pts * 2;
         }
-        
+
         return pts;
     }
 
@@ -167,14 +169,14 @@ public class Utilidades {
 
         return newText.toString();
     }
-    
+
     public static List<OpcionTituloTmp> opcionesTitulosCanciones(Ronda ronda, List<Cancion> canciones) {
-        
+
         List<Cancion> cancionesParaOpciones
                 = cancionesParaListaOpciones(canciones, ronda.getCancion(), NUMERO_OPCIONES);
-        
-        return  obtenerOpcionesTitulosCanciones(ronda, cancionesParaOpciones);     
-    }    
+
+        return obtenerOpcionesTitulosCanciones(ronda, cancionesParaOpciones);
+    }
 
     private static List<OpcionTituloTmp> obtenerOpcionesTitulosCanciones(Ronda ronda, List<Cancion> cancionesParaOpciones) {
 
@@ -201,20 +203,20 @@ public class Utilidades {
 
         return obtenerOpcionesTitulosCanciones(ronda, cancionesParaOpciones);
     }
-    
+
     public static List<OpcionInterpreteTmp> opcionesInterpretesCanciones(Ronda ronda, List<Cancion> canciones) {
-        
+
         List<Cancion> cancionesParaOpciones
                 = cancionesParaListaOpciones(canciones, ronda.getCancion(), NUMERO_OPCIONES);
-        
-        return  obtenerOpcionesInterpretesCanciones(ronda, cancionesParaOpciones);     
-    }    
+
+        return obtenerOpcionesInterpretesCanciones(ronda, cancionesParaOpciones);
+    }
 
     private static List<OpcionInterpreteTmp> obtenerOpcionesInterpretesCanciones(Ronda ronda, List<Cancion> cancionesParaOpciones) {
 
         // de las canciones elije aleatoriamente que une a la correcta y 
         // devuelve una lista con las canciones encriptadas
-        ArrayList<OpcionInterpreteTmp> opciones = new ArrayList();        
+        ArrayList<OpcionInterpreteTmp> opciones = new ArrayList();
 
         OpcionInterpreteTmp newObj;
         for (Cancion cancion : cancionesParaOpciones) {
@@ -234,27 +236,27 @@ public class Utilidades {
         List<Cancion> cancionesParaOpciones
                 = cancionesParaListaOpciones(ronda.getPartida().canciones(),
                         ronda.getCancion(), NUMERO_OPCIONES);
-        
+
         return obtenerOpcionesInterpretesCanciones(ronda, cancionesParaOpciones);
-        
+
     }
-    
-    
-    public static int[] rangoAnyosCanciones(ArrayList<Cancion> canciones){
-        
+
+    public static int[] rangoAnyosCanciones(ArrayList<Cancion> canciones) {
+
         int ini = 9999;
         int fin = 0;
-        
-        for (Cancion elem : canciones){
-            if (elem.getAnyo() < ini)
+
+        for (Cancion elem : canciones) {
+            if (elem.getAnyo() < ini) {
                 ini = elem.getAnyo();
-            if (elem.getAnyo() > fin)
+            }
+            if (elem.getAnyo() > fin) {
                 fin = elem.getAnyo();
+            }
         }
-        
-        return new int[]{ini,fin};        
+
+        return new int[]{ini, fin};
     }
-    
 
     public static List<OpcionAnyoTmp> opcionesAnyosCanciones(Ronda ronda, int anyoIni, int anyoFin) {
 
@@ -421,6 +423,62 @@ public class Utilidades {
             System.err.println("Error al escribir en el archivo: " + e.getMessage());
         }
 
+    }
+
+    public static Cancion existeCancion(Cancion newCancion, List<Cancion> canciones) {
+
+        Cancion cancionExistente = null;
+        LevenshteinDistance distancia = new LevenshteinDistance();
+
+        for (Cancion cancion : canciones) {
+
+            double similitudTitulo = calcularSimilitud(distancia, newCancion.getTitulo(), cancion.getTitulo());
+            double similitudInterprete = calcularSimilitud(distancia, newCancion.getInterprete(), cancion.getInterprete());
+
+            if (similitudTitulo >= UMBRAL_SIMILITUD && similitudInterprete >= UMBRAL_SIMILITUD) {
+                cancionExistente = cancion;
+            }
+        }
+
+        return cancionExistente;
+    }
+
+    public static List<Cancion> buscarDuplicados(List<Cancion> canciones) {
+
+        ArrayList<Cancion> lista = new ArrayList();
+        LevenshteinDistance distancia = new LevenshteinDistance();
+
+        for (int i = 0; i < canciones.size(); i++) {
+            Cancion cancion1 = canciones.get(i);
+            List<Cancion> grupo = new ArrayList<>();
+            for (int j = i + 1; j < canciones.size(); j++) {
+                Cancion cancion2 = canciones.get(j);
+
+                double similitudTitulo = calcularSimilitud(distancia, cancion1.getTitulo(), cancion2.getTitulo());
+                double similitudInterprete = calcularSimilitud(distancia, cancion1.getInterprete(), cancion2.getInterprete());
+
+                if (similitudTitulo >= UMBRAL_SIMILITUD && similitudInterprete >= UMBRAL_SIMILITUD) {
+                    grupo.add(cancion2);
+                }
+            }
+            if (!grupo.isEmpty()) {
+                grupo.add(0, cancion1);  // Añadir la primera canción también al grupo
+            }
+
+            for (Cancion canDuplicada : grupo) {
+                lista.add(canDuplicada);
+            }
+        }
+
+        return lista;
+    }
+
+    private static double calcularSimilitud(LevenshteinDistance distancia, String s1, String s2) {
+        int maxLen = Math.max(s1.length(), s2.length());
+        int distanciaLevenshtein = distancia.apply(s1, s2);
+
+        // Similaridad: 1 - (Distancia de Levenshtein / Longitud máxima de las dos cadenas)
+        return 1.0 - (double) distanciaLevenshtein / maxLen;
     }
 
 }

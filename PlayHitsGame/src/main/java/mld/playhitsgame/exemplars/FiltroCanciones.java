@@ -14,6 +14,7 @@ public class FiltroCanciones {
     private int anyoInicial;
     private int anyoFinal;
     private boolean revisar;
+    private boolean duplicados;
     
         public FiltroCanciones(){        
 
@@ -21,6 +22,7 @@ public class FiltroCanciones {
         this.anyoInicial = 1950;
         this.anyoFinal = 2050;
         this.revisar = false;
+        this.duplicados = false;
 
     }
 
@@ -85,6 +87,21 @@ public class FiltroCanciones {
      */
     public void setRevisar(boolean revisar) {
         this.revisar = revisar;
+    }
+    
+    public boolean isDuplicados() {
+        return duplicados;
+    }
+    
+    public String duplicadosTxt() {
+        if (this.isDuplicados())
+            return "true";
+        else
+            return "false";
+    }
+
+    public void setDuplicados(boolean duplicados) {
+        this.duplicados = duplicados;
     }
     
 

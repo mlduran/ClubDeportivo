@@ -240,10 +240,12 @@ public class ControladorCancion {
             filtro = (FiltroCanciones) modelo.getAttribute("filtroCanciones");
         }
 
-        List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);
+        List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);        
+        
+        if (filtro.isDuplicados())
+            canciones = Utilidades.buscarDuplicados(canciones);        
 
         modelo.addAttribute("canciones", canciones);
-
     }
 
     @GetMapping("/gestionCanciones")
@@ -338,6 +340,9 @@ public class ControladorCancion {
         }
         temasBD(modelo);
         List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);
+        if (filtro.isDuplicados())
+            canciones = Utilidades.buscarDuplicados(canciones);   
+        
         modelo.addAttribute("canciones", canciones);
 
         return "GestionCanciones";
