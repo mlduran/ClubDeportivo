@@ -61,6 +61,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 <a th:href="@{/listaCanciones}" class="button" id="listaCanciones"> LISTA CANCIONES </a>
             </p>
             <p>
+                <a th:href="@{/corregirDuplicados}" class="button" id="corregirDuplicados"> CORREGIR CANCIONES DUPLICADAS </a>
+            </p>
+            <p>
                 <a th:href="@{/exportarCanciones}" class="button" id="exportarCanciones"> EXPORTAR CANCIONES </a>
             </p>
             <p>
@@ -79,6 +82,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 </select>
                 <input type="submit" th:name="anyadirTema" value="Añadir Tema"/> 
                 <input type="submit" th:name="eliminarTema" value="Eliminar Tema"/> 
+                <input type="submit" th:name="eliminarCanciones" value="Eliminar Canciones"/> 
                 <table border="2">
                     <tr> 
                         <th>Sel</th>

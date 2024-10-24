@@ -19,6 +19,7 @@ import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.services.CancionServicioMetodos;
 import mld.playhitsgame.services.TemaServicioMetodos;
+import mld.playhitsgame.utilidades.Utilidades;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -198,20 +199,34 @@ public class UtilidadesSpotify {
         }
 
         return lista;
-
     }
 
     public void grabarListaCanciones(List<Cancion> lista, boolean isTemas) {
+        
+        List<Cancion> cancionesBD = servCancion.findAll();
 
         for (Cancion cancion : lista) {
+            Cancion cancionParaGrabar;
             Optional<Cancion> cancionBD = servCancion.findByIdSpotify(cancion.getSpotifyid());
-            if (cancionBD.isEmpty()) {
+            // verificamos tambien si hay alguna coincidencia por titulo e interprete
+            if (cancionBD.isEmpty()){
+                cancionParaGrabar = Utilidades.existeCancion(cancion, cancionesBD);
+                if (cancionParaGrabar != null){
+                    isTemas = true;
+                    for (Tema tema : cancion.getTematicas())
+                        cancionParaGrabar.anyadirTematica(tema);
+                }
+            }else{
+                cancionParaGrabar = cancionBD.get();
+            } 
+            
+            if (cancionParaGrabar == null) {
                 servCancion.saveCancion(cancion);
             } else {
                 if (isTemas)
-                    servCancion.updateTemasCancion(cancionBD.get().getId(), cancion);
+                    servCancion.updateTemasCancion(cancionParaGrabar.getId(), cancionParaGrabar);
                 else 
-                    servCancion.updateCancion(cancionBD.get().getId(), cancion);
+                    servCancion.updateCancion(cancionParaGrabar.getId(), cancionParaGrabar);
             }
         }
 

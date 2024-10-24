@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import mld.playhitsgame.exemplars.Cancion;
@@ -26,6 +27,7 @@ import mld.playhitsgame.exemplars.OpcionTituloTmp;
 import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.Respuesta;
 import mld.playhitsgame.exemplars.Ronda;
+import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.exemplars.Usuario;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.springframework.core.io.ClassPathResource;
@@ -443,7 +445,18 @@ public class Utilidades {
         return cancionExistente;
     }
 
-    public static List<Cancion> buscarDuplicados(List<Cancion> canciones) {
+    public static List<Cancion> duplicadosParaEliminar(List<Cancion> canciones) {
+
+        return buscarDuplicados(canciones, true, false);
+    }
+
+    public static List<Cancion> duplicadosParaActualizar(List<Cancion> canciones) {
+
+        return buscarDuplicados(canciones, false, true);
+    }
+
+    public static List<Cancion> buscarDuplicados(List<Cancion> canciones,
+            boolean isEliminar, boolean isModificar) {
 
         ArrayList<Cancion> lista = new ArrayList();
         LevenshteinDistance distancia = new LevenshteinDistance();
@@ -465,8 +478,31 @@ public class Utilidades {
                 grupo.add(0, cancion1);  // Añadir la primera canción también al grupo
             }
 
-            for (Cancion canDuplicada : grupo) {
-                lista.add(canDuplicada);
+            if (isEliminar) {
+                // Si los años son diferentes no eliminamos
+                int anyo = 0;
+                for (Cancion canDuplicada : grupo) {
+                    if (anyo == 0) {
+                        anyo = canDuplicada.getAnyo();
+                        continue;
+                    }
+                    if (anyo == canDuplicada.getAnyo()) {
+                        lista.add(canDuplicada);
+                    }
+                }
+            } else if (isModificar) {
+                HashSet<Tema> temas = new HashSet();
+                for (Cancion canDuplicada : grupo) {
+                    temas.addAll(canDuplicada.getTematicas());                    
+                }
+                for (Cancion canDuplicada : grupo) {
+                    canDuplicada.setTematicas(new ArrayList<>(temas));
+                    lista.add(canDuplicada);
+                }                
+            } else {
+                for (Cancion canDuplicada : grupo) {
+                    lista.add(canDuplicada);
+                }
             }
         }
 

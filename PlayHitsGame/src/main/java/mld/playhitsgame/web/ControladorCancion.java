@@ -10,6 +10,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import lombok.extern.slf4j.Slf4j;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.FiltroCanciones;
@@ -243,7 +245,7 @@ public class ControladorCancion {
         List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);        
         
         if (filtro.isDuplicados())
-            canciones = Utilidades.buscarDuplicados(canciones);        
+            canciones = Utilidades.buscarDuplicados(canciones, false, false);        
 
         modelo.addAttribute("canciones", canciones);
     }
@@ -254,6 +256,40 @@ public class ControladorCancion {
         if (!usuarioCorrecto(modelo)) {
             return "redirect:/";
         }
+        temasBD(modelo);
+        gestionCanciones(modelo);
+        return "GestionCanciones";
+    }
+    
+    @GetMapping("/corregirDuplicados")
+    public String corregirDuplicados(Model modelo) {
+
+        if (!usuarioCorrecto(modelo)) {
+            return "redirect:/";
+        }
+        
+        FiltroCanciones filtro;
+        if (modelo.getAttribute("filtroCanciones") == null) {
+            filtro = new FiltroCanciones();
+            modelo.addAttribute("filtroCanciones", filtro);
+        } else {
+            filtro = (FiltroCanciones) modelo.getAttribute("filtroCanciones");
+        }
+        
+        List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);  
+        for (Cancion cancion : Utilidades.duplicadosParaActualizar(canciones)){
+            servCancion.updateCancion(cancion.getId(), cancion);
+        }   
+        for (Cancion cancion : Utilidades.duplicadosParaEliminar(canciones)){
+            // puede haber canciones que se esta utilizando
+            // estas no se podran eliminar
+            try {
+                servCancion.deleteCancion(cancion.getId());
+            } catch (Exception e) {
+                Logger.getLogger(ControladorCancion.class.getName()).log(Level.WARNING, "La Cancion se esta utilizando", cancion);
+            }
+        }        
+        
         temasBD(modelo);
         gestionCanciones(modelo);
         return "GestionCanciones";
@@ -341,7 +377,7 @@ public class ControladorCancion {
         temasBD(modelo);
         List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);
         if (filtro.isDuplicados())
-            canciones = Utilidades.buscarDuplicados(canciones);   
+            canciones = Utilidades.buscarDuplicados(canciones, false, false);   
         
         modelo.addAttribute("canciones", canciones);
 
@@ -360,7 +396,8 @@ public class ControladorCancion {
         String opVerificar = req.getParameter("actualizarVerificar");
         String opAnyadirTema = req.getParameter("anyadirTema");
         String opEliminarTema = req.getParameter("eliminarTema");
-
+        String opEliminarCanciones = req.getParameter("eliminarCanciones");
+        
         String temaModificar = req.getParameter("temaModificar");
         Tema tema = null;
         if (temaModificar != null){
@@ -379,6 +416,11 @@ public class ControladorCancion {
         for (Cancion cancion : canciones) {
             if (req.getParameter(cancion.selId()) != null) {
                 if ("on".equals(req.getParameter(cancion.selId()))) {
+                    
+                    if (opEliminarCanciones != null && opEliminarCanciones.equals("Eliminar Canciones")) {
+                       servCancion.deleteCancion(cancion.getId());
+                       continue;
+                    }
                     if (opVerificar != null && opVerificar.equals("Actualizar Verificar")) {
                         cancion.setRevisar(isValidar);
                     }
