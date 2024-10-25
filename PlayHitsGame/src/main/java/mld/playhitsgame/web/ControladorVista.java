@@ -91,6 +91,8 @@ public class ControladorVista {
     private final int[] NUMERO_RONDAS = {10, 15, 20, 25, 30};
     private final int SEG_PARA_INICIO_RESPUESTA = 15;
 
+    private String urlLoginSpotify;
+    
     @Autowired
     CancionServicioMetodos servCancion;
     @Autowired
@@ -119,6 +121,9 @@ public class ControladorVista {
     EmailServicioMetodos servMail;
 
     private String urlSpotify() {
+        
+        if (urlLoginSpotify != null)
+            return urlLoginSpotify;
 
         String urlLogin = null;
 
@@ -132,6 +137,7 @@ public class ControladorVista {
             URL url = new URL(customIp + "/api/spotify/login");
             BufferedReader urlLectura = new BufferedReader(new InputStreamReader(url.openStream()));
             urlLogin = urlLectura.readLine();
+            urlLoginSpotify = urlLogin;
         } catch (MalformedURLException ex) {
             Logger.getLogger(ControladorSpotify.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
