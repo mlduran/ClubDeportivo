@@ -692,7 +692,7 @@ public class ControladorVista {
                 String enlace = customIp + "/validarUsuario?id=" + String.valueOf(usuario.getId())
                         + "&token=" + token;
 
-                enviarMail(usuario.getUsuario(), "Alta en PlayHitsGame",
+                enviarMail(usuario, "Alta en PlayHitsGame",
                         enlace, "CorreoAlta");
             } catch (Exception ex) {
                 err = "ERROR " + ex;
@@ -759,12 +759,13 @@ public class ControladorVista {
         return "AltaUsuarioAdm";
     }
 
-    private void enviarMail(String des, String asunto, String txt, String plantilla) {
+    private void enviarMail(Usuario usuario, String asunto, String txt, String plantilla) {
         Mail mail = new Mail();
         mail.setAsunto(asunto);
-        mail.setDestinatario(des);
+        mail.setDestinatario(usuario.getUsuario());
         mail.setMensaje(txt);
         mail.setPlantilla(plantilla);
+        mail.setNombre(usuario.getNombre());
         try {
             servMail.enviarCorreo(mail);
         } catch (MessagingException ex) {
@@ -783,7 +784,7 @@ public class ControladorVista {
             if (!usu.getUsuario().contains("."))
                 continue;
             if (usu.isActivo())
-                enviarMail(usu.getUsuario(), "AVISO PlayHitsGame",
+                enviarMail(usu, "AVISO PlayHitsGame",
                     txtMail, "Correo");
         }
         return "redirect:/administracion";
@@ -1357,7 +1358,7 @@ public class ControladorVista {
             String token = usuario.get().getContrasenya();
             String enlace = "El codigo de recuperacion para el cambio de contraseña es : " + token;
 
-            enviarMail(usuario.get().getUsuario(), "Recuperación de Contraseña PlayHitsGame",
+            enviarMail(usuario.get(), "Recuperación de Contraseña PlayHitsGame",
                     enlace, "Correo");
 
             modelo.addAttribute("result", "Se ha enviado un codigo de recuperacion a tu cuenta de correo");

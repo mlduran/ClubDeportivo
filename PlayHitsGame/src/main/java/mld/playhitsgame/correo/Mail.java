@@ -18,6 +18,7 @@ public class Mail {
     private String asunto;
     private String mensaje;   
     private String plantilla;
+    private String nombre;
     
     
 }

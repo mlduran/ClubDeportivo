@@ -48,7 +48,8 @@ public class EmailServicioMetodos implements EmailServicio {
                 = javaMailSender.createMimeMessage();
         MimeMessageHelper helper
                 = new MimeMessageHelper(message, true, "UTF-8");
-
+        
+        helper.setFrom(mailApp);
         helper.setTo(mail.getDestinatario());
         helper.setSubject(mail.getAsunto());
         String plantilla = "correo/";
@@ -62,6 +63,7 @@ public class EmailServicioMetodos implements EmailServicio {
         context.setVariable("imagen", customIp + "/images/playhitsgamePresentacion.png");       
         context.setVariable("mail", mailApp);
         context.setVariable("mensaje", mail.getMensaje());
+        context.setVariable("nombre", mail.getNombre());
         String contenttHTML
                 = templateEngine.process(plantilla, context);
         helper.setText(contenttHTML, true);

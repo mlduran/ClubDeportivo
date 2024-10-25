@@ -17,6 +17,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <img th:src="${imagen}" alt="" />
                         </div>
                         <div class="card shadow-lg">
+                            <p th:text="#{mail.hola} + ' ' + ${nombre} + ','"/>  
+                        </div>
+                        <div class="card shadow-lg">
                             <p th:text="#{mail.alta}"/>
                         </div>
                          <div class="card shadow-lg">
