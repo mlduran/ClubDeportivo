@@ -19,6 +19,7 @@ var verificacion = document.getElementById('verificacion');
 verificacion.style.display = 'table-cell';
 var respOk = document.getElementById('respuestaOK');
 var todoFallo = document.getElementById('todoFallo');
+var esRecord = document.getElementById('esRecord');
 
 var reproductor = document.getElementById("reproductor");
 var reproductorConsulta = document.getElementById("reproductorConsulta");
@@ -84,6 +85,8 @@ window.addEventListener('load', function () {
     }
     if (todoFallo.value === 'false')
         ocultarResultado();
+    if (esRecord.value === 'true')
+        window.alert("Felicidades!!!!, has conseguido un nuevo Record para este tema, puedes consultarlo en la tabla de Records");
 
 });
 

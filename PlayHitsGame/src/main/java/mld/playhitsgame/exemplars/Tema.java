@@ -56,7 +56,10 @@ public class Tema {
     
     public String getDatos(){
         
-        return this.getGenero() + "-" + this.getIdioma();
+        if (this.getGenero() == null || this.getIdioma() == null)
+            return "";
+        else
+            return this.getGenero() + "-" + this.getIdioma();
         
     }
 }

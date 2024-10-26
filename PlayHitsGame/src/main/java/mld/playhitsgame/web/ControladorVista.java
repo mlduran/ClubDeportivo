@@ -78,7 +78,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 // utilizamos los ids para usuario y partida de sesion, para no cargar tantos datos de
 // persistencia en sesion y no usar tanta memoria
 @SessionAttributes({"id_usuarioSesion", "id_partidaSesion", "posiblesinvitados",
-    "rol", "filtroUsuarios", "mensajeRespuesta", "respuestaOK", "todoFallo"})
+    "rol", "filtroUsuarios", "mensajeRespuesta", "respuestaOK", "todoFallo", "esRecord"})
 @Slf4j
 public class ControladorVista {
 
@@ -400,15 +400,19 @@ public class ControladorVista {
         if (modelo.getAttribute("todoFallo") != null) {
             todoFallo = (boolean) modelo.getAttribute("todoFallo");
         }
+        if (modelo.getAttribute("esRecord") != null) {
+            todoFallo = (boolean) modelo.getAttribute("esRecord");
+        }
 
         if ((partida.ultimaRonda() == null || partida.ultimaRonda().isCompletada())
                 && todoFallo == false) {
             try {
                  ultimaRonda = darDeAltaRonda(partida);
             } catch (IndexOutOfBoundsException ex) {
-                finalizarPartidaPersonal(partida, usu);
+                boolean esRecord = finalizarPartidaPersonal(partida, usu);
                 ultimaRonda = partida.ultimaRonda();
                 todoFallo = true;
+                modelo.addAttribute("esRecord", esRecord);
                 modelo.addAttribute("mensajeRespuesta", ex.getMessage() + 
                         ", Felicidades!!!!, puedes iniciar partida otra cuando lo desees");
                 modelo.addAttribute("todoFallo", true);
@@ -445,6 +449,9 @@ public class ControladorVista {
         if (modelo.getAttribute("todoFallo") == null) {
             modelo.addAttribute("todoFallo", false);
         }
+        if (modelo.getAttribute("esRecord") == null) {
+            modelo.addAttribute("esRecord", false);
+        }
 
         long seconds = 0;
         if (ultimaRonda.getInicio() != null) {
@@ -474,14 +481,17 @@ public class ControladorVista {
 
     }
 
-    private void finalizarPartidaPersonal(Partida partida, Usuario usuario) {
+    private boolean finalizarPartidaPersonal(Partida partida, Usuario usuario) {
 
+        // Devuelve true si se ha conseguido un record
+        boolean esRecord = false;
+        
         partida.setStatus(StatusPartida.Terminada);
         servPartida.updatePartida(partida.getId(), partida);
         eliminarOpcionesPartida(partida);
 
         if (partida.isEntreno()) {
-            return;
+            return esRecord;
         }
 
         int pts = partida.ptsUsuario(usuario);
@@ -496,6 +506,7 @@ public class ControladorVista {
                     servTema.update(elTema.getId(), elTema);
                     usuario.setEstrellas(usuario.getEstrellas() + 1);
                     servUsuario.update(usuario.getId(), usuario);
+                    esRecord = true;
                 }
                 if (pts > 0) {
                     Puntuacion newPts = new Puntuacion();
@@ -510,6 +521,7 @@ public class ControladorVista {
                 }
             }
         }
+        return esRecord;
     }
 
     @PostMapping("/partidaPersonal")
@@ -621,7 +633,8 @@ public class ControladorVista {
 
             // si por ejemplo no se acierta nada, podemos finalizar partida
             if (hasPerdido) {
-                finalizarPartidaPersonal(partida, usu);
+                boolean esRecord = finalizarPartidaPersonal(partida, usu);
+                modelo.addAttribute("esRecord", esRecord);
             }
 
         } catch (Exception ex) {
@@ -1440,7 +1453,10 @@ public class ControladorVista {
         for (Tema tema : temas) {
             Record newObj = new Record();
             newObj.setTema(tema);
-            newObj.setDescripcion("(" + tema.getGenero().name() + "-" + tema.getIdioma().name() + ")");
+            if (tema.getGenero() == null || tema.getIdioma() == null)
+                newObj.setDescripcion("");
+            else
+                newObj.setDescripcion("(" + tema.getGenero().name() + "-" + tema.getIdioma().name() + ")");
             newObj.setCanciones(tema.getCanciones().size());
             newObj.setPuntos(tema.getPuntos());
             String usuRecord = "PlayHitsGame";
