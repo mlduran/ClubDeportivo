@@ -63,6 +63,7 @@ import mld.playhitsgame.services.UsuarioRolServicioMetodos;
 import mld.playhitsgame.utilidades.Utilidades;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailSendException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -92,7 +93,7 @@ public class ControladorVista {
     private final int SEG_PARA_INICIO_RESPUESTA = 15;
 
     private String urlLoginSpotify;
-    
+
     @Autowired
     CancionServicioMetodos servCancion;
     @Autowired
@@ -121,9 +122,10 @@ public class ControladorVista {
     EmailServicioMetodos servMail;
 
     private String urlSpotify() {
-        
-        if (urlLoginSpotify != null)
+
+        if (urlLoginSpotify != null) {
             return urlLoginSpotify;
+        }
 
         String urlLogin = null;
 
@@ -407,16 +409,16 @@ public class ControladorVista {
         if ((partida.ultimaRonda() == null || partida.ultimaRonda().isCompletada())
                 && todoFallo == false) {
             try {
-                 ultimaRonda = darDeAltaRonda(partida);
+                ultimaRonda = darDeAltaRonda(partida);
             } catch (IndexOutOfBoundsException ex) {
                 boolean esRecord = finalizarPartidaPersonal(partida, usu);
                 ultimaRonda = partida.ultimaRonda();
                 todoFallo = true;
                 modelo.addAttribute("esRecord", esRecord);
-                modelo.addAttribute("mensajeRespuesta", ex.getMessage() + 
-                        ", Felicidades!!!!, puedes iniciar partida otra cuando lo desees");
+                modelo.addAttribute("mensajeRespuesta", ex.getMessage()
+                        + ", Felicidades!!!!, puedes iniciar partida otra cuando lo desees");
                 modelo.addAttribute("todoFallo", true);
-             }
+            }
         } else {
             ultimaRonda = partida.ultimaRonda();
         }
@@ -485,7 +487,7 @@ public class ControladorVista {
 
         // Devuelve true si se ha conseguido un record
         boolean esRecord = false;
-        
+
         partida.setStatus(StatusPartida.Terminada);
         servPartida.updatePartida(partida.getId(), partida);
         eliminarOpcionesPartida(partida);
@@ -705,16 +707,19 @@ public class ControladorVista {
                 usuario.setActivo(false);
                 usuario.setContrasenya(passEncrip);
                 usuario.setPreferencias("");
-                servUsuario.save(usuario);
-                resp = "Se ha creado el usuario ".concat(usuario.getUsuario());
                 String token = passwordEncoder.encode(usuario.getUsuario());
                 String enlace = customIp + "/validarUsuario?id=" + String.valueOf(usuario.getId())
                         + "&token=" + token;
-
-                enviarMail(usuario, "Alta en PlayHitsGame",
+                boolean ok = enviarMail(usuario, "Alta en PlayHitsGame",
                         enlace, "CorreoAlta");
+                if (ok) {
+                    servUsuario.save(usuario);
+                    resp = "Se ha creado el usuario ".concat(usuario.getUsuario());
+                } else {
+                    err = "El mail de usuario indicado, no es valido";
+                }
             } catch (Exception ex) {
-                err = "ERROR " + ex;
+                err = "ERROR " + ex.getMessage();
             }
         }
 
@@ -778,33 +783,38 @@ public class ControladorVista {
         return "AltaUsuarioAdm";
     }
 
-    private void enviarMail(Usuario usuario, String asunto, String txt, String plantilla) {
+    private boolean enviarMail(Usuario usuario, String asunto, String txt, String plantilla) {
+        boolean ok = true;
         Mail mail = new Mail();
-        mail.setAsunto(asunto);
-        mail.setDestinatario(usuario.getUsuario());
-        mail.setMensaje(txt);
-        mail.setPlantilla(plantilla);
-        mail.setNombre(usuario.getNombre());
         try {
+            mail.setAsunto(asunto);
+            mail.setDestinatario(usuario.getUsuario());
+            mail.setMensaje(txt);
+            mail.setPlantilla(plantilla);
+            mail.setNombre(usuario.getNombre());
             servMail.enviarCorreo(mail);
-        } catch (MessagingException ex) {
-            Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (MessagingException | MailSendException ex) {
+            ok = false;
+            Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);        
         }
+        return ok;
     }
-    
+
     @PostMapping("/enviarMailMasivo")
     public String enviarMailMasivo(Model modelo, HttpServletRequest req) {
-        
+
         String txtMail = req.getParameter("txtMail");
-        
+
         List<Usuario> usuarios = servUsuario.findAll();
-        
-        for (Usuario usu : usuarios){
-            if (!usu.getUsuario().contains("."))
+
+        for (Usuario usu : usuarios) {
+            if (!usu.getUsuario().contains(".")) {
                 continue;
-            if (usu.isActivo())
+            }
+            if (usu.isActivo()) {
                 enviarMail(usu, "AVISO PlayHitsGame",
-                    txtMail, "Correo");
+                        txtMail, "Correo");
+            }
         }
         return "redirect:/administracion";
     }
@@ -886,14 +896,15 @@ public class ControladorVista {
 
         ArrayList<String> temas = new ArrayList();
         for (Tema tema : servTema.findAll()) {
-            if (!tema.getTema().equals("PlayHitsGame"))
+            if (!tema.getTema().equals("PlayHitsGame")) {
                 temas.add(tema.getTema());
+            }
         }
-        
+
         Collections.sort(temas);
         // esto es para que salga primero
         temas.add(0, "PlayHitsGame");
-        
+
         modelo.addAttribute("temas", temas);
     }
 
@@ -1453,10 +1464,11 @@ public class ControladorVista {
         for (Tema tema : temas) {
             Record newObj = new Record();
             newObj.setTema(tema);
-            if (tema.getGenero() == null || tema.getIdioma() == null)
+            if (tema.getGenero() == null || tema.getIdioma() == null) {
                 newObj.setDescripcion("");
-            else
+            } else {
                 newObj.setDescripcion("(" + tema.getGenero().name() + "-" + tema.getIdioma().name() + ")");
+            }
             newObj.setCanciones(tema.getCanciones().size());
             newObj.setPuntos(tema.getPuntos());
             String usuRecord = "PlayHitsGame";

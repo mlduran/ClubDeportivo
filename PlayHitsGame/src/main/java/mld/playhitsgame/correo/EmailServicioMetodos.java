@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,7 @@ public class EmailServicioMetodos implements EmailServicio {
     }
 
     @Override
-    public void enviarCorreo(Mail mail) throws MessagingException {
+    public void enviarCorreo(Mail mail) throws MessagingException, MailSendException {
 
         MimeMessage message
                 = javaMailSender.createMimeMessage();
