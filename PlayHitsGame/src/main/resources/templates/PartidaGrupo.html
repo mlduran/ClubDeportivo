@@ -102,7 +102,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                 </tr>
                                                 <tr>
                                                     <td colspan='3' style="background-color: aqua;">  
-                                                        <div id="mostrarPlayer">
+                                                        <div id="mostrarPlayer" style="display: none;">
                                                             <audio controls id="reproductor">
                                                                 <source th:src="${ronda.cancion.spotifyplay}" type="audio/mpeg" />                                                            
                                                             </audio>
@@ -121,7 +121,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                     </tr>
                                                 </table>                                               
                                             </div>
-                                            <div id="cRespuestas">
+                                            <div id="cRespuestas" style="display: none;">
                                                 <table  class="table table-sm" style="text-align:center;">
                                                     <tr>
                                                         <th style="background-color: lightpink;width: 40%; ">
@@ -136,7 +136,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                     </tr> 
                                                 </table>
                                             </div>
-                                            <div id="respuestas">
+                                            <div id="respuestas" style="display: none;">
                                                 <table class="table-responsive table-bordered" style="max-width: 100%; width: 100%; table-layout: fixed;">
                                                     <tr>
                                                         <td style="background-color:#dcdcdc;width: 40%; ">
