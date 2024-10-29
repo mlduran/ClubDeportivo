@@ -11,7 +11,8 @@ package mld.playhitsgame.exemplars;
 public enum Rol {
     
     master,
-    invitado    
+    invitado,
+    playhitsgame
 
     
 }

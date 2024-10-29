@@ -27,14 +27,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     <body>        
         <section class="h-100">
             <input type="hidden" id="fichAjuda" value='/ayuda/PartidaPersonal.html' />
-            <input type="hidden" id="idusuario" th:value="${usuarioSesion.id}" />
-            <input type="hidden" id="idpartida" th:value="${partidaSesion.id}" />
             <input type="hidden" id="respuestaOK" th:value="${respuestaOK}" />
             <input type="hidden" id="todoFallo" th:value="${todoFallo}" />
             <input type="hidden" id="esRecord" th:value="${esRecord}" />
-            <audio controls id="reproductorConsulta" style="display: none;">
-                <source src="" type="audio/mpeg" />                                                            
-            </audio>
             <div class="container h-100">
                 <div class="row justify-content-sm-center h-100">
                     <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
@@ -48,7 +43,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </tr>
                                     <tr>
                                         <th colspan="3" style="text-align:center;">
-                                            <span th:text="#{general.jugador} + ' : ' + ${usuarioSesion.nombre}" />
+                                            <span th:text="#{general.jugador} + ' : PlayHitsGame'" />
                                         </th>
                                     </tr>
                                     <tr>
@@ -57,29 +52,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </td>
                                     </tr>
                                     <tr>                                        
-                                        <td colspan="2">
-                                            <p th:each="txt : ${partidaSesion.descripcion}" th:text="${txt}" />
+                                        <td colspan="2">  
+                                            <p th:each="txt : ${partidaInvitado.descripcion}" th:text="${txt}" />
                                         </td>
                                         <td>  
-                                            <table>
-                                                <tr>
-                                                    <td>
-                                                        <label for="contador" th:text="#{general.tiempo}"/>
-                                                        <input type="text" id="contador" th:value="${contador}" size="5" disabled/>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <label for="puntos" th:text="#{general.puntos}"/>
-                                                        <input type="text" id="puntos" th:value="${pts}" size="5" disabled/>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <label for="nrondas" th:text="#{general.ronda}"/>
-                                                        <input type="text" id="nrondas" th:value="${#lists.size(partidaSesion.rondas)}" size="5" disabled/>
-                                                    </td>
-                                                </tr>    
+                                            <table> 
                                                 <tr>
                                                     <td>
                                                         <div class="btn text-center">
@@ -115,41 +92,29 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                         </td>
                                     </tr>  
                                 </table>
-                                <table class="table-responsive table-bordered" style="max-width: 100%; width: 100%; table-layout: fixed;">
-                                    <tr th:if="${partidaSesion.entreno}">
-                                        <td colspan="3" style="text-align: center;">
-                                            <form method="post" id="acabarPartida" th:action="@{/acabarPartidaPersonal}"> 
-                                                <button type="submit" class="btn btn-primary ms-auto" th:text="#{general.acabarpartida}"/>
-                                            </form>
-                                        </td>
-                                    </tr>
+                                <table class="table-responsive table-bordered" style="max-width: 100%; width: 100%; table-layout: fixed;">                                   
                                     <tr>
                                         <td colspan="3">
-                                            <form method="post" id="respuestas" th:action="@{/partidaPersonal}"> 
+                                            <form method="post" id="respuestas" th:action="@{/partidaInvitado}"> 
                                                 <table class="table table-sm" style="text-align:center; max-width: 100%; width: 100%; table-layout: fixed;">
                                                     <tr>
                                                         <td colspan='3' style="background-color: aqua;">
                                                             <audio controls id="reproductor">
-                                                                <source th:src="${ronda.cancion.spotifyplay}" type="audio/mpeg" />
+                                                                <source th:src="${cancionInvitado.spotifyplay}" type="audio/mpeg" />
                                                             </audio>
                                                         </td>
                                                     </tr>                                                     
                                                     <tr>
-                                                        <td colspan='3' id="verificacion">  
+                                                        <td colspan='3' id="verificacion">                                                            
                                                             <div th:if="${mensajeRespuesta} != null and ${mensajeRespuesta} != ''">
                                                                 <p th:each="txt : ${mensajeRespuesta}" th:text="${txt}" style="font-size: 25px;"/>
                                                             </div>
                                                             <div th:if="${mensajeRespuesta} == null or ${mensajeRespuesta} == ''">
                                                                 <p th:text="#{general.puedesresponder}" style="font-size: 25px;"/>
                                                             </div>
-                                                            <div th:if="${todoFallo} == true">
-                                                                <a href="/panel" class="text-dark">
-                                                                    <p th:text="#{general.volver}" />
-                                                                </a>
-                                                            </div>
                                                             <div>
                                                                 <img th:src="${spotifyimagenTmp}" alt="PLAYHITSGAME" class="img-fluid" />
-                                                            </div>              
+                                                            </div>                                                           
                                                         </td>
                                                     </tr>
                                                     <table th:if="${todoFallo} == false" class="table-responsive table-bordered" style="max-width: 100%; width: 100%; table-layout: fixed;">
@@ -202,9 +167,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                                     <div th:each="opAnyo : ${opcAnyos}">
                                                                         <tr>
                                                                             <td style="background-color:#dcdcdc;">                                                                
-                                                                                <button style="background-color: white;" type="button" class="btn btn-outline-primary" th:data-name="${opAnyo.opAnyo}" 
-                                                                                        th:onclick="respuestaAnyo(this.getAttribute('data-name'))" th:id="'anyo_' + ${opAnyo.opAnyo}">
-                                                                                    <p th:text="${opAnyo.opAnyo}" />
+                                                                                <button style="background-color: white;" type="button" class="btn btn-outline-primary" th:data-name="${opAnyo}" 
+                                                                                        th:onclick="respuestaAnyo(this.getAttribute('data-name'))" th:id="'anyo_' + ${opAnyo}">
+                                                                                    <p th:text="${opAnyo}" />
                                                                                 </button>
                                                                             </td>
                                                                         </tr>
@@ -217,58 +182,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th colspan="3" style="text-align:center; background-color: lightpink;">
-                                            <p th:text="#{general.respondido}" />
-                                        </th>
-                                    </tr>
-                                    <tr th:each="rondaPart : ${partidaSesion.rondas}">
-                                    <div th:if="${rondaPart.id} != ${ronda.id}">
-                                        <td colspan="3"> 
-                                            <table style="width: 100%;">
-                                                <tr>
-                                                    <th style="text-align:center; background-color: lightblue; width:70%;">                                
-                                                        <p th:text="#{general.ronda} + ' ' + ${rondaPart.numero}" />
-                                                    </th>
-                                                    <th style="width:30%;">
-                                                        <img th:src="${rondaPart.cancion.spotifyimagen}" alt="PLAYHITSGAME" class="img-fluid"
-                                                             th:data-name="${rondaPart.cancion.spotifyplay}"
-                                                             th:onclick="reproducir(this.getAttribute('data-name'))"/>
-                                                    </th>
-                                                <tr>
-                                                <tr>
-                                                    <td style="width:70%;">
-                                                        <table style="width: 100%;">
-                                                            <tr>
-                                                                <td th:data-value="${rondaPart.respuestas.get(0).tituloOk}" th:text="${rondaPart.respuestas.get(0).titulo}" />
-                                                            </tr>
-                                                            <tr>
-                                                                <td th:data-value="${rondaPart.respuestas.get(0).interpreteOk}" th:text="${rondaPart.respuestas.get(0).interprete}" />
-                                                            </tr>
-                                                            <tr>
-                                                                <td th:data-value="${rondaPart.respuestas.get(0).anyoOk}" th:text="${rondaPart.respuestas.get(0).anyo}" /> 
-                                                            </tr>                                                                
-                                                        </table>
-
-                                                    </td>
-                                                    <td style="width:30%;">
-                                                        <table style="width: 100%;">
-                                                            <tr>
-                                                                <td th:text="#{general.puntos} + ' : ' + ${rondaPart.respuestas.get(0).puntos}" />                                                                
-                                                            </tr>
-                                                            <tr>
-                                                                <td th:text="#{general.tiempo} + ' : ' + ${rondaPart.respuestas.get(0).tiempoEmpleado}" />
-                                                            </tr>
-                                                        </table>
-                                                    </td>
-                                                </tr>
-                                            </table>                                            
-                                        </td>                                        
-                                    </div>
-                                    </tr>
-                                    <tr>
                                         <td colspan="3">
                                             <div class="text-center">
-                                                <a href="/panel" class="text-dark">
+                                                <a href="/accesoInvitado" class="text-dark">
                                                     <p th:text="#{general.volver}" />
                                                 </a>
                                             </div>
@@ -290,7 +206,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         </section>         
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
         <script type="text/javascript" th:src="@{/javascript/Info.js}"></script>
-        <script type="text/javascript" th:src="@{/javascript/PartidaPersonal.js}"></script> 
+        <script type="text/javascript" th:src="@{/javascript/PartidaInvitado.js}"></script> 
     </body>
 
 </html>

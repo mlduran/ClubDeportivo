@@ -10,7 +10,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +20,6 @@ import lombok.NoArgsConstructor;
 import mld.playhitsgame.seguridad.Roles;
 import mld.playhitsgame.utilidades.Utilidades;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  *

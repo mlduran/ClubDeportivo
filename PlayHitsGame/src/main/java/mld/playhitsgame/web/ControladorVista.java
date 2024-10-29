@@ -79,7 +79,8 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 // utilizamos los ids para usuario y partida de sesion, para no cargar tantos datos de
 // persistencia en sesion y no usar tanta memoria
 @SessionAttributes({"id_usuarioSesion", "id_partidaSesion", "posiblesinvitados",
-    "rol", "filtroUsuarios", "mensajeRespuesta", "respuestaOK", "todoFallo", "esRecord"})
+    "rol", "filtroUsuarios", "mensajeRespuesta", "respuestaOK", "todoFallo", "esRecord",
+    "partidaInvitado", "cancionInvitado", "spotifyimagenTmp"})
 @Slf4j
 public class ControladorVista {
 
@@ -88,6 +89,9 @@ public class ControladorVista {
 
     @Value("${custom.server.ip}")
     private String customIp;
+
+    @Value("${custom.invitados}")
+    private String invitadosON;
 
     private final int[] NUMERO_RONDAS = {10, 15, 20, 25, 30};
     private final int SEG_PARA_INICIO_RESPUESTA = 15;
@@ -185,6 +189,7 @@ public class ControladorVista {
 
     @GetMapping("/")
     public String inicio(Model modelo) {
+        modelo.addAttribute("invitadosON", invitadosON);
         return "Inicio";
     }
 
@@ -193,6 +198,14 @@ public class ControladorVista {
         modelo.addAttribute("id_usuarioSesion", "");
         modelo.addAttribute("id_partidaSesion", "");
         return "Inicio";
+    }
+
+    @GetMapping("/accesoInvitado")
+    public String accesoInvitado(Model modelo) {
+
+        modelo.addAttribute("rol", Rol.playhitsgame);
+        modelo.addAttribute("spotifyimagenTmp", null);
+        return "PanelInvitado";
     }
 
     @PostMapping("/login")
@@ -245,6 +258,7 @@ public class ControladorVista {
         }
         informarUsuarioModelo(modelo, usu);
         modelo.addAttribute("serverWebsocket", this.serverWebsocket);
+        modelo.addAttribute("spotifyimagenTmp", null);
 
         return "Panel";
     }
@@ -638,6 +652,8 @@ public class ControladorVista {
                 boolean esRecord = finalizarPartidaPersonal(partida, usu);
                 modelo.addAttribute("esRecord", esRecord);
             }
+            
+            modelo.addAttribute("spotifyimagenTmp", cancion.getSpotifyimagen());
 
         } catch (Exception ex) {
             Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);
@@ -795,7 +811,7 @@ public class ControladorVista {
             servMail.enviarCorreo(mail);
         } catch (MessagingException | MailSendException ex) {
             ok = false;
-            Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);        
+            Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);
         }
         return ok;
     }
@@ -957,6 +973,22 @@ public class ControladorVista {
         crearPartida(modelo, newPartida, usu);
         modelo.addAttribute("posiblesinvitados", null);
         return "CrearPartida";
+    }
+
+    @GetMapping("/crearPartidaPersonalInvitado")
+    public String crearPartidaPersonalInvitado(Model modelo) {
+
+        Calendar fecha = Calendar.getInstance();
+        Partida newPartida = new Partida();
+        newPartida.setAnyoInicial(1950);
+        newPartida.setAnyoFinal(fecha.get(Calendar.YEAR));
+        newPartida.setTipo(TipoPartida.personal);
+        newPartida.setDificultad(Dificultad.Entreno);
+
+        modelo.addAttribute("newpartida", newPartida);
+        anyadirTemas(modelo);
+
+        return "CrearPartidaInvitado";
     }
 
     private String crearPartidaGrupo(Partida partida,
@@ -1154,8 +1186,169 @@ public class ControladorVista {
             return crearPartidaPersonal(partida, modelo, req, usu);
         }
         modelo.addAttribute("result", "Error en el tipo de partida");
+        modelo.addAttribute("spotifyimagenTmp", null);
         return "CrearPartida";
 
+    }
+
+    @PostMapping("/crearPartidaInvitado")
+    public String crearPartidaInvitado(@ModelAttribute("newpartida") Partida partida,
+            Model modelo,
+            HttpServletRequest req) {
+        modelo.addAttribute("mensajeRespuesta", "");
+        modelo.addAttribute("respuestaOK", true);
+        modelo.addAttribute("todoFallo", false);
+        FiltroCanciones filtro = new FiltroCanciones();
+        filtro.setAnyoInicial(partida.getAnyoInicial());
+        filtro.setAnyoFinal(partida.getAnyoFinal());
+        filtro.setTema(partida.getTema());
+        List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);
+        if (canciones.size() <= 5) {
+            modelo.addAttribute("result",
+                    "No hay suficientes canciones para iniciar la partida");
+            return "CrearPartidaInvitado";
+        }
+
+        modelo.addAttribute("partidaInvitado", partida);
+        modelo.addAttribute("spotifyimagenTmp", null);
+
+        return "redirect:/partidaInvitado";
+
+    }
+
+    private void opcionesInvitado(Model modelo, Partida partida) {
+
+        FiltroCanciones filtro = new FiltroCanciones();
+        filtro.setAnyoInicial(partida.getAnyoInicial());
+        filtro.setAnyoFinal(partida.getAnyoFinal());
+        filtro.setTema(partida.getTema());
+        List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);
+
+        Cancion cancionSel = cancionRandom(canciones);
+
+        // Crear las opciones para las respuestas
+        List<Cancion> opcCancionesTitulos = cancionesParaListaOpciones(canciones, cancionSel, 5);
+        List<OpcionTituloTmp> opcTitulos = new ArrayList();
+        for (Cancion cancion : opcCancionesTitulos) {
+            OpcionTituloTmp op = new OpcionTituloTmp();
+            op.setCancion(cancion.getId());
+            op.setOpTitulo(encriptarString(cancion.getTitulo()));
+            opcTitulos.add(op);
+        }
+        List<Cancion> opcCancionesInterpretes = cancionesParaListaOpciones(canciones, cancionSel, 5);
+        List<OpcionInterpreteTmp> opcInterpretes = new ArrayList();
+        for (Cancion cancion : opcCancionesInterpretes) {
+            OpcionInterpreteTmp op = new OpcionInterpreteTmp();
+            op.setCancion(cancion.getId());
+            op.setOpInterprete(encriptarString(cancion.getInterprete()));
+            opcInterpretes.add(op);
+        }
+        int[] rangoAnyos = rangoAnyosCanciones((ArrayList<Cancion>) canciones);
+        List<String> opcAnyos = opcionesAnyosCancionesInvitado(cancionSel, rangoAnyos[0], rangoAnyos[1]);
+
+        modelo.addAttribute("cancionInvitado", cancionSel);
+        modelo.addAttribute("opcTitulos", opcTitulos);
+        modelo.addAttribute("opcInterpretes", opcInterpretes);
+        modelo.addAttribute("opcAnyos", opcAnyos);
+
+    }
+
+    @GetMapping("/partidaInvitado")
+    public String partidaInvitado(Model modelo) {
+
+        Partida partida = (Partida) modelo.getAttribute("partidaInvitado");
+
+        if (partida == null) {
+            return "redirect:/";
+        }
+
+        boolean todoFallo = false;
+        if (modelo.getAttribute("todoFallo") != null) {
+            todoFallo = (boolean) modelo.getAttribute("todoFallo");
+        }
+        if (modelo.getAttribute("esRecord") != null) {
+            todoFallo = (boolean) modelo.getAttribute("esRecord");
+        }
+
+        List<OpcionTituloTmp> opcTitulos;
+        List<OpcionInterpreteTmp> opcInterpretes;
+        List<OpcionAnyoTmp> opcAnyos;
+        if (!todoFallo) {
+            opcionesInvitado(modelo, partida);
+        } else {
+            opcTitulos = new ArrayList();
+            opcInterpretes = new ArrayList();
+            opcAnyos = new ArrayList();
+            modelo.addAttribute("opcTitulos", opcTitulos);
+            modelo.addAttribute("opcInterpretes", opcInterpretes);
+            modelo.addAttribute("opcAnyos", opcAnyos);
+        }
+        modelo.addAttribute("partidaInvitado", partida);
+
+        if (modelo.getAttribute("mensajeRespuesta") == null) {
+            modelo.addAttribute("mensajeRespuesta", "");
+        }
+        if (modelo.getAttribute("respuestaOK") == null) {
+            modelo.addAttribute("respuestaOK", true);
+        }
+        if (modelo.getAttribute("todoFallo") == null) {
+            modelo.addAttribute("todoFallo", false);
+        }
+        if (modelo.getAttribute("esRecord") == null) {
+            modelo.addAttribute("esRecord", false);
+        }      
+
+        return "PartidaInvitado";
+    }
+
+    @PostMapping("/partidaInvitado")
+    public String partidaInvitado(Model modelo,
+            @RequestParam("titulo") String titulo,
+            @RequestParam("interprete") String interprete,
+            @RequestParam("anyo") String anyo) {
+
+        Partida partida = (Partida) modelo.getAttribute("partidaInvitado");
+        if (partida == null) {
+            return "redirect:/";
+        }
+        ArrayList<String> mensajeRespuesta = new ArrayList();
+        boolean respuestaOK = false;
+        int fallos = 0;
+        boolean hasPerdido = false;
+        try {
+            Cancion cancion = (Cancion) modelo.getAttribute("cancionInvitado");
+
+            Optional<Cancion> canTit = servCancion.findById(Long.valueOf(titulo));
+            if (!cancion.getTitulo().equals(canTit.get().getTitulo())) {
+                mensajeRespuesta.add("El titulo correcto era "
+                        + cancion.getInterprete() + " tu respondiste " + canTit.get().getTitulo());
+                fallos = fallos + 1;
+            }
+            Optional<Cancion> canInt = servCancion.findById(Long.valueOf(interprete));
+            if (!cancion.getInterprete().equals(canInt.get().getInterprete())) {
+                mensajeRespuesta.add("El interprete correcto era "
+                        + cancion.getInterprete() + " tu respondiste " + canInt.get().getInterprete());
+                fallos = fallos + 1;
+            }
+            if (!anyo.equals(String.valueOf(cancion.getAnyo()))) {
+                mensajeRespuesta.add("El año correcto era "
+                        + String.valueOf(cancion.getAnyo()) + " tu respondiste " + anyo);
+                fallos = fallos + 1;
+            }
+            if (fallos == 0) {
+                mensajeRespuesta.add("Fantastico!!!! has acertado todo");
+                respuestaOK = true;
+            }
+            String img = cancion.getSpotifyimagen();
+            modelo.addAttribute("spotifyimagenTmp", img);
+
+        } catch (Exception ex) {
+            Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        modelo.addAttribute("mensajeRespuesta", mensajeRespuesta);
+        modelo.addAttribute("respuestaOK", respuestaOK);
+        modelo.addAttribute("todoFallo", hasPerdido);
+        return "redirect:/partidaInvitado";
     }
 
     private void resultadosPartida(Partida partidaSesion, Model modelo) {
@@ -1257,7 +1450,7 @@ public class ControladorVista {
     public String administracion(Model modelo) {
 
         Usuario usu = usuarioModelo(modelo);
-        if (usu == null) {
+        if (usu == null || !usu.isAdmin()) {
             return "redirect:/";
         }
 
@@ -1279,7 +1472,7 @@ public class ControladorVista {
     public String administracion(Model modelo, @ModelAttribute("filtroUsuarios") FiltroUsuarios filtro) {
 
         Usuario usu = usuarioModelo(modelo);
-        if (usu == null) {
+        if (usu == null || !usu.isAdmin()) {
             return "redirect:/";
         }
 
@@ -1293,7 +1486,7 @@ public class ControladorVista {
     public String accionesUsuarios(Model modelo, HttpServletRequest req) {
 
         Usuario usu = usuarioModelo(modelo);
-        if (usu == null) {
+        if (usu == null || !usu.isAdmin()) {
             return "redirect:/";
         }
 
@@ -1454,8 +1647,12 @@ public class ControladorVista {
     public String records(Model modelo) {
 
         Usuario usu = usuarioModelo(modelo);
+        Rol rol = null;
         if (usu == null) {
-            return "redirect:/";
+            rol = (Rol) modelo.getAttribute("rol");
+            if (!rol.equals(Rol.playhitsgame)) {
+                return "redirect:/";
+            }
         }
         ArrayList<Tema> temas = (ArrayList<Tema>) servTema.findAll();
 
@@ -1482,7 +1679,13 @@ public class ControladorVista {
             records.add(newObj);
         }
 
+        String volver = "/panel";
+        if (rol != null) {
+            volver = "/accesoInvitado";
+        }
+
         modelo.addAttribute("temas", records);
+        modelo.addAttribute("volver", volver);
 
         return "Records";
     }

@@ -127,7 +127,7 @@ public class Utilidades {
 
     }
 
-    private static List<Cancion> cancionesParaListaOpciones(List<Cancion> canciones,
+    public static List<Cancion> cancionesParaListaOpciones(List<Cancion> canciones,
             Cancion cancionCorrecta, int numero) {
 
         Map<Long, Cancion> lista = new HashMap();
@@ -153,7 +153,7 @@ public class Utilidades {
         return listaDesordenada;
     }
 
-    private static String encriptarString(String txt) {
+    public static String encriptarString(String txt) {
 
         // Subtituimos la mitad aleatoria de letras por *
         int x = txt.replace(" ", "").length() / 2;
@@ -302,6 +302,42 @@ public class Utilidades {
         }
 
         return opciones;
+    }
+    
+    public static List<String> opcionesAnyosCancionesInvitado(Cancion cancion, int anyoIni, int anyoFin) {
+
+        // de las canciones elije aleatoriamente que une a la correcta y 
+        // devuelve una lista con las canciones encriptadas
+        int anyoOk = cancion.getAnyo();
+        int[] anyos = new int[NUMERO_OPCIONES + 1];
+
+        for (int i = 1; i <= NUMERO_OPCIONES; i++) {
+            anyos[i] = (int) (Math.random() * (anyoFin - anyoIni)) + anyoIni;
+            for (int ii = 1; ii < i; ii++) {
+                if (anyos[i] == anyos[ii]) {
+                    i = i - 1;
+                    break;
+                }
+            }
+        }
+        boolean opOk = false;
+        for (int i = 1; i <= NUMERO_OPCIONES; i++) {
+            if (anyos[i] == anyoOk) {
+                opOk = true;
+                break;
+            }
+        }
+        // insertamos la correcta aleatoriamente entre las opciones
+        if (!opOk) {
+            int n = (int) (Math.random() * NUMERO_OPCIONES) + 1;
+            anyos[n] = anyoOk;
+        }
+        
+        ArrayList<String> listaAnyos = new ArrayList(); 
+        for (int i = 1; i <= NUMERO_OPCIONES; i++) 
+            listaAnyos.add(String.valueOf(anyos[i]));
+        
+        return listaAnyos;
     }
 
     public static String nombreServidor() {
