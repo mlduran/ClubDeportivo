@@ -15,6 +15,7 @@ let rol = document.getElementById("rol");
 let colEncabRespuestas = document.getElementById("cRespuestas");
 let colRespuestas = document.getElementById("respuestas");
 let colPreRespuestas = document.getElementById("preRespuestas");
+var touchstart = document.getElementById("touchstart").value;
 let mostrarRespuestas = 0;
 var stompClient = new StompJs.Client({
     brokerURL: dirSocket
@@ -281,21 +282,19 @@ document.addEventListener("keydown", function (event) {
 let lastTouchTime = 0;
 const doubleTapDelay = 1000; // 1 segundo
 
-document.addEventListener("touchstart", function (event) {
-    // Al tocar la pantalla inicio el play
+if (touchstart === 'true') {
+    document.addEventListener("touchstart", function (event) {
+        // Al tocar la pantalla inicio el play
+        event.preventDefault();
+        const currentTime = new Date().getTime(); // Tiempo actual
+        const timeSinceLastTouch = currentTime - lastTouchTime; // Diferencia entre el toque actual y el anterior
 
-    if (activarPlay.value === 'false')
-        return;
+        // Si el tiempo entre toques es menor a 1 segundo, se considera un doble toque
+        if (timeSinceLastTouch < doubleTapDelay && timeSinceLastTouch > 0) {
+            activarDesactivarPlay();
+        }
 
-    event.preventDefault();
-    const currentTime = new Date().getTime(); // Tiempo actual
-    const timeSinceLastTouch = currentTime - lastTouchTime; // Diferencia entre el toque actual y el anterior
-
-    // Si el tiempo entre toques es menor a 1 segundo, se considera un doble toque
-    if (timeSinceLastTouch < doubleTapDelay && timeSinceLastTouch > 0) {
-        activarDesactivarPlay();
-    }
-
-    // Actualizar el tiempo del último toque
-    lastTouchTime = currentTime;
-});
+        // Actualizar el tiempo del último toque
+        lastTouchTime = currentTime;
+    });
+}

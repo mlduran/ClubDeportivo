@@ -18,8 +18,9 @@ var verificacion = document.getElementById('verificacion');
 verificacion.style.display = 'table-cell';
 var respOk = document.getElementById('respuestaOK');
 var todoFallo = document.getElementById('todoFallo');
+var todoFallo = document.getElementById('todoFallo');
 
-var reproductor = document.getElementById("reproductor");
+var touchstart = document.getElementById("touchstart").value;
 
 async function enviarRespuestas() {
 
@@ -81,7 +82,7 @@ window.addEventListener('load', function () {
         verificacion.style.backgroundColor = "orange";
     }
     if (todoFallo.value === 'false')
-        ocultarResultado();   
+        ocultarResultado();
 
 });
 
@@ -107,18 +108,19 @@ document.addEventListener("keydown", function (event) {
 let lastTouchTime = 0;
 const doubleTapDelay = 500; // medio segundo
 
-document.addEventListener("touchstart", function (event) {
-    // Al tocar la pantalla inicio el play
-    event.preventDefault();
-    const currentTime = new Date().getTime(); // Tiempo actual
-    const timeSinceLastTouch = currentTime - lastTouchTime; // Diferencia entre el toque actual y el anterior
+if (touchstart === 'true') {
+    document.addEventListener("touchstart", function (event) {
+        // Al tocar la pantalla inicio el play
+        event.preventDefault();
+        const currentTime = new Date().getTime(); // Tiempo actual
+        const timeSinceLastTouch = currentTime - lastTouchTime; // Diferencia entre el toque actual y el anterior
 
-    // Si el tiempo entre toques es menor a 1 segundo, se considera un doble toque
-    if (timeSinceLastTouch < doubleTapDelay && timeSinceLastTouch > 0) {
-        activarDesactivarPlay();
-    }
+        // Si el tiempo entre toques es menor a 1 segundo, se considera un doble toque
+        if (timeSinceLastTouch < doubleTapDelay && timeSinceLastTouch > 0) {
+            activarDesactivarPlay();
+        }
 
-    // Actualizar el tiempo del último toque
-    lastTouchTime = currentTime;
-});
-
+        // Actualizar el tiempo del último toque
+        lastTouchTime = currentTime;
+    });
+}

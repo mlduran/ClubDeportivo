@@ -73,6 +73,12 @@ public class Usuario {
             inverseJoinColumns = @JoinColumn(name = "partida_id", referencedColumnName = "id")
     )
     private List<Partida> partidasInvitado;
+    
+    public boolean isTouchstart(){
+        // Esto modificarlo cuando ponga las opciones en la pantalla
+        
+        return false;
+    }    
 
     public String getActivoTxt() {
 
