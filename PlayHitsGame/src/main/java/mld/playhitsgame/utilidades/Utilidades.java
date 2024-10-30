@@ -552,5 +552,30 @@ public class Utilidades {
         // Similaridad: 1 - (Distancia de Levenshtein / Longitud máxima de las dos cadenas)
         return 1.0 - (double) distanciaLevenshtein / maxLen;
     }
+    
+    public static String ejecutarComando(String comando) {
+    StringBuilder resultado = new StringBuilder();
+
+    try {
+        ProcessBuilder builder = new ProcessBuilder();
+        builder.command("bash", "-c", comando);
+        Process process = builder.start();
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String linea;
+        while ((linea = reader.readLine()) != null) {
+            resultado.append(linea).append("\n");
+        }
+        
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+            throw new RuntimeException("Error al ejecutar el comando: " + comando);
+        }
+
+    } catch (IOException | InterruptedException | RuntimeException e) {
+    }
+
+    return resultado.toString();
+}
 
 }

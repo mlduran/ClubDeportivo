@@ -4,6 +4,7 @@
  */
 package mld.playhitsgame.web;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
@@ -28,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import mld.playhitsgame.correo.EmailServicioMetodos;
 import mld.playhitsgame.correo.Mail;
 import mld.playhitsgame.exemplars.Cancion;
+import mld.playhitsgame.exemplars.Config;
 import mld.playhitsgame.exemplars.Dificultad;
 import mld.playhitsgame.exemplars.FiltroCanciones;
 import mld.playhitsgame.exemplars.FiltroUsuarios;
@@ -55,6 +57,7 @@ import mld.playhitsgame.exemplars.PuntuacionTMP;
 import mld.playhitsgame.exemplars.TipoPartida;
 import mld.playhitsgame.seguridad.Roles;
 import mld.playhitsgame.seguridad.UsuarioRol;
+import mld.playhitsgame.services.ConfigServicioMetodos;
 import mld.playhitsgame.services.OpcionAnyoTmpServicioMetodos;
 import mld.playhitsgame.services.OpcionInterpreteTmpServicioMetodos;
 import mld.playhitsgame.services.OpcionTituloTmpServicioMetodos;
@@ -93,6 +96,9 @@ public class ControladorVista {
     @Value("${custom.invitados}")
     private String invitadosON;
 
+    @Value("${custom.mailadmin}")
+    private String mailAdmin;
+
     private final int[] NUMERO_RONDAS = {10, 15, 20, 25, 30};
     private final int SEG_PARA_INICIO_RESPUESTA = 15;
 
@@ -123,7 +129,31 @@ public class ControladorVista {
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
-    EmailServicioMetodos servMail;
+    EmailServicioMetodos servMail;    
+    @Autowired
+    ConfigServicioMetodos servConfig;
+    
+    @PostConstruct
+    public void init() {
+        // Código a ejecutar al arrancar la aplicación
+        System.out.println("Aplicación iniciada (PostConstruct). Ejecutando tareas de inicio...");
+        
+        String ipRouterConfigurada = servConfig.getSettings().getIpRouter();
+        System.out.print("IP Router Configurada : " + ipRouterConfigurada);
+        
+        String ipRouterActual = Utilidades.ejecutarComando("curl ifconfig.me");
+        System.out.print("IP Router Actual : " + ipRouterActual);
+        
+        if (!ipRouterConfigurada.equals(ipRouterActual)){
+            Config newConfig = new Config();
+            newConfig.setIpRouter(ipRouterActual);
+            servConfig.saveSettings(newConfig);
+            enviarMail(mailAdmin, "", "Cambio de IP Router", 
+                    "Se modifica la IP de " + ipRouterConfigurada + " a " + ipRouterActual, "Correo");
+            
+        }       
+        
+    }
 
     private String urlSpotify() {
 
@@ -811,15 +841,19 @@ public class ControladorVista {
         return "AltaUsuarioAdm";
     }
 
-    private boolean enviarMail(Usuario usuario, String asunto, String txt, String plantilla) {
+    private boolean enviarMail(Usuario usuario, String asunto, String txt, String plantilla) {        
+        return enviarMail(usuario.getUsuario(), usuario.getNombre(), asunto, txt, plantilla);
+    }
+    
+    public boolean enviarMail(String mailDestino, String nombre, String asunto, String txt, String plantilla) {
         boolean ok = true;
         Mail mail = new Mail();
         try {
             mail.setAsunto(asunto);
-            mail.setDestinatario(usuario.getUsuario());
+            mail.setDestinatario(mailDestino);
             mail.setMensaje(txt);
             mail.setPlantilla(plantilla);
-            mail.setNombre(usuario.getNombre());
+            mail.setNombre(nombre);
             servMail.enviarCorreo(mail);
         } catch (MessagingException | MailSendException ex) {
             ok = false;
@@ -1465,6 +1499,8 @@ public class ControladorVista {
         if (usu == null || !usu.isAdmin()) {
             return "redirect:/logout";
         }
+        
+        modelo.addAttribute("ipRouter", servConfig.getSettings().getIpRouter());
 
         FiltroUsuarios filtro;
         if (modelo.getAttribute("filtroUsuarios") == null) {
@@ -1487,8 +1523,11 @@ public class ControladorVista {
         if (usu == null || !usu.isAdmin()) {
             return "redirect:/logout";
         }
+        
+        
+        modelo.addAttribute("ipRouter", servConfig.getSettings().getIpRouter());
 
-        List<Usuario> usuarios = servUsuario.findByFiltroBasico(filtro);
+        List<Usuario> usuarios = servUsuario.findByFiltroBasico(filtro);        
         modelo.addAttribute("usuarios", usuarios);
 
         return "Administracion";

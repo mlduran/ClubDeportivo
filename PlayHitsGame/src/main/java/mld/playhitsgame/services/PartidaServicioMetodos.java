@@ -21,14 +21,11 @@ public class PartidaServicioMetodos implements PartidaServicio{
     @Override
     public List<Partida> findAll() {
         return DAO.findAll();
-    }
-        
-   
+    }   
         
     @Override
     public Optional<Partida> findById(Long id) {
-        return DAO.findById(id);
-        
+        return DAO.findById(id);        
     }
 
     @Override
