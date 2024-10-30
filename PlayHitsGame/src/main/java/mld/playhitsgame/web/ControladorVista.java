@@ -195,8 +195,20 @@ public class ControladorVista {
 
     @GetMapping("/logout")
     public String logout(Model modelo) {
-        modelo.addAttribute("id_usuarioSesion", "");
-        modelo.addAttribute("id_partidaSesion", "");
+        modelo.addAttribute("invitadosON", invitadosON);
+        modelo.addAttribute("id_usuarioSesion", null);
+        modelo.addAttribute("id_partidaSesion", null);
+        modelo.addAttribute("posiblesinvitados", null);
+        modelo.addAttribute("rol", null);
+        modelo.addAttribute("filtroUsuarios", null);
+        modelo.addAttribute("mensajeRespuesta", null);
+        modelo.addAttribute("respuestaOK", null);
+        modelo.addAttribute("todoFallo", null);
+        modelo.addAttribute("esRecord", null);
+        modelo.addAttribute("partidaInvitado", null);
+        modelo.addAttribute("cancionInvitado", null);
+        modelo.addAttribute("spotifyimagenTmp", null);
+        
         return "Inicio";
     }
 
@@ -250,7 +262,7 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         if (usu.isAdmin()) {
@@ -268,7 +280,7 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
         modelo.addAttribute("rol", Rol.master);
         Partida partida = usu.partidaMasterEnCurso();
@@ -281,7 +293,7 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
         modelo.addAttribute("rol", Rol.invitado);
 
@@ -299,7 +311,7 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
         informarPartidaModelo(modelo, partida);
         if (partida == null) {
@@ -394,7 +406,7 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
         informarUsuarioModelo(modelo, usu);
 
@@ -484,7 +496,7 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
         Partida partida = partidaModelo(modelo);
         if (partida == null) {
@@ -548,7 +560,7 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
         Partida partida = partidaModelo(modelo);
         if (partida == null) {
@@ -676,7 +688,7 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         modelo.addAttribute("newusuario", new Usuario());
@@ -840,7 +852,7 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         try {
@@ -861,7 +873,7 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
         informarUsuarioModelo(modelo, usu);
         return "ModificarUsuario";
@@ -943,7 +955,7 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         Partida newPartida = new Partida();
@@ -965,7 +977,7 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         Partida newPartida = new Partida();
@@ -1174,7 +1186,7 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
         if (partida.isTipoGrupo()) {
             return crearPartidaGrupo(partida, modelo, req, usu);
@@ -1259,7 +1271,7 @@ public class ControladorVista {
         Partida partida = (Partida) modelo.getAttribute("partidaInvitado");
 
         if (partida == null) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         boolean todoFallo = false;
@@ -1309,7 +1321,7 @@ public class ControladorVista {
 
         Partida partida = (Partida) modelo.getAttribute("partidaInvitado");
         if (partida == null) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
         ArrayList<String> mensajeRespuesta = new ArrayList();
         boolean respuestaOK = false;
@@ -1387,7 +1399,7 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         Partida partidaSesion = null;
@@ -1412,7 +1424,7 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
         informarUsuarioModelo(modelo, usu);
         Partida partidaSesion = null;
@@ -1451,7 +1463,7 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null || !usu.isAdmin()) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         FiltroUsuarios filtro;
@@ -1473,7 +1485,7 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null || !usu.isAdmin()) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         List<Usuario> usuarios = servUsuario.findByFiltroBasico(filtro);
@@ -1487,7 +1499,7 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null || !usu.isAdmin()) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         String activo = req.getParameter("activo");
@@ -1552,7 +1564,7 @@ public class ControladorVista {
             if (passwordEncoder.matches(usuario.getUsuario(), token)) {
                 usuario.setActivo(true);
                 servUsuario.update(id, usuario);
-                return "redirect:/";
+                return "redirect:/logout";
             } else {
                 return "error";
             }
@@ -1651,7 +1663,7 @@ public class ControladorVista {
         if (usu == null) {
             rol = (Rol) modelo.getAttribute("rol");
             if (!rol.equals(Rol.playhitsgame)) {
-                return "redirect:/";
+                return "redirect:/logout";
             }
         }
         ArrayList<Tema> temas = (ArrayList<Tema>) servTema.findAll();
@@ -1703,7 +1715,7 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         List<PuntuacionTMP> pts = new ArrayList();

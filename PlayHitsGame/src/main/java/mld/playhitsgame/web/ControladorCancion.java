@@ -62,7 +62,7 @@ public class ControladorCancion {
     public String listaCanciones(Model model) {
 
         if (!usuarioCorrecto(model)) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         List<Cancion> lista = servCancion.findAll();
@@ -95,7 +95,7 @@ public class ControladorCancion {
     public String altaCancion(Model modelo) {
 
         if (!usuarioCorrecto(modelo)) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
         modelo.addAttribute("newcancion", new Cancion());
         return "AltaCancion";
@@ -105,7 +105,7 @@ public class ControladorCancion {
     public String altaCancion(@ModelAttribute("newcancion") Cancion cancion, Model modelo) {
 
         if (!usuarioCorrecto(modelo)) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         String resp = "OK";
@@ -125,7 +125,7 @@ public class ControladorCancion {
     public String modificarCancion(@ModelAttribute("id") Long id, Model modelo) {
 
         if (!usuarioCorrecto(modelo)) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         Optional<Cancion> cancion = servCancion.findById(id);
@@ -139,7 +139,7 @@ public class ControladorCancion {
     public String modificarCancion(@ModelAttribute("cancion") Cancion cancion, Model modelo) {
 
         if (!usuarioCorrecto(modelo)) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         String resp = "OK";
@@ -160,7 +160,7 @@ public class ControladorCancion {
     public String modificarTema(@ModelAttribute("id") Long id, Model modelo) {
 
         if (!usuarioCorrecto(modelo)) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         Optional<Tema> tema = servTema.findById(id);
@@ -172,7 +172,7 @@ public class ControladorCancion {
     public String modificarCancion(@ModelAttribute("tema") Tema tema, Model modelo) {
 
         if (!usuarioCorrecto(modelo)) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         String resp = "OK";
@@ -192,7 +192,7 @@ public class ControladorCancion {
     public String eliminarCancion(@ModelAttribute("id") Long id, Model modelo) {
 
         if (!usuarioCorrecto(modelo)) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         servCancion.deleteCancion(id);
@@ -203,7 +203,7 @@ public class ControladorCancion {
     public String eliminarTema(@ModelAttribute("id") Long id, Model modelo) {
 
         if (!usuarioCorrecto(modelo)) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         Optional<Tema> tema = servTema.findById(id);
@@ -254,7 +254,7 @@ public class ControladorCancion {
     public String revisionCanciones(Model modelo) {
 
         if (!usuarioCorrecto(modelo)) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
         temasBD(modelo);
         gestionCanciones(modelo);
@@ -265,7 +265,7 @@ public class ControladorCancion {
     public String corregirDuplicados(Model modelo) {
 
         if (!usuarioCorrecto(modelo)) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
         
         FiltroCanciones filtro;
@@ -299,7 +299,7 @@ public class ControladorCancion {
     public String editarCanciones(Model modelo) {
 
         if (!usuarioCorrecto(modelo)) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
         gestionCanciones(modelo);
         return "EditarCanciones";
@@ -309,7 +309,7 @@ public class ControladorCancion {
     public String editarCanciones(Model modelo, HttpServletRequest req) {
 
         if (!usuarioCorrecto(modelo)) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         FiltroCanciones filtro = (FiltroCanciones) modelo.getAttribute("filtroCanciones");
@@ -343,7 +343,7 @@ public class ControladorCancion {
     public String exportarCanciones(Model modelo) {
 
         if (!usuarioCorrecto(modelo)) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         gestionCanciones(modelo);
@@ -360,7 +360,7 @@ public class ControladorCancion {
     public String revisionTemas(Model modelo) {
 
         if (!usuarioCorrecto(modelo)) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
         ArrayList<Tema> temas = (ArrayList<Tema>) servTema.findAll();
         modelo.addAttribute("temas", temas);
@@ -372,7 +372,7 @@ public class ControladorCancion {
     public String revisionCanciones(Model modelo, @ModelAttribute("filtroCanciones") FiltroCanciones filtro) {
 
         if (!usuarioCorrecto(modelo)) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
         temasBD(modelo);
         List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);
@@ -390,7 +390,7 @@ public class ControladorCancion {
     public String marcarRevision(Model modelo, HttpServletRequest req) {
 
         if (!usuarioCorrecto(modelo)) {
-            return "redirect:/";
+            return "redirect:/logout";
         }
 
         String opVerificar = req.getParameter("actualizarVerificar");
