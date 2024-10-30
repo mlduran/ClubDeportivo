@@ -196,18 +196,18 @@ public class ControladorVista {
     @GetMapping("/logout")
     public String logout(Model modelo) {
         modelo.addAttribute("invitadosON", invitadosON);
-        modelo.addAttribute("id_usuarioSesion", null);
-        modelo.addAttribute("id_partidaSesion", null);
-        modelo.addAttribute("posiblesinvitados", null);
-        modelo.addAttribute("rol", null);
-        modelo.addAttribute("filtroUsuarios", null);
-        modelo.addAttribute("mensajeRespuesta", null);
-        modelo.addAttribute("respuestaOK", null);
-        modelo.addAttribute("todoFallo", null);
-        modelo.addAttribute("esRecord", null);
-        modelo.addAttribute("partidaInvitado", null);
-        modelo.addAttribute("cancionInvitado", null);
-        modelo.addAttribute("spotifyimagenTmp", null);
+        modelo.addAttribute("id_usuarioSesion", "");
+        modelo.addAttribute("id_partidaSesion", "");
+        modelo.addAttribute("posiblesinvitados", "");
+        modelo.addAttribute("rol", "");
+        modelo.addAttribute("filtroUsuarios", "");
+        modelo.addAttribute("mensajeRespuesta", "");
+        modelo.addAttribute("respuestaOK", "");
+        modelo.addAttribute("todoFallo", "");
+        modelo.addAttribute("esRecord", "");
+        modelo.addAttribute("partidaInvitado", "");
+        modelo.addAttribute("cancionInvitado", "");
+        modelo.addAttribute("spotifyimagenTmp", "");
         
         return "Inicio";
     }
@@ -216,7 +216,7 @@ public class ControladorVista {
     public String accesoInvitado(Model modelo) {
 
         modelo.addAttribute("rol", Rol.playhitsgame);
-        modelo.addAttribute("spotifyimagenTmp", null);
+        modelo.addAttribute("spotifyimagenTmp", "");
         return "PanelInvitado";
     }
 
@@ -270,7 +270,7 @@ public class ControladorVista {
         }
         informarUsuarioModelo(modelo, usu);
         modelo.addAttribute("serverWebsocket", this.serverWebsocket);
-        modelo.addAttribute("spotifyimagenTmp", null);
+        modelo.addAttribute("spotifyimagenTmp", "");
 
         return "Panel";
     }
@@ -592,19 +592,6 @@ public class ControladorVista {
                         + String.valueOf(cancion.getAnyo()) + " tu respondiste " + anyo);
                 fallos = fallos + 1;
             }
-            Optional<Cancion> canInt = servCancion.findById(Long.valueOf(interprete));
-            if (canInt.isPresent()) {
-                resp.setInterprete(canInt.get().getInterprete());
-                ptsInterp = Utilidades.calcularPtsPorInterprete(
-                        canInt.get().getInterprete(), cancion, partida.getDificultad());
-                if (ptsInterp > 0) {
-                    resp.setInterpreteOk(true);
-                } else {
-                    mensajeRespuesta.add("El interprete correcto era "
-                            + cancion.getInterprete() + " tu respondiste " + canInt.get().getInterprete());
-                    fallos = fallos + 1;
-                }
-            }
             Optional<Cancion> canTit = servCancion.findById(Long.valueOf(titulo));
             if (canTit.isPresent()) {
                 resp.setTitulo(canTit.get().getTitulo());
@@ -618,6 +605,19 @@ public class ControladorVista {
                     fallos = fallos + 1;
                 }
             }
+            Optional<Cancion> canInt = servCancion.findById(Long.valueOf(interprete));
+            if (canInt.isPresent()) {
+                resp.setInterprete(canInt.get().getInterprete());
+                ptsInterp = Utilidades.calcularPtsPorInterprete(
+                        canInt.get().getInterprete(), cancion, partida.getDificultad());
+                if (ptsInterp > 0) {
+                    resp.setInterpreteOk(true);
+                } else {
+                    mensajeRespuesta.add("El interprete correcto era "
+                            + cancion.getInterprete() + " tu respondiste " + canInt.get().getInterprete());
+                    fallos = fallos + 1;
+                }
+            }            
             if ((partida.getDificultad().equals(Dificultad.Dificil) && fallos > 0)
                     || (partida.getDificultad().equals(Dificultad.Normal) && fallos > 1)
                     || (partida.getDificultad().equals(Dificultad.Facil) && fallos > 2)) {
@@ -1198,7 +1198,7 @@ public class ControladorVista {
             return crearPartidaPersonal(partida, modelo, req, usu);
         }
         modelo.addAttribute("result", "Error en el tipo de partida");
-        modelo.addAttribute("spotifyimagenTmp", null);
+        modelo.addAttribute("spotifyimagenTmp", "");
         return "CrearPartida";
 
     }
@@ -1222,7 +1222,7 @@ public class ControladorVista {
         }
 
         modelo.addAttribute("partidaInvitado", partida);
-        modelo.addAttribute("spotifyimagenTmp", null);
+        modelo.addAttribute("spotifyimagenTmp", "");
 
         return "redirect:/partidaInvitado";
 
@@ -1333,7 +1333,7 @@ public class ControladorVista {
             Optional<Cancion> canTit = servCancion.findById(Long.valueOf(titulo));
             if (!cancion.getTitulo().equals(canTit.get().getTitulo())) {
                 mensajeRespuesta.add("El titulo correcto era "
-                        + cancion.getInterprete() + " tu respondiste " + canTit.get().getTitulo());
+                        + cancion.getTitulo()+ " tu respondiste " + canTit.get().getTitulo());
                 fallos = fallos + 1;
             }
             Optional<Cancion> canInt = servCancion.findById(Long.valueOf(interprete));
