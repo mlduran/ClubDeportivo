@@ -136,32 +136,32 @@ public class ControladorVista {
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
-    EmailServicioMetodos servMail;    
+    EmailServicioMetodos servMail;
     @Autowired
     ConfigServicioMetodos servConfig;
     @Autowired
     RegistroServicioMetodos servRegistro;
-    
+
     @PostConstruct
     public void init() {
         // Código a ejecutar al arrancar la aplicación
         System.out.println("Aplicación iniciada (PostConstruct). Ejecutando tareas de inicio...");
-        
+
         String ipRouterConfigurada = servConfig.getSettings().getIpRouter();
         System.out.print("IP Router Configurada : " + ipRouterConfigurada);
-        
+
         String ipRouterActual = Utilidades.ejecutarComando("curl ifconfig.me");
         System.out.print("IP Router Actual : " + ipRouterActual);
-        
-        if (!ipRouterConfigurada.equals(ipRouterActual)){
+
+        if (!ipRouterConfigurada.equals(ipRouterActual)) {
             Config newConfig = new Config();
             newConfig.setIpRouter(ipRouterActual);
             servConfig.saveSettings(newConfig);
-            enviarMail(mailAdmin, "", "Cambio de IP Router", 
+            enviarMail(mailAdmin, "", "Cambio de IP Router",
                     "Se modifica la IP de " + ipRouterConfigurada + " a " + ipRouterActual, "Correo");
-            
-        }       
-        
+
+        }
+
     }
 
     private String urlSpotify() {
@@ -226,9 +226,22 @@ public class ControladorVista {
         modelo.addAttribute("id_partidaSesion", partida.getId());
     }
 
+    private String ipCliente(HttpServletRequest request) {
+
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("X-Real-IP");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        
+        return ip;
+    }
+
     @GetMapping("/")
     public String inicio(Model modelo, HttpServletRequest request) {
-        servRegistro.registrar(TipoRegistro.Visita, request.getRemoteAddr());
+        servRegistro.registrar(TipoRegistro.Visita, ipCliente(request));
         modelo.addAttribute("invitadosON", invitadosON);
         return "Inicio";
     }
@@ -248,7 +261,7 @@ public class ControladorVista {
         modelo.addAttribute("partidaInvitado", null);
         modelo.addAttribute("cancionInvitado", null);
         modelo.addAttribute("spotifyimagenTmp", null);
-        
+
         return "Inicio";
     }
 
@@ -293,7 +306,7 @@ public class ControladorVista {
             }
             modelo.addAttribute("id_usuarioSesion", usuarioSesion.getId());
             informarUsuarioModelo(modelo, usuarioSesion);
-            servRegistro.registrar(TipoRegistro.Login, request.getRemoteAddr(), usuarioSesion.getUsuario());
+            servRegistro.registrar(TipoRegistro.Login, ipCliente(request), usuarioSesion.getUsuario());
             return "redirect:/panel";
         }
     }
@@ -658,7 +671,7 @@ public class ControladorVista {
                             + cancion.getInterprete() + " tu respondiste " + canInt.get().getInterprete());
                     fallos = fallos + 1;
                 }
-            }            
+            }
             if ((partida.getDificultad().equals(Dificultad.Dificil) && fallos > 0)
                     || (partida.getDificultad().equals(Dificultad.Normal) && fallos > 1)
                     || (partida.getDificultad().equals(Dificultad.Facil) && fallos > 2)) {
@@ -705,7 +718,7 @@ public class ControladorVista {
                 boolean esRecord = finalizarPartidaPersonal(partida, usu);
                 modelo.addAttribute("esRecord", esRecord);
             }
-            
+
             modelo.addAttribute("spotifyimagenTmp", cancion.getSpotifyimagen());
 
         } catch (Exception ex) {
@@ -852,10 +865,10 @@ public class ControladorVista {
         return "AltaUsuarioAdm";
     }
 
-    private boolean enviarMail(Usuario usuario, String asunto, String txt, String plantilla) {        
+    private boolean enviarMail(Usuario usuario, String asunto, String txt, String plantilla) {
         return enviarMail(usuario.getUsuario(), usuario.getNombre(), asunto, txt, plantilla);
     }
-    
+
     public boolean enviarMail(String mailDestino, String nombre, String asunto, String txt, String plantilla) {
         boolean ok = true;
         Mail mail = new Mail();
@@ -1269,8 +1282,8 @@ public class ControladorVista {
         modelo.addAttribute("partidaInvitado", partida);
         modelo.addAttribute("spotifyimagenTmp", "");
 
-        servRegistro.registrar(TipoRegistro.Invitado, req.getRemoteAddr());
-        
+        servRegistro.registrar(TipoRegistro.Invitado, ipCliente(req));
+
         return "redirect:/partidaInvitado";
 
     }
@@ -1355,7 +1368,7 @@ public class ControladorVista {
         }
         if (modelo.getAttribute("esRecord") == null) {
             modelo.addAttribute("esRecord", false);
-        }      
+        }
 
         return "PartidaInvitado";
     }
@@ -1380,7 +1393,7 @@ public class ControladorVista {
             Optional<Cancion> canTit = servCancion.findById(Long.valueOf(titulo));
             if (!cancion.getTitulo().equals(canTit.get().getTitulo())) {
                 mensajeRespuesta.add("El titulo correcto era "
-                        + cancion.getTitulo()+ " tu respondiste " + canTit.get().getTitulo());
+                        + cancion.getTitulo() + " tu respondiste " + canTit.get().getTitulo());
                 fallos = fallos + 1;
             }
             Optional<Cancion> canInt = servCancion.findById(Long.valueOf(interprete));
@@ -1512,7 +1525,7 @@ public class ControladorVista {
         if (usu == null || !usu.isAdmin()) {
             return "redirect:/logout";
         }
-        
+
         modelo.addAttribute("ipRouter", servConfig.getSettings().getIpRouter());
 
         FiltroUsuarios filtro;
@@ -1536,11 +1549,10 @@ public class ControladorVista {
         if (usu == null || !usu.isAdmin()) {
             return "redirect:/logout";
         }
-        
-        
+
         modelo.addAttribute("ipRouter", servConfig.getSettings().getIpRouter());
 
-        List<Usuario> usuarios = servUsuario.findByFiltroBasico(filtro);        
+        List<Usuario> usuarios = servUsuario.findByFiltroBasico(filtro);
         modelo.addAttribute("usuarios", usuarios);
 
         return "Administracion";
@@ -1796,22 +1808,21 @@ public class ControladorVista {
 
         return "PuntuacionesTema";
     }
-   
 
     @GetMapping("/registro")
     public String registro(Model modelo,
             @RequestParam(name = "page", defaultValue = "0") int page
-    ){
-        
+    ) {
+
         Usuario usu = usuarioModelo(modelo);
         if (usu == null || !usu.isAdmin()) {
             return "redirect:/logout";
         }
-        
+
         int tamano = REG_POR_PAG; // Número de registros por página
         Page<Registro> obtenerRegistrosPaginados = servRegistro.obtenerRegistrosPaginados(page, tamano);
         modelo.addAttribute("registros", obtenerRegistrosPaginados);
-        
+
         return "Registro";
     }
 }
