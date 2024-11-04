@@ -54,7 +54,9 @@ import mld.playhitsgame.exemplars.OpcionTituloTmp;
 import mld.playhitsgame.exemplars.PtsUsuario;
 import mld.playhitsgame.exemplars.Puntuacion;
 import mld.playhitsgame.exemplars.PuntuacionTMP;
+import mld.playhitsgame.exemplars.Registro;
 import mld.playhitsgame.exemplars.TipoPartida;
+import mld.playhitsgame.exemplars.TipoRegistro;
 import mld.playhitsgame.seguridad.Roles;
 import mld.playhitsgame.seguridad.UsuarioRol;
 import mld.playhitsgame.services.ConfigServicioMetodos;
@@ -62,10 +64,14 @@ import mld.playhitsgame.services.OpcionAnyoTmpServicioMetodos;
 import mld.playhitsgame.services.OpcionInterpreteTmpServicioMetodos;
 import mld.playhitsgame.services.OpcionTituloTmpServicioMetodos;
 import mld.playhitsgame.services.PuntuacionServicioMetodos;
+import mld.playhitsgame.services.RegistroServicioMetodos;
 import mld.playhitsgame.services.UsuarioRolServicioMetodos;
 import mld.playhitsgame.utilidades.Utilidades;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.mail.MailSendException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -101,6 +107,7 @@ public class ControladorVista {
 
     private final int[] NUMERO_RONDAS = {10, 15, 20, 25, 30};
     private final int SEG_PARA_INICIO_RESPUESTA = 15;
+    private final int REG_POR_PAG = 100;
 
     private String urlLoginSpotify;
 
@@ -132,6 +139,8 @@ public class ControladorVista {
     EmailServicioMetodos servMail;    
     @Autowired
     ConfigServicioMetodos servConfig;
+    @Autowired
+    RegistroServicioMetodos servRegistro;
     
     @PostConstruct
     public void init() {
@@ -218,7 +227,8 @@ public class ControladorVista {
     }
 
     @GetMapping("/")
-    public String inicio(Model modelo) {
+    public String inicio(Model modelo, HttpServletRequest request) {
+        servRegistro.registrar(TipoRegistro.Visita, request.getRemoteAddr());
         modelo.addAttribute("invitadosON", invitadosON);
         return "Inicio";
     }
@@ -226,18 +236,18 @@ public class ControladorVista {
     @GetMapping("/logout")
     public String logout(Model modelo) {
         modelo.addAttribute("invitadosON", invitadosON);
-        modelo.addAttribute("id_usuarioSesion", "");
-        modelo.addAttribute("id_partidaSesion", "");
-        modelo.addAttribute("posiblesinvitados", "");
-        modelo.addAttribute("rol", "");
-        modelo.addAttribute("filtroUsuarios", "");
+        modelo.addAttribute("id_usuarioSesion", null);
+        modelo.addAttribute("id_partidaSesion", null);
+        modelo.addAttribute("posiblesinvitados", null);
+        modelo.addAttribute("rol", null);
+        modelo.addAttribute("filtroUsuarios", null);
         modelo.addAttribute("mensajeRespuesta", "");
-        modelo.addAttribute("respuestaOK", "");
-        modelo.addAttribute("todoFallo", "");
-        modelo.addAttribute("esRecord", "");
-        modelo.addAttribute("partidaInvitado", "");
-        modelo.addAttribute("cancionInvitado", "");
-        modelo.addAttribute("spotifyimagenTmp", "");
+        modelo.addAttribute("respuestaOK", null);
+        modelo.addAttribute("todoFallo", null);
+        modelo.addAttribute("esRecord", null);
+        modelo.addAttribute("partidaInvitado", null);
+        modelo.addAttribute("cancionInvitado", null);
+        modelo.addAttribute("spotifyimagenTmp", null);
         
         return "Inicio";
     }
@@ -252,7 +262,7 @@ public class ControladorVista {
 
     @PostMapping("/login")
     public String login(@ModelAttribute("elUsuario") String elUsuario,
-            @ModelAttribute("laContrasenya") String laContrasenya, Model modelo) {
+            @ModelAttribute("laContrasenya") String laContrasenya, Model modelo, HttpServletRequest request) {
 
         //String passEncrip = passwordEncoder.encode(laContrasenya);       
         //Optional<Usuario> usuLogin = servUsuario.usuarioLogin(elUsuario, passEncrip);
@@ -283,6 +293,7 @@ public class ControladorVista {
             }
             modelo.addAttribute("id_usuarioSesion", usuarioSesion.getId());
             informarUsuarioModelo(modelo, usuarioSesion);
+            servRegistro.registrar(TipoRegistro.Login, request.getRemoteAddr(), usuarioSesion.getUsuario());
             return "redirect:/panel";
         }
     }
@@ -1258,6 +1269,8 @@ public class ControladorVista {
         modelo.addAttribute("partidaInvitado", partida);
         modelo.addAttribute("spotifyimagenTmp", "");
 
+        servRegistro.registrar(TipoRegistro.Invitado, req.getRemoteAddr());
+        
         return "redirect:/partidaInvitado";
 
     }
@@ -1782,7 +1795,23 @@ public class ControladorVista {
         modelo.addAttribute("pts", pts);
 
         return "PuntuacionesTema";
-
     }
+   
 
+    @GetMapping("/registro")
+    public String registro(Model modelo,
+            @RequestParam(name = "page", defaultValue = "0") int page
+    ){
+        
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null || !usu.isAdmin()) {
+            return "redirect:/logout";
+        }
+        
+        int tamano = REG_POR_PAG; // Número de registros por página
+        Page<Registro> obtenerRegistrosPaginados = servRegistro.obtenerRegistrosPaginados(page, tamano);
+        modelo.addAttribute("registros", obtenerRegistrosPaginados);
+        
+        return "Registro";
+    }
 }

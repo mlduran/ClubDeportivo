@@ -10,7 +10,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -30,6 +32,7 @@ import mld.playhitsgame.exemplars.Ronda;
 import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.exemplars.Usuario;
 import org.apache.commons.text.similarity.LevenshteinDistance;
+import org.json.JSONObject;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -303,7 +306,7 @@ public class Utilidades {
 
         return opciones;
     }
-    
+
     public static List<String> opcionesAnyosCancionesInvitado(Cancion cancion, int anyoIni, int anyoFin) {
 
         // de las canciones elije aleatoriamente que une a la correcta y 
@@ -332,11 +335,12 @@ public class Utilidades {
             int n = (int) (Math.random() * NUMERO_OPCIONES) + 1;
             anyos[n] = anyoOk;
         }
-        
-        ArrayList<String> listaAnyos = new ArrayList(); 
-        for (int i = 1; i <= NUMERO_OPCIONES; i++) 
+
+        ArrayList<String> listaAnyos = new ArrayList();
+        for (int i = 1; i <= NUMERO_OPCIONES; i++) {
             listaAnyos.add(String.valueOf(anyos[i]));
-        
+        }
+
         return listaAnyos;
     }
 
@@ -529,12 +533,12 @@ public class Utilidades {
             } else if (isModificar) {
                 HashSet<Tema> temas = new HashSet();
                 for (Cancion canDuplicada : grupo) {
-                    temas.addAll(canDuplicada.getTematicas());                    
+                    temas.addAll(canDuplicada.getTematicas());
                 }
                 for (Cancion canDuplicada : grupo) {
                     canDuplicada.setTematicas(new ArrayList<>(temas));
                     lista.add(canDuplicada);
-                }                
+                }
             } else {
                 for (Cancion canDuplicada : grupo) {
                     lista.add(canDuplicada);
@@ -552,30 +556,56 @@ public class Utilidades {
         // Similaridad: 1 - (Distancia de Levenshtein / Longitud máxima de las dos cadenas)
         return 1.0 - (double) distanciaLevenshtein / maxLen;
     }
-    
+
     public static String ejecutarComando(String comando) {
-    StringBuilder resultado = new StringBuilder();
+        StringBuilder resultado = new StringBuilder();
 
-    try {
-        ProcessBuilder builder = new ProcessBuilder();
-        builder.command("bash", "-c", comando);
-        Process process = builder.start();
+        try {
+            ProcessBuilder builder = new ProcessBuilder();
+            builder.command("bash", "-c", comando);
+            Process process = builder.start();
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String linea;
-        while ((linea = reader.readLine()) != null) {
-            resultado.append(linea).append("\n");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                resultado.append(linea).append("\n");
+            }
+
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                throw new RuntimeException("Error al ejecutar el comando: " + comando);
+            }
+
+        } catch (IOException | InterruptedException | RuntimeException e) {
         }
-        
-        int exitCode = process.waitFor();
-        if (exitCode != 0) {
-            throw new RuntimeException("Error al ejecutar el comando: " + comando);
-        }
 
-    } catch (IOException | InterruptedException | RuntimeException e) {
+        return resultado.toString();
     }
+    
+    public static String getCountryFromIP(String ipAddress) {
+        String apiURL = "http://ip-api.com/json/" + ipAddress;
+        try {
+            URL url = new URL(apiURL);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            
+            StringBuilder response;
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                String inputLine;
+                response = new StringBuilder();
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+            }
 
-    return resultado.toString();
-}
+            // Convert response to JSON
+            JSONObject jsonResponse = new JSONObject(response.toString());
+            return jsonResponse.getString("country"); // Retorna el país
+
+        } catch (Exception e) {
+            //e.printStackTrace();
+            return "Desconocido";
+        }
+    }
 
 }

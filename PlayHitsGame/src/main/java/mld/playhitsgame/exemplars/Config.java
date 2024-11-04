@@ -25,7 +25,10 @@ public final class Config  {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String ipRouter;
-
+    private String usuarioBD;
+    private String passwBD;
+    private String usuarioMail;
+    private String passMail;
 
 }
 

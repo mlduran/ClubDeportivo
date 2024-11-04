@@ -1,6 +1,8 @@
 package mld.playhitsgame.exemplars;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -9,6 +11,7 @@ import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import mld.playhitsgame.utilidades.Utilidades;
 
 /**
  *
@@ -25,10 +28,18 @@ public final class Registro  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Enumerated(EnumType.STRING)
     private TipoRegistro tipo;
     private String ip;
     private String usuario;
     private Date fecha;
+    
+    
+    public String getPais(){
+        
+        String pais = Utilidades.getCountryFromIP(this.ip);
+        return pais;        
+    }
 
 }
 

@@ -8,5 +8,6 @@ package mld.playhitsgame.exemplars;
 public enum TipoRegistro {
 
     Visita,
-    Login
+    Login,
+    Invitado
 }
