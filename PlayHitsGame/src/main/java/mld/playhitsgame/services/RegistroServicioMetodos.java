@@ -37,6 +37,7 @@ public class RegistroServicioMetodos implements RegistroServicio {
         newRegistro.setIp(ip);
         newRegistro.setTipo(tipo);
         newRegistro.setUsuario(usuario);
+        newRegistro.setPais(newRegistro.getPaisServicio(ip));
         return save(newRegistro);
         
     }

@@ -33,12 +33,13 @@ public final class Registro  {
     private String ip;
     private String usuario;
     private Date fecha;
+    private String pais;
     
     
-    public String getPais(){
+    public String getPaisServicio(String ip){
         
-        String pais = Utilidades.getCountryFromIP(this.ip);
-        return pais;        
+        return Utilidades.getCountryFromIP(ip);
+      
     }
 
 }
