@@ -275,12 +275,12 @@ public class Usuario {
             return this.getGrupo();
         }
     }
-
-    public String getTxtPuntosPartida(Partida partida) {
+    
+    public int getPuntosPartida(Partida partida) {
 
         int pts = Utilidades.calcularPtsUsuario(this, partida, false);
 
-        return String.valueOf(pts) + " Pts";
+        return pts;
     }
 
 }

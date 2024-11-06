@@ -383,9 +383,11 @@ public class ControladorVista {
         for (Usuario usuPartida : partida.usuariosPartida()) {
             PtsUsuario ptsUsuario = new PtsUsuario();
             ptsUsuario.setUsuario(usuPartida);
-            ptsUsuario.setPuntos(usuPartida.getTxtPuntosPartida(partida));
+            ptsUsuario.setPts(usuPartida.getPuntosPartida(partida));
+            ptsUsuario.setPuntos(String.valueOf(usuPartida.getPuntosPartida(partida)) + " Pts");
             ptsUsuarios.add(ptsUsuario);
         }
+        Collections.sort(ptsUsuarios);
 
         modelo.addAttribute("serverWebsocket", this.serverWebsocket);
         modelo.addAttribute("opcAnyos", opcAnyos);

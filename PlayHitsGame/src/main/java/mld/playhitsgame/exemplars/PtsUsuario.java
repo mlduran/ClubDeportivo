@@ -16,9 +16,15 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PtsUsuario {
+public class PtsUsuario implements Comparable<PtsUsuario>{
     
     Usuario usuario;
+    Integer pts;
     String puntos;
+    
+    @Override
+    public int compareTo(PtsUsuario o) {
+        return o.pts.compareTo(this.pts);
+    }
     
 }
