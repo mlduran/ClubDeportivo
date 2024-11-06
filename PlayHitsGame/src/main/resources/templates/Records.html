@@ -26,6 +26,15 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                             <img th:src="@{'/images/playhitsgamePresentacion.png'}" class="img-fluid" alt="PLAYHITSGAME" />
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="text-center">
+                                                <a th:href="${volver}" class="text-dark">
+                                                    <p th:text="#{general.volver}" />
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
                                     <tr th:each="elem : ${temas}">  
                                         <td>
                                             <table style="max-width: 100%; width: 100%; table-layout: fixed;">

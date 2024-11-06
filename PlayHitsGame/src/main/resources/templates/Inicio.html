@@ -50,7 +50,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             </div>  
                             <h1 class="h6 btn text-center" th:text="#{general.titulojuego}"/>
                             <div class="btn text-center" th:if="${invitadosON} == 'true'"> 
-                                <a href="/accesoInvitado" class="btn btn-primary" role="button" th:text="#{general.accederinvitado}"/>
+                                <button th:onclick="window.location.href='/accesoInvitado'" class="btn btn-primary" role="button" th:text="#{general.accederinvitado}"/>
                             </div>                            
                             <div class="modal fade" id="ayuda" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                 <div class="modal-dialog">

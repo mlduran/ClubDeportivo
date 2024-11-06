@@ -53,7 +53,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <div class="card-body p-2" >
                                 <div th:if="*{admin} == true" class="text-center my-2">
                                     <p>
-                                        <a href="/administracion" class="btn btn-primary" role="button" th:text="#{general.administracion}"/>
+                                        <button th:onclick="window.location.href='/administracion'" class="btn btn-primary" role="button" th:text="#{general.administracion}"/>
                                     </p>                                
                                     <div  th:if="${urlSpotify} != null"> 
                                         <p>
@@ -62,16 +62,16 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </div>
                                 </div>
                                 <div th:if="*{colaborador} == true" class="text-center my-2">
-                                    <a href="/gestionCanciones" class="btn btn-primary" role="button" th:text="#{general.gestioncanciones}"/>
+                                    <button th:onclick="window.location.href='/gestionCanciones'" class="btn btn-primary" role="button" th:text="#{general.gestioncanciones}"/>
                                 </div>
                                 <div th:if="*{colaborador} == true" class="text-center my-2">
-                                    <a href="/gestionTemas" class="btn btn-primary" role="button" th:text="#{general.gestiontemas}"/>
+                                    <button th:onclick="window.location.href='/gestionTemas'" class="btn btn-primary" role="button" th:text="#{general.gestiontemas}"/>
                                 </div>
                                 <div th:if="*{partidaPersonalEnCurso()} != null" class="text-center my-2">
-                                    <a href="/partidaPersonal" class="btn btn-primary" role="button" th:text="#{general.partidapersonalpendiente}"/>
+                                    <button th:onclick="window.location.href='/partidaPersonal'" class="btn btn-primary" role="button" th:text="#{general.partidapersonalpendiente}"/>
                                 </div>
                                 <div th:if="*{partidaMasterEnCurso()} != null" class="text-center my-2">
-                                    <a href="/partidaMaster" class="btn btn-primary" role="button" th:text="#{general.partidamasterpendiente}"/>
+                                    <button th:onclick="window.location.href='/partidaMaster'" class="btn btn-primary" role="button" th:text="#{general.partidamasterpendiente}"/>
                                 </div>
                                 <div th:if="*{sinGrupo()} == false and *{hayPartidasInvitadoPendientes()} == false" class="text-center my-5">
                                     <p class="text-center" th:text='#{general.nohaypartinv}'/>
@@ -105,11 +105,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <div class="card-body p-3" >
                                 <div th:if="*{sePuedeCrearPartidaMaster()} == true" class="text-center my-2">                                
                                     <p>
-                                        <a href="/crearPartidaPersonal" class="btn btn-primary" role="button" th:text="#{general.crearpartidapersonal}"/>
+                                        <button th:onclick="window.location.href='/crearPartidaPersonal'" class="btn btn-primary" role="button" th:text="#{general.crearpartidapersonal}"/>
                                     </p> 
                                     <div th:if="${serverWebsocket} != ''">
                                         <p>
-                                            <a href="/crearPartida" class="btn btn-primary" role="button" th:text="#{general.crearpartidagrupo}"/>
+                                            <button th:onclick="window.location.href='/crearPartida'" class="btn btn-primary" role="button" th:text="#{general.crearpartidagrupo}"/>
                                         </p>
                                     </div>
                                 </div>                                
@@ -222,7 +222,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             </div> 
                             <div  class="text-center my-2">
                                 <p>
-                                    <a href="/records" class="btn btn-primary" role="button" th:text="#{general.records}"/>
+                                    <button th:onclick="window.location.href='/records'" class="btn btn-primary" role="button" th:text="#{general.records}"/>
                                 </p>  
                             </div>
                             <div class="card-footer py-3 border-0">
