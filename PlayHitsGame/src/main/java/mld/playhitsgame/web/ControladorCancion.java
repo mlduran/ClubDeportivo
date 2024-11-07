@@ -335,8 +335,10 @@ public class ControladorCancion {
                     servCancion.updateCancion(cancion.getId(), cancion);
                 }
             }
-        }
-        return "redirect:/editarCanciones";
+        }        
+        gestionCanciones(modelo);
+        
+        return "EditarCanciones";
     }
 
     @GetMapping("/exportarCanciones")
