@@ -13,11 +13,6 @@
   <priority>1.00</priority>
 </url>
 <url>
-  <loc>https://playhitsgame.es/recuperarContrasenya</loc>
-  <lastmod>2024-11-04T13:05:22+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
   <loc>https://playhitsgame.es/altaUsuario</loc>
   <lastmod>2024-11-04T13:05:22+00:00</lastmod>
   <priority>0.80</priority>
@@ -28,17 +23,7 @@
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://playhitsgame.es/logout</loc>
-  <lastmod>2024-11-04T13:05:22+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
   <loc>https://playhitsgame.es/crearPartidaPersonalInvitado</loc>
-  <lastmod>2024-11-04T13:05:22+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://playhitsgame.es/records</loc>
   <lastmod>2024-11-04T13:05:22+00:00</lastmod>
   <priority>0.64</priority>
 </url>

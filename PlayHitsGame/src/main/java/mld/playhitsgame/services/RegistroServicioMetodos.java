@@ -11,6 +11,7 @@ import mld.playhitsgame.exemplars.TipoRegistro;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -43,7 +44,8 @@ public class RegistroServicioMetodos implements RegistroServicio {
     }
     
     public Page<Registro> obtenerRegistrosPaginados(int pagina, int tamano) {
-        return DAO.findAll(PageRequest.of(pagina, tamano));
+        return DAO.findAll(PageRequest.of(pagina, 
+                tamano, Sort.by("fecha").descending()));
     }
 
 }
