@@ -11,7 +11,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
     </head>
     <body>
-        <header th:insert="~{plantillas/playhitsgame :: encabezado}"></header>
+        <header th:insert="~{plantillas/playhitsgame :: encabezado}"></header>        
 
         <a href="/panel" class="button" id="volver">VOLVER</a>
         <audio controls id="reproductor" style="display: none;">
@@ -74,6 +74,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <div th:if="${canciones != null and !canciones.empty}">
 
             <form method="post" th:action="@{/cambiosMasivos}" >
+                <input type="hidden" id="paginaActual" th:name="paginaActual" th:value="${canciones.number}"/>
                 <input type="checkbox" name="validar" id="validar">Verificar?</<input>
                 <input type="submit" th:name="actualizarVerificar" value="Actualizar Verificar"/> 
                 <select th:name="temaModificar" value="">
@@ -84,6 +85,21 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 <input type="submit" th:name="eliminarTema" value="Eliminar Tema"/> 
                 <input type="submit" th:name="eliminarCanciones" value="Eliminar Canciones"/> 
                 <table border="2">
+                    <tr>
+                        <td colspan="10" style="text-align: center;">
+                            <div>
+                                <span th:text="'Página ' + ${canciones.number + 1} + ' de ' + ${canciones.totalPages}"></span>
+
+                                <div>
+                                    <a th:if="${canciones.hasPrevious()}"
+                                       th:href="@{/gestionCanciones(page=${canciones.number - 1})}">Página anterior</a>
+                                    |
+                                    <a th:if="${canciones.hasNext()}"
+                                       th:href="@{/gestionCanciones(page=${canciones.number + 1})}">Página siguiente</a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
                     <tr> 
                         <th>Sel</th>
                         <th>Titulo</th>
@@ -114,6 +130,21 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                  th:data-name="${elem.spotifyplay}"
                                  th:onclick="reproducir(this.getAttribute('data-name'))"/>
                         </td>                        
+                    </tr>
+                    <tr>
+                        <td colspan="10" style="text-align: center;">
+                            <div>
+                                <span th:text="'Página ' + ${canciones.number + 1} + ' de ' + ${canciones.totalPages}"></span>
+
+                                <div>
+                                    <a th:if="${canciones.hasPrevious()}"
+                                       th:href="@{/gestionCanciones(page=${canciones.number - 1})}">Página anterior</a>
+                                    |
+                                    <a th:if="${canciones.hasNext()}"
+                                       th:href="@{/gestionCanciones(page=${canciones.number + 1})}">Página siguiente</a>
+                                </div>
+                            </div>
+                        </td>
                     </tr>
                 </table>
             </form>

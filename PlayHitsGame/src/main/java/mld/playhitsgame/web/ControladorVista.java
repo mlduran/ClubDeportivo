@@ -1821,8 +1821,7 @@ public class ControladorVista {
             return "redirect:/logout";
         }
 
-        int tamano = REG_POR_PAG; // Número de registros por página
-        Page<Registro> obtenerRegistrosPaginados = servRegistro.obtenerRegistrosPaginados(page, tamano);
+        Page<Registro> obtenerRegistrosPaginados = servRegistro.obtenerRegistrosPaginados(page, REG_POR_PAG);
         modelo.addAttribute("registros", obtenerRegistrosPaginados);
 
         return "Registro";

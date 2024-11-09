@@ -16,9 +16,13 @@ import mld.playhitsgame.exemplars.SearchSpecifications;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.FiltroCanciones;
 import mld.playhitsgame.exemplars.Partida;
+import mld.playhitsgame.exemplars.Registro;
 import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.projections.ampliada.CancionAmpliadaView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -135,7 +139,7 @@ public class CancionServicioMetodos implements CancionServicio {
         }
 
     }
-
+    
     public List<Cancion> obtenerCanciones(Partida partida) {
 
         List<Cancion> canciones;
