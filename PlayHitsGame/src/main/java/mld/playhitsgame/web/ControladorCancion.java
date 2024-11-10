@@ -401,21 +401,16 @@ public class ControladorCancion {
     }
 
     @PostMapping("/gestionCanciones")
-    public String revisionCanciones(Model modelo, @ModelAttribute("filtroCanciones") FiltroCanciones filtro) {
+    public String revisionCanciones(Model modelo, 
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @ModelAttribute("filtroCanciones") FiltroCanciones filtro) {
 
         if (!usuarioCorrecto(modelo)) {
             return "redirect:/logout";
         }
         temasBD(modelo);
-        List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);
-        if (filtro.isDuplicados()) {
-            canciones = Utilidades.buscarDuplicados(canciones, false, false);
-        }
-
-        modelo.addAttribute("canciones", canciones);
-
+        gestionCanciones(modelo, page);
         return "GestionCanciones";
-
     }
 
     @PostMapping("/cambiosMasivos")
@@ -449,6 +444,11 @@ public class ControladorCancion {
 
         FiltroCanciones filtro = (FiltroCanciones) modelo.getAttribute("filtroCanciones");
         List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);
+        
+        if (filtro.isDuplicados()) {
+            canciones = Utilidades.buscarDuplicados(canciones, false, false);
+        }
+        
         Pageable pageable = PageRequest.of(page, REG_POR_PAG);
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), canciones.size());
@@ -461,8 +461,9 @@ public class ControladorCancion {
                     if (opEliminarCanciones != null && opEliminarCanciones.equals("Eliminar Canciones")) {
                         try {
                             servCancion.deleteCancion(cancion.getId());
+                            System.out.println("Se elimina cancion " + String.valueOf(cancion.getId()));
                         } catch (Exception e) {
-                            System.out.println("ERROR al Eliminar " + String.valueOf(cancion.selId()) + e.getMessage());
+                            System.out.println("ERROR al eliminar cancion " + String.valueOf(cancion.getId()) + " " + e.getMessage());
                         }
                         continue;
                     }

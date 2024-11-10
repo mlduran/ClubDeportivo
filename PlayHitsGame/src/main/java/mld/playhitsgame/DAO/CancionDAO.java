@@ -11,7 +11,9 @@ import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.projections.ampliada.CancionAmpliadaView;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -44,9 +46,14 @@ public interface CancionDAO extends JpaRepository<Cancion, Long>{
     @Query(value = "SELECT * FROM canciones WHERE revisar=false ;", nativeQuery = true)
     List<Cancion> finBySinRevisar();
    
+    @Modifying   
+    @Transactional
+    @Query(value = "DELETE FROM canciones_tematicas WHERE canciones_id=:idCancion ;", nativeQuery = true)
+    void eliminarRelacionTemas(Long idCancion);
     
-    
-    
-    
+    @Modifying   
+    @Transactional
+    @Query(value = "DELETE FROM canciones_rondas WHERE cancion_id=:idCancion ;", nativeQuery = true)
+    void eliminarRelacionRondas(Long idCancion);
     
 }
