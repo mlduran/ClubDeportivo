@@ -97,6 +97,17 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     <a th:if="${canciones.hasNext()}"
                                        th:href="@{/gestionCanciones(page=${canciones.number + 1})}">Página siguiente</a>
                                 </div>
+                                <div th:each="block : ${#numbers.sequence(0, canciones.totalPages - 1, 50)}">
+                                    <div>
+                                        <span th:each="pageNumber : ${#numbers.sequence(block, block + 49)}" 
+                                              th:if="${pageNumber < canciones.totalPages}">
+                                            <a th:href="@{/gestionCanciones(page=${pageNumber})}"
+                                               th:text="${pageNumber + 1}"
+                                               th:classappend="${pageNumber == canciones.number} ? 'current-page' : ''"></a>
+                                            <span th:if="${pageNumber < canciones.totalPages - 1 && pageNumber % 50 != 49}"> | </span>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -138,8 +149,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 
                                 <div>
                                     <a th:if="${canciones.hasPrevious()}"
-                                       th:href="@{/gestionCanciones(page=${canciones.number - 1})}">Página anterior</a>
-                                    |
+                                       th:href="@{/gestionCanciones(page=${canciones.number - 1})}">Página anterior</a>                                    |
                                     <a th:if="${canciones.hasNext()}"
                                        th:href="@{/gestionCanciones(page=${canciones.number + 1})}">Página siguiente</a>
                                 </div>
