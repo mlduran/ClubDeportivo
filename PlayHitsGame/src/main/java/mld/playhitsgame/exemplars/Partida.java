@@ -137,7 +137,8 @@ public class Partida {
         if (this.isTipoPersonal() && this.getDificultad() != null) {
             txt.add("Dificultad: ".concat(this.getDificultad().name()));
         }
-        txt.add("Canciones: " + String.valueOf(this.nCanciones));
+        if (this.nCanciones > 0)
+            txt.add("Canciones: " + String.valueOf(this.nCanciones));
         txt.add("Año inicial: " + String.valueOf(this.getAnyoInicial()));
         txt.add("Año final: " + String.valueOf(this.getAnyoFinal()));
 

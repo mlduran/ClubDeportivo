@@ -26,20 +26,32 @@ IONOS_RECORD_ID="424c4132-a03f-7e18-0176-e51859fe3b83"
 DNS_RECORD_NAME=""  # El subdominio a actualizar, deja vacío si es el dominio raíz
 NEW_IP=$(curl -s ifconfig.me)  # La nueva IP que quieres asignar
 LOG_FILE="/home/miguel/scripts/ionos_ip_update.log"
+IP_FILE="/home/miguel/scripts/last_ip.txt"
+
+# Verificar si el archivo de IP existe; si no, crearlo
+if [ ! -f "$IP_FILE" ]; then
+    echo "0.0.0.0" > "$IP_FILE"  
+fi
+
+# Leer la IP almacenada previamente
+LAST_IP=$(cat "$IP_FILE")
 
 # URL base de la API de IONOS
 API_URL="https://api.hosting.ionos.com/dns/v1"
 JSON_PUT=$(jq -n --arg ip "$NEW_IP" '{"disabled": false,"content": $ip,"ttl": 3600, "prio": 0}')
 
 # Actualizar el registro A con la nueva IP
-UPDATE_RESPONSE=$(curl -X PUT "$API_URL/zones/$IONOS_ZONE_ID/records/$IONOS_RECORD_ID" -H 'accept: application/json' -H 'Content-Type: application/json' -d "$JSON_PUT")
+if [ "$NEW_IP" != "$LAST_IP" ]; then
+    # Ejecutar la actualización solo si la IP ha cambiado
+    UPDATE_RESPONSE=$(curl -X PUT "$API_URL/zones/$IONOS_ZONE_ID/records/$IONOS_RECORD_ID" -H "X-API-Key:$IONOS_API_KEY" -H 'accept: application/json' -H 'Content-Type: application/json' -d "$JSON_PUT")
 
-# Verificar si se actualizó correctamente
-if echo "$UPDATE_RESPONSE" | jq -e '.errors' > /dev/null; then
-    echo "[$(date)] Error al actualizar el registro DNS: $(echo "$UPDATE_RESPONSE" | jq -r '.errors[].detail')" | tee -a "$LOG_FILE"
-else
-    echo "[$(date)] El registro DNS se actualizó correctamente a la IP $NEW_IP" | tee -a "$LOG_FILE"
+    echo "[$(date)] $UPDATE_RESPONSE" | tee -a "$LOG_FILE"
+    echo "[$(date)] El registro DNS se actualizó a la IP $NEW_IP" | tee -a "$LOG_FILE"
+
+    # Actualizar el archivo con la nueva IP
+    echo "$NEW_IP" > "$IP_FILE"
 fi
+
 
 
 
