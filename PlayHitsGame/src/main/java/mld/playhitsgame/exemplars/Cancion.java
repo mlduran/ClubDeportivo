@@ -41,6 +41,8 @@ public class Cancion{
     private List<Ronda> rondas ;
     private boolean revisar;
     
+    
+    
     public String selId(){
         
         return "sel_" + String.valueOf(this.getId());

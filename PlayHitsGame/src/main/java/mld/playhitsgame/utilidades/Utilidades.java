@@ -607,5 +607,34 @@ public class Utilidades {
             return "Desconocido";
         }
     }
+    
+    
+    
+    public static String filtrarTitulo(String titulo){
+        
+        String[] phrasesToRemove = {
+            "- Original mix",
+            "- Radio Edit",
+            "- Single Version",
+            "- Radio Mix",
+            "- Edit",
+            "\\(7\" Version\\)",
+            "\\(Remastered\\)",
+            "- Remastered",
+            "(Re-Record)"
+        };
+
+        for (String phrase : phrasesToRemove) {
+            titulo = titulo.replaceAll("\\s*" + phrase + "\\s*", "");
+        }
+        
+        titulo = titulo.replaceAll("- .*? Remaster", "");
+        titulo = titulo.replaceAll("\\(From.*", "");
+        titulo = titulo.replaceAll("\\- From.*", "");
+        titulo = titulo.replaceAll("\\(Theme from.*", "");
+        
+        return titulo.trim();  
+        
+    }
 
 }

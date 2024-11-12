@@ -126,8 +126,8 @@ public class UtilidadesSpotify {
                 album = track.getJSONObject("album");
                 imagenes = album.getJSONArray("images");
                 grupo = artists.getJSONObject(0);
-
-                cancion.setTitulo((String) track.getString("name"));
+                String titulo = Utilidades.filtrarTitulo((String) track.getString("name"));
+                cancion.setTitulo(titulo);
                 cancion.setInterprete((String) grupo.getString("name"));
                 cancion.setAnyo(Integer.getInteger(anyo));
                 cancion.setSpotifyid((String) track.getString("id"));
@@ -186,7 +186,8 @@ public class UtilidadesSpotify {
                 }
                 grupo = artists.getJSONObject(0);
 
-                cancion.setTitulo((String) track.getString("name"));
+                String titulo = Utilidades.filtrarTitulo((String) track.getString("name"));
+                cancion.setTitulo(titulo);
                 cancion.setInterprete((String) grupo.getString("name"));
                 cancion.setSpotifyid((String) track.getString("id"));
                 cancion.setSpotifyplay((String) track.getString("preview_url"));

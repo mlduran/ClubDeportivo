@@ -278,6 +278,21 @@ public class ControladorCancion {
         gestionCanciones(modelo, page);
         return "GestionCanciones";
     }
+    
+    
+    
+    private void corregirTitulos(List<Cancion> canciones){
+        
+        for (Cancion cancion : canciones){
+            String newTitulo = Utilidades.filtrarTitulo(cancion.getTitulo());
+            if (!newTitulo.equals(cancion.getTitulo())){
+                cancion.setTitulo(newTitulo);
+                servCancion.updateCancion(cancion.getId(), cancion);
+            }           
+        }        
+    }
+    
+    
 
     @GetMapping("/corregirDuplicados")
     public String corregirDuplicados(Model modelo,
@@ -286,7 +301,7 @@ public class ControladorCancion {
         if (!usuarioCorrecto(modelo)) {
             return "redirect:/logout";
         }
-
+        
         FiltroCanciones filtro;
         if (modelo.getAttribute("filtroCanciones") == null) {
             filtro = new FiltroCanciones();
@@ -296,6 +311,8 @@ public class ControladorCancion {
         }
 
         List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);
+        corregirTitulos(canciones);
+        
         for (Cancion cancion : Utilidades.duplicadosParaActualizar(canciones)) {
             servCancion.updateCancion(cancion.getId(), cancion);
         }
