@@ -124,23 +124,37 @@ public class Partida {
         return txt;
     }
 
-    public List<String> getDescripcion() {
+    public List<Descripcion> getDescripcion() {
 
-        ArrayList<String> txt = new ArrayList();
-
+        ArrayList<Descripcion> txt = new ArrayList();
+        Descripcion des;
         if (this.getGrupo() != null && !this.getGrupo().isEmpty()) {
-            txt.add("Grupo: ".concat(this.getGrupo()));
+            des = new Descripcion();
+            des.setEtiqueta("general.grup");
+            des.setValor(this.getGrupo());
+            txt.add(des);
         }
         if (this.getTema() != null && !this.getTema().isEmpty()) {
-            txt.add("Tema: ".concat(this.getTema()));
+            des = new Descripcion();
+            des.setEtiqueta("general.tema");
+            des.setValor(this.getTema());
+            txt.add(des);
         }
-        if (this.isTipoPersonal() && this.getDificultad() != null) {
-            txt.add("Dificultad: ".concat(this.getDificultad().name()));
+        if (this.nCanciones > 0) {
+            des = new Descripcion();
+            des.setEtiqueta("general.canciones");
+            des.setValor(String.valueOf(this.nCanciones));
+            txt.add(des);
         }
-        if (this.nCanciones > 0)
-            txt.add("Canciones: " + String.valueOf(this.nCanciones));
-        txt.add("Año inicial: " + String.valueOf(this.getAnyoInicial()));
-        txt.add("Año final: " + String.valueOf(this.getAnyoFinal()));
+
+        des = new Descripcion();
+        des.setEtiqueta("general.anyoini");
+        des.setValor(String.valueOf(String.valueOf(this.getAnyoInicial())));
+        txt.add(des);
+        des = new Descripcion();
+        des.setEtiqueta("general.anyofin");
+        des.setValor(String.valueOf(String.valueOf(this.getAnyoFinal())));
+        txt.add(des);
 
         return txt;
     }
@@ -237,12 +251,11 @@ public class Partida {
         return lista;
 
     }
-    
-    public boolean isEntreno(){
-        
-        return this.getDificultad().equals(Dificultad.Entreno);        
-        
+
+    public boolean isEntreno() {
+
+        return this.getDificultad().equals(Dificultad.Entreno);
+
     }
-    
 
 }

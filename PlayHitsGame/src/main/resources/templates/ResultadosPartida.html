@@ -42,7 +42,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         <p th:text="#{general.grupo}"/>
                     </td>
                     <td>
-                        <p th:each="txt : ${partidaSesion.descripcion}" th:text="${txt}"></p>
+                        <p th:each="txt : ${partidaSesion.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
                     </td>
                     <td>
                         <p th:text="#{general.participantes}" />                                                

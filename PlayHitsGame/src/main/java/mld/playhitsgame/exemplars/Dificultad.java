@@ -10,8 +10,19 @@ package mld.playhitsgame.exemplars;
  */
 public enum Dificultad {
  
-    Facil,
-    Normal,    
-    Dificil,
-    Entreno
+    Facil("dificultad.facil"),
+    Normal("dificultad.normal"),
+    Dificil("dificultad.dificil"),
+    Entreno("dificultad.entreno");
+
+    private final String messageKey;
+
+    Dificultad(String messageKey) {
+        this.messageKey = messageKey;
+    }
+
+    public String getMessageKey() {
+        
+        return messageKey;
+    }
 }

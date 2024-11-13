@@ -17,13 +17,16 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 
     <body>
         <section>
-            <input type="hidden" id="fichAjuda" value='/ayuda/PartidaGrupo.html' />
+            <input type="hidden" id="fichAjuda" th:value="'/ayuda/PartidaGrupo_' + ${locale.language} + '.html'" />
             <input type="hidden" id="serverWS" th:value="${serverWebsocket}" />
             <input type="hidden" id="idusuario" th:value="${usuarioSesion.id}" />
             <input type="hidden" id="idpartida" th:value="${partidaSesion.id}" />
             <input type="hidden" id="rol" th:value="${rol}" />
             <input type="hidden" id="activarPlay" th:value="${partidaSesion.activarPlay}" />
             <input type="hidden" id="touchstart" th:value="${usuarioSesion.touchstart}" />
+            <input type="hidden" id="txtprimerocancion" th:value="#{general.primerocancion}" />
+            <input type="hidden" id="txtprimerointer" th:value="#{general.primerointer}" />
+            <input type="hidden" id="txtprimeroanyo" th:value="#{general.primeroanyo}" />
             <div class="container h-100">
                 <div class="row justify-content-sm-center h-100">
                     <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
@@ -47,7 +50,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </tr>
                                     <tr>
                                         <td colspan="2">  
-                                            <p th:each="txt : ${partidaSesion.descripcion}" th:text="${txt}" />
+                                            <p th:each="txt : ${partidaSesion.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
                                             <div class="btn text-center">                                               
                                                 <input type="image" class="btn" id="imageInfo" alt="Info"  data-bs-toggle="modal" data-bs-target="#ayuda" th:src="@{'/images/info.png'}"  width="60" height="60" /> 
                                             </div>                            

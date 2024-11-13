@@ -12,7 +12,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     </head>
     <body>
     <body>
-        <input type="hidden" id="fichAjuda" value='/ayuda/CrearPartida.html' />
+        <input type="hidden" id="fichAjuda" th:value="'/ayuda/CrearPartida_' + ${locale.language} + '.html'" />
         <section class="h-100">
             <div class="container h-100">
                 <div class="row justify-content-sm-center h-100">
@@ -37,7 +37,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                         <label class="mb-2 text-muted" for="dificultad" th:text="#{general.dificultad}"/>
                                         <select th:field="*{dificultad}" title="Dificultad" id="dificultad">
                                             <option th:each="dificultadOpt : ${T(mld.playhitsgame.exemplars.Dificultad).values()}" 
-                                                    th:value="${dificultadOpt}" th:text="${dificultadOpt}"></option>
+                                                    th:value="${dificultadOpt}" th:text="#{${dificultadOpt.messageKey}}"></option>
                                         </select>
                                     </div>
                                     <div class="mb-3">

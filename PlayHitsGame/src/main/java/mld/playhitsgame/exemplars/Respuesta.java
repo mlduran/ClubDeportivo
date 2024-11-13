@@ -44,7 +44,7 @@ public class Respuesta{
 
 
     public String getPuntosTxt(){
-        return " (Pts ".concat(String.valueOf(puntos) + ")");        
+        return " ( ".concat(String.valueOf(puntos) + " )");        
     }    
     
     public String getTiempoEmpleado(){

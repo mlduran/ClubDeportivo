@@ -87,7 +87,7 @@ window.addEventListener('load', function () {
     if (todoFallo.value === 'false')
         ocultarResultado();
     if (esRecord.value === 'true')
-        window.alert("Felicidades!!!!, has conseguido un nuevo Record para este tema, puedes consultarlo en la tabla de Records");
+        window.alert(document.getElementById("txtrecordtema").value);
 
 });
 

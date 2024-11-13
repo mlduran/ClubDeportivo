@@ -25,14 +25,15 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     </head>
 
     <body>        
-        <section class="h-100">
-            <input type="hidden" id="fichAjuda" value='/ayuda/PartidaPersonal.html' />
+        <section class="h-100">            
+            <input type="hidden" id="fichAjuda" th:value="'/ayuda/PartidaPersonal_' + ${locale.language} + '.html'" />
             <input type="hidden" id="idusuario" th:value="${usuarioSesion.id}" />
             <input type="hidden" id="idpartida" th:value="${partidaSesion.id}" />
             <input type="hidden" id="respuestaOK" th:value="${respuestaOK}" />
             <input type="hidden" id="todoFallo" th:value="${todoFallo}" />
             <input type="hidden" id="esRecord" th:value="${esRecord}" />
             <input type="hidden" id="touchstart" th:value="${usuarioSesion.touchstart}" />
+            <input type="hidden" id="txtrecordtema" th:value="#{general.recordtema}" />
             <audio controls id="reproductorConsulta" style="display: none;">
                 <source src="" type="audio/mpeg" />                                                            
             </audio>
@@ -58,8 +59,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </td>
                                     </tr>
                                     <tr>                                        
-                                        <td colspan="2">
-                                            <p th:each="txt : ${partidaSesion.descripcion}" th:text="${txt}" />
+                                        <td colspan="2">                                            
+                                            <p th:each="txt : ${partidaSesion.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
+                                            <p th:text="#{general.dificultad} + ' : ' + #{${partidaSesion.dificultad.messageKey}}" />
                                         </td>
                                         <td>  
                                             <table>

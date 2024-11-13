@@ -32,11 +32,11 @@ var txtPrimeros = function (datosJson) {
 
     var txt = "";
     if (datosJson["primeroCancion"] !== undefined && datosJson["primeroCancion"] !== "")
-        txt = txt + "El jugador mas rapido acertando la cancion ha sido " + datosJson["primeroCancion"] + "\n";
+        txt = txt + document.getElementById("txtprimerocancion").value + datosJson["primeroCancion"] + "\n";
     if (datosJson["primeroInterprete"] !== undefined && datosJson["primeroInterprete"] !== "")
-        txt = txt + "El jugador mas rapido acertando el interprete ha sido " + datosJson["primeroInterprete"] + "\n";
+        txt = txt + document.getElementById("txtprimerointer").value + datosJson["primeroInterprete"] + "\n";
     if (datosJson["primeroAnyo"] !== undefined && datosJson["primeroAnyo"] !== "")
-        txt = txt + "El jugador mas rapido acertando el año ha sido " + datosJson["primeroAnyo"];
+        txt = txt + document.getElementById("txtprimeroanyo").value + datosJson["primeroAnyo"];
 
     return txt;
 };
@@ -113,7 +113,7 @@ function inicializarWS() {
     stompClient.onWebSocketError = (error) => {
         console.error('Error websocket ', error);
         if (avisoErrorWS) {
-            window.alert("No hay conexion al socket " + dirSocket);
+            window.alert("Error conexion socket " + dirSocket);
             avisoErrorWS = false;
         }
     };

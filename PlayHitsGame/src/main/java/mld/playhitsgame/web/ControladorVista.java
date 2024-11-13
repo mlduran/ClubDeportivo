@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -67,10 +68,9 @@ import mld.playhitsgame.services.PuntuacionServicioMetodos;
 import mld.playhitsgame.services.RegistroServicioMetodos;
 import mld.playhitsgame.services.UsuarioRolServicioMetodos;
 import mld.playhitsgame.utilidades.Utilidades;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.mail.MailSendException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -89,7 +89,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 // persistencia en sesion y no usar tanta memoria
 @SessionAttributes({"id_usuarioSesion", "id_partidaSesion", "posiblesinvitados",
     "rol", "filtroUsuarios", "mensajeRespuesta", "respuestaOK", "todoFallo", "esRecord",
-    "partidaInvitado", "cancionInvitado", "spotifyimagenTmp"})
+    "partidaInvitado", "cancionInvitado", "spotifyimagenTmp", "locale"})
 @Slf4j
 public class ControladorVista {
 
@@ -110,6 +110,9 @@ public class ControladorVista {
     private final int REG_POR_PAG = 100;
 
     private String urlLoginSpotify;
+    
+    @Autowired
+    private MessageSource messageSource;
 
     @Autowired
     CancionServicioMetodos servCancion;
@@ -162,6 +165,22 @@ public class ControladorVista {
 
         }
 
+    }
+    
+    private Locale idioma(Model modelo){
+        
+        Locale idioma = (Locale) modelo.getAttribute("locale");
+        
+        if (idioma == null)
+            idioma = Locale.getDefault();
+        
+        return idioma;        
+    }
+    
+    private String mensaje(Model modelo, String idMensaje){
+        
+        return messageSource.getMessage(idMensaje, null, idioma(modelo));
+        
     }
 
     private String urlSpotify() {
@@ -240,9 +259,10 @@ public class ControladorVista {
     }
 
     @GetMapping("/")
-    public String inicio(Model modelo, HttpServletRequest request) {
+    public String inicio(Model modelo, HttpServletRequest request, Locale locale) {
         servRegistro.registrar(TipoRegistro.Visita, ipCliente(request));
         modelo.addAttribute("invitadosON", invitadosON);
+        modelo.addAttribute("locale", locale);
         return "Inicio";
     }
 
@@ -283,7 +303,7 @@ public class ControladorVista {
         Optional<Usuario> usuLogin = servUsuario.findByUsuario(usu);
 
         if (usuLogin.isEmpty()) {
-            modelo.addAttribute("error", "Usuario o password incorrectos");
+            modelo.addAttribute("error", mensaje(modelo, "general.usuarioincorrecto"));
             return "Inicio";
         } else {
             Usuario usuarioSesion = usuLogin.get();
@@ -291,12 +311,12 @@ public class ControladorVista {
             boolean ok = passwordEncoder.matches(laContrasenya, usuarioSesion.getContrasenya());
 
             if (!ok) {
-                modelo.addAttribute("error", "Usuario o password incorrectos");
+                modelo.addAttribute("error", mensaje(modelo, "general.usuarioincorrecto"));
                 return "Inicio";
             }
 
             if (!usuarioSesion.isActivo()) {
-                modelo.addAttribute("error", "Debes activar tu cuenta con el enlace que se envió a tu cuenta de correo, comprueba la carpeta de spawn");
+                modelo.addAttribute("error", mensaje(modelo, "general.activarcuenta"));
                 return "Inicio";
             }
             usuarioSesion.getPartidasInvitado();
@@ -384,7 +404,7 @@ public class ControladorVista {
             PtsUsuario ptsUsuario = new PtsUsuario();
             ptsUsuario.setUsuario(usuPartida);
             ptsUsuario.setPts(usuPartida.getPuntosPartida(partida));
-            ptsUsuario.setPuntos(String.valueOf(usuPartida.getPuntosPartida(partida)) + " Pts");
+            ptsUsuario.setPuntos(String.valueOf(usuPartida.getPuntosPartida(partida)));
             ptsUsuarios.add(ptsUsuario);
         }
         Collections.sort(ptsUsuarios);
@@ -433,7 +453,7 @@ public class ControladorVista {
             canciones.remove(cancionSel);
             if (canciones.isEmpty()) // TODO Aqui se deberia de acabar la partida
             {
-                throw new IndexOutOfBoundsException("Ya no hay mas canciones");
+                throw new IndexOutOfBoundsException("nomascanciones");
             }
 
         }
@@ -497,8 +517,8 @@ public class ControladorVista {
                 ultimaRonda = partida.ultimaRonda();
                 todoFallo = true;
                 modelo.addAttribute("esRecord", esRecord);
-                modelo.addAttribute("mensajeRespuesta", ex.getMessage()
-                        + ", Felicidades!!!!, puedes iniciar partida otra cuando lo desees");
+                modelo.addAttribute("mensajeRespuesta", mensaje(modelo, ex.getMessage())
+                        + mensaje(modelo, "general.iniciarotrapartida"));
                 modelo.addAttribute("todoFallo", true);
             }
         } else {
@@ -630,7 +650,7 @@ public class ControladorVista {
             Ronda ronda = partida.ultimaRonda();
 
             if (ronda.isCompletada()) {
-                throw new Exception("La ronda no es correcta");
+                throw new Exception(mensaje(modelo, "general.rondaincorrecta"));
             }
 
             Cancion cancion = ronda.getCancion();
@@ -644,8 +664,8 @@ public class ControladorVista {
             if (ptsAnyo > 0) {
                 resp.setAnyoOk(true);
             } else {
-                mensajeRespuesta.add("El año correcto era "
-                        + String.valueOf(cancion.getAnyo()) + " tu respondiste " + anyo);
+                mensajeRespuesta.add(mensaje(modelo, "general.anyocorrecto")
+                        + String.valueOf(cancion.getAnyo()) + " " + mensaje(modelo, "general.turespondiste") + anyo);
                 fallos = fallos + 1;
             }
             Optional<Cancion> canTit = servCancion.findById(Long.valueOf(titulo));
@@ -656,8 +676,8 @@ public class ControladorVista {
                 if (ptsTitulo > 0) {
                     resp.setTituloOk(true);
                 } else {
-                    mensajeRespuesta.add("El titulo correcto era "
-                            + cancion.getTitulo() + " tu respondiste " + canTit.get().getTitulo());
+                    mensajeRespuesta.add(mensaje(modelo, "general.titulocorrecto")
+                            + cancion.getTitulo() + " " + mensaje(modelo, "general.turespondiste") + canTit.get().getTitulo());
                     fallos = fallos + 1;
                 }
             }
@@ -669,19 +689,19 @@ public class ControladorVista {
                 if (ptsInterp > 0) {
                     resp.setInterpreteOk(true);
                 } else {
-                    mensajeRespuesta.add("El interprete correcto era "
-                            + cancion.getInterprete() + " tu respondiste " + canInt.get().getInterprete());
+                    mensajeRespuesta.add(mensaje(modelo, "general.intercorrecto")
+                            + cancion.getInterprete() + " " + mensaje(modelo, "general.turespondiste") + canInt.get().getInterprete());
                     fallos = fallos + 1;
                 }
             }
             if ((partida.getDificultad().equals(Dificultad.Dificil) && fallos > 0)
                     || (partida.getDificultad().equals(Dificultad.Normal) && fallos > 1)
                     || (partida.getDificultad().equals(Dificultad.Facil) && fallos > 2)) {
-                mensajeRespuesta.add("Lo siento!!!!, se acabo la partida, puedes iniciar otra cuando lo desees");
+                mensajeRespuesta.add(mensaje(modelo, "general.seacabo"));
                 hasPerdido = true;
             }
             if (fallos == 0) {
-                mensajeRespuesta.add("Fantastico!!!! has acertado todo");
+                mensajeRespuesta.add(mensaje(modelo, "general.todoacertado"));
                 respuestaOK = true;
             }
 
@@ -773,7 +793,7 @@ public class ControladorVista {
             Optional<Usuario> usuLogin = servUsuario.findByUsuario(usuario.getUsuario());
             if (!usuLogin.isEmpty()) {
                 usuOK = false;
-                err = "El usuario " + usuario.getUsuario() + " ya existe";
+                err = mensaje(modelo, "general.elusu") + usuario.getUsuario() + " " + mensaje(modelo, "general.yaexiste");
             }
         }
 
@@ -794,13 +814,13 @@ public class ControladorVista {
                 String token = passwordEncoder.encode(usuario.getUsuario());
                 String enlace = customIp + "/validarUsuario?id=" + String.valueOf(usuario.getId())
                         + "&token=" + token;
-                boolean ok = enviarMail(usuario, "Alta en PlayHitsGame",
+                boolean ok = enviarMail(usuario, mensaje(modelo, "general.altaplay"),
                         enlace, "CorreoAlta");
                 if (ok) {
                     servUsuario.save(usuario);
-                    resp = "Se ha creado el usuario ".concat(usuario.getUsuario());
+                    resp = mensaje(modelo, "general.usuariocreado").concat(usuario.getUsuario());
                 } else {
-                    err = "El mail de usuario indicado, no es valido";
+                    err = mensaje(modelo, "general.mailinvalido");
                 }
             } catch (Exception ex) {
                 err = "ERROR " + ex.getMessage();
@@ -822,7 +842,7 @@ public class ControladorVista {
         boolean usuOK = true;
         try {
             if (!usuario.getContrasenya().equals(pws2)) {
-                throw new Exception("Las Contraseñas no son iguales");
+                throw new Exception(mensaje(modelo, "general.pwdesigual"));
             }
         } catch (Exception ex) {
             passwOK = false;
@@ -900,7 +920,7 @@ public class ControladorVista {
                 continue;
             }
             if (usu.isActivo()) {
-                enviarMail(usu, "AVISO PlayHitsGame",
+                enviarMail(usu, mensaje(modelo, "general.avisoplay"),
                         txtMail, "Correo");
             }
         }
@@ -1074,28 +1094,28 @@ public class ControladorVista {
 
             // Validaciones
             if (!usu.sePuedeCrearPartidaMaster()) {
-                throw new Exception("Ya tienes una partida Master creada, no se pueden crear mas");
+                throw new Exception(mensaje(modelo, "general.partidayacreada"));
             }
             if (partida.getAnyoFinal() <= partida.getAnyoInicial()) {
-                throw new Exception("Las Fechas Iniciales y Finales no son correctas");
+                throw new Exception(mensaje(modelo, "general.fechaserr"));
             }
             if (partida.getAnyoFinal() > anyoActual) {
-                throw new Exception("El año final es erroneo");
+                throw new Exception(mensaje(modelo, "general.fechafinerr"));
             }
             if (partida.getAnyoInicial() < 1950) {
-                throw new Exception("El año inicial es erroneo");
+                throw new Exception(mensaje(modelo, "general.fechainierr"));
             }
             if ((partida.getAnyoFinal() - partida.getAnyoInicial()) < 5) {
-                throw new Exception("El peridodo de años, debe ser de al menos 5 años");
+                throw new Exception(mensaje(modelo, "general.periodoerr"));
             }
             if (nrondas < 10 || nrondas > 30) {
-                throw new Exception("Las rondas deben estar entre 10 y 30");
+                throw new Exception(mensaje(modelo, "general.rondaserr"));
             }
 
             List<Cancion> canciones = servCancion.obtenerCanciones(partida);
 
             if (canciones.size() < nrondas) {
-                throw new Exception("No hay suficientes canciones, cambia la seleccion");
+                throw new Exception(mensaje(modelo, "general.cancionesinsuficientes"));
             }
 
             partida.setInvitados(new ArrayList());
@@ -1195,19 +1215,19 @@ public class ControladorVista {
 
             // Validaciones
             if (!usu.sePuedeCrearPartidaMaster()) {
-                throw new Exception("Ya tienes una partida creada, no se pueden crear mas");
+                throw new Exception(mensaje(modelo, "general.partidayacreadanormal"));
             }
             if (partida.getAnyoFinal() <= partida.getAnyoInicial()) {
-                throw new Exception("Las Fechas Iniciales y Finales no son correctas");
+                throw new Exception(mensaje(modelo, "general.fechaserr"));
             }
             if (partida.getAnyoFinal() > anyoActual) {
-                throw new Exception("El año final es erroneo");
+                throw new Exception(mensaje(modelo, "general.fechafinerr"));
             }
             if (partida.getAnyoInicial() < 1950) {
-                throw new Exception("El año inicial es erroneo");
+                throw new Exception(mensaje(modelo, "general.fechainierr"));
             }
             if ((partida.getAnyoFinal() - partida.getAnyoInicial()) < 5) {
-                throw new Exception("El peridodo de años, debe ser de al menos 5 años");
+                throw new Exception(mensaje(modelo, "general.periodoerr"));
             }
 
             FiltroCanciones filtro = new FiltroCanciones();
@@ -1216,7 +1236,7 @@ public class ControladorVista {
             filtro.setTema(partida.getTema());
             List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);
             if (canciones.size() <= 5) {
-                throw new Exception("No hay suficientes canciones para iniciar la partida");
+                throw new Exception(mensaje(modelo, "general.cancionesinsuficientes"));
             }
 
             partida.setInvitados(new ArrayList());
@@ -1257,7 +1277,7 @@ public class ControladorVista {
             modelo.addAttribute("todoFallo", false);
             return crearPartidaPersonal(partida, modelo, req, usu);
         }
-        modelo.addAttribute("result", "Error en el tipo de partida");
+        modelo.addAttribute("result", mensaje(modelo, "general.errtipopartida"));
         modelo.addAttribute("spotifyimagenTmp", "");
         return "CrearPartida";
 
@@ -1394,23 +1414,23 @@ public class ControladorVista {
 
             Optional<Cancion> canTit = servCancion.findById(Long.valueOf(titulo));
             if (!cancion.getTitulo().equals(canTit.get().getTitulo())) {
-                mensajeRespuesta.add("El titulo correcto era "
-                        + cancion.getTitulo() + " tu respondiste " + canTit.get().getTitulo());
+                mensajeRespuesta.add(mensaje(modelo, "general.titulocorrecto")
+                            + cancion.getTitulo() + " " + mensaje(modelo, "general.turespondiste") + canTit.get().getTitulo());
                 fallos = fallos + 1;
             }
             Optional<Cancion> canInt = servCancion.findById(Long.valueOf(interprete));
             if (!cancion.getInterprete().equals(canInt.get().getInterprete())) {
-                mensajeRespuesta.add("El interprete correcto era "
-                        + cancion.getInterprete() + " tu respondiste " + canInt.get().getInterprete());
+                mensajeRespuesta.add(mensaje(modelo, "general.intercorrecto")
+                            + cancion.getInterprete() + " " + mensaje(modelo, "general.turespondiste") + canInt.get().getInterprete());
                 fallos = fallos + 1;
             }
             if (!anyo.equals(String.valueOf(cancion.getAnyo()))) {
-                mensajeRespuesta.add("El año correcto era "
-                        + String.valueOf(cancion.getAnyo()) + " tu respondiste " + anyo);
+                mensajeRespuesta.add(mensaje(modelo, "general.anyocorrecto")
+                        + String.valueOf(cancion.getAnyo()) + " " + mensaje(modelo, "general.turespondiste") + anyo);
                 fallos = fallos + 1;
             }
             if (fallos == 0) {
-                mensajeRespuesta.add("Fantastico!!!! has acertado todo");
+                mensajeRespuesta.add(mensaje(modelo, "general.todoacertado"));
                 respuestaOK = true;
             }
             String img = cancion.getSpotifyimagen();
@@ -1653,16 +1673,16 @@ public class ControladorVista {
         Optional<Usuario> usuario = servUsuario.findByUsuario(usu);
 
         if (usuario.isEmpty()) {
-            modelo.addAttribute("error", "Este usuario no existe");
+            modelo.addAttribute("error", mensaje(modelo, "general.usunoexiste"));
             return "PasswordOlvidado";
         } else {
             String token = usuario.get().getContrasenya();
-            String enlace = "El codigo de recuperacion para el cambio de contraseña es : " + token;
+            String enlace = mensaje(modelo, "general.txttokenrepssw") + token;
 
-            enviarMail(usuario.get(), "Recuperación de Contraseña PlayHitsGame",
+            enviarMail(usuario.get(), mensaje(modelo, "general.recupcontra"),
                     enlace, "Correo");
 
-            modelo.addAttribute("result", "Se ha enviado un codigo de recuperacion a tu cuenta de correo");
+            modelo.addAttribute("result", mensaje(modelo, "general.codigoenviado"));
             modelo.addAttribute("mail", mail);
         }
         return "PasswordOlvidado";
@@ -1682,12 +1702,12 @@ public class ControladorVista {
         }
         Optional<Usuario> usuarioCambio = servUsuario.findByUsuario(usu);
         if (usuarioCambio.isEmpty()) {
-            modelo.addAttribute("error", "Este usuario no existe");
+            modelo.addAttribute("error", mensaje(modelo, "general.usunoexiste"));
             return "PasswordOlvidado";
         }
         Usuario usuCambio = usuarioCambio.get();
         if (!token.equals(usuCambio.getContrasenya())) {
-            modelo.addAttribute("error", "El codigo de recuperación no es correto");
+            modelo.addAttribute("error", mensaje(modelo, "general.tokenerr"));
             return "PasswordOlvidado";
         } else {
             boolean passwOK = true;
@@ -1709,7 +1729,7 @@ public class ControladorVista {
                         usuCambio.setContrasenya(newPassw);
                     }
                     servUsuario.update(usuCambio.getId(), usuCambio);
-                    resp = "Se ha modificado la contraseña correctamente";
+                    resp = mensaje(modelo, "general.cambiookpssw");
                 } catch (Exception ex) {
                     err = "ERROR " + ex.getMessage();
                 }
@@ -1795,7 +1815,7 @@ public class ControladorVista {
             if (findById.isPresent()) {
                 ptsTMP.setUsuario(findById.get().getNombre());
             } else {
-                ptsTMP.setUsuario("Desconocido");
+                ptsTMP.setUsuario("-");
             }
             ptsTMP.setPuntos(punt.getPuntos());
             pts.add(ptsTMP);
