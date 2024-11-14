@@ -49,6 +49,8 @@ public class Usuario {
     private int puntos;
     private int estrellas;
     private String preferencias;
+    @OneToMany
+    private ArrayList<Tema> temas;
 
     @ManyToMany(fetch = FetchType.EAGER, targetEntity = UsuarioRol.class, cascade = CascadeType.PERSIST)
     @JoinTable(name = "usuario_roles", joinColumns = @JoinColumn(name = "usuario_id"),

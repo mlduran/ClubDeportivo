@@ -33,6 +33,9 @@ public class Tema {
     private Genero genero;
     @ManyToMany(mappedBy = "tematicas")
     private List<Cancion> canciones;
+    
+    @ManyToOne
+    private Usuario usuario;
 
     private String listasSpotify;
     private Long usuarioRecord;

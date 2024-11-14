@@ -33,6 +33,7 @@ import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.Config;
 import mld.playhitsgame.exemplars.Dificultad;
 import mld.playhitsgame.exemplars.FiltroCanciones;
+import mld.playhitsgame.exemplars.FiltroTemas;
 import mld.playhitsgame.exemplars.FiltroUsuarios;
 import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.Respuesta;
@@ -1003,7 +1004,8 @@ public class ControladorVista {
     private void anyadirTemas(Model modelo) {
 
         ArrayList<String> temas = new ArrayList();
-        for (Tema tema : servTema.findAll()) {
+        FiltroTemas filtroTemas = new FiltroTemas((Locale) modelo.getAttribute("locale"));
+        for (Tema tema : filtroTemas.filtrarTemas(servTema.findAll())) {
             if (!tema.getTema().equals("PlayHitsGame")) {
                 temas.add(tema.getTema());
             }
