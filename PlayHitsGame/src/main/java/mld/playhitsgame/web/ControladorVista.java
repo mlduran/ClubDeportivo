@@ -283,7 +283,7 @@ public class ControladorVista {
         modelo.addAttribute("cancionInvitado", null);
         modelo.addAttribute("spotifyimagenTmp", null);
 
-        return "Inicio";
+        return "redirect:/";
     }
 
     @GetMapping("/accesoInvitado")
@@ -1302,6 +1302,8 @@ public class ControladorVista {
                     "No hay suficientes canciones para iniciar la partida");
             return "CrearPartidaInvitado";
         }
+        
+        partida.setDificultad(Dificultad.Entreno);
 
         modelo.addAttribute("partidaInvitado", partida);
         modelo.addAttribute("spotifyimagenTmp", "");

@@ -49,8 +49,9 @@ public class Usuario {
     private int puntos;
     private int estrellas;
     private String preferencias;
-    @OneToMany
-    private ArrayList<Tema> temas;
+    
+    @OneToMany(mappedBy = "usuario")
+    private List<Tema> temas;
 
     @ManyToMany(fetch = FetchType.EAGER, targetEntity = UsuarioRol.class, cascade = CascadeType.PERSIST)
     @JoinTable(name = "usuario_roles", joinColumns = @JoinColumn(name = "usuario_id"),
@@ -75,6 +76,7 @@ public class Usuario {
             inverseJoinColumns = @JoinColumn(name = "partida_id", referencedColumnName = "id")
     )
     private List<Partida> partidasInvitado;
+ 
     
     public boolean isTouchstart(){
         // Esto modificarlo cuando ponga las opciones en la pantalla

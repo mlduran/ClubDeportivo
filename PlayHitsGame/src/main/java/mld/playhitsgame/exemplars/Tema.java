@@ -35,6 +35,7 @@ public class Tema {
     private List<Cancion> canciones;
     
     @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = true)
     private Usuario usuario;
 
     private String listasSpotify;

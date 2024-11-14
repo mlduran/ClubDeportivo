@@ -54,8 +54,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </tr>
                                     <tr>                                        
                                         <td colspan="2"> 
-                                            <p th:each="txt : ${partidaSesion.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
-                                            <p th:text="#{general.dificultad} + ' : ' + #{${partidaSesion.dificultad.messageKey}}" />
+                                            <p th:each="txt : ${partidaInvitado.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
+                                            <p th:text="#{general.dificultad} + ' : ' + #{${partidaInvitado.dificultad.messageKey}}" />
                                         </td>
                                         <td>  
                                             <table> 
