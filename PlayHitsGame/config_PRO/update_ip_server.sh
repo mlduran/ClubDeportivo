@@ -42,11 +42,7 @@ JSON_PUT=$(jq -n --arg ip "$NEW_IP" '{"disabled": false,"content": $ip,"ttl": 36
 # Actualizar el registro A con la nueva IP
 if [ "$NEW_IP" != "$LAST_IP" ]; then
     # Ejecutar la actualización solo si la IP ha cambiado
-    UPDATE_RESPONSE=$(curl -X PUT "$API_URL/zones/$IONOS_ZONE_ID/records/$IONOS_RECORD_ID"
-        -H "X-API-Key:$IONOS_API_KEY"
-        -H 'accept: application/json'
-        -H 'Content-Type: application/json'
-        -d "$JSON_PUT")
+    UPDATE_RESPONSE=$(curl -X PUT "$API_URL/zones/$IONOS_ZONE_ID/records/$IONOS_RECORD_ID" -H "X-API-Key:$IONOS_API_KEY" -H 'accept: application/json' -H 'Content-Type: application/json' -d "$JSON_PUT")
 
     echo "[$(date)] $UPDATE_RESPONSE" | tee -a "$LOG_FILE"
 

@@ -621,7 +621,11 @@ public class Utilidades {
             "\\(7\" Version\\)",
             "\\(Remastered\\)",
             "- Remastered",
-            "(Re-Record)"
+            "(Re-Record)",
+            "\\( Remasterizado\\)",
+            "-  Remasterizado",
+            "\\( Remasterizada\\)",
+            "-  Remasterizada"
         };
 
         for (String phrase : phrasesToRemove) {
