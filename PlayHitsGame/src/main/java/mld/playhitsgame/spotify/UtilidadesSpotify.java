@@ -79,7 +79,8 @@ public class UtilidadesSpotify {
                 grupo = artists.getJSONObject(0);
 
                 cancion.append("id", track.getString("id"));
-                cancion.append("titulo", track.getString("name"));
+                String titulo = Utilidades.filtrarTitulo((String) track.getString("name"));
+                cancion.append("titulo", titulo);
                 cancion.append("interprete", grupo.getString("name"));
                 cancion.append("anyo", anyo);
                 cancion.append("album", elAlbum);
