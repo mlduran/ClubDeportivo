@@ -48,4 +48,9 @@ public class RegistroServicioMetodos implements RegistroServicio {
                 tamano, Sort.by("fecha").descending()));
     }
 
+    @Override
+    public void limpiarRegistro(String tipo) {
+        DAO.deleteByTipo(tipo);
+    }
+
 }

@@ -286,5 +286,10 @@ public class Usuario {
 
         return pts;
     }
+    
+    public boolean isTieneTema(){
+        
+        return this.getTemas() != null && !this.getTemas().isEmpty();
+    }
 
 }

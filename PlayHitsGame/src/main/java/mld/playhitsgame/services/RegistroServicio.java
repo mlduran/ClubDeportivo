@@ -13,5 +13,7 @@ import mld.playhitsgame.exemplars.Registro;
 public interface RegistroServicio {  
 
     Registro save(Registro registro);
+    
+    void limpiarRegistro(String tipo);
 
 }

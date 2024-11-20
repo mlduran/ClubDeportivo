@@ -32,6 +32,18 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                             <option th:each="elem : ${temas}" 
                                                     th:value="${elem}" th:text="${elem}" ></option>
                                         </select>
+                                        <!--
+                                        <div th:if="${!usuarioSesion.tieneTema}">
+                                            <a href="/crearTematica" class="text-dark">
+                                                <p th:text="#{general.creartematica}"/>  
+                                            </a>   
+                                        </div>
+                                        <div th:if="${usuarioSesion.tieneTema}">
+                                            <a href="/anyadirCancionesTema" class="text-dark">
+                                                <p th:text="#{general.creartematica}"/>  
+                                            </a>   
+                                        </div>
+                                        -->
                                     </div>
                                     <div class="mb-3" th:if="${newpartida.tipoPersonal}">
                                         <label class="mb-2 text-muted" for="dificultad" th:text="#{general.dificultad}"/>

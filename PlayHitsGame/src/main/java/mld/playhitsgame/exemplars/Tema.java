@@ -21,6 +21,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "temas")
 public class Tema {
 
+    public static final int MIN_CANCIONES = 25;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,7 +35,7 @@ public class Tema {
     private Genero genero;
     @ManyToMany(mappedBy = "tematicas")
     private List<Cancion> canciones;
-    
+
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = true)
     private Usuario usuario;
@@ -57,13 +59,14 @@ public class Tema {
         }
         return String.valueOf(n);
     }
-    
-    public String getDatos(){
-        
-        if (this.getGenero() == null || this.getIdioma() == null)
+
+    public String getDatos() {
+
+        if (this.getGenero() == null || this.getIdioma() == null) {
             return "";
-        else
+        } else {
             return this.getGenero() + "-" + this.getIdioma();
-        
+        }
+
     }
 }

@@ -18,7 +18,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 
                 <div class="justify-content-s-center h-100">
 
-                    <table class="table-responsive table-bordered align-items-center" border="2" >
+                    <table class="table-responsive table-bordered align-items-center" border="2" style="max-width: 100%; width: 100%; table-layout: fixed;">
                         <tr>
                             <td style="text-align:center;">
                                 <img th:src="@{'/images/playhitsgamePresentacion.png'}" class="img-fluid" alt="PLAYHITSGAME" />
@@ -33,6 +33,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <td style="text-align:center;">
                                 <h1>REGISTRO</h1>
                             </td> 
+                        </tr>
+                        <tr>
+                            <td style="text-align:center;">
+                                <a th:href="@{/registroLimpiar}" class="button" id="limpiarRegistro"> LIMPIAR </a>
+                            </td>
                         </tr>
                         <tr>
                             <td style="text-align:center;">

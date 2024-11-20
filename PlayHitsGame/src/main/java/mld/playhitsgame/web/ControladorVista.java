@@ -35,6 +35,8 @@ import mld.playhitsgame.exemplars.Dificultad;
 import mld.playhitsgame.exemplars.FiltroCanciones;
 import mld.playhitsgame.exemplars.FiltroTemas;
 import mld.playhitsgame.exemplars.FiltroUsuarios;
+import mld.playhitsgame.exemplars.Genero;
+import mld.playhitsgame.exemplars.Idioma;
 import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.Respuesta;
 import mld.playhitsgame.exemplars.Rol;
@@ -327,7 +329,8 @@ public class ControladorVista {
             }
             modelo.addAttribute("id_usuarioSesion", usuarioSesion.getId());
             informarUsuarioModelo(modelo, usuarioSesion);
-            servRegistro.registrar(TipoRegistro.Login, ipCliente(request), usuarioSesion.getUsuario());
+            if (!usuarioSesion.isAdmin())
+                servRegistro.registrar(TipoRegistro.Login, ipCliente(request), usuarioSesion.getUsuario());
             return "redirect:/panel";
         }
     }
@@ -1850,4 +1853,70 @@ public class ControladorVista {
 
         return "Registro";
     }
+    
+    @GetMapping("/registroLimpiar")
+    public String registroLimpiar(Model modelo){
+        
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null || !usu.isAdmin()) {
+            return "redirect:/logout";
+        }
+        
+        servRegistro.limpiarRegistro(TipoRegistro.Visita.name());
+        
+        return "redirect:/registro";       
+    }
+    
+    @GetMapping("/crearTematica")
+    public String crearTematica(Model modelo) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/logout";
+        }
+
+        Tema newTema = new Tema();
+        newTema.setUsuario(usu);
+        newTema.setDescripcion(usu.getAlias());
+        newTema.setIdioma(Idioma.International);
+        newTema.setGenero(Genero.Generico);
+        
+        modelo.addAttribute("tema", newTema);
+        
+        return "AltaTema";
+    }
+    
+    @PostMapping("/crearTematica")
+    public String crearTematica(@ModelAttribute("newTema") Tema newTema, 
+            Model modelo) {
+        
+        List<Tema> temas = servTema.findAll();
+        HashSet<Cancion> canciones = new HashSet();
+        
+        String err = null;
+        
+        try {        
+            for (Tema unTema : temas){
+                if (unTema.getGenero().equals(newTema.getGenero()) &&
+                      unTema.getIdioma().equals(newTema.getIdioma()))
+                    canciones.addAll(unTema.getCanciones());
+            }
+            if (canciones.size() < Tema.MIN_CANCIONES)
+                err = mensaje(modelo, "general.sincancionesparatema");
+        } catch (Exception ex) {
+            err = ex.getMessage();
+        }
+        
+        if (err != null){
+            modelo.addAttribute("tema", newTema);
+            modelo.addAttribute("error", err);
+            return "AltaTema";
+        }
+        
+        modelo.addAttribute("tema", servTema.save(newTema));
+        modelo.addAttribute("canciones", canciones);
+        
+        return "ModificarCancionesTema";
+    }
+
 }
