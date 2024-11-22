@@ -823,7 +823,7 @@ public class ControladorVista {
                         + "&token=" + token;
                 boolean ok = enviarMail(usuario, mensaje(modelo, "general.altaplay"),
                         enlace, "CorreoAlta");
-                if (ok) {                    
+                if (ok) {
                     resp = mensaje(modelo, "general.usuariocreado").concat(usuario.getUsuario());
                 } else {
                     err = mensaje(modelo, "general.mailinvalido");
@@ -950,7 +950,7 @@ public class ControladorVista {
         } catch (Exception e) {
             Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, e);
         }
-        return "redirect:/administracion";
+        return "redirect:/usuarios";
     }
 
     @GetMapping("/modificarUsuario")
@@ -1010,12 +1010,13 @@ public class ControladorVista {
 
         ArrayList<String> temas = new ArrayList();
         Locale elLocale;
-        
-        if (modelo.getAttribute("locale") != null)        
+
+        if (modelo.getAttribute("locale") != null) {
             elLocale = (Locale) modelo.getAttribute("locale");
-        else
+        } else {
             elLocale = Locale.getDefault();
-        
+        }
+
         FiltroTemas filtroTemas = new FiltroTemas(elLocale);
         for (Tema tema : filtroTemas.filtrarTemas(servTema.findAll())) {
             if (!tema.getTema().equals("PlayHitsGame")) {
@@ -1546,14 +1547,14 @@ public class ControladorVista {
 
         ArrayList<Usuario> usuarios = (ArrayList<Usuario>) servUsuario.usuariosGrupo(usu.getGrupo());
         ArrayList<Usuario> invitados = new ArrayList();
-        
-        if (!usu.sinGrupo()){
+
+        if (!usu.sinGrupo()) {
             // Nos eleiminamos a nosotros mismos y ponemos el resto en seleccionado por defecto
             for (Usuario elem : usuarios) {
                 if (!Objects.equals(elem.getId(), usu.getId())) {
                     invitados.add(elem);
                 }
-            }   
+            }
         }
         return invitados;
     }
@@ -1567,36 +1568,9 @@ public class ControladorVista {
         }
 
         modelo.addAttribute("ipRouter", servConfig.getSettings().getIpRouter());
-
-        FiltroUsuarios filtro;
-        if (modelo.getAttribute("filtroUsuarios") == null) {
-            filtro = new FiltroUsuarios();
-            modelo.addAttribute("filtroUsuarios", filtro);
-        } else {
-            filtro = (FiltroUsuarios) modelo.getAttribute("filtroUsuarios");
-        }
-
-        List<Usuario> usuarios = servUsuario.findByFiltroBasico(filtro);
-        modelo.addAttribute("usuarios", usuarios);
-
+        
         return "Administracion";
-    }
-
-    @PostMapping("/administracion")
-    public String administracion(Model modelo, @ModelAttribute("filtroUsuarios") FiltroUsuarios filtro) {
-
-        Usuario usu = usuarioModelo(modelo);
-        if (usu == null || !usu.isAdmin()) {
-            return "redirect:/logout";
-        }
-
-        modelo.addAttribute("ipRouter", servConfig.getSettings().getIpRouter());
-
-        List<Usuario> usuarios = servUsuario.findByFiltroBasico(filtro);
-        modelo.addAttribute("usuarios", usuarios);
-
-        return "Administracion";
-    }
+    }  
 
     @PostMapping("/accionesUsuarios")
     public String accionesUsuarios(Model modelo, HttpServletRequest req) {
@@ -1653,7 +1627,7 @@ public class ControladorVista {
                 }
             }
         }
-        return "redirect:/administracion";
+        return "redirect:/usuarios";
     }
 
     @GetMapping("/validarUsuario")
@@ -1820,13 +1794,15 @@ public class ControladorVista {
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/logout";
-        }
+        }        
 
         List<PuntuacionTMP> pts = new ArrayList();
 
         List<Puntuacion> obtenerPuntuacionesPersonales = sevrPuntuacion.obtenerPuntuacionesPersonales(tema_id);
         Optional<Tema> tema = servTema.findById(tema_id);
 
+        // mostramos solo los 50 primeros, aunque devuelve los 100 primeros
+        int contador = 50;
         for (Puntuacion punt : obtenerPuntuacionesPersonales) {
             PuntuacionTMP ptsTMP = new PuntuacionTMP();
             Optional<Usuario> findById = servUsuario.findById(punt.getIdUsuario());
@@ -1837,6 +1813,11 @@ public class ControladorVista {
             }
             ptsTMP.setPuntos(punt.getPuntos());
             pts.add(ptsTMP);
+
+            contador++;
+            if (contador >= 50) {
+                break; // Salimos del bucle después de procesar 50 elementos
+            }
         }
 
         if (pts.isEmpty()) {
@@ -1863,6 +1844,47 @@ public class ControladorVista {
         modelo.addAttribute("registros", obtenerRegistrosPaginados);
 
         return "Registro";
+    }
+    
+    @GetMapping("/usuarios")
+    public String usuarios(Model modelo,
+            @RequestParam(name = "page", defaultValue = "0") int page
+    ) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null || !usu.isAdmin()) {
+            return "redirect:/logout";
+        }
+        
+        FiltroUsuarios filtro;
+        if (modelo.getAttribute("filtroUsuarios") == null) {
+            filtro = new FiltroUsuarios();
+            modelo.addAttribute("filtroUsuarios", filtro);
+        } else {
+            filtro = (FiltroUsuarios) modelo.getAttribute("filtroUsuarios");
+        }
+
+        Page<Usuario> usuarios = servUsuario.findByFiltroBasico(filtro, page, REG_POR_PAG);
+
+        modelo.addAttribute("usuarios", usuarios);
+
+        return "Usuarios";
+    }
+    
+    @PostMapping("/usuarios")
+    public String usuarios(Model modelo, @ModelAttribute("filtroUsuarios") FiltroUsuarios filtro,
+            @RequestParam(name = "page", defaultValue = "0") int page) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null || !usu.isAdmin()) {
+            return "redirect:/logout";
+        }       
+
+        Page<Usuario> usuarios = servUsuario.findByFiltroBasico(filtro, page, REG_POR_PAG);
+
+        modelo.addAttribute("usuarios", usuarios);
+
+        return "Usuarios";
     }
 
     @GetMapping("/registroLimpiar")
@@ -1979,23 +2001,23 @@ public class ControladorVista {
     public void anyadirCancionTema(
             @PathVariable("cancion_id") Long cancion_id,
             @PathVariable("tema_id") Long tema_id) {
-        
+
         Cancion cancion = servCancion.findById(cancion_id).get();
         Tema tema = servTema.findById(tema_id).get();
         cancion.anyadirTematica(tema);
-        
+
         servCancion.updateTemasCancion(cancion_id, cancion);
     }
-    
+
     @GetMapping("/eliminarCancionTema/{cancion_id}/{tema_id}")
     public void eliminarCancionTema(
             @PathVariable("cancion_id") Long cancion_id,
             @PathVariable("tema_id") Long tema_id) {
-        
+
         Cancion cancion = servCancion.findById(cancion_id).get();
         Tema tema = servTema.findById(tema_id).get();
         cancion.eliminarTematica(tema);
-        
+
         servCancion.updateTemasCancion(cancion_id, cancion);
     }
 }
