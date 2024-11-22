@@ -12,7 +12,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     </head>
     <body>
     <body>
-        <input type="hidden" id="fichAjuda" th:value="'/ayuda/CrearPartida_' + ${locale.language} + '.html'" />
+        <input type="hidden" id="fichAjuda" 
+               th:value="${locale != null ? '/ayuda/CrearPartida_' + locale.language + '.html' : '/ayuda/CrearPartida_es.html'}" />
         <section class="h-100">
             <div class="container h-100">
                 <div class="row justify-content-sm-center h-100">
@@ -39,8 +40,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                             </a>   
                                         </div>
                                         <div th:if="${usuarioSesion.tieneTema}">
-                                            <a href="/anyadirCancionesTema" class="text-dark">
-                                                <p th:text="#{general.creartematica}"/>  
+                                            <a href="/modificarTematica" class="text-dark">
+                                                <p th:text="#{general.modificartutema}"/>  
                                             </a>   
                                         </div>
                                         -->

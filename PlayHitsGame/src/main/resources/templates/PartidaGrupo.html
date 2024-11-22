@@ -17,7 +17,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 
     <body>
         <section>
-            <input type="hidden" id="fichAjuda" th:value="'/ayuda/PartidaGrupo_' + ${locale.language} + '.html'" />
+            <input type="hidden" id="fichAjuda" 
+               th:value="${locale != null ? '/ayuda/PartidaGrupo_' + locale.language + '.html' : '/ayuda/PartidaGrupo_es.html'}" />
             <input type="hidden" id="serverWS" th:value="${serverWebsocket}" />
             <input type="hidden" id="idusuario" th:value="${usuarioSesion.id}" />
             <input type="hidden" id="idpartida" th:value="${partidaSesion.id}" />

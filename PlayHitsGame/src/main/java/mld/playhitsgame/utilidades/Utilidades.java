@@ -622,10 +622,10 @@ public class Utilidades {
             "\\(Remastered\\)",
             "- Remastered",
             "(Re-Record)",
-            "\\( Remasterizado\\)",
-            "-  Remasterizado",
-            "\\( Remasterizada\\)",
-            "-  Remasterizada"
+            "\\(Remasterizado\\)",
+            "- Remasterizado",
+            "\\(Remasterizada\\)",
+            "- Remasterizada"
         };
 
         for (String phrase : phrasesToRemove) {

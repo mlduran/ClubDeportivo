@@ -113,7 +113,7 @@ public class ControladorVista {
     private final int REG_POR_PAG = 100;
 
     private String urlLoginSpotify;
-    
+
     @Autowired
     private MessageSource messageSource;
 
@@ -169,21 +169,22 @@ public class ControladorVista {
         }
 
     }
-    
-    private Locale idioma(Model modelo){
-        
+
+    private Locale idioma(Model modelo) {
+
         Locale idioma = (Locale) modelo.getAttribute("locale");
-        
-        if (idioma == null)
+
+        if (idioma == null) {
             idioma = Locale.getDefault();
-        
-        return idioma;        
+        }
+
+        return idioma;
     }
-    
-    private String mensaje(Model modelo, String idMensaje){
-        
+
+    private String mensaje(Model modelo, String idMensaje) {
+
         return messageSource.getMessage(idMensaje, null, idioma(modelo));
-        
+
     }
 
     private String urlSpotify() {
@@ -257,7 +258,7 @@ public class ControladorVista {
         if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
         }
-        
+
         return ip;
     }
 
@@ -329,8 +330,9 @@ public class ControladorVista {
             }
             modelo.addAttribute("id_usuarioSesion", usuarioSesion.getId());
             informarUsuarioModelo(modelo, usuarioSesion);
-            if (!usuarioSesion.isAdmin())
+            if (!usuarioSesion.isAdmin()) {
                 servRegistro.registrar(TipoRegistro.Login, ipCliente(request), usuarioSesion.getUsuario());
+            }
             return "redirect:/panel";
         }
     }
@@ -815,13 +817,13 @@ public class ControladorVista {
                 usuario.setActivo(false);
                 usuario.setContrasenya(passEncrip);
                 usuario.setPreferencias("");
+                usuario = servUsuario.save(usuario);
                 String token = passwordEncoder.encode(usuario.getUsuario());
                 String enlace = customIp + "/validarUsuario?id=" + String.valueOf(usuario.getId())
                         + "&token=" + token;
                 boolean ok = enviarMail(usuario, mensaje(modelo, "general.altaplay"),
                         enlace, "CorreoAlta");
-                if (ok) {
-                    servUsuario.save(usuario);
+                if (ok) {                    
                     resp = mensaje(modelo, "general.usuariocreado").concat(usuario.getUsuario());
                 } else {
                     err = mensaje(modelo, "general.mailinvalido");
@@ -1007,7 +1009,14 @@ public class ControladorVista {
     private void anyadirTemas(Model modelo) {
 
         ArrayList<String> temas = new ArrayList();
-        FiltroTemas filtroTemas = new FiltroTemas((Locale) modelo.getAttribute("locale"));
+        Locale elLocale;
+        
+        if (modelo.getAttribute("locale") != null)        
+            elLocale = (Locale) modelo.getAttribute("locale");
+        else
+            elLocale = Locale.getDefault();
+        
+        FiltroTemas filtroTemas = new FiltroTemas(elLocale);
         for (Tema tema : filtroTemas.filtrarTemas(servTema.findAll())) {
             if (!tema.getTema().equals("PlayHitsGame")) {
                 temas.add(tema.getTema());
@@ -1305,7 +1314,7 @@ public class ControladorVista {
                     "No hay suficientes canciones para iniciar la partida");
             return "CrearPartidaInvitado";
         }
-        
+
         partida.setDificultad(Dificultad.Entreno);
 
         modelo.addAttribute("partidaInvitado", partida);
@@ -1422,13 +1431,13 @@ public class ControladorVista {
             Optional<Cancion> canTit = servCancion.findById(Long.valueOf(titulo));
             if (!cancion.getTitulo().equals(canTit.get().getTitulo())) {
                 mensajeRespuesta.add(mensaje(modelo, "general.titulocorrecto")
-                            + cancion.getTitulo() + " " + mensaje(modelo, "general.turespondiste") + canTit.get().getTitulo());
+                        + cancion.getTitulo() + " " + mensaje(modelo, "general.turespondiste") + canTit.get().getTitulo());
                 fallos = fallos + 1;
             }
             Optional<Cancion> canInt = servCancion.findById(Long.valueOf(interprete));
             if (!cancion.getInterprete().equals(canInt.get().getInterprete())) {
                 mensajeRespuesta.add(mensaje(modelo, "general.intercorrecto")
-                            + cancion.getInterprete() + " " + mensaje(modelo, "general.turespondiste") + canInt.get().getInterprete());
+                        + cancion.getInterprete() + " " + mensaje(modelo, "general.turespondiste") + canInt.get().getInterprete());
                 fallos = fallos + 1;
             }
             if (!anyo.equals(String.valueOf(cancion.getAnyo()))) {
@@ -1537,12 +1546,14 @@ public class ControladorVista {
 
         ArrayList<Usuario> usuarios = (ArrayList<Usuario>) servUsuario.usuariosGrupo(usu.getGrupo());
         ArrayList<Usuario> invitados = new ArrayList();
-
-        // Nos eleiminamos a nosotros mismos y ponemos el resto en seleccionado por defecto
-        for (Usuario elem : usuarios) {
-            if (!Objects.equals(elem.getId(), usu.getId())) {
-                invitados.add(elem);
-            }
+        
+        if (!usu.sinGrupo()){
+            // Nos eleiminamos a nosotros mismos y ponemos el resto en seleccionado por defecto
+            for (Usuario elem : usuarios) {
+                if (!Objects.equals(elem.getId(), usu.getId())) {
+                    invitados.add(elem);
+                }
+            }   
         }
         return invitados;
     }
@@ -1853,20 +1864,20 @@ public class ControladorVista {
 
         return "Registro";
     }
-    
+
     @GetMapping("/registroLimpiar")
-    public String registroLimpiar(Model modelo){
-        
+    public String registroLimpiar(Model modelo) {
+
         Usuario usu = usuarioModelo(modelo);
         if (usu == null || !usu.isAdmin()) {
             return "redirect:/logout";
         }
-        
+
         servRegistro.limpiarRegistro(TipoRegistro.Visita.name());
-        
-        return "redirect:/registro";       
+
+        return "redirect:/registro";
     }
-    
+
     @GetMapping("/crearTematica")
     public String crearTematica(Model modelo) {
 
@@ -1880,43 +1891,111 @@ public class ControladorVista {
         newTema.setDescripcion(usu.getAlias());
         newTema.setIdioma(Idioma.International);
         newTema.setGenero(Genero.Generico);
-        
+
         modelo.addAttribute("tema", newTema);
-        
+
         return "AltaTema";
     }
-    
-    @PostMapping("/crearTematica")
-    public String crearTematica(@ModelAttribute("newTema") Tema newTema, 
-            Model modelo) {
-        
+
+    private HashSet<Cancion> cancionesParaTema(Tema tema) {
+
         List<Tema> temas = servTema.findAll();
         HashSet<Cancion> canciones = new HashSet();
-        
-        String err = null;
-        
-        try {        
-            for (Tema unTema : temas){
-                if (unTema.getGenero().equals(newTema.getGenero()) &&
-                      unTema.getIdioma().equals(newTema.getIdioma()))
-                    canciones.addAll(unTema.getCanciones());
+        for (Tema unTema : temas) {
+            if (unTema.getGenero().equals(tema.getGenero())
+                    && unTema.getIdioma().equals(tema.getIdioma())) {
+                canciones.addAll(unTema.getCanciones());
             }
-            if (canciones.size() < Tema.MIN_CANCIONES)
-                err = mensaje(modelo, "general.sincancionesparatema");
+        }
+
+        return canciones;
+    }
+
+    @PostMapping("/crearTematica")
+    public String crearTematica(@ModelAttribute("newTema") Tema newTema,
+            Model modelo) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/logout";
+        }
+
+        String err = null;
+        HashSet<Cancion> canciones = null;
+
+        try {
+            Optional<Tema> temaBD = servTema.findBytema(newTema.getTema());
+            if (temaBD.isPresent()) {
+                err = mensaje(modelo, "general.temaexistebd");
+            } else {
+                canciones = cancionesParaTema(newTema);
+
+                if (canciones.size() < Tema.MIN_CANCIONES) {
+                    err = mensaje(modelo, "general.sincancionesparatema");
+                }
+            }
         } catch (Exception ex) {
             err = ex.getMessage();
         }
-        
-        if (err != null){
+
+        if (err != null) {
             modelo.addAttribute("tema", newTema);
             modelo.addAttribute("error", err);
             return "AltaTema";
         }
-        
-        modelo.addAttribute("tema", servTema.save(newTema));
-        modelo.addAttribute("canciones", canciones);
-        
+
+        newTema.setUsuario(usu);
+        newTema.setDescripcion(usu.getNombre());
+
+        Tema tema = servTema.save(newTema);
+
+        modelo.addAttribute("tema", tema);
+        modelo.addAttribute(
+                "cancionesDisponibles", canciones);
+
         return "ModificarCancionesTema";
     }
 
+    @GetMapping("/modificarTematica")
+    public String modificarTematica(Model modelo) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/logout";
+        }
+
+        HashSet<Cancion> canciones = cancionesParaTema(usu.getTemas().getFirst());
+
+        modelo.addAttribute(
+                "tema", usu.getTemas().getFirst());
+
+        modelo.addAttribute(
+                "cancionesDisponibles", canciones);
+
+        return "ModificarCancionesTema";
+    }
+
+    @GetMapping("/anyadirCancionTema/{cancion_id}/{tema_id}")
+    public void anyadirCancionTema(
+            @PathVariable("cancion_id") Long cancion_id,
+            @PathVariable("tema_id") Long tema_id) {
+        
+        Cancion cancion = servCancion.findById(cancion_id).get();
+        Tema tema = servTema.findById(tema_id).get();
+        cancion.anyadirTematica(tema);
+        
+        servCancion.updateTemasCancion(cancion_id, cancion);
+    }
+    
+    @GetMapping("/eliminarCancionTema/{cancion_id}/{tema_id}")
+    public void eliminarCancionTema(
+            @PathVariable("cancion_id") Long cancion_id,
+            @PathVariable("tema_id") Long tema_id) {
+        
+        Cancion cancion = servCancion.findById(cancion_id).get();
+        Tema tema = servTema.findById(tema_id).get();
+        cancion.eliminarTematica(tema);
+        
+        servCancion.updateTemasCancion(cancion_id, cancion);
+    }
 }

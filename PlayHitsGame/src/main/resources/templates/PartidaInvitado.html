@@ -26,7 +26,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 
     <body>        
         <section class="h-100">
-            <input type="hidden" id="fichAjuda" th:value="'/ayuda/PartidaPersonal_' + ${locale.language} + '.html'" />
+            <input type="hidden" id="fichAjuda" 
+               th:value="${locale != null ? '/ayuda/PartidaPersonal_' + locale.language + '.html' : '/ayuda/PartidaPersonal_es.html'}" />
             <input type="hidden" id="respuestaOK" th:value="${respuestaOK}" />
             <input type="hidden" id="todoFallo" th:value="${todoFallo}" />
             <input type="hidden" id="esRecord" th:value="${esRecord}" />

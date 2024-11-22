@@ -46,8 +46,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </tr>
                                     <tr>
                                         <td colspan="3"  style="text-align:center; background-color: lightpink;">
-                                    <spawn th:text="#{general.partidapersonal}" />
-                                    </td>
+                                            <span th:text="#{general.partidapersonal}" />
+                                        </td>
                                     </tr>
                                     <tr>                                        
                                         <td colspan="2">
@@ -82,7 +82,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                         </th>
                                     </tr>
                                     <tr th:each="rondaPart : ${partidaSesion.rondas}">
-                                        <td colspan="3"> 
+                                        <td th:if="${!rondaPart.respuestas.isEmpty()}" colspan="3"> 
                                             <table style="width: 100%;">
                                                 <tr>
                                                     <th style="text-align:center; background-color: lightblue; width:70%;">                                
@@ -93,7 +93,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                              th:data-name="${rondaPart.cancion.spotifyplay}"
                                                              th:onclick="reproducir(this.getAttribute('data-name'))"/>
                                                     </th>
-                                                <tr>
+                                                </tr>
                                                 <tr>
                                                     <td style="width:70%;">
                                                         <table style="width: 100%;">
@@ -107,7 +107,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                                 <td th:data-value="${rondaPart.respuestas.get(0).anyoOk}" th:text="${rondaPart.respuestas.get(0).anyo}" /> 
                                                             </tr>                                                                
                                                         </table>
-
                                                     </td>
                                                     <td style="width:30%;">
                                                         <table style="width: 100%;">
