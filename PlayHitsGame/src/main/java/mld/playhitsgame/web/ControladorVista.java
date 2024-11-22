@@ -1766,7 +1766,7 @@ public class ControladorVista {
         Rol rol = null;
         if (usu == null) {
             rol = (Rol) modelo.getAttribute("rol");
-            if (!rol.equals(Rol.playhitsgame)) {
+            if (rol == null || !rol.equals(Rol.playhitsgame)) {
                 return "redirect:/logout";
             }
         }
