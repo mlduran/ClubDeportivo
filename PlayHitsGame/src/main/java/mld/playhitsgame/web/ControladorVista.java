@@ -1798,11 +1798,10 @@ public class ControladorVista {
 
         List<PuntuacionTMP> pts = new ArrayList();
 
+        // Se muestran los 50 primeros
         List<Puntuacion> obtenerPuntuacionesPersonales = sevrPuntuacion.obtenerPuntuacionesPersonales(tema_id);
         Optional<Tema> tema = servTema.findById(tema_id);
 
-        // mostramos solo los 50 primeros, aunque devuelve los 100 primeros
-        int contador = 50;
         for (Puntuacion punt : obtenerPuntuacionesPersonales) {
             PuntuacionTMP ptsTMP = new PuntuacionTMP();
             Optional<Usuario> findById = servUsuario.findById(punt.getIdUsuario());
@@ -1813,11 +1812,6 @@ public class ControladorVista {
             }
             ptsTMP.setPuntos(punt.getPuntos());
             pts.add(ptsTMP);
-
-            contador++;
-            if (contador >= 50) {
-                break; // Salimos del bucle después de procesar 50 elementos
-            }
         }
 
         if (pts.isEmpty()) {
