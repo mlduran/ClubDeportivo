@@ -234,11 +234,18 @@ public class ControladorVista {
 
     private Partida partidaModelo(Model modelo) {
 
-        Long id_part = (Long) modelo.getAttribute("id_partidaSesion");
         Partida partidaSesion = null;
-        try {
-            partidaSesion = servPartida.findById(id_part).get();
-        } catch (Exception ex) {
+        Object id = modelo.getAttribute("id_partidaSesion");
+        Long id_part = null;
+        if (id != null && id != "") {
+            id_part = (Long) id;
+        }
+
+        if (id_part != null) {
+            try {
+                partidaSesion = servPartida.findById(id_part).get();
+            } catch (Exception ex) {
+            }
         }
 
         return partidaSesion;
@@ -273,8 +280,8 @@ public class ControladorVista {
     @GetMapping("/logout")
     public String logout(Model modelo) {
         modelo.addAttribute("invitadosON", invitadosON);
-        modelo.addAttribute("id_usuarioSesion", null);
-        modelo.addAttribute("id_partidaSesion", null);
+        modelo.addAttribute("id_usuarioSesion", "");
+        modelo.addAttribute("id_partidaSesion", "");
         modelo.addAttribute("posiblesinvitados", null);
         modelo.addAttribute("rol", null);
         modelo.addAttribute("filtroUsuarios", null);
@@ -1568,9 +1575,9 @@ public class ControladorVista {
         }
 
         modelo.addAttribute("ipRouter", servConfig.getSettings().getIpRouter());
-        
+
         return "Administracion";
-    }  
+    }
 
     @PostMapping("/accionesUsuarios")
     public String accionesUsuarios(Model modelo, HttpServletRequest req) {
@@ -1794,7 +1801,7 @@ public class ControladorVista {
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/logout";
-        }        
+        }
 
         List<PuntuacionTMP> pts = new ArrayList();
 
@@ -1839,7 +1846,7 @@ public class ControladorVista {
 
         return "Registro";
     }
-    
+
     @GetMapping("/usuarios")
     public String usuarios(Model modelo,
             @RequestParam(name = "page", defaultValue = "0") int page
@@ -1849,7 +1856,7 @@ public class ControladorVista {
         if (usu == null || !usu.isAdmin()) {
             return "redirect:/logout";
         }
-        
+
         FiltroUsuarios filtro;
         if (modelo.getAttribute("filtroUsuarios") == null) {
             filtro = new FiltroUsuarios();
@@ -1864,7 +1871,7 @@ public class ControladorVista {
 
         return "Usuarios";
     }
-    
+
     @PostMapping("/usuarios")
     public String usuarios(Model modelo, @ModelAttribute("filtroUsuarios") FiltroUsuarios filtro,
             @RequestParam(name = "page", defaultValue = "0") int page) {
@@ -1872,7 +1879,7 @@ public class ControladorVista {
         Usuario usu = usuarioModelo(modelo);
         if (usu == null || !usu.isAdmin()) {
             return "redirect:/logout";
-        }       
+        }
 
         Page<Usuario> usuarios = servUsuario.findByFiltroBasico(filtro, page, REG_POR_PAG);
 
