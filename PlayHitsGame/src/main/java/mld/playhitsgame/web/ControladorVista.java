@@ -551,7 +551,7 @@ public class ControladorVista {
         }
 
         if ((partida.ultimaRonda() == null || partida.ultimaRonda().isCompletada())
-                && todoFallo == false) {
+                && !partida.isTerminada() && todoFallo == false) {
             try {
                 ultimaRonda = darDeAltaRonda(partida);
             } catch (IndexOutOfBoundsException ex) {

@@ -43,6 +43,7 @@ public class Tema {
     private String listasSpotify;
     private Long usuarioRecord;
     private int puntos;
+    private boolean activo;
 
     public String getNumCanciones() {
 
