@@ -20,6 +20,36 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <img th:src="@{'/images/playhitsgamePresentacion.png'}" class="img-fluid" alt="PLAYHITSGAME" />
                         </div>
                         <div class="text-center my-1">
+                            <!-- Formulario para Poner Mantenimiento -->
+                            <form th:action="@{/ponerMantenimiento}" method="post">                                
+                                <button id="ponerMant" type="submit"
+                                        th:classappend="${config.mantenimiento} ? 'btn btn-secondary' : 'btn btn-success'">
+                                    Poner Mantenimiento Hasta
+                                </button>
+                                <input type="datetime-local" id="fechaMantenimiento" name="fechaMantenimiento" 
+                                       th:value="${fechaHoraActual}" />
+                            </form>
+                            <br/>
+                            <!-- Formulario para Quitar Mantenimiento -->
+                            <form th:action="@{/quitarMantenimiento}" method="post">                                
+                                <button id="quitarMant" type="submit"
+                                        th:classappend="${config.mantenimiento} ? 'btn btn-success' : 'btn btn-secondary'">
+                                    Quitar Mantenimiento
+                                </button>
+                            </form>
+                        </div>
+                        <hr style="border: 0; height: 2px; background-color: #333; width: 100%;"/>
+                        <div class="text-center my-1">
+                            <form th:action="@{/cambiarMensajeInicio}" method="post">
+                                <label for="txtInicio_es">MENSAJE DE INICIO ESPAÑOL</label><br>
+                                <textarea id="txtInicio_es" name="txtInicio_es" th:text="${config.mensajeInicio_es}" cols="40" rows="2"></textarea><br>
+                                <label for="txtInicio_en">MENSAJE DE INICIO INGLES</label><br>
+                                <textarea id="txtInicio_en" name="txtInicio_en" th:text="${config.mensajeInicio_en}" cols="40" rows="2"></textarea><br><br>
+                                <button type="submit">Modificar</button>
+                            </form>
+                        </div>
+                        <hr style="border: 0; height: 2px; background-color: #333; width: 100%;"/>
+                        <div class="text-center my-1">
                             <form th:action="@{/enviarMailMasivo}" method="post">
                                 <label for="txtMail">ENVIO DE MAIL MASIVO</label><br>
                                 <textarea id="txtMail" name="txtMail" cols="40" rows="10"></textarea><br><br>
@@ -29,7 +59,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         <hr style="border: 0; height: 2px; background-color: #333; width: 100%;"/>
                         <div class="text-center my-1">
                             <label for="ipRouter">IP ROUTER</label>
-                            <input id="ipRouter" type="text" th:value="${ipRouter}" disabled />
+                            <input id="ipRouter" type="text" th:value="${config.ipRouter}" disabled />
                         </div>
                         <hr style="border: 0; height: 2px; background-color: #333; width: 100%;"/>
                         <div class="text-center my-1">

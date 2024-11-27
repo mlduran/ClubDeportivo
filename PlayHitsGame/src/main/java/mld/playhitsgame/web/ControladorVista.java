@@ -13,7 +13,9 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -160,7 +162,7 @@ public class ControladorVista {
         System.out.print("IP Router Actual : " + ipRouterActual);
 
         if (!ipRouterConfigurada.equals(ipRouterActual)) {
-            Config newConfig = new Config();
+            Config newConfig = servConfig.getSettings();
             newConfig.setIpRouter(ipRouterActual);
             servConfig.saveSettings(newConfig);
             enviarMail(mailAdmin, "", "Cambio de IP Router",
@@ -274,6 +276,42 @@ public class ControladorVista {
         servRegistro.registrar(TipoRegistro.Visita, ipCliente(request));
         modelo.addAttribute("invitadosON", invitadosON);
         modelo.addAttribute("locale", locale);
+        try {
+            Config config = servConfig.getSettings();
+
+            if (config.isMantenimiento()) {
+                LocalDateTime fechaMant = config.getFechaMantenimiento();
+                LocalDateTime fechaActu = LocalDateTime.now();
+                Duration duracion = Duration.between(fechaActu, fechaMant);
+                long dias = duracion.toDays();
+                long horas = duracion.toHours() % 24;
+                long minutos = duracion.toMinutes() % 60;
+                
+                String mensaje = mensaje(modelo, "general.mantenimiento");
+                if (dias > 0)
+                    mensaje = mensaje.concat(String.valueOf(dias) + " " + mensaje(modelo, "general.dias"));
+                if (horas > 0)
+                    mensaje = mensaje.concat(String.valueOf(horas) + " " + mensaje(modelo, "general.horas"));
+                if (minutos > 0)
+                    mensaje = mensaje.concat(String.valueOf(minutos) + " " + mensaje(modelo, "general.minutos"));               
+                modelo.addAttribute("mensajeInicio", mensaje);
+            } else if (config.getMensajeInicio_es() != null
+                    && !"".equals(config.getMensajeInicio_es())) {
+                String mensaje = null;
+                if ("es".equals(locale.getLanguage())) {
+                    mensaje = config.getMensajeInicio_es();
+                }
+                if ("en".equals(locale.getLanguage())) {
+                    mensaje = config.getMensajeInicio_en();
+                }
+                modelo.addAttribute("mensajeInicio", mensaje);
+            }
+
+        } catch (Exception ex) {
+            Logger.getLogger(ControladorVista.class.getName()).log(
+                    Level.WARNING, null, ex);
+        }
+
         return "Inicio";
     }
 
@@ -282,16 +320,7 @@ public class ControladorVista {
         modelo.addAttribute("invitadosON", invitadosON);
         modelo.addAttribute("id_usuarioSesion", "");
         modelo.addAttribute("id_partidaSesion", "");
-        modelo.addAttribute("posiblesinvitados", null);
-        modelo.addAttribute("rol", null);
-        modelo.addAttribute("filtroUsuarios", null);
-        modelo.addAttribute("mensajeRespuesta", "");
-        modelo.addAttribute("respuestaOK", null);
-        modelo.addAttribute("todoFallo", null);
-        modelo.addAttribute("esRecord", null);
-        modelo.addAttribute("partidaInvitado", null);
-        modelo.addAttribute("cancionInvitado", null);
-        modelo.addAttribute("spotifyimagenTmp", null);
+        modelo.addAttribute("rol", "");
 
         return "redirect:/";
     }
@@ -466,7 +495,7 @@ public class ControladorVista {
             canciones.remove(cancionSel);
             if (canciones.isEmpty()) // TODO Aqui se deberia de acabar la partida
             {
-                throw new IndexOutOfBoundsException("nomascanciones");
+                throw new IndexOutOfBoundsException("general.nomascanciones");
             }
 
         }
@@ -537,7 +566,10 @@ public class ControladorVista {
         } else {
             ultimaRonda = partida.ultimaRonda();
         }
-        ultimaRonda.getRespuestas();
+        if (ultimaRonda == null) {
+            System.out.println("MLD Verificar partida sospechosa " + partida.getId().toString());
+            ultimaRonda.getRespuestas();
+        }
 
         List<OpcionTituloTmp> opcTitulos;
         List<OpcionInterpreteTmp> opcInterpretes;
@@ -721,7 +753,7 @@ public class ControladorVista {
             LocalTime actual = LocalTime.now();
             LocalTime sinComienzo = actual.minusSeconds(SEG_PARA_INICIO_RESPUESTA);
 
-            if (ronda.getInicio().isAfter(sinComienzo)) {
+            if (ronda.getInicio() != null && ronda.getInicio().isAfter(sinComienzo)) {
                 resp.setInicio(ronda.getInicio());
             } else {
                 resp.setInicio(sinComienzo);
@@ -1573,10 +1605,58 @@ public class ControladorVista {
         if (usu == null || !usu.isAdmin()) {
             return "redirect:/logout";
         }
+        
+        Config config = servConfig.getSettings();
+        
+        LocalDateTime fecha;
+        if (config.isMantenimiento())
+            fecha = config.getFechaMantenimiento();
+        else
+            fecha = LocalDateTime.now();
 
-        modelo.addAttribute("ipRouter", servConfig.getSettings().getIpRouter());
+        // Formatea la fecha y hora en el formato requerido
+        String fechaHoraFormateada = fecha.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+        modelo.addAttribute("fechaHoraActual", fechaHoraFormateada);
+        
+        modelo.addAttribute("config", config);
 
         return "Administracion";
+    }
+
+    @PostMapping("/cambiarMensajeInicio")
+    public String cambiarMensajeInicio(Model model, HttpServletRequest req) {
+
+        Config newConfig = servConfig.getSettings();
+        newConfig.setMensajeInicio_es(req.getParameter("txtInicio_es"));
+        newConfig.setMensajeInicio_en(req.getParameter("txtInicio_en"));
+        servConfig.saveSettings(newConfig);
+
+        return "redirect:/administracion";
+    }
+
+    @PostMapping("/ponerMantenimiento")
+    public String ponerMantenimiento(Model model, HttpServletRequest req) {
+
+        Config newConfig = servConfig.getSettings();
+        newConfig.setMantenimiento(true);
+        String f = req.getParameter("fechaMantenimiento");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        LocalDateTime fecha = LocalDateTime.parse(f, formatter);
+        newConfig.setFechaMantenimiento(fecha);
+        //newConfig.setFechaMantenimiento();
+        servConfig.saveSettings(newConfig);
+
+        return "redirect:/administracion";
+    }
+
+    @PostMapping("/quitarMantenimiento")
+    public String quitarMantenimiento(Model model, HttpServletRequest req) {
+
+        Config newConfig = servConfig.getSettings();
+        newConfig.setMantenimiento(false);
+        servConfig.saveSettings(newConfig);
+
+        return "redirect:/administracion";
     }
 
     @PostMapping("/accionesUsuarios")
@@ -1639,6 +1719,20 @@ public class ControladorVista {
 
     @GetMapping("/validarUsuario")
     public String validarUsuario(Model modelo, HttpServletRequest req) {
+
+        if (req.getParameter("id") == null
+                || req.getParameter("token") == null) {
+            String url;
+            StringBuffer requestURL = req.getRequestURL(); // Obtiene la URL completa hasta el path
+            String queryString = req.getQueryString(); // Obtiene la cadena de consulta (query parameters)
+            if (queryString == null) {
+                url = requestURL.toString();
+            } else {
+                url = requestURL.append("?").append(queryString).toString();
+            }
+            System.out.println("MLD Error validacion " + url);
+            return "error";
+        }
 
         Long id = Long.valueOf(req.getParameter("id"));
         String token = (String) req.getParameter("token");

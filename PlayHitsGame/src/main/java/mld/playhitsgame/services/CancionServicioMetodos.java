@@ -81,6 +81,14 @@ public class CancionServicioMetodos implements CancionServicio {
         if (Objects.nonNull(cancion.getSpotifyid()) && !"".equalsIgnoreCase(cancion.getSpotifyid())) {
             cancionObj.setSpotifyid(cancion.getSpotifyid());
         }
+        
+        if (Objects.nonNull(cancion.getSpotifyplay()) && !"".equalsIgnoreCase(cancion.getSpotifyplay())) {
+            cancionObj.setSpotifyplay(cancion.getSpotifyplay());
+        }
+        
+        if (Objects.nonNull(cancion.getSpotifyimagen()) && !"".equalsIgnoreCase(cancion.getSpotifyimagen())) {
+            cancionObj.setSpotifyimagen(cancion.getSpotifyimagen());
+        }
 
         cancionObj.setRevisar(cancion.pendienteRevision());
 

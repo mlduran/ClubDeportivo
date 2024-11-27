@@ -46,6 +46,7 @@ public class ConfigServicioMetodos implements ConfigServicio{
         Config settings = new Config();
         settings.setId(1L);
         settings.setIpRouter("");
+        settings.setMantenimiento(false);
         return DAO.save(settings);
     }
     

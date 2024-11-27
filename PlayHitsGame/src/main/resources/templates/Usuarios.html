@@ -51,6 +51,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <table border="2" class="table-responsive text-center">
                                 <tr> 
                                     <th>Sel</th>
+                                    <th>Fecha</th>
                                     <th>Usuario</th>
                                     <th>Activo?</th>
                                     <th>Alias</th>
@@ -61,6 +62,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                 </tr>
                                 <tr th:each="elem : ${usuarios}">
                                     <td><input type="checkbox" th:name="${elem.selId()}" th:id="${elem.selId()}" /></td>
+                                    <td th:text="${#dates.format(elem.alta, 'dd-MM-yyyy')}"></td>
                                     <td th:text="${elem.usuario}"></td>
                                     <td th:text="${elem.activoTxt}"></td>
                                     <td th:text="${elem.alias}"></td>
@@ -72,7 +74,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td colspan="8">
+                                    <td colspan="9">
                                         <div>
                                             <span th:text="'Página ' + ${usuarios.number + 1} + ' de ' + ${usuarios.totalPages}"></span>
 
@@ -87,7 +89,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td colspan="8">
+                                    <td colspan="9">
                                         <div class="text-center">
                                             <a href="/administracion" class="text-dark">
                                                 <p th:text="#{general.volver}" />

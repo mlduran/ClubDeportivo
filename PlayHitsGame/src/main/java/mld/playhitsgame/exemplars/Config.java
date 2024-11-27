@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,6 +30,10 @@ public final class Config  {
     private String passwBD;
     private String usuarioMail;
     private String passMail;
+    private String mensajeInicio_es;
+    private String mensajeInicio_en;
+    private boolean mantenimiento;
+    private LocalDateTime fechaMantenimiento;
 
 }
 
