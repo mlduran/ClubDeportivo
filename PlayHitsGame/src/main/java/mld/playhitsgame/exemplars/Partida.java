@@ -65,6 +65,7 @@ public class Partida {
     private String ganador;
 
     private boolean activarPlay;
+    private boolean sinOfuscar;
 
     public boolean isTipoGrupo() {
 

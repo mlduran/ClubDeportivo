@@ -34,5 +34,7 @@ public interface UsuarioDAO extends JpaRepository<Usuario, Long>{
     @Query(value = "SELECT * FROM usuarios WHERE grupo=:grupo ;", nativeQuery=true)
     List<Usuario> usuariosGrupo(String grupo);
 
+    @Query(value = "SELECT * FROM usuarios WHERE estrellas > 0 ORDER BY estrellas DESC LIMIT 50;", nativeQuery=true)
+    List<Usuario> usuariosEstrella();
     
 }

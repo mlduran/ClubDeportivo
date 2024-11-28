@@ -10,15 +10,12 @@ import java.util.Objects;
 import java.util.Optional;
 import mld.playhitsgame.DAO.UsuarioDAO;
 import mld.playhitsgame.exemplars.FiltroUsuarios;
-import mld.playhitsgame.exemplars.Registro;
 import mld.playhitsgame.exemplars.Usuario;
 import mld.playhitsgame.projections.ampliada.UsuarioAmpliadaView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -134,5 +131,10 @@ public class UsuarioServicioMetodos implements UsuarioServicio {
         // Retorna un objeto Page creado a partir de los usuarios paginados
         return new PageImpl<>(usuariosPaginados, Pageable.ofSize(tamanioPagina).withPage(numeroPagina), usuariosFiltro.size());
 
+    }
+
+    @Override
+    public List<Usuario> usuariosEstrella() {
+        return DAO.usuariosEstrella();
     }
 }

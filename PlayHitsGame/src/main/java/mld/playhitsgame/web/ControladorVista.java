@@ -219,9 +219,10 @@ public class ControladorVista {
 
     private Usuario usuarioModelo(Model modelo) {
 
-        Long id_usu = (Long) modelo.getAttribute("id_usuarioSesion");
+        Long id_usu;
         Usuario usuarioSesion = null;
         try {
+            id_usu = (Long) modelo.getAttribute("id_usuarioSesion");
             usuarioSesion = servUsuario.findById(id_usu).get();
         } catch (Exception ex) {
         }
@@ -568,7 +569,7 @@ public class ControladorVista {
         }
         if (ultimaRonda == null) {
             System.out.println("MLD Verificar partida sospechosa " + partida.getId().toString());
-            ultimaRonda.getRespuestas();
+            //ultimaRonda.getRespuestas();
         }
 
         List<OpcionTituloTmp> opcTitulos;
@@ -1845,6 +1846,9 @@ public class ControladorVista {
                 return "redirect:/logout";
             }
         }
+        
+        List<Usuario> jugadoresEstrella = servUsuario.usuariosEstrella();        
+        
         ArrayList<Tema> temas = (ArrayList<Tema>) servTema.findAll();
 
         ArrayList<Record> records = new ArrayList();
@@ -1875,6 +1879,7 @@ public class ControladorVista {
             volver = "/accesoInvitado";
         }
 
+        modelo.addAttribute("jugadoresEstrella", jugadoresEstrella);
         modelo.addAttribute("temas", records);
         modelo.addAttribute("volver", volver);
 
