@@ -63,7 +63,8 @@ public class Utilidades {
         return pts;
     }
 
-    public static int calcularPtsPorTitulo(String titulo, Cancion cancion, Dificultad dificultad) {
+    public static int calcularPtsPorTitulo(String titulo, Cancion cancion, 
+            Dificultad dificultad, boolean sinOfuscar) {
 
         int pts = 0;
         if (titulo != null && titulo.equals(cancion.getTitulo())) {
@@ -77,12 +78,17 @@ public class Utilidades {
         if (dificultad.equals(Dificultad.Dificil)) {
             pts = pts * 2;
         }
+        
+        if (sinOfuscar){
+            pts = pts / 2;
+        }
 
         return pts;
 
     }
 
-    public static int calcularPtsPorInterprete(String interprete, Cancion cancion, Dificultad dificultad) {
+    public static int calcularPtsPorInterprete(String interprete, Cancion cancion, 
+            Dificultad dificultad, boolean sinOfuscar) {
 
         int pts = 0;
         if (interprete != null && interprete.equals(cancion.getInterprete())) {
@@ -95,6 +101,10 @@ public class Utilidades {
         }
         if (dificultad.equals(Dificultad.Dificil)) {
             pts = pts * 2;
+        }
+        
+        if (sinOfuscar){
+            pts = pts / 2;
         }
 
         return pts;
@@ -175,15 +185,16 @@ public class Utilidades {
         return newText.toString();
     }
 
-    public static List<OpcionTituloTmp> opcionesTitulosCanciones(Ronda ronda, List<Cancion> canciones) {
+    public static List<OpcionTituloTmp> opcionesTitulosCanciones(Ronda ronda, List<Cancion> canciones, boolean isEncriptar) {
 
         List<Cancion> cancionesParaOpciones
                 = cancionesParaListaOpciones(canciones, ronda.getCancion(), NUMERO_OPCIONES);
 
-        return obtenerOpcionesTitulosCanciones(ronda, cancionesParaOpciones);
+        return obtenerOpcionesTitulosCanciones(ronda, cancionesParaOpciones, isEncriptar);
     }
 
-    private static List<OpcionTituloTmp> obtenerOpcionesTitulosCanciones(Ronda ronda, List<Cancion> cancionesParaOpciones) {
+    private static List<OpcionTituloTmp> obtenerOpcionesTitulosCanciones(Ronda ronda, 
+            List<Cancion> cancionesParaOpciones, boolean isEncriptar) {
 
         ArrayList<OpcionTituloTmp> opciones = new ArrayList();
         OpcionTituloTmp newObj;
@@ -192,32 +203,37 @@ public class Utilidades {
             newObj.setPartida(ronda.getPartida().getId());
             newObj.setRonda(ronda.getId());
             newObj.setCancion(cancion.getId());
-            newObj.setOpTitulo(encriptarString(cancion.getTitulo()));
+            if (isEncriptar)
+                newObj.setOpTitulo(encriptarString(cancion.getTitulo()));
+            else 
+                newObj.setOpTitulo(cancion.getTitulo());
             opciones.add(newObj);
         }
 
         return opciones;
     }
 
-    public static List<OpcionTituloTmp> opcionesTitulosCanciones(Ronda ronda) {
+    public static List<OpcionTituloTmp> opcionesTitulosCanciones(Ronda ronda, boolean isEncriptar) {
 
         // de las canciones elije aleatoriamente que une a la correcta y 
         // devuelve una lista con las canciones encriptadas
         List<Cancion> cancionesParaOpciones
                 = cancionesParaListaOpciones(ronda.getPartida().canciones(), ronda.getCancion(), NUMERO_OPCIONES);
 
-        return obtenerOpcionesTitulosCanciones(ronda, cancionesParaOpciones);
+        return obtenerOpcionesTitulosCanciones(ronda, cancionesParaOpciones, isEncriptar);
     }
 
-    public static List<OpcionInterpreteTmp> opcionesInterpretesCanciones(Ronda ronda, List<Cancion> canciones) {
+    public static List<OpcionInterpreteTmp> opcionesInterpretesCanciones(Ronda ronda,
+            List<Cancion> canciones, boolean isEncriptar) {
 
         List<Cancion> cancionesParaOpciones
                 = cancionesParaListaOpciones(canciones, ronda.getCancion(), NUMERO_OPCIONES);
 
-        return obtenerOpcionesInterpretesCanciones(ronda, cancionesParaOpciones);
+        return obtenerOpcionesInterpretesCanciones(ronda, cancionesParaOpciones, isEncriptar);
     }
 
-    private static List<OpcionInterpreteTmp> obtenerOpcionesInterpretesCanciones(Ronda ronda, List<Cancion> cancionesParaOpciones) {
+    private static List<OpcionInterpreteTmp> obtenerOpcionesInterpretesCanciones(Ronda ronda,
+            List<Cancion> cancionesParaOpciones, boolean isEncriptar) {
 
         // de las canciones elije aleatoriamente que une a la correcta y 
         // devuelve una lista con las canciones encriptadas
@@ -229,20 +245,23 @@ public class Utilidades {
             newObj.setPartida(ronda.getPartida().getId());
             newObj.setRonda(ronda.getId());
             newObj.setCancion(cancion.getId());
-            newObj.setOpInterprete(encriptarString(cancion.getInterprete()));
+            if (isEncriptar)
+                newObj.setOpInterprete(encriptarString(cancion.getInterprete()));
+            else
+                newObj.setOpInterprete(cancion.getInterprete());
             opciones.add(newObj);
         }
 
         return opciones;
     }
 
-    public static List<OpcionInterpreteTmp> opcionesInterpretesCanciones(Ronda ronda) {
+    public static List<OpcionInterpreteTmp> opcionesInterpretesCanciones(Ronda ronda, boolean isEncriptar) {
 
         List<Cancion> cancionesParaOpciones
                 = cancionesParaListaOpciones(ronda.getPartida().canciones(),
                         ronda.getCancion(), NUMERO_OPCIONES);
 
-        return obtenerOpcionesInterpretesCanciones(ronda, cancionesParaOpciones);
+        return obtenerOpcionesInterpretesCanciones(ronda, cancionesParaOpciones, isEncriptar);
 
     }
 

@@ -470,14 +470,14 @@ public class WebsocketControler {
             if (ptsAnyo > 0) {
                 resp.setAnyoOk(true);
             }
-            ptsTitulo = Utilidades.calcularPtsPorTitulo(resp.getTitulo(), cancion, Dificultad.Normal);
+            ptsTitulo = Utilidades.calcularPtsPorTitulo(resp.getTitulo(), cancion, Dificultad.Normal, false);
             if (resp.getUsuario().equals(primerAcertanteTitulo)) {
                 ptsTitulo = ptsTitulo * 2;
             }
             if (ptsTitulo > 0) {
                 resp.setTituloOk(true);
             }
-            ptsInterp = Utilidades.calcularPtsPorInterprete(resp.getInterprete(), cancion, Dificultad.Normal);
+            ptsInterp = Utilidades.calcularPtsPorInterprete(resp.getInterprete(), cancion, Dificultad.Normal, false);
             if (resp.getUsuario().equals(primerAcertanteInterprete)) {
                 ptsInterp = ptsInterp * 2;
             }

@@ -67,6 +67,7 @@ public class PartidaServicioMetodos implements PartidaServicio{
         obj.setNCanciones(partida.getNCanciones());
         obj.setRondaActual(partida.getRondaActual());
         obj.setActivarPlay(partida.isActivarPlay());
+        obj.setSinOfuscar(partida.isSinOfuscar());
         
         return DAO.save(obj);
     }

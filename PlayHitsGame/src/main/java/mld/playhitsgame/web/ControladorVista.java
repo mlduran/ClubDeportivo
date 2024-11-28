@@ -506,10 +506,10 @@ public class ControladorVista {
         Ronda ronda = servRonda.saveRonda(newRonda);
 
         // Crear las opciones para las respuestas
-        for (OpcionTituloTmp op : opcionesTitulosCanciones(ronda, canciones)) {
+        for (OpcionTituloTmp op : opcionesTitulosCanciones(ronda, canciones, !partida.isSinOfuscar())) {
             servOpTitulo.saveOpcionTituloTmp(op);
         }
-        for (OpcionInterpreteTmp op : opcionesInterpretesCanciones(ronda, canciones)) {
+        for (OpcionInterpreteTmp op : opcionesInterpretesCanciones(ronda, canciones, !partida.isSinOfuscar())) {
             servOpInterprete.saveOpcionInterpreteTmp(op);
         }
         int[] rangoAnyos = rangoAnyosCanciones((ArrayList<Cancion>) canciones);
@@ -718,7 +718,7 @@ public class ControladorVista {
             if (canTit.isPresent()) {
                 resp.setTitulo(canTit.get().getTitulo());
                 ptsTitulo = Utilidades.calcularPtsPorTitulo(
-                        canTit.get().getTitulo(), cancion, partida.getDificultad());
+                        canTit.get().getTitulo(), cancion, partida.getDificultad(), partida.isSinOfuscar());
                 if (ptsTitulo > 0) {
                     resp.setTituloOk(true);
                 } else {
@@ -731,7 +731,7 @@ public class ControladorVista {
             if (canInt.isPresent()) {
                 resp.setInterprete(canInt.get().getInterprete());
                 ptsInterp = Utilidades.calcularPtsPorInterprete(
-                        canInt.get().getInterprete(), cancion, partida.getDificultad());
+                        canInt.get().getInterprete(), cancion, partida.getDificultad(), partida.isSinOfuscar());
                 if (ptsInterp > 0) {
                     resp.setInterpreteOk(true);
                 } else {
@@ -1131,6 +1131,7 @@ public class ControladorVista {
         newPartida.setAnyoFinal(fecha.get(Calendar.YEAR));
         newPartida.setTipo(TipoPartida.personal);
         newPartida.setDificultad(Dificultad.Entreno);
+        newPartida.setSinOfuscar(false);
 
         modelo.addAttribute("newpartida", newPartida);
         anyadirTemas(modelo);
@@ -1234,10 +1235,10 @@ public class ControladorVista {
             int[] rangoAnyos = rangoAnyosCanciones((ArrayList<Cancion>) canciones);
             // Crear las opciones para las respuestas
             for (Ronda ronda : partida.getRondas()) {
-                for (OpcionTituloTmp op : opcionesTitulosCanciones(ronda)) {
+                for (OpcionTituloTmp op : opcionesTitulosCanciones(ronda, true)) {
                     servOpTitulo.saveOpcionTituloTmp(op);
                 }
-                for (OpcionInterpreteTmp op : opcionesInterpretesCanciones(ronda)) {
+                for (OpcionInterpreteTmp op : opcionesInterpretesCanciones(ronda, true)) {
                     servOpInterprete.saveOpcionInterpreteTmp(op);
                 }
                 for (OpcionAnyoTmp op
@@ -1383,7 +1384,10 @@ public class ControladorVista {
         for (Cancion cancion : opcCancionesTitulos) {
             OpcionTituloTmp op = new OpcionTituloTmp();
             op.setCancion(cancion.getId());
-            op.setOpTitulo(encriptarString(cancion.getTitulo()));
+            if (partida.isSinOfuscar())
+                op.setOpTitulo(cancion.getTitulo());
+            else
+                op.setOpTitulo(encriptarString(cancion.getTitulo()));
             opcTitulos.add(op);
         }
         List<Cancion> opcCancionesInterpretes = cancionesParaListaOpciones(canciones, cancionSel, 5);
@@ -1391,7 +1395,10 @@ public class ControladorVista {
         for (Cancion cancion : opcCancionesInterpretes) {
             OpcionInterpreteTmp op = new OpcionInterpreteTmp();
             op.setCancion(cancion.getId());
-            op.setOpInterprete(encriptarString(cancion.getInterprete()));
+            if (partida.isSinOfuscar())
+                op.setOpInterprete(cancion.getInterprete());
+            else
+                op.setOpInterprete(encriptarString(cancion.getInterprete()));
             opcInterpretes.add(op);
         }
         int[] rangoAnyos = rangoAnyosCanciones((ArrayList<Cancion>) canciones);
