@@ -18,7 +18,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     <body>
         <section>
             <input type="hidden" id="fichAjuda" 
-               th:value="${locale != null ? '/ayuda/PartidaGrupo_' + locale.language + '.html' : '/ayuda/PartidaGrupo_es.html'}" />
+                   th:value="${locale != null ? '/ayuda/PartidaGrupo_' + locale.language + '.html' : '/ayuda/PartidaGrupo_es.html'}" />
             <input type="hidden" id="serverWS" th:value="${serverWebsocket}" />
             <input type="hidden" id="idusuario" th:value="${usuarioSesion.id}" />
             <input type="hidden" id="idpartida" th:value="${partidaSesion.id}" />
@@ -46,8 +46,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </tr>
                                     <tr>
                                         <td colspan="3"  style="text-align:center; background-color: lightpink;">
-                                    <spawn th:text="#{general.partida} + ' ' + #{general.grupo}" />
-                                    </td>
+                                            <span th:text="#{general.partida} + ' ' + #{general.grupo}" />
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td colspan="2">  
@@ -204,17 +204,37 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                 </tr>
                                                 <tr>
                                                     <td>
-                                                        <p th:text="#{general.cancion}"/>
-                                                        <p th:text="'Titulo: ' + ${ronda.cancion.titulo}"/>
-                                                        <p th:text="'Interprete: ' + ${ronda.cancion.interprete}"/>
-                                                        <p th:text="'Año: ' + ${ronda.cancion.anyo}"/>
+                                                        <table>
+                                                            <tr>
+                                                                <td th:text="#{general.cancion}"></td>                                                                
+                                                            </tr>   
+                                                            <tr>
+                                                                <td th:text="'Titulo: ' + ${ronda.cancion.titulo}"></td>                                                                
+                                                            </tr>       
+                                                            <tr>
+                                                                <td th:text="'Interprete: ' + ${ronda.cancion.interprete}"></td>                                                                
+                                                            </tr>       
+                                                            <tr>
+                                                                <td th:text="'Año: ' + ${ronda.cancion.anyo}"></td>                                                                
+                                                            </tr>       
+                                                        </table> 
                                                     </td>
                                                 <div th:each="resp : ${respuestas}">
                                                     <td th:if="${resp.ronda.numero == ronda.numero}">
-                                                        <p th:text="#{general.puntos} + ' ' + ${resp.puntos}" />
-                                                        <p th:text="${resp.titulo}" />
-                                                        <p th:text="${resp.interprete}" />
-                                                        <p th:text="${resp.anyo}" />
+                                                        <table style="width: 100%; align-content: center">
+                                                            <tr>
+                                                                <td th:text="#{general.puntos} + ' ' + ${resp.puntos}" style="background-color: lightgrey"></td>                                                                
+                                                            </tr>   
+                                                            <tr>
+                                                                <td th:text="${resp.titulo}" th:style="${ronda.cancion.titulo == resp.titulo} ? 'background-color: lightgreen;' : ''"></td>                                                                
+                                                            </tr>   
+                                                            <tr>
+                                                                <td th:text="${resp.interprete}" th:style="${ronda.cancion.interprete == resp.interprete} ? 'background-color: lightgreen;' : ''"></td>                                                                
+                                                            </tr>   
+                                                            <tr>
+                                                                <td th:text="${resp.anyo}" th:style="${ronda.cancion.anyo == resp.anyo} ? 'background-color: lightgreen;' : ''"></td>                                                                
+                                                            </tr>   
+                                                        </table>
                                                     </td>
                                                 </div>
                                                 </tr>
