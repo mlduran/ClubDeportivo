@@ -569,7 +569,7 @@ public class ControladorVista {
         }
         if (ultimaRonda == null) {
             System.out.println("MLD Verificar partida sospechosa " + partida.getId().toString());
-            //ultimaRonda.getRespuestas();
+            return "redirect:/panel";
         }
 
         List<OpcionTituloTmp> opcTitulos;
@@ -1473,8 +1473,14 @@ public class ControladorVista {
         boolean respuestaOK = false;
         int fallos = 0;
         boolean hasPerdido = false;
+        Cancion cancion;
         try {
-            Cancion cancion = (Cancion) modelo.getAttribute("cancionInvitado");
+            try {
+                cancion = (Cancion) modelo.getAttribute("cancionInvitado");
+            } catch (Exception e) {                
+                System.out.println("Error al obtener cancion en partida invitado en el post");
+                return "error";
+            }
 
             Optional<Cancion> canTit = servCancion.findById(Long.valueOf(titulo));
             if (!cancion.getTitulo().equals(canTit.get().getTitulo())) {
@@ -1500,8 +1506,8 @@ public class ControladorVista {
             String img = cancion.getSpotifyimagen();
             modelo.addAttribute("spotifyimagenTmp", img);
 
-        } catch (Exception ex) {
-            Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NumberFormatException ex) {            
+            Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);            
         }
         modelo.addAttribute("mensajeRespuesta", mensajeRespuesta);
         modelo.addAttribute("respuestaOK", respuestaOK);
@@ -1741,12 +1747,19 @@ public class ControladorVista {
             System.out.println("MLD Error validacion " + url);
             return "error";
         }
-
-        Long id = Long.valueOf(req.getParameter("id"));
-        String token = (String) req.getParameter("token");
-
-        Optional<Usuario> usu = servUsuario.findById(id);
-        if (usu.isPresent()) {
+        
+        Optional<Usuario> usu = null;
+        String token = null;
+        Long id = null;
+        try {
+            id = Long.valueOf(req.getParameter("id"));
+            token = (String) req.getParameter("token");
+            
+            usu = servUsuario.findById(id);
+        } catch (NumberFormatException numberFormatException) {
+        }
+        
+        if (usu != null && usu.isPresent()) {
             Usuario usuario = usu.get();
             if (passwordEncoder.matches(usuario.getUsuario(), token)) {
                 usuario.setActivo(true);
@@ -1847,8 +1860,11 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         Rol rol = null;
-        if (usu == null) {
-            rol = (Rol) modelo.getAttribute("rol");
+        if (usu == null) {            
+            try {
+                rol = (Rol) modelo.getAttribute("rol");
+            } catch (Exception e) {
+            }
             if (rol == null || !rol.equals(Rol.playhitsgame)) {
                 return "redirect:/logout";
             }
