@@ -94,6 +94,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 // persistencia en sesion y no usar tanta memoria
 @SessionAttributes({"id_usuarioSesion", "id_partidaSesion", "posiblesinvitados",
     "rol", "filtroUsuarios", "mensajeRespuesta", "respuestaOK", "todoFallo", "esRecord",
+    "soundOK","soundErrTitulo","soundErrInterp","soundErrAnyo",
     "partidaInvitado", "cancionInvitado", "spotifyimagenTmp", "locale"})
 @Slf4j
 public class ControladorVista {
@@ -1455,7 +1456,7 @@ public class ControladorVista {
         if (modelo.getAttribute("esRecord") == null) {
             modelo.addAttribute("esRecord", false);
         }
-
+        
         return "PartidaInvitado";
     }
 
@@ -1474,6 +1475,12 @@ public class ControladorVista {
         int fallos = 0;
         boolean hasPerdido = false;
         Cancion cancion;
+        boolean soundOK = false;
+        //boolean soundFin = false;
+        boolean soundErrTitulo = false;
+        boolean soundErrInterp = false;
+        boolean soundErrAnyo = false;
+        
         try {
             try {
                 cancion = (Cancion) modelo.getAttribute("cancionInvitado");
@@ -1487,21 +1494,25 @@ public class ControladorVista {
                 mensajeRespuesta.add(mensaje(modelo, "general.titulocorrecto")
                         + cancion.getTitulo() + " " + mensaje(modelo, "general.turespondiste") + canTit.get().getTitulo());
                 fallos = fallos + 1;
+                soundErrTitulo = true;
             }
             Optional<Cancion> canInt = servCancion.findById(Long.valueOf(interprete));
             if (!cancion.getInterprete().equals(canInt.get().getInterprete())) {
                 mensajeRespuesta.add(mensaje(modelo, "general.intercorrecto")
                         + cancion.getInterprete() + " " + mensaje(modelo, "general.turespondiste") + canInt.get().getInterprete());
                 fallos = fallos + 1;
+                soundErrInterp = true;
             }
             if (!anyo.equals(String.valueOf(cancion.getAnyo()))) {
                 mensajeRespuesta.add(mensaje(modelo, "general.anyocorrecto")
                         + String.valueOf(cancion.getAnyo()) + " " + mensaje(modelo, "general.turespondiste") + anyo);
                 fallos = fallos + 1;
+                soundErrAnyo = true;
             }
             if (fallos == 0) {
                 mensajeRespuesta.add(mensaje(modelo, "general.todoacertado"));
                 respuestaOK = true;
+                soundOK = true;
             }
             String img = cancion.getSpotifyimagen();
             modelo.addAttribute("spotifyimagenTmp", img);
@@ -1512,6 +1523,23 @@ public class ControladorVista {
         modelo.addAttribute("mensajeRespuesta", mensajeRespuesta);
         modelo.addAttribute("respuestaOK", respuestaOK);
         modelo.addAttribute("todoFallo", hasPerdido);
+        if (soundOK)
+            modelo.addAttribute("soundOK", "Aplausos.mp3");
+        else
+            modelo.addAttribute("soundOK", "");
+        if (soundErrTitulo)
+            modelo.addAttribute("soundErrTitulo", "ErrorTitulo.mp3");
+        else
+            modelo.addAttribute("soundErrTitulo", "");
+        if(soundErrInterp)
+            modelo.addAttribute("soundErrInterp", "ErrorInterprete.mp3");
+        else
+            modelo.addAttribute("soundErrInterp", "");
+        if(soundErrAnyo)
+            modelo.addAttribute("soundErrAnyo", "ErrorAnyo.mp3");
+        else
+            modelo.addAttribute("soundErrAnyo", "");
+        
         return "redirect:/partidaInvitado";
     }
 

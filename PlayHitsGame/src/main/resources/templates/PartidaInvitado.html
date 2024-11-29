@@ -27,11 +27,35 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     <body>        
         <section class="h-100">
             <input type="hidden" id="fichAjuda" 
-               th:value="${locale != null ? '/ayuda/PartidaPersonal_' + locale.language + '.html' : '/ayuda/PartidaPersonal_es.html'}" />
+                   th:value="${locale != null ? '/ayuda/PartidaPersonal_' + locale.language + '.html' : '/ayuda/PartidaPersonal_es.html'}" />
             <input type="hidden" id="respuestaOK" th:value="${respuestaOK}" />
             <input type="hidden" id="todoFallo" th:value="${todoFallo}" />
             <input type="hidden" id="esRecord" th:value="${esRecord}" />
             <input type="hidden" id="touchstart" th:value="false" />
+            <input type="hidden" id="soundOK" th:value="${soundOK}" />
+            <input type="hidden" id="soundErrTitulo" th:value="${soundErrTitulo}" />
+            <input type="hidden" id="soundErrInterp" th:value="${soundErrInterp}" />
+            <input type="hidden" id="soundErrAnyo" th:value="${soundErrAnyo}" />
+            <div th:if="${soundOK != null && soundOK != ''}">
+                <audio controls autoplay style="display: none;">
+                    <source th:src="@{/sounds/{file}(file=${soundOK})}" type="audio/mpeg">
+                </audio>
+            </div>
+            <div th:if="${soundErrTitulo != null && soundErrTitulo != ''}">
+                <audio controls autoplay style="display: none;">
+                    <source th:src="@{/sounds/{file}(file=${soundErrTitulo})}" type="audio/mpeg">
+                </audio>
+            </div>
+            <div th:if="${soundErrInterp != null && soundErrInterp != ''}">
+                <audio controls autoplay style="display: none;">
+                    <source th:src="@{/sounds/{file}(file=${soundErrInterp})}" type="audio/mpeg">
+                </audio>
+            </div>
+            <div th:if="${soundErrAnyo != null && soundErrAnyo != ''}">
+                <audio controls autoplay style="display: none;">
+                    <source th:src="@{/sounds/{file}(file=${soundErrAnyo})}" type="audio/mpeg">
+                </audio>
+            </div>
             <div class="container h-100">
                 <div class="row justify-content-sm-center h-100">
                     <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
