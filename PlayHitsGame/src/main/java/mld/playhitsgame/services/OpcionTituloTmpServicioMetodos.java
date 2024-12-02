@@ -9,7 +9,9 @@ import mld.playhitsgame.DAO.OpcionTituloDAO;
 import mld.playhitsgame.exemplars.OpcionTituloTmp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 @Service
 public class OpcionTituloTmpServicioMetodos implements OpcionTituloTmpServicio {
 

@@ -11,7 +11,9 @@ import mld.playhitsgame.DAO.TemaDAO;
 import mld.playhitsgame.exemplars.Tema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 @Service
 public class TemaServicioMetodos implements TemaServicio {
 

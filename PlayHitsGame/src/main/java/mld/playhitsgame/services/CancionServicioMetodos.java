@@ -20,7 +20,9 @@ import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.projections.ampliada.CancionAmpliadaView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 @Service
 public class CancionServicioMetodos implements CancionServicio {
 

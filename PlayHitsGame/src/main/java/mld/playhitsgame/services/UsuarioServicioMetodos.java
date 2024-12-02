@@ -16,8 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 @Service
 public class UsuarioServicioMetodos implements UsuarioServicio {
 
@@ -111,7 +114,7 @@ public class UsuarioServicioMetodos implements UsuarioServicio {
     }
 
     public Page<Usuario> findByFiltroBasico(FiltroUsuarios filtroUsuario, int numeroPagina, int tamanioPagina) {
-        List<Usuario> usuarios = DAO.findAll(); // Supongo que `DAO` devuelve una lista completa.
+        List<Usuario> usuarios = DAO.findAll(Sort.by(Sort.Direction.DESC, "alta")); // Supongo que `DAO` devuelve una lista completa.
 
         // Filtra los usuarios según el filtro
         List<Usuario> usuariosFiltro = new ArrayList<>();

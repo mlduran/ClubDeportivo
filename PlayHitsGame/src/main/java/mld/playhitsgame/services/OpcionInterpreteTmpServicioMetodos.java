@@ -9,7 +9,9 @@ import mld.playhitsgame.DAO.OpcionInterpreteDAO;
 import mld.playhitsgame.exemplars.OpcionInterpreteTmp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 @Service
 public class OpcionInterpreteTmpServicioMetodos implements OpcionInterpreteTmpServicio{
     
