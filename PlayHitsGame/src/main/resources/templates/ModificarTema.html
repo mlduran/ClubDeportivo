@@ -21,9 +21,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         <div class="card shadow-lg">
                             <div class="card-body p-5">
                                 <h1 class="fs-4 card-title fw-bold mb-4" text="Modificar Tema"/>
-                                <form method="post" th:action="@{/modificarTema}" th:object="${tema}">  
-                                    <input type="hidden" th:field="*{id}" required="required"/></p>
-                                    <p>Tema<input type="text" th:field="*{tema}" required="required" disabled/></p>
+                                <form method="post" th:action="@{/modificarTema}" th:object="${temaUpdate}">  
+                                    <input type="hidden" th:field="*{id}" required="required"/>
+                                    <p>Tema<input type="text" th:field="*{tema}" required="required"/></p>
                                     <p>Descripción<input type="text" th:field="*{descripcion}"/></p>
                                     <p>Genero
                                         <select th:field="*{genero}" title="Genero">
@@ -36,7 +36,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                     th:value="${idiomaOpt}" th:text="${idiomaOpt}"></option>
                                         </select></p>
                                     <p>Listas Spotify<input type="text" th:field="*{listasSpotify}"/></p>
-                                    <input type="submit" value="Modificar Tema"/>    
+                                    <label>Activo?</label>
+                                    <input type="checkbox" th:field="*{activo}"/>
+                                    <br/><br/>
+                                    <input type="submit" value="Modificar Tema"/>   
+                                    <br/>
                                     <p th:text="${result}"></p>
                                 </form>
                             </div>

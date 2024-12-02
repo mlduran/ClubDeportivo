@@ -15,32 +15,52 @@ import java.util.Locale;
  */
 public class FiltroTemas {
 
+    /**
+     * @return the activo
+     */
+    public boolean isActivo() {
+        return activo;
+    }
+
+    /**
+     * @param activo the activo to set
+     */
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+
+    private boolean activo;
     private List<Idioma> idiomas;
     private List<Genero> generos;
     private Usuario usuario;
 
     public FiltroTemas(Locale idioma) {
 
+        this.activo = true;
         this.idiomas = new ArrayList<>();
+
         this.idiomas.add(Idioma.International);
-        if ("es".equals(idioma.getLanguage()))
-            this.idiomas.add(Idioma.Spanish);        
-        
+        if ("es".equals(idioma.getLanguage())) {
+            this.idiomas.add(Idioma.Spanish);
+        }
+
         this.generos = new ArrayList<>();
         this.generos.addAll(Arrays.asList(Genero.values()));
 
     }
-    
-    public List<Tema> filtrarTemas( List<Tema> temas){
-        
+
+    public List<Tema> filtrarTemas(List<Tema> temas) {
+
         ArrayList<Tema> temasFiltados = new ArrayList();
-        
-        for (Tema tema : temas){
-            if (this.getIdiomas().contains(tema.getIdioma()) &&
-                    this.getGeneros().contains(tema.getGenero()))
+
+        for (Tema tema : temas) {
+            if (this.isActivo() == tema.isActivo()
+                    && this.getIdiomas().contains(tema.getIdioma())
+                    && this.getGeneros().contains(tema.getGenero())) {
                 temasFiltados.add(tema);
+            }
         }
-        
+
         return temasFiltados;
     }
 
@@ -85,7 +105,5 @@ public class FiltroTemas {
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
-
-    
 
 }

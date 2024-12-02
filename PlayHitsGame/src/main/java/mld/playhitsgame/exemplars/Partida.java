@@ -66,6 +66,7 @@ public class Partida {
 
     private boolean activarPlay;
     private boolean sinOfuscar;
+    private boolean sonidos;
 
     public boolean isTipoGrupo() {
 

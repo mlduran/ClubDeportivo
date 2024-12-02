@@ -816,30 +816,32 @@ public class ControladorVista {
         modelo.addAttribute("mensajeRespuesta", mensajeRespuesta);
         modelo.addAttribute("respuestaOK", respuestaOK);
         modelo.addAttribute("todoFallo", hasPerdido);
-        if (soundOK) {
-            modelo.addAttribute("soundOK", "Aplausos.mp3");
-        } else {
-            modelo.addAttribute("soundOK", "");
-        }
-        if (soundErrTitulo) {
-            modelo.addAttribute("soundErrTitulo", "ErrorTitulo.mp3");
-        } else {
-            modelo.addAttribute("soundErrTitulo", "");
-        }
-        if (soundErrInterp) {
-            modelo.addAttribute("soundErrInterp", "ErrorInterprete.mp3");
-        } else {
-            modelo.addAttribute("soundErrInterp", "");
-        }
-        if (soundErrAnyo) {
-            modelo.addAttribute("soundErrAnyo", "ErrorAnyo.mp3");
-        } else {
-            modelo.addAttribute("soundErrAnyo", "");
-        }
-        if (soundEliminado) {
-            modelo.addAttribute("soundEliminado", "Eliminado.mp3");
-        } else {
-            modelo.addAttribute("soundEliminado", "");
+        if (partida.isSonidos()) {
+            if (soundOK) {
+                modelo.addAttribute("soundOK", "Aplausos.mp3");
+            } else {
+                modelo.addAttribute("soundOK", "");
+            }
+            if (soundErrTitulo) {
+                modelo.addAttribute("soundErrTitulo", "ErrorTitulo.mp3");
+            } else {
+                modelo.addAttribute("soundErrTitulo", "");
+            }
+            if (soundErrInterp) {
+                modelo.addAttribute("soundErrInterp", "ErrorInterprete.mp3");
+            } else {
+                modelo.addAttribute("soundErrInterp", "");
+            }
+            if (soundErrAnyo) {
+                modelo.addAttribute("soundErrAnyo", "ErrorAnyo.mp3");
+            } else {
+                modelo.addAttribute("soundErrAnyo", "");
+            }
+            if (soundEliminado) {
+                modelo.addAttribute("soundEliminado", "Eliminado.mp3");
+            } else {
+                modelo.addAttribute("soundEliminado", "");
+            }
         }
 
         return "redirect:/partidaPersonal";
@@ -1179,6 +1181,7 @@ public class ControladorVista {
         newPartida.setTipo(TipoPartida.personal);
         newPartida.setDificultad(Dificultad.Entreno);
         newPartida.setSinOfuscar(false);
+        newPartida.setSonidos(false);
 
         modelo.addAttribute("newpartida", newPartida);
         anyadirTemas(modelo);
@@ -1570,25 +1573,27 @@ public class ControladorVista {
         modelo.addAttribute("mensajeRespuesta", mensajeRespuesta);
         modelo.addAttribute("respuestaOK", respuestaOK);
         modelo.addAttribute("todoFallo", hasPerdido);
-        if (soundOK) {
-            modelo.addAttribute("soundOK", "Aplausos.mp3");
-        } else {
-            modelo.addAttribute("soundOK", "");
-        }
-        if (soundErrTitulo) {
-            modelo.addAttribute("soundErrTitulo", "ErrorTitulo.mp3");
-        } else {
-            modelo.addAttribute("soundErrTitulo", "");
-        }
-        if (soundErrInterp) {
-            modelo.addAttribute("soundErrInterp", "ErrorInterprete.mp3");
-        } else {
-            modelo.addAttribute("soundErrInterp", "");
-        }
-        if (soundErrAnyo) {
-            modelo.addAttribute("soundErrAnyo", "ErrorAnyo.mp3");
-        } else {
-            modelo.addAttribute("soundErrAnyo", "");
+        if (partida.isSonidos()) {
+            if (soundOK) {
+                modelo.addAttribute("soundOK", "Aplausos.mp3");
+            } else {
+                modelo.addAttribute("soundOK", "");
+            }
+            if (soundErrTitulo) {
+                modelo.addAttribute("soundErrTitulo", "ErrorTitulo.mp3");
+            } else {
+                modelo.addAttribute("soundErrTitulo", "");
+            }
+            if (soundErrInterp) {
+                modelo.addAttribute("soundErrInterp", "ErrorInterprete.mp3");
+            } else {
+                modelo.addAttribute("soundErrInterp", "");
+            }
+            if (soundErrAnyo) {
+                modelo.addAttribute("soundErrAnyo", "ErrorAnyo.mp3");
+            } else {
+                modelo.addAttribute("soundErrAnyo", "");
+            }
         }
 
         return "redirect:/partidaInvitado";

@@ -170,12 +170,12 @@ public class ControladorCancion {
         }
 
         Optional<Tema> tema = servTema.findById(id);
-        modelo.addAttribute("tema", tema);
+        modelo.addAttribute("temaUpdate", tema);
         return "ModificarTema";
     }
 
     @PostMapping("/modificarTema")
-    public String modificarCancion(@ModelAttribute("tema") Tema tema, Model modelo) {
+    public String modificarCancion(@ModelAttribute("temaUpdate") Tema tema, Model modelo) {
 
         if (!usuarioCorrecto(modelo)) {
             return "redirect:/logout";
