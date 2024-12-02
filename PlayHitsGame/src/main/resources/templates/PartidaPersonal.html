@@ -34,6 +34,36 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             <input type="hidden" id="todoFallo" th:value="${todoFallo}" />
             <input type="hidden" id="esRecord" th:value="${esRecord}" />
             <input type="hidden" id="touchstart" th:value="${usuarioSesion.touchstart}" />
+            <input type="hidden" id="soundOK" th:value="${soundOK}" />
+            <input type="hidden" id="soundErrTitulo" th:value="${soundErrTitulo}" />
+            <input type="hidden" id="soundErrInterp" th:value="${soundErrInterp}" />
+            <input type="hidden" id="soundErrAnyo" th:value="${soundErrAnyo}" />
+            <input type="hidden" id="soundEliminado" th:value="${soundEliminado}" />
+            <div th:if="${soundOK != null && soundOK != ''}">
+                <audio controls autoplay style="display: none;">
+                    <source th:src="@{/sounds/{file}(file=${soundOK})}" type="audio/mpeg">
+                </audio>
+            </div>
+            <div th:if="${soundErrTitulo != null && soundErrTitulo != ''}">
+                <audio controls autoplay style="display: none;">
+                    <source th:src="@{/sounds/{file}(file=${soundErrTitulo})}" type="audio/mpeg">
+                </audio>
+            </div>
+            <div th:if="${soundErrInterp != null && soundErrInterp != ''}">
+                <audio controls autoplay style="display: none;">
+                    <source th:src="@{/sounds/{file}(file=${soundErrInterp})}" type="audio/mpeg">
+                </audio>
+            </div>
+            <div th:if="${soundErrAnyo != null && soundErrAnyo != ''}">
+                <audio controls autoplay style="display: none;">
+                    <source th:src="@{/sounds/{file}(file=${soundErrAnyo})}" type="audio/mpeg">
+                </audio>
+            </div>
+            <div th:if="${soundEliminado != null && soundEliminado != ''}">
+                <audio controls autoplay style="display: none;">
+                    <source th:src="@{/sounds/{file}(file=${soundEliminado})}" type="audio/mpeg">
+                </audio>
+            </div>
             <input type="hidden" id="txtrecordtema" th:value="#{general.recordtema}" />
             <audio controls id="reproductorConsulta" style="display: none;">
                 <source src="" type="audio/mpeg" />                                                            

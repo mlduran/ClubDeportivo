@@ -94,7 +94,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 // persistencia en sesion y no usar tanta memoria
 @SessionAttributes({"id_usuarioSesion", "id_partidaSesion", "posiblesinvitados",
     "rol", "filtroUsuarios", "mensajeRespuesta", "respuestaOK", "todoFallo", "esRecord",
-    "soundOK","soundErrTitulo","soundErrInterp","soundErrAnyo",
+    "soundOK", "soundErrTitulo", "soundErrInterp", "soundErrAnyo", "soundEliminado",
     "partidaInvitado", "cancionInvitado", "spotifyimagenTmp", "locale"})
 @Slf4j
 public class ControladorVista {
@@ -288,14 +288,17 @@ public class ControladorVista {
                 long dias = duracion.toDays();
                 long horas = duracion.toHours() % 24;
                 long minutos = duracion.toMinutes() % 60;
-                
+
                 String mensaje = mensaje(modelo, "general.mantenimiento");
-                if (dias > 0)
+                if (dias > 0) {
                     mensaje = mensaje.concat(String.valueOf(dias) + " " + mensaje(modelo, "general.dias"));
-                if (horas > 0)
+                }
+                if (horas > 0) {
                     mensaje = mensaje.concat(String.valueOf(horas) + " " + mensaje(modelo, "general.horas"));
-                if (minutos > 0)
-                    mensaje = mensaje.concat(String.valueOf(minutos) + " " + mensaje(modelo, "general.minutos"));               
+                }
+                if (minutos > 0) {
+                    mensaje = mensaje.concat(String.valueOf(minutos) + " " + mensaje(modelo, "general.minutos"));
+                }
                 modelo.addAttribute("mensajeInicio", mensaje);
             } else if (config.getMensajeInicio_es() != null
                     && !"".equals(config.getMensajeInicio_es())) {
@@ -323,6 +326,12 @@ public class ControladorVista {
         modelo.addAttribute("id_usuarioSesion", "");
         modelo.addAttribute("id_partidaSesion", "");
         modelo.addAttribute("rol", "");
+
+        modelo.addAttribute("soundOK", "");
+        modelo.addAttribute("soundErrTitulo", "");
+        modelo.addAttribute("soundErrInterp", "");
+        modelo.addAttribute("soundErrAnyo", "");
+        modelo.addAttribute("soundEliminado", "");
 
         return "redirect:/";
     }
@@ -693,6 +702,12 @@ public class ControladorVista {
         boolean respuestaOK = false;
         int fallos = 0;
         boolean hasPerdido = false;
+        boolean soundOK = false;
+        boolean soundEliminado = false;
+        boolean soundErrTitulo = false;
+        boolean soundErrInterp = false;
+        boolean soundErrAnyo = false;
+
         try {
             Ronda ronda = partida.ultimaRonda();
 
@@ -714,6 +729,7 @@ public class ControladorVista {
                 mensajeRespuesta.add(mensaje(modelo, "general.anyocorrecto")
                         + String.valueOf(cancion.getAnyo()) + " " + mensaje(modelo, "general.turespondiste") + anyo);
                 fallos = fallos + 1;
+                soundErrAnyo = true;
             }
             Optional<Cancion> canTit = servCancion.findById(Long.valueOf(titulo));
             if (canTit.isPresent()) {
@@ -726,6 +742,7 @@ public class ControladorVista {
                     mensajeRespuesta.add(mensaje(modelo, "general.titulocorrecto")
                             + cancion.getTitulo() + " " + mensaje(modelo, "general.turespondiste") + canTit.get().getTitulo());
                     fallos = fallos + 1;
+                    soundErrTitulo = true;
                 }
             }
             Optional<Cancion> canInt = servCancion.findById(Long.valueOf(interprete));
@@ -739,6 +756,7 @@ public class ControladorVista {
                     mensajeRespuesta.add(mensaje(modelo, "general.intercorrecto")
                             + cancion.getInterprete() + " " + mensaje(modelo, "general.turespondiste") + canInt.get().getInterprete());
                     fallos = fallos + 1;
+                    soundErrInterp = true;
                 }
             }
             if ((partida.getDificultad().equals(Dificultad.Dificil) && fallos > 0)
@@ -746,10 +764,12 @@ public class ControladorVista {
                     || (partida.getDificultad().equals(Dificultad.Facil) && fallos > 2)) {
                 mensajeRespuesta.add(mensaje(modelo, "general.seacabo"));
                 hasPerdido = true;
+                soundEliminado = true;
             }
             if (fallos == 0) {
                 mensajeRespuesta.add(mensaje(modelo, "general.todoacertado"));
                 respuestaOK = true;
+                soundOK = true;
             }
 
             LocalTime actual = LocalTime.now();
@@ -796,6 +816,32 @@ public class ControladorVista {
         modelo.addAttribute("mensajeRespuesta", mensajeRespuesta);
         modelo.addAttribute("respuestaOK", respuestaOK);
         modelo.addAttribute("todoFallo", hasPerdido);
+        if (soundOK) {
+            modelo.addAttribute("soundOK", "Aplausos.mp3");
+        } else {
+            modelo.addAttribute("soundOK", "");
+        }
+        if (soundErrTitulo) {
+            modelo.addAttribute("soundErrTitulo", "ErrorTitulo.mp3");
+        } else {
+            modelo.addAttribute("soundErrTitulo", "");
+        }
+        if (soundErrInterp) {
+            modelo.addAttribute("soundErrInterp", "ErrorInterprete.mp3");
+        } else {
+            modelo.addAttribute("soundErrInterp", "");
+        }
+        if (soundErrAnyo) {
+            modelo.addAttribute("soundErrAnyo", "ErrorAnyo.mp3");
+        } else {
+            modelo.addAttribute("soundErrAnyo", "");
+        }
+        if (soundEliminado) {
+            modelo.addAttribute("soundEliminado", "Eliminado.mp3");
+        } else {
+            modelo.addAttribute("soundEliminado", "");
+        }
+
         return "redirect:/partidaPersonal";
     }
 
@@ -1385,10 +1431,11 @@ public class ControladorVista {
         for (Cancion cancion : opcCancionesTitulos) {
             OpcionTituloTmp op = new OpcionTituloTmp();
             op.setCancion(cancion.getId());
-            if (partida.isSinOfuscar())
+            if (partida.isSinOfuscar()) {
                 op.setOpTitulo(cancion.getTitulo());
-            else
+            } else {
                 op.setOpTitulo(encriptarString(cancion.getTitulo()));
+            }
             opcTitulos.add(op);
         }
         List<Cancion> opcCancionesInterpretes = cancionesParaListaOpciones(canciones, cancionSel, 5);
@@ -1396,10 +1443,11 @@ public class ControladorVista {
         for (Cancion cancion : opcCancionesInterpretes) {
             OpcionInterpreteTmp op = new OpcionInterpreteTmp();
             op.setCancion(cancion.getId());
-            if (partida.isSinOfuscar())
+            if (partida.isSinOfuscar()) {
                 op.setOpInterprete(cancion.getInterprete());
-            else
+            } else {
                 op.setOpInterprete(encriptarString(cancion.getInterprete()));
+            }
             opcInterpretes.add(op);
         }
         int[] rangoAnyos = rangoAnyosCanciones((ArrayList<Cancion>) canciones);
@@ -1456,7 +1504,7 @@ public class ControladorVista {
         if (modelo.getAttribute("esRecord") == null) {
             modelo.addAttribute("esRecord", false);
         }
-        
+
         return "PartidaInvitado";
     }
 
@@ -1476,15 +1524,14 @@ public class ControladorVista {
         boolean hasPerdido = false;
         Cancion cancion;
         boolean soundOK = false;
-        //boolean soundFin = false;
         boolean soundErrTitulo = false;
         boolean soundErrInterp = false;
         boolean soundErrAnyo = false;
-        
+
         try {
             try {
                 cancion = (Cancion) modelo.getAttribute("cancionInvitado");
-            } catch (Exception e) {                
+            } catch (Exception e) {
                 System.out.println("Error al obtener cancion en partida invitado en el post");
                 return "error";
             }
@@ -1517,29 +1564,33 @@ public class ControladorVista {
             String img = cancion.getSpotifyimagen();
             modelo.addAttribute("spotifyimagenTmp", img);
 
-        } catch (NumberFormatException ex) {            
-            Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);            
+        } catch (NumberFormatException ex) {
+            Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);
         }
         modelo.addAttribute("mensajeRespuesta", mensajeRespuesta);
         modelo.addAttribute("respuestaOK", respuestaOK);
         modelo.addAttribute("todoFallo", hasPerdido);
-        if (soundOK)
+        if (soundOK) {
             modelo.addAttribute("soundOK", "Aplausos.mp3");
-        else
+        } else {
             modelo.addAttribute("soundOK", "");
-        if (soundErrTitulo)
+        }
+        if (soundErrTitulo) {
             modelo.addAttribute("soundErrTitulo", "ErrorTitulo.mp3");
-        else
+        } else {
             modelo.addAttribute("soundErrTitulo", "");
-        if(soundErrInterp)
+        }
+        if (soundErrInterp) {
             modelo.addAttribute("soundErrInterp", "ErrorInterprete.mp3");
-        else
+        } else {
             modelo.addAttribute("soundErrInterp", "");
-        if(soundErrAnyo)
+        }
+        if (soundErrAnyo) {
             modelo.addAttribute("soundErrAnyo", "ErrorAnyo.mp3");
-        else
+        } else {
             modelo.addAttribute("soundErrAnyo", "");
-        
+        }
+
         return "redirect:/partidaInvitado";
     }
 
@@ -1647,19 +1698,20 @@ public class ControladorVista {
         if (usu == null || !usu.isAdmin()) {
             return "redirect:/logout";
         }
-        
+
         Config config = servConfig.getSettings();
-        
+
         LocalDateTime fecha;
-        if (config.isMantenimiento())
+        if (config.isMantenimiento()) {
             fecha = config.getFechaMantenimiento();
-        else
+        } else {
             fecha = LocalDateTime.now();
+        }
 
         // Formatea la fecha y hora en el formato requerido
         String fechaHoraFormateada = fecha.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
         modelo.addAttribute("fechaHoraActual", fechaHoraFormateada);
-        
+
         modelo.addAttribute("config", config);
 
         return "Administracion";
@@ -1775,18 +1827,18 @@ public class ControladorVista {
             System.out.println("MLD Error validacion " + url);
             return "error";
         }
-        
+
         Optional<Usuario> usu = null;
         String token = null;
         Long id = null;
         try {
             id = Long.valueOf(req.getParameter("id"));
             token = (String) req.getParameter("token");
-            
+
             usu = servUsuario.findById(id);
         } catch (NumberFormatException numberFormatException) {
         }
-        
+
         if (usu != null && usu.isPresent()) {
             Usuario usuario = usu.get();
             if (passwordEncoder.matches(usuario.getUsuario(), token)) {
@@ -1888,7 +1940,7 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         Rol rol = null;
-        if (usu == null) {            
+        if (usu == null) {
             try {
                 rol = (Rol) modelo.getAttribute("rol");
             } catch (Exception e) {
@@ -1897,9 +1949,9 @@ public class ControladorVista {
                 return "redirect:/logout";
             }
         }
-        
-        List<Usuario> jugadoresEstrella = servUsuario.usuariosEstrella();        
-        
+
+        List<Usuario> jugadoresEstrella = servUsuario.usuariosEstrella();
+
         ArrayList<Tema> temas = (ArrayList<Tema>) servTema.findAll();
 
         ArrayList<Record> records = new ArrayList();
@@ -2171,4 +2223,5 @@ public class ControladorVista {
 
         servCancion.updateTemasCancion(cancion_id, cancion);
     }
+
 }
