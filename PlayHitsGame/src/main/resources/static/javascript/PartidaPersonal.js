@@ -162,8 +162,12 @@ const intervalId = setInterval(() => {
             secondsCounter.value = secondsElapsed;
         else
             secondsCounter.value = "... " + Math.abs(secondsElapsed);
-    }else{
+    } else {
         secondsCounter.value = "";
     }
-    
+
 }, 1000);
+
+function confirmarAccion() {
+    return confirm(document.getElementById('mensajeAcabar').value);
+}

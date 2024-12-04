@@ -94,7 +94,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     <tr>                                        
                                         <td colspan="2">                                            
                                             <p th:each="txt : ${partidaSesion.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
-                                            <p th:text="#{general.dificultad} + ' : ' + #{${partidaSesion.dificultad.messageKey}}" />
+                                            <p th:text="#{general.dificultad} + ' : ' + #{${partidaSesion.dificultad.messageKey}}" />                                            
+                                            <p th:if="${partidaSesion.sinOfuscar == true}" th:text="#{general.sinofuscar}" />
                                         </td>
                                         <td>  
                                             <table>
@@ -151,14 +152,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                         </td>
                                     </tr>  
                                 </table>
-                                <table class="table-responsive table-bordered" style="max-width: 100%; width: 100%; table-layout: fixed;">
-                                    <tr th:if="${partidaSesion.entreno}">
-                                        <td colspan="3" style="text-align: center;">
-                                            <form method="post" id="acabarPartida" th:action="@{/acabarPartidaPersonal}"> 
-                                                <button type="submit" class="btn btn-primary ms-auto" th:text="#{general.acabarpartida}"/>
-                                            </form>
-                                        </td>
-                                    </tr>
+                                <table class="table-responsive table-bordered" style="max-width: 100%; width: 100%; table-layout: fixed;">                                    
                                     <tr>
                                         <td colspan="3">
                                             <form method="post" id="respuestas" th:action="@{/partidaPersonal}"> 
@@ -249,6 +243,15 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                             </td>                                                            
                                                         </tr>                                          
                                                     </table>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <!--<tr th:if="${partidaSesion.entreno}">-->
+                                    <tr>
+                                        <input type="hidden" id="mensajeAcabar" th:value="#{general.confirmacabarpartida}" />
+                                        <td colspan="3" style="text-align: center;">
+                                            <form method="post" id="acabarPartida" th:action="@{/acabarPartidaPersonal}" onsubmit="return confirmarAccion()"> 
+                                                <button type="submit" class="btn btn-primary ms-auto" th:text="#{general.acabarpartida}"/>
                                             </form>
                                         </td>
                                     </tr>
