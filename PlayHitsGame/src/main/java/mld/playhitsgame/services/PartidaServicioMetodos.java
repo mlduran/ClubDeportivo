@@ -77,9 +77,13 @@ public class PartidaServicioMetodos implements PartidaServicio{
 
     @Override
     public void deletePartida(Long id) {
+        DAO.eliminarRelacionRespuestas(id);
+        DAO.eliminarRelacionRondas(id);
+        DAO.eliminarRelacionUsuarios(id);
         DAO.deleteById(id);
     }    
 
+    @Override
     public Optional<Partida> partidaUsuarioMaster(Long idUsuario) {
         return DAO.partidaUsuarioMaster(idUsuario);
     }

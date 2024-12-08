@@ -1195,6 +1195,7 @@ public class ControladorVista {
         Calendar cal = Calendar.getInstance();
         int anyoActual = cal.get(Calendar.YEAR);
         int nrondas = Integer.parseInt(req.getParameter("nrondas"));
+        Partida newPartida = null;
 
         try {
 
@@ -1224,7 +1225,14 @@ public class ControladorVista {
                 throw new Exception(mensaje(modelo, "general.cancionesinsuficientes"));
             }
 
-            partida.setInvitados(new ArrayList());
+            partida.setInvitados(new ArrayList()); 
+            partida.setNCanciones(canciones.size());
+            partida.setMaster(usu);
+            partida.setRondaActual(1);
+            partida.setGrupo(usu.getGrupo());             
+            newPartida = servPartida.savePartida(partida);
+            usu.getPartidasMaster().add(newPartida);
+            modelo.addAttribute("id_partidaSesion", newPartida);
 
             ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) modelo.getAttribute("posiblesinvitados");
             if (posiblesInvitados != null) {
@@ -1235,25 +1243,14 @@ public class ControladorVista {
 
                         Optional<Usuario> usuario = servUsuario.findById(usuarioInv.getId());
                         if (!usuario.isEmpty()) {
-                            usuario.get().getPartidasInvitado().add(partida);
+                            usuario.get().getPartidasInvitado().add(newPartida);
                             partida.getInvitados().add(usuario.get());
+                            servUsuario.update(usuario.get().getId(), usuario.get());
                         }
                     }
                 }
             }
-
-            partida.setNCanciones(canciones.size());
-            partida.setMaster(usu);
-            partida.setRondaActual(1);
-            partida.setGrupo(usu.getGrupo());
-            Partida newPartida = servPartida.savePartida(partida);
-            modelo.addAttribute("id_partidaSesion", partida.getId());
-            usu.getPartidasMaster().add(newPartida);
-
-            for (Usuario usuPartida : partida.getInvitados()) {
-                servUsuario.update(usuPartida.getId(), usuPartida);
-            }
-
+            
             //crear las rondas con nrondas
             partida.setRondas(new ArrayList());
             for (int i = 1; i <= nrondas; i++) {
@@ -1298,6 +1295,8 @@ public class ControladorVista {
             }
 
         } catch (Exception ex) {
+            if (newPartida != null)
+                servPartida.deletePartida(newPartida.getId());
             String resp = "ERROR " + ex.getMessage();
             modelo.addAttribute("result", resp);
             anyadirTemas(modelo);
@@ -2227,6 +2226,14 @@ public class ControladorVista {
         cancion.eliminarTematica(tema);
 
         servCancion.updateTemasCancion(cancion_id, cancion);
+    }
+    
+    private void eliminarPartida(Partida partida){
+        
+        
+        
+        
+        
     }
 
 }
