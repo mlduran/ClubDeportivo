@@ -45,6 +45,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                     <th>Idioma</th>
                     <th>Genero</th>                   
                     <th>Canciones</th>
+                    <th>Canciones Temporales</th>
                     <th>Listas Spotify</th>
                     <th>Operaciones</th>
                 </tr>
@@ -54,6 +55,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                     <td th:text="${elem.idioma}"></td>
                     <td th:text="${elem.genero}"></td>
                     <td th:text="${elem.numCanciones}"></td>
+                    <td th:text="${elem.numCancionesTmp}"></td>
                     <td th:text="${elem.listasSpotify}"></td>
                     <td>
                         <a th:href="@{'/spotifyServiciosTema/' + ${elem.id}}">Actualizar Listas</a>

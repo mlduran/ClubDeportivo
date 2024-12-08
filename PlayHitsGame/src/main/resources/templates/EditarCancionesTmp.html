@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Editar Canciones</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+
+    <body>
+        <header th:insert="~{plantillas/playhitsgame :: encabezado}"></header>
+        <audio controls id="reproductor" style="display: none;">
+            <source src="" type="audio/mpeg" />                                                            
+        </audio>
+
+        <div style="align-content: center">
+            <button type="button" onclick="window.close()">CERRAR</button>
+            <div th:if="${canciones != null and !canciones.empty}">
+                <form method="post" th:action="@{/editarCanciones}" >    
+                    <input type="hidden" th:id="paginaActual" th:name="paginaActual" th:value="${canciones.number}"/>
+                    <table border="2">
+                        <tr>
+                            <td colspan="10" style="text-align: center;">
+                                <input type="submit" value="Actualizar"/> 
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="10" style="text-align: center;">
+                                <div>
+                                    <span th:text="'Página ' + ${canciones.number + 1} + ' de ' + ${canciones.totalPages}"></span>
+
+                                    <div>
+                                        <a th:if="${canciones.hasPrevious()}"
+                                           th:href="@{/editarCanciones(page=${canciones.number - 1})}">Página anterior</a>
+                                        |
+                                        <a th:if="${canciones.hasNext()}"
+                                           th:href="@{/editarCanciones(page=${canciones.number + 1})}">Página siguiente</a>
+                                    </div>
+                                    <div th:each="block : ${#numbers.sequence(0, canciones.totalPages - 1, 50)}">
+                                        <div>
+                                            <span th:each="pageNumber : ${#numbers.sequence(block, block + 49)}" 
+                                                  th:if="${pageNumber < canciones.totalPages}">
+                                                <a th:href="@{/gestionCanciones(page=${pageNumber})}"
+                                                   th:text="${pageNumber + 1}"
+                                                   th:classappend="${pageNumber == canciones.number} ? 'current-page' : ''"></a>
+                                                <span th:if="${pageNumber < canciones.totalPages - 1 && pageNumber % 50 != 49}"> | </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>IdSpotify</th>
+                            <th>Titulo</th>
+                            <th>Interprete</th>
+                            <th>Año</th>
+                            <th>URLPLay</th>
+                            <th>Play</th>
+                        </tr>
+                        <tr th:each="elem : ${canciones}">   
+                            <input type="hidden" th:name="${elem.selId()}" th:id="${elem.selId()}" th:value="${elem.id}" readonly />
+                            <td>
+                                <input type="text" id="idSpotify" name="idSpotify" th:value="${elem.spotifyid}" disabled/>
+                            </td>
+                            <td>
+                                <input type="text" th:id="'titulo_' + ${elem.selId()}" th:name="'titulo_' + ${elem.selId()}" th:value="${elem.titulo}" size="60" />
+                            </td>
+                            <td>
+                                <input type="text" th:id="'interprete_' + ${elem.selId()}" th:name="'interprete_' + ${elem.selId()}" th:value="${elem.interprete}" size="30"/>
+                            </td>
+                            <td>
+                                <input type="text" th:id="'anyo_' + ${elem.selId()}" th:name="'anyo_' + ${elem.selId()}" th:value="${elem.anyo}"/>
+                            </td>
+                            <td>
+                                <input type="text" th:id="'spotifyplay_' + ${elem.selId()}" th:name="'spotifyplay_' + ${elem.selId()}" th:value="${elem.spotifyplay}"/>
+                            </td>
+                            <td>
+                                
+                            </td>
+                            <td>
+                                <img id="play" src="images/play.webp" alt="Play" width="30" height="30" style="align-content: center"
+                                     th:data-name="${elem.spotifyplay}"
+                                     th:onclick="reproducir(this.getAttribute('data-name'))"/>
+                            </td>                    
+                        </tr>
+                        <tr>
+                            <td colspan="10" style="text-align: center;">
+                                <div>
+                                    <span th:text="'Página ' + ${canciones.number + 1} + ' de ' + ${canciones.totalPages}"></span>
+
+                                    <div>
+                                        <a th:if="${canciones.hasPrevious()}"
+                                           th:href="@{/editarCanciones(page=${canciones.number - 1})}">Página anterior</a>
+                                        |
+                                        <a th:if="${canciones.hasNext()}"
+                                           th:href="@{/editarCanciones(page=${canciones.number + 1})}">Página siguiente</a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="10" style="text-align: center;">
+                                <input type="submit" value="Actualizar"/> 
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>   
+
+            <div th:if="${canciones == null or canciones.empty}">
+                <p>NO HAY NINGUNA CANCION PARA LISTAR</p>
+            </div>
+        </div>
+        <script type="text/javascript" th:src="@{/javascript/Reproductor.js}"></script>
+
+    </body>    
+
+</html>

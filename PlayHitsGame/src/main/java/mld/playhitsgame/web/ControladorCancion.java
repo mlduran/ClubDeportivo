@@ -14,10 +14,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import lombok.extern.slf4j.Slf4j;
 import mld.playhitsgame.exemplars.Cancion;
+import mld.playhitsgame.exemplars.CancionTmp;
 import mld.playhitsgame.exemplars.FiltroCanciones;
 import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.exemplars.Usuario;
 import mld.playhitsgame.services.CancionServicioMetodos;
+import mld.playhitsgame.services.CancionTmpServicioMetodos;
 import mld.playhitsgame.services.TemaServicioMetodos;
 import mld.playhitsgame.services.UsuarioServicioMetodos;
 import mld.playhitsgame.utilidades.Utilidades;
@@ -43,6 +45,8 @@ public class ControladorCancion {
 
     @Autowired
     CancionServicioMetodos servCancion;
+    @Autowired
+    CancionTmpServicioMetodos servCancionTmp;
     @Autowired
     TemaServicioMetodos servTema;
     @Autowired
@@ -238,7 +242,7 @@ public class ControladorCancion {
 
     }
 
-    private void gestionCanciones(Model modelo, int page) {
+    private void gestionCanciones(Model modelo, int page, boolean isTmp) {
 
         FiltroCanciones filtro;
         if (modelo.getAttribute("filtroCanciones") == null) {
@@ -248,7 +252,11 @@ public class ControladorCancion {
             filtro = (FiltroCanciones) modelo.getAttribute("filtroCanciones");
         }
 
-        List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);
+        List canciones;
+        if (isTmp)
+            canciones = servCancionTmp.buscarCancionesPorFiltro(filtro);
+        else
+            canciones= servCancion.buscarCancionesPorFiltro(filtro);
 
         if (filtro.isDuplicados()) {
             canciones = Utilidades.buscarDuplicados(canciones, false, false);
@@ -275,8 +283,22 @@ public class ControladorCancion {
         }
 
         temasBD(modelo);
-        gestionCanciones(modelo, page);
+        gestionCanciones(modelo, page, false);
         return "GestionCanciones";
+    }
+    
+    @GetMapping("/gestionCancionesTmp")
+    public String revisionCancionesTmp(Model modelo,
+            @RequestParam(name = "page", defaultValue = "0") int page
+    ) {
+
+        if (!usuarioCorrecto(modelo)) {
+            return "redirect:/logout";
+        }
+
+        temasBD(modelo);
+        gestionCanciones(modelo, page, true);
+        return "GestionCancionesTmp";
     }
     
     
@@ -327,7 +349,7 @@ public class ControladorCancion {
         }
 
         temasBD(modelo);
-        gestionCanciones(modelo, page);
+        gestionCanciones(modelo, page, true);
         return "GestionCanciones";
     }
 
@@ -338,8 +360,19 @@ public class ControladorCancion {
         if (!usuarioCorrecto(modelo)) {
             return "redirect:/logout";
         }
-        gestionCanciones(modelo, page);
+        gestionCanciones(modelo, page, false);
         return "EditarCanciones";
+    }
+    
+    @GetMapping("/editarCancionesTmp")
+    public String editarCancionesTmp(Model modelo,
+            @RequestParam(name = "page", defaultValue = "0") int page) {
+
+        if (!usuarioCorrecto(modelo)) {
+            return "redirect:/logout";
+        }
+        gestionCanciones(modelo, page, true);
+        return "EditarCancionesTmp";
     }
 
     @PostMapping("/editarCanciones")
@@ -376,15 +409,64 @@ public class ControladorCancion {
                     cancion.setAnyo(anyo);
                     isCambio = true;
                 }
+                if (!cancion.getSpotifyplay().equals(req.getParameter("spotifyplay_" + cancion.selId()))) {
+                    cancion.setSpotifyplay(req.getParameter("spotifyplay_" + cancion.selId()));
+                    isCambio = true;
+                }
                 if (isCambio) {
                     cancion.setRevisar(false);
                     servCancion.updateCancion(cancion.getId(), cancion);
                 }
             }
         }
-        gestionCanciones(modelo, Integer.parseInt(pageString));
+        gestionCanciones(modelo, Integer.parseInt(pageString), true);
 
         return "EditarCanciones";
+    }
+    
+    @PostMapping("/editarCancionesTmp")
+    public String editarCancionesTmp(Model modelo, HttpServletRequest req) {
+
+        if (!usuarioCorrecto(modelo)) {
+            return "redirect:/logout";
+        }
+
+        String pageString = req.getParameter("paginaActual");
+        int page = Integer.parseInt(pageString);
+
+        FiltroCanciones filtro = (FiltroCanciones) modelo.getAttribute("filtroCanciones");
+        List<CancionTmp> canciones = servCancionTmp.buscarCancionesPorFiltro(filtro);
+
+        Pageable pageable = PageRequest.of(page, REG_POR_PAG);
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), canciones.size());
+
+        List<CancionTmp> sublist = canciones.subList(start, end);
+        for (CancionTmp cancion : sublist) {
+            boolean isCambio = false;
+            if (req.getParameter(cancion.selId()) != null) {
+                if (!cancion.getTitulo().equals(req.getParameter("titulo_" + cancion.selId()))) {
+                    cancion.setTitulo(req.getParameter("titulo_" + cancion.selId()));
+                    isCambio = true;
+                }
+                if (!cancion.getInterprete().equals(req.getParameter("interprete_" + cancion.selId()))) {
+                    cancion.setInterprete(req.getParameter("interprete_" + cancion.selId()));
+                    isCambio = true;
+                }
+                int anyo = Integer.parseInt(req.getParameter("anyo_" + cancion.selId()));
+                if (cancion.getAnyo() != anyo) {
+                    cancion.setAnyo(anyo);
+                    isCambio = true;
+                }
+                if (isCambio) {
+                    cancion.setRevisar(false);
+                    servCancionTmp.updateCancionTmp(cancion.getId(), cancion);
+                }
+            }
+        }
+        gestionCanciones(modelo, Integer.parseInt(pageString), true);
+
+        return "EditarCancionesTmp";
     }
 
     @GetMapping("/exportarCanciones")
@@ -395,7 +477,7 @@ public class ControladorCancion {
             return "redirect:/logout";
         }
 
-        gestionCanciones(modelo, page);
+        gestionCanciones(modelo, page, true);
         temasBD(modelo);
         List<Cancion> canciones = (List<Cancion>) modelo.getAttribute("canciones");
         Utilidades.exportarCanciones(canciones, rutaexportfiles);
@@ -426,8 +508,21 @@ public class ControladorCancion {
             return "redirect:/logout";
         }
         temasBD(modelo);
-        gestionCanciones(modelo, page);
+        gestionCanciones(modelo, page, false);
         return "GestionCanciones";
+    }
+    
+    @PostMapping("/gestionCancionesTmp")
+    public String revisionCancionesTmp(Model modelo, 
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @ModelAttribute("filtroCanciones") FiltroCanciones filtro) {
+
+        if (!usuarioCorrecto(modelo)) {
+            return "redirect:/logout";
+        }
+        temasBD(modelo);
+        gestionCanciones(modelo, page, true);
+        return "GestionCancionesTmp";
     }
 
     @PostMapping("/cambiosMasivos")
@@ -499,7 +594,7 @@ public class ControladorCancion {
             }
         }
         temasBD(modelo);
-        gestionCanciones(modelo, page);
+        gestionCanciones(modelo, page, false);
         return "GestionCanciones";
     }
 

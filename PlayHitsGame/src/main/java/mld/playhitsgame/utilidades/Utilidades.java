@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import mld.playhitsgame.exemplars.Cancion;
+import mld.playhitsgame.exemplars.CancionTmp;
 import mld.playhitsgame.exemplars.Dificultad;
 import mld.playhitsgame.exemplars.OpcionAnyoTmp;
 import mld.playhitsgame.exemplars.OpcionInterpreteTmp;
@@ -503,6 +504,42 @@ public class Utilidades {
 
         return cancionExistente;
     }
+    
+    public static CancionTmp existeCancionTmp(CancionTmp newCancion, List<CancionTmp> canciones) {
+
+        CancionTmp cancionExistente = null;
+        LevenshteinDistance distancia = new LevenshteinDistance();
+
+        for (CancionTmp cancion : canciones) {
+
+            double similitudTitulo = calcularSimilitud(distancia, newCancion.getTitulo(), cancion.getTitulo());
+            double similitudInterprete = calcularSimilitud(distancia, newCancion.getInterprete(), cancion.getInterprete());
+
+            if (similitudTitulo >= UMBRAL_SIMILITUD && similitudInterprete >= UMBRAL_SIMILITUD) {
+                cancionExistente = cancion;
+            }
+        }
+
+        return cancionExistente;
+    }
+    
+    public static boolean isExisteCancionTmp(CancionTmp newCancion, List<Cancion> canciones) {
+
+        boolean cancionExistente = false;
+        LevenshteinDistance distancia = new LevenshteinDistance();
+
+        for (Cancion cancion : canciones) {
+
+            double similitudTitulo = calcularSimilitud(distancia, newCancion.getTitulo(), cancion.getTitulo());
+            double similitudInterprete = calcularSimilitud(distancia, newCancion.getInterprete(), cancion.getInterprete());
+
+            if (similitudTitulo >= UMBRAL_SIMILITUD && similitudInterprete >= UMBRAL_SIMILITUD) {
+                cancionExistente = true;
+            }
+        }
+
+        return cancionExistente;
+    }
 
     public static List<Cancion> duplicadosParaEliminar(List<Cancion> canciones) {
 
@@ -626,8 +663,7 @@ public class Utilidades {
             return "Desconocido";
         }
     }
-    
-    
+        
     
     public static String filtrarTitulo(String titulo){
         

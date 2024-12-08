@@ -16,8 +16,10 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mld.playhitsgame.exemplars.Cancion;
+import mld.playhitsgame.exemplars.CancionTmp;
 import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.services.CancionServicioMetodos;
+import mld.playhitsgame.services.CancionTmpServicioMetodos;
 import mld.playhitsgame.services.TemaServicioMetodos;
 import mld.playhitsgame.utilidades.Utilidades;
 import org.json.JSONArray;
@@ -36,7 +38,11 @@ public class UtilidadesSpotify {
     @Autowired
     CancionServicioMetodos servCancion;
     @Autowired
+    CancionTmpServicioMetodos servCancionTmp;
+    @Autowired
     TemaServicioMetodos servTema;
+
+    private final String URL_PREV = "https://";
 
     public JSONArray obtenerDatosSpotify(String datos) {
 
@@ -85,8 +91,7 @@ public class UtilidadesSpotify {
                 cancion.append("anyo", anyo);
                 cancion.append("album", elAlbum);
                 cancion.append("imagen", laImagen);
-                String urlPlay = track.getString("preview_url");
-                cancion.append("preview_url", urlPlay);
+                cancion.append("preview_url", URL_PREV);
 
                 lista.put(cancion);
 
@@ -100,9 +105,9 @@ public class UtilidadesSpotify {
 
     }
 
-    public List<Cancion> obtenerDatosJson(String datos, String anyo) {
+    public List<CancionTmp> obtenerDatosJson(String datos, String anyo) {
 
-        List<Cancion> lista = new LinkedList<>();
+        List<CancionTmp> lista = new LinkedList<>();
         JSONObject track, grupo, album, imagen;
         JSONArray artists, imagenes;
 
@@ -119,7 +124,7 @@ public class UtilidadesSpotify {
 
             try {
 
-                Cancion cancion = new Cancion();
+                CancionTmp cancion = new CancionTmp();
 
                 JSONObject elemJson = (JSONObject) elem;
                 track = elemJson.getJSONObject("track");
@@ -132,7 +137,7 @@ public class UtilidadesSpotify {
                 cancion.setInterprete((String) grupo.getString("name"));
                 cancion.setAnyo(Integer.getInteger(anyo));
                 cancion.setSpotifyid((String) track.getString("id"));
-                cancion.setSpotifyplay((String) track.getString("preview_url"));
+                cancion.setSpotifyplay(URL_PREV);
                 if (!imagenes.isEmpty()) {
                     imagen = imagenes.getJSONObject(0);
                     cancion.setSpotifyimagen(imagen.getString("url"));
@@ -149,9 +154,9 @@ public class UtilidadesSpotify {
 
     }
 
-    public List<Cancion> obtenerDatosJson(String datos) {
+    public List<CancionTmp> obtenerDatosJson(String datos) {
 
-        List<Cancion> lista = new LinkedList<>();
+        List<CancionTmp> lista = new LinkedList<>();
         JSONObject track, grupo, album, imagen;
         JSONArray artists, imagenes;
 
@@ -168,7 +173,7 @@ public class UtilidadesSpotify {
 
             try {
 
-                Cancion cancion = new Cancion();
+                CancionTmp cancion = new CancionTmp();
 
                 JSONObject elemJson = (JSONObject) elem;
                 track = elemJson.getJSONObject("track");
@@ -191,7 +196,7 @@ public class UtilidadesSpotify {
                 cancion.setTitulo(titulo);
                 cancion.setInterprete((String) grupo.getString("name"));
                 cancion.setSpotifyid((String) track.getString("id"));
-                cancion.setSpotifyplay((String) track.getString("preview_url"));
+                cancion.setSpotifyplay(URL_PREV);
 
                 lista.add(cancion);
             } catch (JSONException ex) {
@@ -203,35 +208,72 @@ public class UtilidadesSpotify {
         return lista;
     }
 
-    public void grabarListaCanciones(List<Cancion> lista, boolean isTemas) {
-        
-        List<Cancion> cancionesBD = servCancion.findAll();
+    public void grabarListaCanciones(List<CancionTmp> lista, boolean isTemas) {
 
-        for (Cancion cancion : lista) {
-            Cancion cancionParaGrabar;
-            Optional<Cancion> cancionBD = servCancion.findByIdSpotify(cancion.getSpotifyid());
+        List<CancionTmp> cancionesBDTmp = servCancionTmp.findAll();
+        List<Cancion> cancionesBD = servCancion.findAll();
+        CancionTmp cancionParaGrabar = null;
+
+        for (CancionTmp cancion : lista) {
+
+            boolean altaTmp = false;
+
+            String des = cancion.getSpotifyid() + " - " + cancion.getTitulo() + " - " + cancion.getInterprete();
+
+            Optional<CancionTmp> resultadoTmp = cancionesBDTmp.stream()
+                    .filter(cancionbd -> cancionbd.getSpotifyid().equals(cancion.getSpotifyid()))
+                    .findFirst();
+            if (resultadoTmp.isPresent() && isTemas) {
+                cancionParaGrabar = resultadoTmp.get();
+                System.out.println("Cancion encontrada en BD Temporal, se añade para tema: " + des);
+            }
+
+            Optional<Cancion> resultado = cancionesBD.stream()
+                    .filter(cancionbd -> cancionbd.getSpotifyid().equals(cancion.getSpotifyid()))
+                    .findFirst();
+            if (resultado.isPresent() && isTemas) {
+                cancionParaGrabar = cancion;
+                cancionParaGrabar.setSoloTemas(true);
+                altaTmp = true;
+                System.out.println("Cancion encontrada en BD, se añade para tema: " + des);
+            }
+
             // verificamos tambien si hay alguna coincidencia por titulo e interprete
-            if (cancionBD.isEmpty()){
-                cancionParaGrabar = Utilidades.existeCancion(cancion, cancionesBD);
-                if (cancionParaGrabar != null){
-                    isTemas = true;
-                    for (Tema tema : cancion.getTematicas())
-                        cancionParaGrabar.anyadirTematica(tema);
-                }
-            }else{
-                cancionParaGrabar = cancionBD.get();
-            } 
-            
             if (cancionParaGrabar == null) {
-                servCancion.saveCancion(cancion);
-            } else {
-                if (isTemas)
-                    servCancion.updateTemasCancion(cancionParaGrabar.getId(), cancionParaGrabar);
-                else 
-                    servCancion.updateCancion(cancionParaGrabar.getId(), cancionParaGrabar);
+                cancionParaGrabar = Utilidades.existeCancionTmp(cancion, cancionesBDTmp);
+                if (cancionParaGrabar != null && isTemas) {
+                    cancionParaGrabar.setSoloTemas(true);
+                    System.out.println("Cancion encontrada en BD, se añade para tema : " + des);
+                }
+            }
+            if (cancionParaGrabar == null) {
+                boolean existeEnBD = Utilidades.isExisteCancionTmp(cancion, cancionesBD);
+                if (existeEnBD && isTemas) {
+                    cancionParaGrabar = cancion;
+                    cancionParaGrabar.setSoloTemas(true);
+                    altaTmp = true;
+                    System.out.println("Cancion encontrada en BD, se añade para tema : " + des);
+                }
+            }
+
+            if (cancionParaGrabar == null) {
+                servCancionTmp.saveCancionTmp(cancion);
+            } else if (isTemas) {
+                if (cancionParaGrabar.isSoloTemas()) {
+                    // la cancion exite en BD pero no en la temporal
+                    if (altaTmp) {
+                        cancionParaGrabar = servCancionTmp.saveCancionTmp(cancion);
+                    } else {
+                        servCancionTmp.updateCancionTmp(cancionParaGrabar.getId(), cancionParaGrabar);
+                    }
+                }
+
+                for (Tema tema : cancion.getTematicas()) {
+                    cancionParaGrabar.anyadirTematica(tema);
+                }
+                servCancionTmp.updateTemasCancionTmp(cancionParaGrabar.getId(), cancionParaGrabar);
             }
         }
-
     }
 
     public JSONArray obtenerDatosLista(String idPlayList, String token) {
@@ -293,16 +335,17 @@ public class UtilidadesSpotify {
                 Logger.getLogger(SpotifyController.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            List<Cancion> canciones = obtenerDatosJson(response.body(), anyoPlayList);
+            List<CancionTmp> canciones = obtenerDatosJson(response.body(), anyoPlayList);
 
             Optional<Tema> temaPlayHitsGame = servTema.findBytema("PlayHitsGame");
             if (!canciones.isEmpty()) {
-                for (Cancion cancion : canciones){
+                for (CancionTmp cancion : canciones) {
                     cancion.setAnyo(Integer.valueOf(anyoPlayList));
-                    cancion.setRevisar(false); 
+                    cancion.setRevisar(false);
                     cancion.setTematicas(new ArrayList());
-                    if (temaPlayHitsGame.isPresent())
-                    cancion.anyadirTematica(temaPlayHitsGame.get());
+                    if (temaPlayHitsGame.isPresent()) {
+                        cancion.anyadirTematica(temaPlayHitsGame.get());
+                    }
                 }
                 grabarListaCanciones(canciones, false);
                 offset = offset + 100;
@@ -341,14 +384,15 @@ public class UtilidadesSpotify {
                 Logger.getLogger(SpotifyController.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            List<Cancion> canciones = obtenerDatosJson(response.body());
+            List<CancionTmp> canciones = obtenerDatosJson(response.body());
 
             Tema tema = altaTema(temaPlayList, idPlayList);
 
             if (!canciones.isEmpty()) {
-                for (Cancion cancion : canciones) {
-                    if (cancion.getTematicas() == null)
+                for (CancionTmp cancion : canciones) {
+                    if (cancion.getTematicas() == null) {
                         cancion.setTematicas(new ArrayList());
+                    }
                     cancion.getTematicas().add(tema);
                     cancion.setRevisar(true);
                 }

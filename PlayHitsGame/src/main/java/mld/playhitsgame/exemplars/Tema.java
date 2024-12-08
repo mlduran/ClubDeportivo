@@ -35,6 +35,8 @@ public class Tema {
     private Genero genero;
     @ManyToMany(mappedBy = "tematicas")
     private List<Cancion> canciones;
+    @ManyToMany(mappedBy = "tematicas")
+    private List<CancionTmp> cancionesTmp;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = true)
@@ -49,6 +51,12 @@ public class Tema {
 
         return String.valueOf(this.getCanciones().size());
     }
+    
+    public String getNumCancionesTmp() {
+
+        return String.valueOf(this.getCancionesTmp().size());
+    }
+    
 
     public String getNumCancionesValidadas() {
 

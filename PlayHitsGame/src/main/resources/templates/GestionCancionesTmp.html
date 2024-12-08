@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Gestion Canciones Temporales</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    </head>
+    <body>
+        <header th:insert="~{plantillas/playhitsgame :: encabezado}"></header>        
+
+        <a href="/panel" class="button" id="volver">VOLVER</a>
+        <audio controls id="reproductor" style="display: none;">
+            <source src="" type="audio/mpeg" />                                                            
+        </audio>
+        <div>
+            <form method="post" th:action="@{/gestionCancionesTmp}" th:object="${filtroCanciones}" > 
+                <table border="2">
+                    <tr>
+                        <th>Tema</th>
+                        <th>Año Inicial</th>
+                        <th>Año Final</th>
+                        <th>Verificar</th>
+                        <th>Duplicados</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <select th:field="*{tema}" title="Tema">
+                                <option th:each="elem : ${temas}" 
+                                        th:value="${elem}" th:text="${elem}"></option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" th:field="*{anyoInicial}" required="required"/>
+                        </td>
+                        <td>
+                            <input type="number" th:field="*{anyoFinal}" required="required"/>
+                        </td>
+
+                        <td>
+                            <input type="checkbox" th:field="*{revisar}" />
+                        </td>
+                        <td>
+                            <input type="checkbox" th:field="*{duplicados}" />
+                        </td>
+
+                        <td>
+                            <input type="submit" value="Buscar"/>   
+                        </td>
+                    </tr>  
+                </table>
+            </form>           
+            <p>
+                <a th:href="@{/editarCancionesTmp}" target="_blank" class="button" id="editarCanciones"> EDITAR CANCIONES </a>
+            </p>
+            <p th:text="${result}"></p>
+        </div>
+        <div th:if="${canciones != null and !canciones.empty}">
+
+            <form method="post" th:action="@{/cambiosMasivos}" >
+                <input type="hidden" id="paginaActual" th:name="paginaActual" th:value="${canciones.number}"/>
+                <input type="checkbox" name="validar" id="validar">Verificar?</<input>
+                <input type="submit" th:name="actualizarVerificar" value="Actualizar Verificar"/> 
+                <select th:name="temaModificar" value="">
+                    <option th:each="elem : ${temas}" 
+                            th:value="${elem}" th:text="${elem}"></option>
+                </select>
+                <input type="submit" th:name="anyadirTema" value="Añadir Tema"/> 
+                <input type="submit" th:name="eliminarTema" value="Eliminar Tema"/> 
+                <input type="submit" th:name="eliminarCanciones" value="Eliminar Canciones"/> 
+                <table border="2">
+                    <tr>
+                        <td colspan="10" style="text-align: center;">
+                            <div>
+                                <span th:text="'Página ' + ${canciones.number + 1} + ' de ' + ${canciones.totalPages}"></span>
+
+                                <div>
+                                    <a th:if="${canciones.hasPrevious()}"
+                                       th:href="@{/gestionCancionesTmp(page=${canciones.number - 1})}">Página anterior</a>
+                                    |
+                                    <a th:if="${canciones.hasNext()}"
+                                       th:href="@{/gestionCancionesTmp(page=${canciones.number + 1})}">Página siguiente</a>
+                                </div>
+                                <div th:each="block : ${#numbers.sequence(0, canciones.totalPages - 1, 50)}">
+                                    <div>
+                                        <span th:each="pageNumber : ${#numbers.sequence(block, block + 49)}" 
+                                              th:if="${pageNumber < canciones.totalPages}">
+                                            <a th:href="@{/gestionCancionesTmp(page=${pageNumber})}"
+                                               th:text="${pageNumber + 1}"
+                                               th:classappend="${pageNumber == canciones.number} ? 'current-page' : ''"></a>
+                                            <span th:if="${pageNumber < canciones.totalPages - 1 && pageNumber % 50 != 49}"> | </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr> 
+                        <th>Sel</th>
+                        <th>Titulo</th>
+                        <th>Interprete</th>
+                        <th>Album</th>
+                        <th>Temas</th>                   
+                        <th>Año</th>
+                        <th>Spotifyid</th>                   
+                        <th>Verificar?</th>
+                        <th>SoloTemas?</th>
+                        <th>Acciones</th>
+                        <th>Play</th>
+                    </tr>
+                    <tr th:each="elem : ${canciones}">
+                        <td><input type="checkbox" th:name="${elem.selId()}" th:id="${elem.selId()}" /></td>
+                        <td th:text="${elem.titulo}"></td>
+                        <td th:text="${elem.interprete}"></td>
+                        <td th:text="${elem.album}"></td>
+                        <td th:text="${elem.tematicasTxt}"></td>
+                        <td th:text="${elem.anyo}"></td>
+                        <td th:text="${elem.spotifyid}"></td>
+                        <td th:text="${elem.txtRevision()}"></td>
+                        <td th:text="${elem.txtSoloTemas}"></td>
+                        <td>
+                            <a th:href="@{'/modificarCancionTmp/' + ${elem.id}}">Editar</a>
+                            <a th:href="@{'/eliminarCancionTmp/' + ${elem.id}}">Eliminar</a>
+                        </td>
+                        <td>
+                            <img id="play" src="images/play.webp" alt="Play" width="30" height="30" style="align-content: center"
+                                 th:data-name="${elem.spotifyplay}"
+                                 th:onclick="reproducir(this.getAttribute('data-name'))"/>
+                        </td>                        
+                    </tr>
+                    <tr>
+                        <td colspan="10" style="text-align: center;">
+                            <div>
+                                <span th:text="'Página ' + ${canciones.number + 1} + ' de ' + ${canciones.totalPages}"></span>
+
+                                <div>
+                                    <a th:if="${canciones.hasPrevious()}"
+                                       th:href="@{/gestionCancionesTmp(page=${canciones.number - 1})}">Página anterior</a>                                    |
+                                    <a th:if="${canciones.hasNext()}"
+                                       th:href="@{/gestionCancionesTmp(page=${canciones.number + 1})}">Página siguiente</a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>   
+
+        <div th:if="${canciones == null or canciones.empty}">
+            <p>NO HAY NINGUNA CANCION PARA LISTAR</p>
+        </div>
+
+        <div class="text-center">
+            <a href="/panel" class="text-dark">
+                <p th:text="#{general.volver}" />
+            </a>
+        </div>
+
+        <script type="text/javascript" th:src="@{/javascript/Reproductor.js}"></script>
+    </body>
+</html>

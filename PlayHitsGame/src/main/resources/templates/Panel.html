@@ -63,6 +63,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </div>
                                 </div>
                                 <div th:if="*{colaborador} == true" class="text-center my-2">
+                                    <button th:onclick="window.location.href='/gestionCancionesTmp'" class="btn btn-primary" role="button" th:text="#{general.gestioncancionestmp}"/>
+                                </div>
+                                <div th:if="*{colaborador} == true" class="text-center my-2">
                                     <button th:onclick="window.location.href='/gestionCanciones'" class="btn btn-primary" role="button" th:text="#{general.gestioncanciones}"/>
                                 </div>
                                 <div th:if="*{colaborador} == true" class="text-center my-2">
