@@ -641,6 +641,33 @@ public class ControladorVista {
 
     }
 
+    private void altaPuntuacion(Tema elTema, Usuario usuario,
+            Partida partida, int pts) {
+
+        // de momento solo damos da talta la puntuacion 
+        // si no exite esa puntuacion y usuario, mas adelante se 
+        // podria hacer solo con un usuario
+        List<Puntuacion> listaPts = sevrPuntuacion.obtenerPuntuacionesUsuario(
+                elTema.getId(), usuario.getId());
+
+        if (!listaPts.isEmpty()) {
+            for (Puntuacion puntuacion : listaPts) {
+                if (puntuacion.getPuntos() == pts) {
+                    return; // si ya esxite salimos
+                }
+            }
+        }
+        Puntuacion newPts = new Puntuacion();
+        newPts.setTema(elTema);
+        newPts.setPuntos(pts);
+        newPts.setTipoPartida(TipoPartida.personal);
+        newPts.setIdUsuario(usuario.getId());
+        newPts.setDificultad(partida.getDificultad());
+        newPts.setAnyoInicial(partida.getAnyoInicial());
+        newPts.setAnyoFinal(partida.getAnyoFinal());
+        sevrPuntuacion.save(newPts);
+    }
+
     private boolean finalizarPartidaPersonal(Partida partida, Usuario usuario) {
 
         // Devuelve true si se ha conseguido un record
@@ -669,15 +696,12 @@ public class ControladorVista {
                     esRecord = true;
                 }
                 if (pts > 0) {
-                    Puntuacion newPts = new Puntuacion();
-                    newPts.setTema(elTema);
-                    newPts.setPuntos(pts);
-                    newPts.setTipoPartida(TipoPartida.personal);
-                    newPts.setIdUsuario(usuario.getId());
-                    newPts.setDificultad(partida.getDificultad());
-                    newPts.setAnyoInicial(partida.getAnyoInicial());
-                    newPts.setAnyoFinal(partida.getAnyoFinal());
-                    sevrPuntuacion.save(newPts);
+                    try {
+                        altaPuntuacion(elTema, usuario, partida, pts);
+                    } catch (Exception e) {
+                        Logger.getLogger(ControladorVista.class.getName()).
+                                log(Level.SEVERE, "Error en alta de puntacion", e);
+                    }
                 }
             }
         }
@@ -1225,11 +1249,11 @@ public class ControladorVista {
                 throw new Exception(mensaje(modelo, "general.cancionesinsuficientes"));
             }
 
-            partida.setInvitados(new ArrayList()); 
+            partida.setInvitados(new ArrayList());
             partida.setNCanciones(canciones.size());
             partida.setMaster(usu);
             partida.setRondaActual(1);
-            partida.setGrupo(usu.getGrupo());             
+            partida.setGrupo(usu.getGrupo());
             newPartida = servPartida.savePartida(partida);
             usu.getPartidasMaster().add(newPartida);
             modelo.addAttribute("id_partidaSesion", newPartida);
@@ -1250,7 +1274,7 @@ public class ControladorVista {
                     }
                 }
             }
-            
+
             //crear las rondas con nrondas
             partida.setRondas(new ArrayList());
             for (int i = 1; i <= nrondas; i++) {
@@ -1295,8 +1319,9 @@ public class ControladorVista {
             }
 
         } catch (Exception ex) {
-            if (newPartida != null)
+            if (newPartida != null) {
                 servPartida.deletePartida(newPartida.getId());
+            }
             String resp = "ERROR " + ex.getMessage();
             modelo.addAttribute("result", resp);
             anyadirTemas(modelo);
@@ -2227,13 +2252,9 @@ public class ControladorVista {
 
         servCancion.updateTemasCancion(cancion_id, cancion);
     }
-    
-    private void eliminarPartida(Partida partida){
-        
-        
-        
-        
-        
+
+    private void eliminarPartida(Partida partida) {
+
     }
 
 }

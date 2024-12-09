@@ -14,6 +14,8 @@ import mld.playhitsgame.exemplars.Puntuacion;
 public interface PuntuacionServicio {
 
     List<Puntuacion> obtenerPuntuacionesPersonales(Long tema_id);
-    Puntuacion save(Puntuacion puntuacion); 
- 
+
+    Puntuacion save(Puntuacion puntuacion);
+
+    List<Puntuacion> obtenerPuntuacionesUsuario(Long tema_id, Long id_usuario);
 }

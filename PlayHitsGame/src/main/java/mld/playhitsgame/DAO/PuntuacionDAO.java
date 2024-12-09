@@ -21,6 +21,7 @@ public interface PuntuacionDAO extends JpaRepository<Puntuacion, Long> {
     @Query(value = "SELECT * FROM puntuaciones WHERE tipo_partida=1 AND tema_id=:tema_id ORDER BY puntos DESC LIMIT 50; ", nativeQuery = true)
     List<Puntuacion> obtenerPuntuacionesPersonales(Long tema_id);
     
-
+    @Query(value = "SELECT * FROM puntuaciones WHERE tipo_partida=1 AND tema_id=:tema_id AND id_usuario=:id_usuario; ", nativeQuery = true)
+    List<Puntuacion> obtenerPuntuacionesUsuario(Long tema_id, Long id_usuario);
 
 }

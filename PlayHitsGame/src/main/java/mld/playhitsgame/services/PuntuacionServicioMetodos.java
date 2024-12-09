@@ -27,6 +27,12 @@ public class PuntuacionServicioMetodos implements PuntuacionServicio {
     public Puntuacion save(Puntuacion puntuacion) {
         return DAO.save(puntuacion);
     }
+    
+    @Override
+    public List<Puntuacion> obtenerPuntuacionesUsuario(Long tema_id, Long id_usuario){
+        
+        return DAO.obtenerPuntuacionesUsuario(tema_id, id_usuario);        
+    }
 
    
 
