@@ -32,9 +32,9 @@ public class CancionTmp {
     private String spotifyimagen;
     private boolean revisar;
     private boolean soloTemas;
-    
-    public String selId(){
-        
+
+    public String selId() {
+
         return "sel_" + String.valueOf(this.getId());
     }
 
@@ -46,13 +46,14 @@ public class CancionTmp {
             return "NO";
         }
     }
-    
-    public String txtSoloTemas(){
-        
-        if (this.isSoloTemas())
+
+    public String txtSoloTemas() {
+
+        if (this.isSoloTemas()) {
             return "SI";
-        else 
-            return "NO";        
+        } else {
+            return "NO";
+        }
     }
 
     public String getTematicasTxt() {
@@ -92,6 +93,13 @@ public class CancionTmp {
             }
         }
         this.getTematicas().add(tema);
+    }
+
+    public boolean isTieneTemas(List<Tema> temas) {
+        // Devuelve si la cancion tiene icluidos todos los
+        // temas de la lista
+
+        return this.tematicas.containsAll(temas);
     }
 
 }

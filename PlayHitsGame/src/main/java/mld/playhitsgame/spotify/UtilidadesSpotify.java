@@ -223,17 +223,21 @@ public class UtilidadesSpotify {
 
             Optional<CancionTmp> resultadoTmp = servCancionTmp.findByIdSpotify(cancion.getSpotifyid());
             if (resultadoTmp.isPresent() && isTemas) {
-                cancionParaGrabar = resultadoTmp.get();
-                System.out.println("Cancion encontrada en BD Temporal, se añade para tema: " + des);
+                if (!resultadoTmp.get().isTieneTemas(cancion.getTematicas())) {
+                    cancionParaGrabar = resultadoTmp.get();
+                    System.out.println("Cancion encontrada en BD Temporal, se añade para tema: " + des);
+                }
             }
 
             if (cancionParaGrabar == null) {
                 Optional<Cancion> resultado = servCancion.findByIdSpotify(cancion.getSpotifyid());
                 if (resultado.isPresent() && isTemas) {
-                    cancionParaGrabar = cancion;
-                    cancionParaGrabar.setSoloTemas(true);
-                    altaTmp = true;
-                    System.out.println("Cancion encontrada en BD, se añade para tema: " + des);
+                    if (!resultado.get().isTieneTemas(cancion.getTematicas())) {
+                        cancionParaGrabar = cancion;
+                        cancionParaGrabar.setSoloTemas(true);
+                        altaTmp = true;
+                        System.out.println("Cancion encontrada en BD, se añade para tema: " + des);
+                    }
                 }
             }
 
@@ -257,6 +261,7 @@ public class UtilidadesSpotify {
 
             if (cancionParaGrabar == null) {
                 servCancionTmp.saveCancionTmp(cancion);
+                System.out.println("Cancion NUEVA : " + des);
             } else if (isTemas) {
                 if (cancionParaGrabar.isSoloTemas()) {
                     // la cancion exite en BD pero no en la temporal

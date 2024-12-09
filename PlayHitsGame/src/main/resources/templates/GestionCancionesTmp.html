@@ -57,6 +57,15 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             <p>
                 <a th:href="@{/editarCancionesTmp}" target="_blank" class="button" id="editarCanciones"> EDITAR CANCIONES </a>
             </p>
+            <hr style="border: 1px solid #ccc; margin: 20px 0;" />
+            <p>
+                <a th:href="@{/incorporarCancionesTmp}" class="button" id="incorporarCancionesTmp"> INCORPORAR CANCIONES TEMPORALES </a>
+            </p>
+            <hr style="border: 1px solid #ccc; margin: 20px 0;" />
+            <p>
+                <a th:href="@{/incorporarEliminarCancionesTmp}" class="button" id="incorporarEliminarCancionesTmp"> INCORPORAR Y ELIMINAR CANCIONES TEMPORALES </a>
+            </p>            
+            <hr style="border: 1px solid #ccc; margin: 20px 0;" />
             <p th:text="${result}"></p>
         </div>
         <div th:if="${canciones != null and !canciones.empty}">

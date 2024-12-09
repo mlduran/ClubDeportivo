@@ -523,6 +523,24 @@ public class Utilidades {
         return cancionExistente;
     }
     
+    public static Cancion existeCancion(CancionTmp newCancion, List<Cancion> canciones) {
+
+        Cancion cancionExistente = null;
+        LevenshteinDistance distancia = new LevenshteinDistance();
+
+        for (Cancion cancion : canciones) {
+
+            double similitudTitulo = calcularSimilitud(distancia, newCancion.getTitulo(), cancion.getTitulo());
+            double similitudInterprete = calcularSimilitud(distancia, newCancion.getInterprete(), cancion.getInterprete());
+
+            if (similitudTitulo >= UMBRAL_SIMILITUD && similitudInterprete >= UMBRAL_SIMILITUD) {
+                cancionExistente = cancion;
+            }
+        }
+
+        return cancionExistente;
+    }
+    
     public static boolean isExisteCancionTmp(CancionTmp newCancion, List<Cancion> canciones) {
 
         boolean cancionExistente = false;

@@ -97,6 +97,13 @@ public class Cancion{
         }
         this.getTematicas().add(tema);
     }
+    
+    public boolean isTieneTemas(List<Tema> temas){
+        // Devuelve si la cancion tiene icluidos todos los
+        // temas de la lista
+        
+        return this.tematicas.containsAll(temas);        
+    }
      
     
 }

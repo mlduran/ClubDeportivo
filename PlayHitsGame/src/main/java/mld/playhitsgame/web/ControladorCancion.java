@@ -643,7 +643,7 @@ public class ControladorCancion {
         }
 
         temasBD(modelo);
-        
+
     }
 
     private void ejecutarCambiosBD(HttpServletRequest req, List<Cancion> sublist, Tema tema,
@@ -680,7 +680,7 @@ public class ControladorCancion {
 
     private void ejecutarCambiosBDTmp(HttpServletRequest req, List<CancionTmp> sublist, Tema tema,
             String opVerificar, String opAnyadirTema, String opEliminarTema, String opEliminarCanciones, boolean isValidar) {
-        
+
         for (CancionTmp cancion : sublist) {
             if (req.getParameter(cancion.selId()) != null) {
                 if ("on".equals(req.getParameter(cancion.selId()))) {
@@ -707,8 +707,97 @@ public class ControladorCancion {
                     servCancionTmp.updateCancionTmp(cancion.getId(), cancion);
                 }
             }
-        }        
-        
+        }
+
+    }
+
+    private void incorporarCancionesBD(Model modelo, int page, boolean eliminar) {
+
+        FiltroCanciones filtro;
+        if (modelo.getAttribute("filtroCanciones") == null) {
+            filtro = new FiltroCanciones();
+            modelo.addAttribute("filtroCanciones", filtro);
+        } else {
+            filtro = (FiltroCanciones) modelo.getAttribute("filtroCanciones");
+        }
+        List<CancionTmp> canciones = servCancionTmp.buscarCancionesPorFiltro(filtro);
+
+        Pageable pageable = PageRequest.of(page, REG_POR_PAG);
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), canciones.size());
+
+        List<CancionTmp> sublist = canciones.subList(start, end);
+        List<Cancion> cancionesBD = servCancion.findAll();
+
+        for (CancionTmp cancionTmp : sublist) {
+            String des = cancionTmp.getSpotifyid() + " - " + cancionTmp.getTitulo() + " - " + cancionTmp.getInterprete();
+
+            Cancion cancionExistente;
+            Optional<Cancion> cancionBD = servCancion.findByIdSpotify(cancionTmp.getSpotifyid());
+            if (cancionBD.isEmpty()) {
+                cancionExistente = Utilidades.existeCancion(cancionTmp, cancionesBD);
+            } else {
+                cancionExistente = cancionBD.get();
+            }
+            if (cancionTmp.isSoloTemas()) {
+                if (cancionExistente != null) {
+                    if (cancionExistente.isTieneTemas(cancionTmp.getTematicas())) {
+                        System.out.println("Ya tiene los temas " + des);
+                    } else {
+                        for (Tema tema : cancionTmp.getTematicas()) {
+                            cancionExistente.anyadirTematica(tema);
+                        }
+                        servCancion.updateTemasCancion(cancionExistente.getId(), cancionExistente);
+                        System.out.println("Se añaden tematicas a " + des);
+                    }
+                }
+            } else {
+                Cancion cancionNew = new Cancion();
+                cancionNew.setAlbum(cancionTmp.getAlbum());
+                cancionNew.setAnyo(cancionTmp.getAnyo());
+                cancionNew.setInterprete(cancionTmp.getInterprete());
+                cancionNew.setRevisar(cancionTmp.isRevisar());
+                cancionNew.setSpotifyid(cancionTmp.getSpotifyid());
+                cancionNew.setSpotifyimagen(cancionTmp.getSpotifyimagen());
+                cancionNew.setSpotifyplay(cancionTmp.getSpotifyplay());
+                cancionNew.setTitulo(cancionTmp.getTitulo());
+                cancionNew.setTematicas(cancionTmp.getTematicas());
+                servCancion.saveCancion(cancionNew);
+                System.out.println("Se añaden NUEVA CANCION " + des);
+            }
+
+            if (eliminar) {
+                servCancionTmp.deleteCancionTmp(cancionTmp.getId());
+            }
+
+        }
+
+    }
+
+    @GetMapping("/incorporarCancionesTmp")
+    public String incorporarCancionesTmp(Model modelo,
+            @RequestParam(name = "page", defaultValue = "0") int page) {
+
+        if (!usuarioCorrecto(modelo)) {
+            return "redirect:/logout";
+        }
+
+        incorporarCancionesBD(modelo, page, false);
+        gestionCanciones(modelo, page, true);
+        return "GestionCancionesTmp";
+    }
+
+    @GetMapping("/incorporarEliminarCancionesTmp")
+    public String incorporarEliminarCancionesTmp(Model modelo,
+            @RequestParam(name = "page", defaultValue = "0") int page) {
+
+        if (!usuarioCorrecto(modelo)) {
+            return "redirect:/logout";
+        }
+
+        incorporarCancionesBD(modelo, page, true);
+        gestionCanciones(modelo, page, true);
+        return "GestionCancionesTmp";
     }
 
 }
