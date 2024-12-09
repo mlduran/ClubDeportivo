@@ -32,9 +32,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                     </td>
                 </tr>  
                 <tr>
-                    <td colspan="3"  style="text-align:center; background-color: lightpink;">
+                    <th colspan="3" style="text-align:center; background-color: lightpink;">
                 <spawn th:text="#{general.partida} + ' ' + #{general.finalizada}" />
-                </td>
+                <br/>
+                <spawn th:text="#{general.ganador} + ' : ' + ${partidaSesion.ganador}" />                
+                </th>
                 </tr>
                 <tr>
                     <td>
