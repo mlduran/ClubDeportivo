@@ -212,30 +212,29 @@ public class UtilidadesSpotify {
 
         List<CancionTmp> cancionesBDTmp = servCancionTmp.findAll();
         List<Cancion> cancionesBD = servCancion.findAll();
-        CancionTmp cancionParaGrabar = null;
+        CancionTmp cancionParaGrabar;
 
         for (CancionTmp cancion : lista) {
 
             boolean altaTmp = false;
+            cancionParaGrabar = null;
 
             String des = cancion.getSpotifyid() + " - " + cancion.getTitulo() + " - " + cancion.getInterprete();
 
-            Optional<CancionTmp> resultadoTmp = cancionesBDTmp.stream()
-                    .filter(cancionbd -> cancionbd.getSpotifyid().equals(cancion.getSpotifyid()))
-                    .findFirst();
+            Optional<CancionTmp> resultadoTmp = servCancionTmp.findByIdSpotify(cancion.getSpotifyid());
             if (resultadoTmp.isPresent() && isTemas) {
                 cancionParaGrabar = resultadoTmp.get();
                 System.out.println("Cancion encontrada en BD Temporal, se añade para tema: " + des);
             }
 
-            Optional<Cancion> resultado = cancionesBD.stream()
-                    .filter(cancionbd -> cancionbd.getSpotifyid().equals(cancion.getSpotifyid()))
-                    .findFirst();
-            if (resultado.isPresent() && isTemas) {
-                cancionParaGrabar = cancion;
-                cancionParaGrabar.setSoloTemas(true);
-                altaTmp = true;
-                System.out.println("Cancion encontrada en BD, se añade para tema: " + des);
+            if (cancionParaGrabar == null) {
+                Optional<Cancion> resultado = servCancion.findByIdSpotify(cancion.getSpotifyid());
+                if (resultado.isPresent() && isTemas) {
+                    cancionParaGrabar = cancion;
+                    cancionParaGrabar.setSoloTemas(true);
+                    altaTmp = true;
+                    System.out.println("Cancion encontrada en BD, se añade para tema: " + des);
+                }
             }
 
             // verificamos tambien si hay alguna coincidencia por titulo e interprete

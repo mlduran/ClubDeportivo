@@ -30,11 +30,11 @@ public interface CancionTmpDAO extends JpaRepository<CancionTmp, Long>{
     @Query(value = "SELECT * FROM canciones_tmp WHERE spotifyid=:id ;", nativeQuery = true)
     Optional<CancionTmp> findByIdSpotify(String id);
     
-    @Query(value = "SELECT * FROM canciones_tmp WHERE anyo>=:anyoinicial AND anyo<=:anyofinal AND revisar=:revisar ;", nativeQuery = true)
-    List<CancionTmp> findByFiltroBasico(int anyoinicial, int anyofinal, boolean revisar);
+    @Query(value = "SELECT * FROM canciones_tmp WHERE anyo>=:anyoinicial AND anyo<=:anyofinal AND revisar=:revisar AND solo_temas=:solo_temas ;", nativeQuery = true)
+    List<CancionTmp> findByFiltroBasico(int anyoinicial, int anyofinal, boolean revisar, boolean solo_temas);
     
-    @Query(value = "SELECT canciones_tmp.*, temas.tema FROM canciones_tmp INNER JOIN canciones_tmp_tematicas ON canciones_tmp.id = canciones_tmp_tematicas.canciones_tmp_id INNER JOIN temas ON temas.id = canciones_tmp_tematicas.tematicas_id WHERE tema=:tema AND anyo>=:anyoinicial AND anyo<=:anyofinal AND revisar=:revisar ;", nativeQuery = true)
-    List<CancionTmp> findByFiltroConTema(String tema, int anyoinicial, int anyofinal, boolean revisar);
+    @Query(value = "SELECT canciones_tmp.*, temas.tema FROM canciones_tmp INNER JOIN canciones_tmp_tematicas ON canciones_tmp.id = canciones_tmp_tematicas.canciones_tmp_id INNER JOIN temas ON temas.id = canciones_tmp_tematicas.tematicas_id WHERE tema=:tema AND anyo>=:anyoinicial AND anyo<=:anyofinal AND revisar=:revisar AND solo_temas=:solo_temas ;", nativeQuery = true)
+    List<CancionTmp> findByFiltroConTema(String tema, int anyoinicial, int anyofinal, boolean revisar, boolean solo_temas);
 
     @Query(value = "SELECT * FROM canciones_tmp WHERE revisar=false ;", nativeQuery = true)
     List<CancionTmp> finBySinRevisar();
@@ -42,11 +42,5 @@ public interface CancionTmpDAO extends JpaRepository<CancionTmp, Long>{
     @Modifying   
     @Transactional
     @Query(value = "DELETE FROM canciones_tmp_tematicas WHERE canciones_tmp_id=:idCancionTmp ;", nativeQuery = true)
-    void eliminarRelacionTemas(Long idCancionTmp);
-    
-    @Modifying   
-    @Transactional
-    @Query(value = "DELETE FROM canciones_tmp_rondas WHERE cancion_id=:idCancionTmp ;", nativeQuery = true)
-    void eliminarRelacionRondas(Long idCancionTmp);
-    
+    void eliminarRelacionTemas(Long idCancionTmp);   
 }

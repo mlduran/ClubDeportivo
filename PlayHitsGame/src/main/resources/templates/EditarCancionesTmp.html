@@ -19,7 +19,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <div style="align-content: center">
             <button type="button" onclick="window.close()">CERRAR</button>
             <div th:if="${canciones != null and !canciones.empty}">
-                <form method="post" th:action="@{/editarCanciones}" >    
+                <form method="post" th:action="@{/editarCancionesTmp}" >    
                     <input type="hidden" th:id="paginaActual" th:name="paginaActual" th:value="${canciones.number}"/>
                     <table border="2">
                         <tr>
@@ -73,13 +73,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                 <input type="text" th:id="'interprete_' + ${elem.selId()}" th:name="'interprete_' + ${elem.selId()}" th:value="${elem.interprete}" size="30"/>
                             </td>
                             <td>
-                                <input type="text" th:id="'anyo_' + ${elem.selId()}" th:name="'anyo_' + ${elem.selId()}" th:value="${elem.anyo}"/>
+                                <input type="text" th:id="'anyo_' + ${elem.selId()}" th:name="'anyo_' + ${elem.selId()}" th:value="${elem.anyo}" size="4"/>
                             </td>
                             <td>
-                                <input type="text" th:id="'spotifyplay_' + ${elem.selId()}" th:name="'spotifyplay_' + ${elem.selId()}" th:value="${elem.spotifyplay}"/>
-                            </td>
-                            <td>
-                                
+                                <input type="text" th:id="'spotifyplay_' + ${elem.selId()}" th:name="'spotifyplay_' + ${elem.selId()}" th:value="${elem.spotifyplay}" size="120"/>
                             </td>
                             <td>
                                 <img id="play" src="images/play.webp" alt="Play" width="30" height="30" style="align-content: center"

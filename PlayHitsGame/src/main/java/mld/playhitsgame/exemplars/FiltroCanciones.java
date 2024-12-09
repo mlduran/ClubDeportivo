@@ -9,12 +9,27 @@ package mld.playhitsgame.exemplars;
  * @author miguel
  */
 public class FiltroCanciones {
+
+    /**
+     * @return the soloTemas
+     */
+    public boolean isSoloTemas() {
+        return soloTemas;
+    }
+
+    /**
+     * @param soloTemas the soloTemas to set
+     */
+    public void setSoloTemas(boolean soloTemas) {
+        this.soloTemas = soloTemas;
+    }
     
     private String tema;
     private int anyoInicial;
     private int anyoFinal;
     private boolean revisar;
     private boolean duplicados;
+    private boolean soloTemas;
     
         public FiltroCanciones(){        
 
@@ -23,6 +38,7 @@ public class FiltroCanciones {
         this.anyoFinal = 2050;
         this.revisar = false;
         this.duplicados = false;
+        this.soloTemas = false;
 
     }
 

@@ -15,7 +15,6 @@ import mld.playhitsgame.exemplars.SearchOperation;
 import mld.playhitsgame.exemplars.SearchSpecifications;
 import mld.playhitsgame.exemplars.CancionTmp;
 import mld.playhitsgame.exemplars.FiltroCanciones;
-import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.Tema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -103,7 +102,6 @@ public class CancionTmpServicioMetodos implements CancionTmpServicio {
     @Override
     public void deleteCancionTmp(Long id) {
         DAO.eliminarRelacionTemas(id);
-        DAO.eliminarRelacionRondas(id);
         DAO.deleteById(id);
     }
 
@@ -131,27 +129,11 @@ public class CancionTmpServicioMetodos implements CancionTmpServicio {
     public List<CancionTmp> buscarCancionesPorFiltro(FiltroCanciones filtro) {
 
         if (!"".equals(filtro.getTema())) {
-            return DAO.findByFiltroConTema(filtro.getTema(), filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar());
+            return DAO.findByFiltroConTema(filtro.getTema(), filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar(), filtro.isSoloTemas());
         } else {
-            return DAO.findByFiltroBasico(filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar());
+            return DAO.findByFiltroBasico(filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar(), filtro.isSoloTemas());
         }
 
-    }
+    }    
     
-    public List<CancionTmp> obtenerCanciones(Partida partida) {
-
-        List<CancionTmp> canciones;
-
-        if (!partida.getTema().isBlank()) {
-            canciones = DAO.findByFiltroConTema(partida.getTema(), partida.getAnyoInicial(),
-                    partida.getAnyoFinal(), false);
-        } else {
-            canciones = DAO.findByFiltroBasico(partida.getAnyoInicial(),
-                    partida.getAnyoFinal(), false);
-        }
-
-        return canciones;
-
-    }
-
 }

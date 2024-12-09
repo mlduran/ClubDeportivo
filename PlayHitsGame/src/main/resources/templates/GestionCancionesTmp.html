@@ -25,7 +25,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         <th>Año Inicial</th>
                         <th>Año Final</th>
                         <th>Verificar</th>
-                        <th>Duplicados</th>
+                        <th>SoloTemas?</th>
+                        <th>Duplicados</th>                        
                     </tr>
                     <tr>
                         <td>
@@ -45,9 +46,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <input type="checkbox" th:field="*{revisar}" />
                         </td>
                         <td>
-                            <input type="checkbox" th:field="*{duplicados}" />
+                            <input type="checkbox" th:field="*{soloTemas}" />
                         </td>
-
                         <td>
                             <input type="submit" value="Buscar"/>   
                         </td>
@@ -61,7 +61,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         </div>
         <div th:if="${canciones != null and !canciones.empty}">
 
-            <form method="post" th:action="@{/cambiosMasivos}" >
+            <form method="post" th:action="@{/cambiosMasivosTmp}" >
                 <input type="hidden" id="paginaActual" th:name="paginaActual" th:value="${canciones.number}"/>
                 <input type="checkbox" name="validar" id="validar">Verificar?</<input>
                 <input type="submit" th:name="actualizarVerificar" value="Actualizar Verificar"/> 
