@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
  *
  * @author miguel
  */
+
 @Service
 public class UtilidadesSpotify {
 
@@ -212,71 +213,53 @@ public class UtilidadesSpotify {
 
         List<CancionTmp> cancionesBDTmp = servCancionTmp.findAll();
         List<Cancion> cancionesBD = servCancion.findAll();
-        CancionTmp cancionParaGrabar;
 
         for (CancionTmp cancion : lista) {
 
-            boolean altaTmp = false;
-            cancionParaGrabar = null;
-
             String des = cancion.getSpotifyid() + " - " + cancion.getTitulo() + " - " + cancion.getInterprete();
 
+            // CASO 1 el ID Spotify existe en la BD temporal - solo añadimos tema
             Optional<CancionTmp> resultadoTmp = servCancionTmp.findByIdSpotify(cancion.getSpotifyid());
-            if (resultadoTmp.isPresent() && isTemas) {
-                if (!resultadoTmp.get().isTieneTemas(cancion.getTematicas())) {
-                    cancionParaGrabar = resultadoTmp.get();
-                    System.out.println("Cancion encontrada en BD Temporal, se añade para tema: " + des);
-                }
-            }
-
-            if (cancionParaGrabar == null) {
-                Optional<Cancion> resultado = servCancion.findByIdSpotify(cancion.getSpotifyid());
-                if (resultado.isPresent() && isTemas) {
-                    if (!resultado.get().isTieneTemas(cancion.getTematicas())) {
-                        cancionParaGrabar = cancion;
-                        cancionParaGrabar.setSoloTemas(true);
-                        altaTmp = true;
-                        System.out.println("Cancion encontrada en BD, se añade para tema: " + des);
-                    }
-                }
-            }
-
-            // verificamos tambien si hay alguna coincidencia por titulo e interprete
-            if (cancionParaGrabar == null) {
-                cancionParaGrabar = Utilidades.existeCancionTmp(cancion, cancionesBDTmp);
-                if (cancionParaGrabar != null && isTemas) {
-                    cancionParaGrabar.setSoloTemas(true);
-                    System.out.println("Cancion encontrada en BD, se añade para tema : " + des);
-                }
-            }
-            if (cancionParaGrabar == null) {
-                boolean existeEnBD = Utilidades.isExisteCancionTmp(cancion, cancionesBD);
-                if (existeEnBD && isTemas) {
-                    cancionParaGrabar = cancion;
-                    cancionParaGrabar.setSoloTemas(true);
-                    altaTmp = true;
-                    System.out.println("Cancion encontrada en BD, se añade para tema : " + des);
-                }
-            }
-
-            if (cancionParaGrabar == null) {
-                servCancionTmp.saveCancionTmp(cancion);
-                System.out.println("Cancion NUEVA : " + des);
-            } else if (isTemas) {
-                if (cancionParaGrabar.isSoloTemas()) {
-                    // la cancion exite en BD pero no en la temporal
-                    if (altaTmp) {
-                        cancionParaGrabar = servCancionTmp.saveCancionTmp(cancion);
-                    } else {
-                        servCancionTmp.updateCancionTmp(cancionParaGrabar.getId(), cancionParaGrabar);
-                    }
-                }
-
+            if (resultadoTmp.isPresent()) {
                 for (Tema tema : cancion.getTematicas()) {
-                    cancionParaGrabar.anyadirTematica(tema);
-                }
-                servCancionTmp.updateTemasCancionTmp(cancionParaGrabar.getId(), cancionParaGrabar);
+                    resultadoTmp.get().anyadirTematica(tema);
+                }               
+                servCancionTmp.updateTemasCancionTmp(resultadoTmp.get().getId(), resultadoTmp.get());
+                System.out.println("Cancion encontrada en BD Temporal, se añade para tema: " + des);
+                continue;
             }
+
+            // CASO 2 el ID Spotify existe en la BD Real - Damos de alta para añadir tema
+            Optional<Cancion> resultado = servCancion.findByIdSpotify(cancion.getSpotifyid());
+            if (resultado.isPresent()) {
+                servCancionTmp.saveCancionTmp(cancion);
+                System.out.println("Cancion encontrada en BD, se da de alta para añadir tema: " + des);
+                continue;
+            }            
+
+            // CASO 3 verificamos tambien si hay alguna coincidencia por titulo e interprete en BD Temporal - solo añadimos tema
+            CancionTmp existeCancionTmp = Utilidades.existeCancionTmp(cancion, cancionesBDTmp);
+            if (existeCancionTmp != null) {
+                for (Tema tema : cancion.getTematicas()) {
+                    existeCancionTmp.anyadirTematica(tema);
+                }               
+                servCancionTmp.updateTemasCancionTmp(existeCancionTmp.getId(), existeCancionTmp);
+                System.out.println("Cancion encontrada en BD Temporal, se añade para tema : " + des);
+                continue;                
+            }
+
+            // CASO 4 verificamos tambien si hay alguna coincidencia por titulo e interprete en BD real - solo añadimos tema
+            boolean existeEnBD = Utilidades.isExisteCancionTmp(cancion, cancionesBD);
+            if (existeEnBD) {
+                cancion.setSoloTemas(true);
+                servCancionTmp.saveCancionTmp(cancion);
+                System.out.println("Cancion encontrada en BD, se da de alta para añadir tema: " + des);
+                continue;
+            }
+
+            // ULTIMO CASO se da de alta en BD como nueva cancion
+            servCancionTmp.saveCancionTmp(cancion);
+            System.out.println("Cancion NUEVA : " + des);              
         }
     }
 

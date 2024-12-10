@@ -739,7 +739,7 @@ public class ControladorCancion {
             } else {
                 cancionExistente = cancionBD.get();
             }
-            if (cancionTmp.isSoloTemas()) {
+            if (cancionExistente != null || cancionTmp.isSoloTemas()) {
                 if (cancionExistente != null) {
                     if (cancionExistente.isTieneTemas(cancionTmp.getTematicas())) {
                         System.out.println("Ya tiene los temas " + des);
@@ -751,7 +751,7 @@ public class ControladorCancion {
                         System.out.println("Se añaden tematicas a " + des);
                     }
                 }
-            } else {
+            } else {                
                 Cancion cancionNew = new Cancion();
                 cancionNew.setAlbum(cancionTmp.getAlbum());
                 cancionNew.setAnyo(cancionTmp.getAnyo());
@@ -761,9 +761,14 @@ public class ControladorCancion {
                 cancionNew.setSpotifyimagen(cancionTmp.getSpotifyimagen());
                 cancionNew.setSpotifyplay(cancionTmp.getSpotifyplay());
                 cancionNew.setTitulo(cancionTmp.getTitulo());
-                cancionNew.setTematicas(cancionTmp.getTematicas());
-                servCancion.saveCancion(cancionNew);
-                System.out.println("Se añaden NUEVA CANCION " + des);
+                Cancion cancionBDnew = servCancion.saveCancion(cancionNew);
+                cancionBDnew.setTematicas(new ArrayList());
+                for (Tema tema :cancionTmp.getTematicas()){
+                    cancionBDnew.anyadirTematica(tema);
+                }
+                servCancion.updateTemasCancion(cancionBDnew.getId(), cancionBDnew);                
+                
+                System.out.println("Se añade NUEVA CANCION " + des);
             }
 
             if (eliminar) {
