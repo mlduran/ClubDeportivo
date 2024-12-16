@@ -85,6 +85,12 @@ public class Partida {
         return this.status == StatusPartida.Terminada;
 
     }
+    
+    public boolean isEnCurso() {
+
+        return this.status == StatusPartida.EnCurso;
+
+    }
 
     public String fechaFormateada() {
 
