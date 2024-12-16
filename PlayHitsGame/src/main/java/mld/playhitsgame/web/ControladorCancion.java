@@ -15,11 +15,13 @@ import java.util.logging.Logger;
 import lombok.extern.slf4j.Slf4j;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.CancionTmp;
+import mld.playhitsgame.exemplars.Config;
 import mld.playhitsgame.exemplars.FiltroCanciones;
 import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.exemplars.Usuario;
 import mld.playhitsgame.services.CancionServicioMetodos;
 import mld.playhitsgame.services.CancionTmpServicioMetodos;
+import mld.playhitsgame.services.ConfigServicioMetodos;
 import mld.playhitsgame.services.TemaServicioMetodos;
 import mld.playhitsgame.services.UsuarioServicioMetodos;
 import mld.playhitsgame.utilidades.Utilidades;
@@ -51,6 +53,8 @@ public class ControladorCancion {
     TemaServicioMetodos servTema;
     @Autowired
     UsuarioServicioMetodos servUsuario;
+    @Autowired
+    ConfigServicioMetodos servConfig;
 
     @Value("${custom.rutaexportfiles}")
     private String rutaexportfiles;
@@ -774,8 +778,11 @@ public class ControladorCancion {
             if (eliminar) {
                 servCancionTmp.deleteCancionTmp(cancionTmp.getId());
             }
-
         }
+        
+        Config settings = servConfig.getSettings();
+        settings.setNCanciones(String.valueOf(servCancion.numRegs()));
+        servConfig.saveSettings(settings);        
 
     }
 

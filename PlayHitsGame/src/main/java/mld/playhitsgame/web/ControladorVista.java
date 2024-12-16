@@ -189,6 +189,13 @@ public class ControladorVista {
         return messageSource.getMessage(idMensaje, null, idioma(modelo));
 
     }
+    private String mensaje(Model modelo, String idMensaje, String arg) {    
+        
+        Object[] lista = new Object[]{arg};
+        
+        return messageSource.getMessage(idMensaje, lista, idioma(modelo));
+
+    }
 
     private String urlSpotify() {
 
@@ -309,6 +316,9 @@ public class ControladorVista {
                 if ("en".equals(locale.getLanguage())) {
                     mensaje = config.getMensajeInicio_en();
                 }
+                modelo.addAttribute("mensajeInicio", mensaje);
+            } else{
+                String mensaje = mensaje(modelo, "general.ncancionesbd", config.getNCanciones());
                 modelo.addAttribute("mensajeInicio", mensaje);
             }
 

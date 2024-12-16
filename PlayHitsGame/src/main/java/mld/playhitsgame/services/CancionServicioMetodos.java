@@ -35,6 +35,11 @@ public class CancionServicioMetodos implements CancionServicio {
         return DAO.findAll();
 
     }
+    
+    public long numRegs(){
+        
+        return DAO.count();
+    }
 
     // @Override
     // public List<Cancion> findAllSpecificaciones(SearchSpecifications<SearchCriteria> searchSpecifications){
