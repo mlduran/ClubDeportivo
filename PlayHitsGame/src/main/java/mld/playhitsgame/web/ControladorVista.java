@@ -2230,10 +2230,15 @@ public class ControladorVista {
     }
 
     @GetMapping("/anyadirCancionTema/{cancion_id}/{tema_id}")
-    public void anyadirCancionTema(
+    public void anyadirCancionTema(Model modelo,
             @PathVariable("cancion_id") Long cancion_id,
             @PathVariable("tema_id") Long tema_id) {
 
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return ;
+        }
+        
         Cancion cancion = servCancion.findById(cancion_id).get();
         Tema tema = servTema.findById(tema_id).get();
         cancion.anyadirTematica(tema);
@@ -2242,10 +2247,15 @@ public class ControladorVista {
     }
 
     @GetMapping("/eliminarCancionTema/{cancion_id}/{tema_id}")
-    public void eliminarCancionTema(
+    public void eliminarCancionTema(Model modelo,
             @PathVariable("cancion_id") Long cancion_id,
             @PathVariable("tema_id") Long tema_id) {
 
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return ;
+        }
+        
         Cancion cancion = servCancion.findById(cancion_id).get();
         Tema tema = servTema.findById(tema_id).get();
         cancion.eliminarTematica(tema);
@@ -2253,8 +2263,20 @@ public class ControladorVista {
         servCancion.updateTemasCancion(cancion_id, cancion);
     }
 
-    private void eliminarPartida(Partida partida) {
+    @GetMapping("/partidasGrupo")
+    public String partidasGrupo(Model modelo, 
+            @RequestParam(name = "page", defaultValue = "0") int page) {
 
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/logout";
+        }
+        
+        Page<Partida> partidas = servPartida.partidasGrupo(page, REG_POR_PAG);
+        
+        modelo.addAttribute("partidas", partidas);
+        
+        return "PartidasGrupo";        
     }
 
 }

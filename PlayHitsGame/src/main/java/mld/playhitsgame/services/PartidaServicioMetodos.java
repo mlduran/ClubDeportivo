@@ -4,12 +4,17 @@
  */
 package mld.playhitsgame.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import mld.playhitsgame.DAO.PartidaDAO;
 import mld.playhitsgame.exemplars.Partida;
+import mld.playhitsgame.exemplars.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,7 +93,22 @@ public class PartidaServicioMetodos implements PartidaServicio{
         return DAO.partidaUsuarioMaster(idUsuario);
     }
 
-  
+    @Override
+    public Page<Partida> partidasGrupo(int numeroPagina, int tamanioPagina){
+        
+        ArrayList<Partida> partidas = DAO.partidasGrupo();
+        
+        // Calcula los índices para paginación manual
+        int start = numeroPagina * tamanioPagina;
+        int end = Math.min(start + tamanioPagina, partidas.size());
+
+        // Verifica si los índices están fuera de rango
+        List<Partida> partidasPaginadas = start > end ? new ArrayList<>() : partidas.subList(start, end);
+
+        // Retorna un objeto Page creado a partir de los usuarios paginados
+        return new PageImpl<>(partidasPaginadas, Pageable.ofSize(tamanioPagina).withPage(numeroPagina), partidasPaginadas.size());
+   
+    }
   
  
 }

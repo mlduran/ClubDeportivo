@@ -4,9 +4,11 @@
  */
 package mld.playhitsgame.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import mld.playhitsgame.exemplars.Partida;
+import org.springframework.data.domain.Page;
 
 
 
@@ -26,7 +28,7 @@ public interface PartidaServicio {
     void deletePartida(Long id);
     
     Optional<Partida> partidaUsuarioMaster(Long idUsuario);
-    
+    Page<Partida> partidasGrupo(int numeroPagina, int tamanioPagina);
     
     
 }

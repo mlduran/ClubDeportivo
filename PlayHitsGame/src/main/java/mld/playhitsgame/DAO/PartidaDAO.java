@@ -4,6 +4,7 @@
  */
 package mld.playhitsgame.DAO;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import mld.playhitsgame.exemplars.Partida;
 
@@ -23,6 +24,9 @@ public interface PartidaDAO extends JpaRepository<Partida, Long> {
 
     @Query(value = "SELECT * FROM partidas WHERE master_id=:idusuario AND (status <> 'Terminada' AND status <> 'Historico')", nativeQuery = true)
     Optional<Partida> partidaUsuarioMaster(Long idusuario);
+    
+    @Query(value = "SELECT * FROM partidas WHERE tipo='grupo' AND  status <> 'Historico' ORDER BY fecha DESC", nativeQuery = true)
+    ArrayList<Partida> partidasGrupo();
 
     @Modifying
     @Transactional

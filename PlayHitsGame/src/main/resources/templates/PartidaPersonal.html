@@ -247,7 +247,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                         </td>
                                     </tr>
                                     <!--<tr th:if="${partidaSesion.entreno}">-->
-                                    <tr>
+                                    <tr th:if="${partidaSesion.enCurso}">
                                         <input type="hidden" id="mensajeAcabar" th:value="#{general.confirmacabarpartida}" />
                                         <td colspan="3" style="text-align: center;">
                                             <form method="post" id="acabarPartida" th:action="@{/acabarPartidaPersonal}" onsubmit="return confirmarAccion()"> 
