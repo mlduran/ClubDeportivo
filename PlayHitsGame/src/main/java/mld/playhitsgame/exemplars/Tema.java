@@ -68,6 +68,12 @@ public class Tema {
         }
         return String.valueOf(n);
     }
+    
+    public String getDescripcion(){
+        
+        return this.getTema() + " - " + this.getNumCancionesValidadas() +
+                " tracks";
+    }
 
     public String getDatos() {
 

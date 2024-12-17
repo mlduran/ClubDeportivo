@@ -19,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import mld.playhitsgame.correo.EmailServicioMetodos;
 import mld.playhitsgame.correo.Mail;
@@ -187,14 +189,12 @@ public class ControladorVista {
     private String mensaje(Model modelo, String idMensaje) {
 
         return messageSource.getMessage(idMensaje, null, idioma(modelo));
-
     }
-    private String mensaje(Model modelo, String idMensaje, String arg) {    
-        
-        Object[] lista = new Object[]{arg};
-        
-        return messageSource.getMessage(idMensaje, lista, idioma(modelo));
 
+    private String mensaje(Model modelo, String idMensaje, String arg) {
+
+        Object[] lista = new Object[]{arg};
+        return messageSource.getMessage(idMensaje, lista, idioma(modelo));
     }
 
     private String urlSpotify() {
@@ -317,7 +317,7 @@ public class ControladorVista {
                     mensaje = config.getMensajeInicio_en();
                 }
                 modelo.addAttribute("mensajeInicio", mensaje);
-            } else{
+            } else {
                 String mensaje = mensaje(modelo, "general.ncancionesbd", config.getNCanciones());
                 modelo.addAttribute("mensajeInicio", mensaje);
             }
@@ -1131,7 +1131,8 @@ public class ControladorVista {
 
     private void anyadirTemas(Model modelo) {
 
-        ArrayList<String> temas = new ArrayList();
+        ArrayList<Tema> temas = new ArrayList();
+        Tema temaPlayHitsGame = null;
         Locale elLocale;
 
         if (modelo.getAttribute("locale") != null) {
@@ -1141,17 +1142,24 @@ public class ControladorVista {
         }
 
         FiltroTemas filtroTemas = new FiltroTemas(elLocale);
-        for (Tema tema : filtroTemas.filtrarTemas(servTema.findAll())) {
+        List<Tema> temasFiltados = filtroTemas.filtrarTemas(servTema.findAll());
+        for (Tema tema : temasFiltados) {
             if (!tema.getTema().equals("PlayHitsGame")) {
-                temas.add(tema.getTema());
+                temas.add(tema);
+            }
+            else{
+               temaPlayHitsGame = tema; 
             }
         }
 
-        Collections.sort(temas);
-        // esto es para que salga primero
-        temas.add(0, "PlayHitsGame");
+        List<Tema> temasOrdenados = temas.stream()
+                .sorted(Comparator.comparing(Tema::getTema))
+                .collect(Collectors.toList());
 
-        modelo.addAttribute("temas", temas);
+        // esto es para que salga primero
+        temasOrdenados.add(0, temaPlayHitsGame);
+
+        modelo.addAttribute("temas", temasOrdenados);
     }
 
     private void crearPartida(Model modelo, Partida newPartida, Usuario usu) {
@@ -2246,9 +2254,9 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
-            return ;
+            return;
         }
-        
+
         Cancion cancion = servCancion.findById(cancion_id).get();
         Tema tema = servTema.findById(tema_id).get();
         cancion.anyadirTematica(tema);
@@ -2263,9 +2271,9 @@ public class ControladorVista {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
-            return ;
+            return;
         }
-        
+
         Cancion cancion = servCancion.findById(cancion_id).get();
         Tema tema = servTema.findById(tema_id).get();
         cancion.eliminarTematica(tema);
@@ -2274,19 +2282,19 @@ public class ControladorVista {
     }
 
     @GetMapping("/partidasGrupo")
-    public String partidasGrupo(Model modelo, 
+    public String partidasGrupo(Model modelo,
             @RequestParam(name = "page", defaultValue = "0") int page) {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
             return "redirect:/logout";
         }
-        
+
         Page<Partida> partidas = servPartida.partidasGrupo(page, REG_POR_PAG);
-        
+
         modelo.addAttribute("partidas", partidas);
-        
-        return "PartidasGrupo";        
+
+        return "PartidasGrupo";
     }
 
 }

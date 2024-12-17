@@ -31,7 +31,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                         <label class="mb-2 text-muted" for="tema" th:text="#{general.tema}"/>
                                         <select th:field="*{tema}" title="Tema" id="tema" > 
                                             <option th:each="elem : ${temas}" 
-                                                    th:value="${elem}" th:text="${elem}" ></option>
+                                                    th:value="${elem.tema}" th:text="${elem.descripcion}" ></option>
                                         </select>
                                         <!--
                                         <div th:if="${!usuarioSesion.tieneTema}">
