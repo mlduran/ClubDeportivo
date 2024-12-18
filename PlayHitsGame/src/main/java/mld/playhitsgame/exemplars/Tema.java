@@ -28,7 +28,6 @@ public class Tema {
     private Long id;
     @Column(unique = true)
     private String tema;
-    private String descripcion;
     @Enumerated(EnumType.STRING)
     private Idioma idioma;
     @Enumerated(EnumType.STRING)
@@ -45,6 +44,7 @@ public class Tema {
     private String listasSpotify;
     private Long usuarioRecord;
     private int puntos;
+    private int nPartidas;
     private boolean activo;
 
     public String getNumCanciones() {

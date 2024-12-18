@@ -1146,9 +1146,8 @@ public class ControladorVista {
         for (Tema tema : temasFiltados) {
             if (!tema.getTema().equals("PlayHitsGame")) {
                 temas.add(tema);
-            }
-            else{
-               temaPlayHitsGame = tema; 
+            } else {
+                temaPlayHitsGame = tema;
             }
         }
 
@@ -1229,6 +1228,17 @@ public class ControladorVista {
         anyadirTemas(modelo);
 
         return "CrearPartidaInvitado";
+    }
+
+    private void registrarNuevaPartidaEnTema(Partida partida) {
+
+        String tema = partida.getTema();
+        Optional<Tema> elTema = servTema.findBytema(tema);
+        if (elTema.isPresent()) {
+            Tema updTema = elTema.get();
+            updTema.setNPartidas(updTema.getNPartidas() + 1);
+            servTema.update(updTema.getId(), updTema);
+        }
     }
 
     private String crearPartidaGrupo(Partida partida,
@@ -1335,6 +1345,7 @@ public class ControladorVista {
                     servOpAnyo.saveOpcionAnyoTmp(op);
                 }
             }
+            registrarNuevaPartidaEnTema(partida);
 
         } catch (Exception ex) {
             if (newPartida != null) {
@@ -1395,6 +1406,7 @@ public class ControladorVista {
             modelo.addAttribute("id_partidaSesion", partida.getId());
             usu.getPartidasMaster().add(newPartida);
             servUsuario.update(usu.getId(), usu);
+            registrarNuevaPartidaEnTema(partida);
         } catch (Exception ex) {
             String resp = "ERROR " + ex.getMessage();
             modelo.addAttribute("result", resp);
@@ -1999,7 +2011,7 @@ public class ControladorVista {
 
         List<Usuario> jugadoresEstrella = servUsuario.usuariosEstrella();
 
-        ArrayList<Tema> temas = (ArrayList<Tema>) servTema.findAll();
+        ArrayList<Tema> temas = (ArrayList<Tema>) servTema.findAllPorPartidas();
 
         ArrayList<Record> records = new ArrayList();
 
@@ -2160,7 +2172,6 @@ public class ControladorVista {
 
         Tema newTema = new Tema();
         newTema.setUsuario(usu);
-        newTema.setDescripcion(usu.getAlias());
         newTema.setIdioma(Idioma.International);
         newTema.setGenero(Genero.Generico);
 
@@ -2217,7 +2228,6 @@ public class ControladorVista {
         }
 
         newTema.setUsuario(usu);
-        newTema.setDescripcion(usu.getNombre());
 
         Tema tema = servTema.save(newTema);
 

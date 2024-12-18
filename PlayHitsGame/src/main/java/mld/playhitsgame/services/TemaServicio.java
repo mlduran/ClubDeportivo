@@ -14,8 +14,9 @@ import mld.playhitsgame.exemplars.Tema;
  */
 public interface TemaServicio {
 
-    List<Tema> findAll();
+    List<Tema> findAllPorPartidas();
 
+    List<Tema> findAll();
     Optional<Tema> findById(Long id);
 
     Optional<Tema> findBytema(String tema);

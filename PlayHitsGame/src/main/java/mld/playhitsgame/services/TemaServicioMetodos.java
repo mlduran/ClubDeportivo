@@ -10,6 +10,7 @@ import java.util.Optional;
 import mld.playhitsgame.DAO.TemaDAO;
 import mld.playhitsgame.exemplars.Tema;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,11 @@ public class TemaServicioMetodos implements TemaServicio {
     @Override
     public List<Tema> findAll() {
         return DAO.findAll();
+    }
+    
+    @Override
+    public List<Tema> findAllPorPartidas() {
+        return DAO.findAll(Sort.by(Sort.Direction.DESC, "nPartidas"));
     }
     
     @Override
@@ -41,10 +47,6 @@ public class TemaServicioMetodos implements TemaServicio {
         
         Tema obj = DAO.findById(id).get();
         
-        if (Objects.nonNull(tema.getDescripcion()) && !"".equalsIgnoreCase(tema.getDescripcion())) {
-            obj.setDescripcion(tema.getDescripcion());
-        }
-
         if (Objects.nonNull(tema.getIdioma())) {
             obj.setIdioma(tema.getIdioma());
         }
@@ -59,6 +61,7 @@ public class TemaServicioMetodos implements TemaServicio {
         obj.setPuntos(tema.getPuntos());
         obj.setUsuarioRecord(tema.getUsuarioRecord());
         obj.setActivo(tema.isActivo());
+        obj.setNPartidas(tema.getNPartidas());
         
 
         return DAO.save(obj);
