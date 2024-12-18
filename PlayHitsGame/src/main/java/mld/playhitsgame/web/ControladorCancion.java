@@ -785,6 +785,47 @@ public class ControladorCancion {
         servConfig.saveSettings(settings);        
 
     }
+    
+    @GetMapping("/limpiarCancionesTmp")
+    public String limpiarCancionesTmp(Model modelo) {
+        
+        if (!usuarioCorrecto(modelo)) {
+            return "redirect:/logout";
+        }
+ 
+        List<CancionTmp> canciones = servCancionTmp.findAll();      
+        List<Cancion> cancionesBD = servCancion.findAll();
+
+        for (CancionTmp cancionTmp : canciones) {
+            String des = cancionTmp.getSpotifyid() + " - " + cancionTmp.getTitulo() + " - " + cancionTmp.getInterprete();
+
+            Cancion cancionExistente;
+            Optional<Cancion> cancionBD = servCancion.findByIdSpotify(cancionTmp.getSpotifyid());
+            if (cancionBD.isEmpty()) {
+                cancionExistente = Utilidades.existeCancion(cancionTmp, cancionesBD);
+            } else {
+                cancionExistente = cancionBD.get();
+            }
+            if (cancionExistente != null || cancionTmp.isSoloTemas()) {
+                if (cancionExistente != null) {
+                    if (cancionExistente.isTieneTemas(cancionTmp.getTematicas())) {
+                        System.out.println("SE ELIMINA " + des);
+                        servCancionTmp.deleteCancionTmp(cancionTmp.getId());
+                    } else {
+                        System.out.println("NUEVA TEMATICA " + des);
+                        if (!cancionTmp.isSoloTemas()){
+                            cancionTmp.setSoloTemas(true);
+                            servCancionTmp.updateCancionTmp(cancionTmp.getId(), cancionTmp);
+                        }                            
+                    }
+                }
+            } else {
+                System.out.println("NUEVA CANCION " + des);
+            }
+        }
+        
+        return "redirect:/gestionCancionesTmp";
+    }
 
     @GetMapping("/incorporarCancionesTmp")
     public String incorporarCancionesTmp(Model modelo,
