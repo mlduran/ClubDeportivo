@@ -22,18 +22,23 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         <div class="card shadow-lg">
                             <p th:text="${mensaje}"/>  
                         </div>
-                                                
+
                         <hr style="border: 0; height: 2px; background-color: #333; width: 100%;"/>
+                        <div class="card shadow-lg">
+                            <a href="https://playhitsgame.es" class="text-dark">
+                                <p th:text="PlayHitsGame"/>  
+                            </a>
+                        </div>
                         <div class="card shadow-lg">
                             <a th:href="${'mailto:' + mail}">
                                 <p th:text="${mail}"/>
                             </a>
-                        </div>
-                        
+                        </div>                        
+
                         <div class="text-center mt-5 text-muted">
                             <p th:text="#{general.version}"/>
                         </div> 
-                        
+
                     </div>
                 </div>
             </div>
