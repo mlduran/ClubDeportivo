@@ -146,7 +146,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         </td>                        
                     </tr>
                     <tr>
-                        <td colspan="10" style="text-align: center;">
+                        <td colspan="11" style="text-align: center;">
                             <div>
                                 <span th:text="'Página ' + ${canciones.number + 1} + ' de ' + ${canciones.totalPages}"></span>
 
@@ -159,18 +159,19 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             </div>
                         </td>
                     </tr>
+                    <tr>
+                    <div class="text-center">
+                        <a href="/panel" class="text-dark">
+                            <p th:text="#{general.volver}" />
+                        </a>
+                    </div>
+                    </tr>
                 </table>
             </form>
         </div>   
 
         <div th:if="${canciones == null or canciones.empty}">
             <p>NO HAY NINGUNA CANCION PARA LISTAR</p>
-        </div>
-
-        <div class="text-center">
-            <a href="/panel" class="text-dark">
-                <p th:text="#{general.volver}" />
-            </a>
         </div>
 
         <script type="text/javascript" th:src="@{/javascript/Reproductor.js}"></script>

@@ -32,6 +32,11 @@ public class CancionTmp {
     private String spotifyimagen;
     private boolean revisar;
     private boolean soloTemas;
+    
+    public void setSpotifyplay(String spotifyplay) {        
+        
+        this.spotifyplay = spotifyplay.replace("&dl=0", "&raw=1");
+    }
 
     public String selId() {
 

@@ -39,14 +39,7 @@ public class Cancion{
     private String spotifyimagen;
     @OneToMany
     private List<Ronda> rondas ;
-    private boolean revisar;
-    
-    
-    public void setSpotifyplay(String spotifyplay) {        
-        
-        this.spotifyplay = spotifyplay.replace("&dl=0", "&raw=1");
-    }
-    
+    private boolean revisar;  
     
     public String selId(){
         
