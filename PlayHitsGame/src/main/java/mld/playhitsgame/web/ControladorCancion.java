@@ -755,7 +755,7 @@ public class ControladorCancion {
                         System.out.println("Se añaden tematicas a " + des);
                     }
                 }
-            } else {                
+            } else {
                 Cancion cancionNew = new Cancion();
                 cancionNew.setAlbum(cancionTmp.getAlbum());
                 cancionNew.setAnyo(cancionTmp.getAnyo());
@@ -767,11 +767,11 @@ public class ControladorCancion {
                 cancionNew.setTitulo(cancionTmp.getTitulo());
                 Cancion cancionBDnew = servCancion.saveCancion(cancionNew);
                 cancionBDnew.setTematicas(new ArrayList());
-                for (Tema tema :cancionTmp.getTematicas()){
+                for (Tema tema : cancionTmp.getTematicas()) {
                     cancionBDnew.anyadirTematica(tema);
                 }
-                servCancion.updateTemasCancion(cancionBDnew.getId(), cancionBDnew);                
-                
+                servCancion.updateTemasCancion(cancionBDnew.getId(), cancionBDnew);
+
                 System.out.println("Se añade NUEVA CANCION " + des);
             }
 
@@ -779,22 +779,15 @@ public class ControladorCancion {
                 servCancionTmp.deleteCancionTmp(cancionTmp.getId());
             }
         }
-        
+
         Config settings = servConfig.getSettings();
         settings.setNCanciones(String.valueOf(servCancion.numRegs()));
-        servConfig.saveSettings(settings);        
+        servConfig.saveSettings(settings);
 
     }
-    
-    @GetMapping("/limpiarCancionesTmp")
-    public String limpiarCancionesTmp(Model modelo) {
-        
-        if (!usuarioCorrecto(modelo)) {
-            return "redirect:/logout";
-        }
- 
-        List<CancionTmp> canciones = servCancionTmp.findAll();      
-        List<Cancion> cancionesBD = servCancion.findAll();
+
+    private void limpiarCancionesTmp(
+            List<CancionTmp> canciones, List<Cancion> cancionesBD) {
 
         for (CancionTmp cancionTmp : canciones) {
             String des = cancionTmp.getSpotifyid() + " - " + cancionTmp.getTitulo() + " - " + cancionTmp.getInterprete();
@@ -813,17 +806,62 @@ public class ControladorCancion {
                         servCancionTmp.deleteCancionTmp(cancionTmp.getId());
                     } else {
                         System.out.println("NUEVA TEMATICA " + des);
-                        if (!cancionTmp.isSoloTemas()){
+                        if (!cancionTmp.isSoloTemas()) {
                             cancionTmp.setSoloTemas(true);
                             servCancionTmp.updateCancionTmp(cancionTmp.getId(), cancionTmp);
-                        }                            
+                        }
                     }
                 }
             } else {
                 System.out.println("NUEVA CANCION " + des);
             }
         }
+    }
+
+    @GetMapping("/limpiarCancionesTmpPagina")
+    public String limpiarCancionesTmpPagina(Model modelo, @RequestParam(name = "page", defaultValue = "0") int page,
+            @ModelAttribute("filtroCanciones") FiltroCanciones filtro) {
+
+        if (!usuarioCorrecto(modelo)) {
+            return "redirect:/logout";
+        }
+
+        List canciones;
+        canciones = servCancionTmp.buscarCancionesPorFiltro(filtro);
+
+        if (filtro.isDuplicados()) {
+            canciones = Utilidades.buscarDuplicados(canciones, false, false);
+        }
+
+        Pageable pageable = PageRequest.of(page, REG_POR_PAG);
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), canciones.size());
+
+        List<CancionTmp> sublist = canciones.subList(start, end);
+        List<Cancion> cancionesBD = servCancion.findAll();
+
+        limpiarCancionesTmp(sublist, cancionesBD);
+        temasBD(modelo);
         
+        modelo.addAttribute("canciones",
+                new PageImpl<>(sublist, pageable, canciones.size()));
+        modelo.addAttribute("paginaActual", page);
+
+        return "GestionCancionesTmp";
+    }
+
+    @GetMapping("/limpiarCancionesTmp")
+    public String limpiarCancionesTmp(Model modelo) {
+
+        if (!usuarioCorrecto(modelo)) {
+            return "redirect:/logout";
+        }
+
+        List<CancionTmp> canciones = servCancionTmp.findAll();
+        List<Cancion> cancionesBD = servCancion.findAll();
+
+        limpiarCancionesTmp(canciones, cancionesBD);
+
         return "redirect:/gestionCancionesTmp";
     }
 
