@@ -875,6 +875,7 @@ public class ControladorCancion {
 
         incorporarCancionesBD(modelo, page, false);
         gestionCanciones(modelo, page, true);
+        temasBD(modelo);
         return "GestionCancionesTmp";
     }
 
@@ -888,6 +889,7 @@ public class ControladorCancion {
 
         incorporarCancionesBD(modelo, page, true);
         gestionCanciones(modelo, page, true);
+        temasBD(modelo);
         return "GestionCancionesTmp";
     }
 
