@@ -23,15 +23,15 @@ public class FiltroCanciones {
     public void setSoloTemas(boolean soloTemas) {
         this.soloTemas = soloTemas;
     }
-    
+
     private String tema;
     private int anyoInicial;
     private int anyoFinal;
     private boolean revisar;
     private boolean duplicados;
     private boolean soloTemas;
-    
-        public FiltroCanciones(){        
+
+    public FiltroCanciones() {
 
         this.tema = "";
         this.anyoInicial = 1950;
@@ -90,12 +90,13 @@ public class FiltroCanciones {
     public boolean isRevisar() {
         return revisar;
     }
-    
+
     public String revisarTxt() {
-        if (this.isRevisar())
+        if (this.isRevisar()) {
             return "true";
-        else
+        } else {
             return "false";
+        }
     }
 
     /**
@@ -104,35 +105,34 @@ public class FiltroCanciones {
     public void setRevisar(boolean revisar) {
         this.revisar = revisar;
     }
-    
+
     public boolean isDuplicados() {
         return duplicados;
     }
-    
+
     public String duplicadosTxt() {
-        if (this.isDuplicados())
+        if (this.isDuplicados()) {
             return "true";
-        else
+        } else {
             return "false";
+        }
     }
 
     public void setDuplicados(boolean duplicados) {
         this.duplicados = duplicados;
     }
-    
 
-    public String filtroSQL(){
-        
+    public String filtroSQL() {
+
         String sql = "";
-        if (!"".equals(this.getTema()))
+        if (!"".equals(this.getTema())) {
             sql = sql.concat("tema = '").concat(this.getTema()).concat("' AND ");
+        }
         sql = sql.concat("anyo >= ").concat(String.valueOf(this.getAnyoInicial())).concat(" AND ");
         sql = sql.concat("anyo <= ").concat(String.valueOf(this.getAnyoFinal())).concat(" AND ");
         sql = sql.concat("revisar = ").concat(this.revisarTxt());
         return sql;
-        
+
     }
-    
-    
-    
+
 }

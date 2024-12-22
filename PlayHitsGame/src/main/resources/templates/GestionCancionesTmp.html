@@ -74,6 +74,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                 <a th:href="@{/limpiarCancionesTmpPagina(page=${canciones.number})}" class="button" id="limpiarCancionesTmpPagina"> LIMPIAR CANCIONES TEMPORALES DE ESTA PAGINA </a>
             </p>    
             <hr style="border: 1px solid #ccc; margin: 20px 0;" />
+             <p>
+                <a th:href="@{/validarReproduccionesTmp}" class="button" id="validarReproduccionesTmp"> VALIDAR REPRODUCCIONES </a>
+            </p>
+            <hr style="border: 1px solid #ccc; margin: 20px 0;" />
             <p th:text="${result}"></p>
         </div>
         <div th:if="${canciones != null and !canciones.empty}">

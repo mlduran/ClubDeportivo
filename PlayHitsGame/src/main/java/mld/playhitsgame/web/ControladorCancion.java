@@ -10,9 +10,11 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import lombok.extern.slf4j.Slf4j;
+import mld.playhitsgame.correo.EmailServicioMetodos;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.CancionTmp;
 import mld.playhitsgame.exemplars.Config;
@@ -55,9 +57,13 @@ public class ControladorCancion {
     UsuarioServicioMetodos servUsuario;
     @Autowired
     ConfigServicioMetodos servConfig;
+    @Autowired
+    EmailServicioMetodos servEmail;
 
     @Value("${custom.rutaexportfiles}")
     private String rutaexportfiles;
+    @Value("${custom.mailadmin}")
+    private String mailAdmin;
 
     private boolean usuarioCorrecto(Model modelo) {
 
@@ -363,6 +369,121 @@ public class ControladorCancion {
         }
     }
 
+    private void informarErroresReproduccion(StringBuilder err, boolean isTmp) {
+
+        if (!err.isEmpty()) {
+            String cabecera;
+            if (isTmp) {
+                cabecera = "Se han detectado los siguientes errores y las canciones Temporales se han dejado pendientes de validar \n \n";
+            } else {
+                cabecera = "Se han detectado los siguientes errores y las canciones se han dejado pendientes de validar \n \n";
+            }
+
+            Utilidades.enviarMail(servEmail, mailAdmin, "", "Canciones no disponibles",
+                    cabecera + err.toString(), "Correo");
+        }
+
+    }
+
+    private void validarReproducciones(List<Cancion> canciones) {
+        
+        CompletableFuture.runAsync(() -> {
+            StringBuilder err = new StringBuilder();
+            String des;
+            for (Cancion cancion : canciones) {
+                des = cancion.getTitulo() + " - " + cancion.getInterprete();
+                if (Utilidades.validarReproduccion(cancion)) {
+                    System.out.println(des + " : OK");
+                } else {
+                    err.append(des);
+                    cancion.setRevisar(true);
+                    servCancion.updateCancion(cancion.getId(), cancion);
+                }
+                try {
+                    Thread.sleep(1000); // Pausa de 1 segundo
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    System.err.println("La espera fue interrumpida: " + e.getMessage());
+                }
+            }
+            informarErroresReproduccion(err, false);
+        });
+
+    }
+
+    private void validarReproduccionesTmp(List<CancionTmp> canciones) {
+
+        CompletableFuture.runAsync(() -> {
+            StringBuilder err = new StringBuilder();
+            String des;
+            for (CancionTmp cancion : canciones) {
+                des = cancion.getTitulo() + " - " + cancion.getInterprete();
+                if (Utilidades.validarReproduccion(cancion)) {
+                    System.out.println(des + " : OK");
+                } else {
+                    err.append(des);
+                    cancion.setRevisar(true);
+                    servCancionTmp.updateCancionTmp(cancion.getId(), cancion);
+                }
+                try {
+                    Thread.sleep(1000); // Pausa de 1 segundo
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    System.err.println("La espera fue interrumpida: " + e.getMessage());
+                }
+            }
+            informarErroresReproduccion(err, false);
+        });
+    }
+
+    @GetMapping("/validarReproducciones")
+    public String validarReproducciones(Model modelo,
+            @RequestParam(name = "page", defaultValue = "0") int page) {
+
+        if (!usuarioCorrecto(modelo)) {
+            return "redirect:/logout";
+        }
+        FiltroCanciones filtro;
+        if (modelo.getAttribute("filtroCanciones") == null) {
+            filtro = new FiltroCanciones();
+            modelo.addAttribute("filtroCanciones", filtro);
+        } else {
+            filtro = (FiltroCanciones) modelo.getAttribute("filtroCanciones");
+        }
+
+        List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);
+        validarReproducciones(canciones);
+
+        temasBD(modelo);
+        gestionCanciones(modelo, page, false);
+        return "GestionCanciones";
+
+    }
+
+    @GetMapping("/validarReproduccionesTmp")
+    public String validarReproduccionesTmp(Model modelo,
+            @RequestParam(name = "page", defaultValue = "0") int page) {
+
+        if (!usuarioCorrecto(modelo)) {
+            return "redirect:/logout";
+        }
+        FiltroCanciones filtro;
+        if (modelo.getAttribute("filtroCanciones") == null) {
+            filtro = new FiltroCanciones();
+            modelo.addAttribute("filtroCanciones", filtro);
+        } else {
+            filtro = (FiltroCanciones) modelo.getAttribute("filtroCanciones");
+        }
+
+        List<CancionTmp> canciones = servCancionTmp.buscarCancionesPorFiltro(filtro);
+        validarReproduccionesTmp(canciones);
+
+        temasBD(modelo);
+        gestionCanciones(modelo, page, true);
+        return "GestionCancionesTmp";
+
+    }
+
     @GetMapping("/corregirDuplicados")
     public String corregirDuplicados(Model modelo,
             @RequestParam(name = "page", defaultValue = "0") int page) {
@@ -396,7 +517,7 @@ public class ControladorCancion {
         }
 
         temasBD(modelo);
-        gestionCanciones(modelo, page, true);
+        gestionCanciones(modelo, page, false);
         return "GestionCanciones";
     }
 
@@ -466,7 +587,7 @@ public class ControladorCancion {
                 }
             }
         }
-        gestionCanciones(modelo, Integer.parseInt(pageString), true);
+        gestionCanciones(modelo, Integer.parseInt(pageString), false);
 
         return "EditarCanciones";
     }
@@ -528,7 +649,7 @@ public class ControladorCancion {
             return "redirect:/logout";
         }
 
-        gestionCanciones(modelo, page, true);
+        gestionCanciones(modelo, page, false);
         temasBD(modelo);
         List<Cancion> canciones = (List<Cancion>) modelo.getAttribute("canciones");
         Utilidades.exportarCanciones(canciones, rutaexportfiles);
@@ -842,7 +963,7 @@ public class ControladorCancion {
 
         limpiarCancionesTmp(sublist, cancionesBD);
         temasBD(modelo);
-        
+
         modelo.addAttribute("canciones",
                 new PageImpl<>(sublist, pageable, canciones.size()));
         modelo.addAttribute("paginaActual", page);

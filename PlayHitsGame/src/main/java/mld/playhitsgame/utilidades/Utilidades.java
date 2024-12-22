@@ -4,6 +4,7 @@
  */
 package mld.playhitsgame.utilidades;
 
+import jakarta.mail.MessagingException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -21,6 +22,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import mld.playhitsgame.correo.EmailServicioMetodos;
+import mld.playhitsgame.correo.Mail;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.CancionTmp;
 import mld.playhitsgame.exemplars.Dificultad;
@@ -32,17 +37,22 @@ import mld.playhitsgame.exemplars.Respuesta;
 import mld.playhitsgame.exemplars.Ronda;
 import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.exemplars.Usuario;
+import mld.playhitsgame.web.ControladorVista;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-
+import org.springframework.mail.MailSendException;
+import org.springframework.stereotype.Component;
+    
 /**
  *
  * @author miguel
  */
-public class Utilidades {
 
+public class Utilidades {    
+   
     private static final int NUMERO_OPCIONES = 5;
     private static final double UMBRAL_SIMILITUD = 0.90;
 
@@ -712,6 +722,76 @@ public class Utilidades {
         
         return titulo.trim();  
         
+    }
+    
+    public static boolean enviarMail(EmailServicioMetodos emailServicio,
+            Usuario usuario, String asunto, String txt, String plantilla) {
+        return enviarMail(emailServicio, usuario.getUsuario(), usuario.getNombre(), asunto, txt, plantilla);
+    }
+
+    public static boolean enviarMail(EmailServicioMetodos emailServicio,
+            String mailDestino, String nombre, String asunto, String txt, String plantilla) {
+        boolean ok = true;
+        Mail mail = new Mail();
+        try {
+            mail.setAsunto(asunto);
+            mail.setDestinatario(mailDestino);
+            mail.setMensaje(txt);
+            mail.setPlantilla(plantilla);
+            mail.setNombre(nombre);
+            emailServicio.enviarCorreo(mail);
+        } catch (MessagingException | MailSendException ex) {
+            ok = false;
+            Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return ok;
+    }
+    
+    private static boolean isURLValid(String urlString) {
+        try {
+            // Crear un objeto URL
+            URL url = new URL(urlString);
+
+            // Abrir una conexión HTTP
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            // Establecer el método HTTP HEAD para evitar descargar el archivo completo
+            connection.setRequestMethod("HEAD");
+
+            // Establecer tiempo de espera
+            connection.setConnectTimeout(5000); // 5 segundos
+            connection.setReadTimeout(5000);
+
+            // Conectar al servidor
+            connection.connect();
+            
+            // Verificar el código de respuesta HTTP
+            int responseCode = connection.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                return false; // No es accesible
+            }
+            
+            // Verificar el encabezado Content-Type
+            String contentType = connection.getContentType();
+            if (contentType != null && contentType.equals("audio/mpeg")) {
+                return true; // La URL es válida y es un MP3
+            }
+        } catch (IOException e) {
+            System.out.println("Se ha detectado una URL no valida : " + urlString);
+            return false;
+        }
+        
+        return false;
+    }
+    
+    public static boolean validarReproduccion(Cancion cancion){
+        
+        return isURLValid(cancion.getSpotifyplay());
+    }
+    
+    public static boolean validarReproduccion(CancionTmp cancion){
+        
+        return isURLValid(cancion.getSpotifyplay());
     }
 
 }

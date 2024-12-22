@@ -11,5 +11,6 @@ package mld.playhitsgame.exemplars;
 public enum TipoPartida {
  
     grupo,
-    personal
+    personal,
+    batalla
 }

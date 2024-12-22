@@ -79,7 +79,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
-import org.springframework.mail.MailSendException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -121,6 +120,9 @@ public class ControladorVista {
 
     @Autowired
     private MessageSource messageSource;
+    
+    @Autowired
+    EmailServicioMetodos servEmail;
 
     @Autowired
     CancionServicioMetodos servCancion;
@@ -147,8 +149,6 @@ public class ControladorVista {
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
-    EmailServicioMetodos servMail;
-    @Autowired
     ConfigServicioMetodos servConfig;
     @Autowired
     RegistroServicioMetodos servRegistro;
@@ -168,7 +168,7 @@ public class ControladorVista {
             Config newConfig = servConfig.getSettings();
             newConfig.setIpRouter(ipRouterActual);
             servConfig.saveSettings(newConfig);
-            enviarMail(mailAdmin, "", "Cambio de IP Router",
+            Utilidades.enviarMail(servEmail,mailAdmin, "", "Cambio de IP Router",
                     "Se modifica la IP de " + ipRouterConfigurada + " a " + ipRouterActual, "Correo");
 
         }
@@ -944,7 +944,7 @@ public class ControladorVista {
                 String token = passwordEncoder.encode(usuario.getUsuario());
                 String enlace = customIp + "/validarUsuario?id=" + String.valueOf(usuario.getId())
                         + "&token=" + token;
-                boolean ok = enviarMail(usuario, mensaje(modelo, "general.altaplay"),
+                boolean ok = Utilidades.enviarMail(servEmail, usuario, mensaje(modelo, "general.altaplay"),
                         enlace, "CorreoAlta");
                 if (ok) {
                     resp = mensaje(modelo, "general.usuariocreado").concat(usuario.getUsuario());
@@ -1015,28 +1015,7 @@ public class ControladorVista {
         modelo.addAttribute("error", err);
         return "AltaUsuarioAdm";
     }
-
-    private boolean enviarMail(Usuario usuario, String asunto, String txt, String plantilla) {
-        return enviarMail(usuario.getUsuario(), usuario.getNombre(), asunto, txt, plantilla);
-    }
-
-    public boolean enviarMail(String mailDestino, String nombre, String asunto, String txt, String plantilla) {
-        boolean ok = true;
-        Mail mail = new Mail();
-        try {
-            mail.setAsunto(asunto);
-            mail.setDestinatario(mailDestino);
-            mail.setMensaje(txt);
-            mail.setPlantilla(plantilla);
-            mail.setNombre(nombre);
-            servMail.enviarCorreo(mail);
-        } catch (MessagingException | MailSendException ex) {
-            ok = false;
-            Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return ok;
-    }
-
+    
     @PostMapping("/enviarMailMasivo")
     public String enviarMailMasivo(Model modelo, HttpServletRequest req) {
 
@@ -1049,7 +1028,7 @@ public class ControladorVista {
                 continue;
             }
             if (usu.isActivo()) {
-                enviarMail(usu, mensaje(modelo, "general.avisoplay"),
+                Utilidades.enviarMail(servEmail,usu, mensaje(modelo, "general.avisoplay"),
                         txtMail, "Correo");
             }
         }
@@ -1932,7 +1911,7 @@ public class ControladorVista {
             String token = usuario.get().getContrasenya();
             String enlace = mensaje(modelo, "general.txttokenrepssw") + token;
 
-            enviarMail(usuario.get(), mensaje(modelo, "general.recupcontra"),
+            Utilidades.enviarMail(servEmail, usuario.get(), mensaje(modelo, "general.recupcontra"),
                     enlace, "Correo");
 
             modelo.addAttribute("result", mensaje(modelo, "general.codigoenviado"));
