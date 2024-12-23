@@ -27,6 +27,9 @@ public interface PartidaDAO extends JpaRepository<Partida, Long> {
     
     @Query(value = "SELECT * FROM partidas WHERE tipo='grupo' AND  status <> 'Historico' ORDER BY fecha DESC", nativeQuery = true)
     ArrayList<Partida> partidasGrupo();
+    
+    @Query(value = "SELECT * FROM partidas WHERE tipo='batalla' AND  status = 'Creada' ", nativeQuery = true)
+    ArrayList<Partida> partidasBatallaCreadas();
 
     @Modifying
     @Transactional

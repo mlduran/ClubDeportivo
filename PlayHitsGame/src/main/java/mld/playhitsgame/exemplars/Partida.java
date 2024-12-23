@@ -79,6 +79,12 @@ public class Partida {
         return this.getTipo().equals(TipoPartida.personal);
 
     }
+    
+    public boolean isTipoBatalla() {
+
+        return this.getTipo().equals(TipoPartida.batalla);
+
+    }
 
     public boolean isTerminada() {
 
@@ -265,5 +271,14 @@ public class Partida {
         return this.getDificultad().equals(Dificultad.Entreno);
 
     }
+    
+    
+    public String getCuentaAtras(){
+        
+        return "xxx";
+        
+        
+    }
+    
 
 }

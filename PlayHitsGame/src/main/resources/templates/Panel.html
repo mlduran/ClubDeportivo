@@ -116,7 +116,50 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                             <button th:onclick="window.location.href='/crearPartida'" class="btn btn-primary" role="button" th:text="#{general.crearpartidagrupo}"/>
                                         </p>
                                     </div>
-                                </div>                                
+                                </div>  
+                                <div th:unless="${batallas.isEmpty()}" class="text-center my-2">                                
+                                    <div class="table-responsive-lg ">
+                                        <table class="table table-sm table-striped table-bordered" > 
+                                            <thead class="table-light" style="text-align:center;">
+                                                <tr>
+                                                    <th colspan="4">
+                                                        <p th:text="#{general.batallasdisponibles}"/>
+                                                    </th>                   
+                                                </tr> 
+                                                <tr>
+                                                    <th>
+                                                        <p th:text="#{general.empiezaen}"/> 
+                                                    </th>
+                                                    <th>
+                                                        <p th:text="#{general.configuracion}"/> 
+                                                    </th>
+                                                    <th>
+                                                        <p th:text="#{general.participantes}"/> 
+                                                    </th>
+                                                    <th></th>
+                                                </tr>                                            
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="batalla : ${batallas}">
+                                                    <td>
+                                                        <p th:text="${batalla.cuentaAtras}"/>   
+                                                    </td>
+                                                    <td>
+                                                        <p th:each="txt : ${batalla.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
+                                                    </td>
+                                                    <td>                                                        
+                                                        <p th:text="${batalla.usuariosTxT}"/>                                                        
+                                                    </td>
+                                                    <td>
+                                                        <a th:href="'/unirseABatalla/' + ${batalla.id}" class="button"> 
+                                                            <p th:text="#{general.unirme}"/>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                                 <div th:if="*{hayPartidasTerminadasPersonales()} == true" class="text-center my-2" >
 
                                     <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#tablapartidaspersonales" 

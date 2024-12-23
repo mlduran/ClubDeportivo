@@ -60,7 +60,7 @@ public class PartidaServicioMetodos implements PartidaServicio{
             obj.setTema(partida.getTema());
         }        
 
-        if(Objects.nonNull(partida.getGrupo()) && !"".equalsIgnoreCase(partida.getGrupo())){
+        if(Objects.nonNull(partida.getGrupo())){
             obj.setGrupo(partida.getGrupo());
         }
         
@@ -108,6 +108,11 @@ public class PartidaServicioMetodos implements PartidaServicio{
         // Retorna un objeto Page creado a partir de los usuarios paginados
         return new PageImpl<>(partidasPaginadas, Pageable.ofSize(tamanioPagina).withPage(numeroPagina), partidasPaginadas.size());
    
+    }
+
+    @Override
+    public List<Partida> partidasBatallaCreadas() {
+        return DAO.partidasBatallaCreadas();
     }
   
  

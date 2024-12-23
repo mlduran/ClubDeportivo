@@ -5,7 +5,6 @@
 package mld.playhitsgame.web;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,13 +12,16 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,7 +34,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import mld.playhitsgame.correo.EmailServicioMetodos;
-import mld.playhitsgame.correo.Mail;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.Config;
 import mld.playhitsgame.exemplars.Dificultad;
@@ -120,7 +121,7 @@ public class ControladorVista {
 
     @Autowired
     private MessageSource messageSource;
-    
+
     @Autowired
     EmailServicioMetodos servEmail;
 
@@ -168,7 +169,7 @@ public class ControladorVista {
             Config newConfig = servConfig.getSettings();
             newConfig.setIpRouter(ipRouterActual);
             servConfig.saveSettings(newConfig);
-            Utilidades.enviarMail(servEmail,mailAdmin, "", "Cambio de IP Router",
+            Utilidades.enviarMail(servEmail, mailAdmin, "", "Cambio de IP Router",
                     "Se modifica la IP de " + ipRouterConfigurada + " a " + ipRouterActual, "Correo");
 
         }
@@ -406,8 +407,12 @@ public class ControladorVista {
             modelo.addAttribute("urlSpotify", urlSpotify());
         }
         informarUsuarioModelo(modelo, usu);
+
+        List<Partida> batallas = servPartida.partidasBatallaCreadas();
+
         modelo.addAttribute("serverWebsocket", this.serverWebsocket);
         modelo.addAttribute("spotifyimagenTmp", "");
+        modelo.addAttribute("batallas", batallas);
 
         return "Panel";
     }
@@ -1015,21 +1020,29 @@ public class ControladorVista {
         modelo.addAttribute("error", err);
         return "AltaUsuarioAdm";
     }
-    
+
     @PostMapping("/enviarMailMasivo")
     public String enviarMailMasivo(Model modelo, HttpServletRequest req) {
 
         String txtMail = req.getParameter("txtMail");
 
-        List<Usuario> usuarios = servUsuario.findAll();
-
-        for (Usuario usu : usuarios) {
-            if (!usu.getUsuario().contains(".")) {
-                continue;
-            }
-            if (usu.isActivo()) {
-                Utilidades.enviarMail(servEmail,usu, mensaje(modelo, "general.avisoplay"),
-                        txtMail, "Correo");
+        String enviar = req.getParameter("enviar");
+        String prueba = req.getParameter("prueba");
+        
+        if (prueba != null) {
+            Utilidades.enviarMail(servEmail, mailAdmin, "",mensaje(modelo, "general.avisoplay"),
+                            txtMail, "Correo");
+        }
+        if (enviar != null) {
+            List<Usuario> usuarios = servUsuario.findAll();
+            for (Usuario usu : usuarios) {
+                if (!usu.getUsuario().contains(".")) {
+                    continue;
+                }
+                if (usu.isActivo()) {
+                    Utilidades.enviarMail(servEmail, usu, mensaje(modelo, "general.avisoplay"),
+                            txtMail, "Correo");
+                }
             }
         }
         return "redirect:/administracion";
@@ -1209,6 +1222,64 @@ public class ControladorVista {
         return "CrearPartidaInvitado";
     }
 
+    @GetMapping("/crearBatalla")
+    public String crearBatalla(Model modelo) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/logout";
+        }
+
+        Partida newPartida = new Partida();
+        crearPartida(modelo, newPartida, usu);
+
+        return "CrearBatalla";
+    }
+
+    @PostMapping("/crearBatalla")
+    public String crearBatalla(@ModelAttribute("newpartida") Partida partida,
+            Model modelo,
+            HttpServletRequest req
+    ) {
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/logout";
+        }
+
+        Partida newPartida = null;
+        int nrondas = Integer.parseInt(req.getParameter("nrondas"));
+
+        try {
+            // Validaciones
+            if (!usu.isAdmin()) {
+                throw new Exception(mensaje(modelo, "general.usuarionopermitido"));
+            }
+
+            newPartida = CreaDatosPartida(req, modelo, partida, usu, nrondas);
+            // retrasamos 1 dia la fecha para poder añadirse
+            LocalDate newfecha = LocalDate.now().plusDays(1);
+            newPartida.setFecha(Date.from(newfecha.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            newPartida.setTipo(TipoPartida.batalla);
+            newPartida.setStatus(StatusPartida.Creada);
+            newPartida.setGrupo("");
+            servPartida.updatePartida(newPartida.getId(), newPartida);
+            modelo.addAttribute("result", mensaje(modelo, "general.btallacreada"));
+
+        } catch (Exception ex) {
+            if (newPartida != null) {
+                servPartida.deletePartida(newPartida.getId());
+            }
+            String resp = "ERROR " + ex.getMessage();
+            modelo.addAttribute("result", resp);
+        }
+        anyadirTemas(modelo);
+        informarUsuarioModelo(modelo, usu);
+        modelo.addAttribute("oprondas", NUMERO_RONDAS);
+        modelo.addAttribute("nronda", nrondas);
+
+        return "CrearBatalla";
+    }
+
     private void registrarNuevaPartidaEnTema(Partida partida) {
 
         String tema = partida.getTema();
@@ -1220,13 +1291,93 @@ public class ControladorVista {
         }
     }
 
-    private String crearPartidaGrupo(Partida partida,
-            Model modelo, HttpServletRequest req, Usuario usu) {
+    private Partida CreaDatosPartida(HttpServletRequest req, Model modelo,
+            Partida partida, Usuario usu, int nrondas) throws Exception {
 
         Calendar cal = Calendar.getInstance();
         int anyoActual = cal.get(Calendar.YEAR);
-        int nrondas = Integer.parseInt(req.getParameter("nrondas"));
+        Partida newPartida;
+
+        if (partida.getAnyoFinal() <= partida.getAnyoInicial()) {
+            throw new Exception(mensaje(modelo, "general.fechaserr"));
+        }
+        if (partida.getAnyoFinal() > anyoActual) {
+            throw new Exception(mensaje(modelo, "general.fechafinerr"));
+        }
+        if (partida.getAnyoInicial() < 1950) {
+            throw new Exception(mensaje(modelo, "general.fechainierr"));
+        }
+        if ((partida.getAnyoFinal() - partida.getAnyoInicial()) < 5) {
+            throw new Exception(mensaje(modelo, "general.periodoerr"));
+        }
+        if (nrondas < 10 || nrondas > 30) {
+            throw new Exception(mensaje(modelo, "general.rondaserr"));
+        }
+
+        List<Cancion> canciones = servCancion.obtenerCanciones(partida);
+
+        if (canciones.size() < nrondas) {
+            throw new Exception(mensaje(modelo, "general.cancionesinsuficientes"));
+        }
+
+        partida.setInvitados(new ArrayList());
+        partida.setNCanciones(canciones.size());
+        partida.setMaster(usu);
+        partida.setRondaActual(1);
+        partida.setGrupo(usu.getGrupo());
+        newPartida = servPartida.savePartida(partida);
+        //crear las rondas con nrondas
+        newPartida.setRondas(new ArrayList());
+        for (int i = 1; i <= nrondas; i++) {
+            Ronda newRonda = new Ronda();
+            newRonda.setNumero(i);
+            newRonda.setPartida(partida);
+            newRonda.setRespuestas(new ArrayList());
+            Ronda ronda = servRonda.saveRonda(newRonda);
+            //Crear las respuestas
+            for (Usuario usuario : partida.usuariosPartida()) {
+                usuario.setRespuestas(new ArrayList());
+                Respuesta newResp = new Respuesta();
+                newResp.setRonda(ronda);
+                newResp.setUsuario(usuario);
+                servRespuesta.saveRespuesta(newResp);
+            }
+
+            servRonda.updateRonda(ronda.getId(), ronda);
+            newPartida.getRondas().add(ronda);
+
+        }
+        asignarCancionesAleatorias(newPartida, canciones);
+        for (Ronda ronda : partida.getRondas()) {
+            servRonda.updateRonda(ronda.getId(), ronda);
+        }
+        newPartida.setStatus(StatusPartida.EnCurso);
+        servPartida.updatePartida(newPartida.getId(), partida);
+
+        int[] rangoAnyos = rangoAnyosCanciones((ArrayList<Cancion>) canciones);
+        // Crear las opciones para las respuestas
+        for (Ronda ronda : partida.getRondas()) {
+            for (OpcionTituloTmp op : opcionesTitulosCanciones(ronda, true)) {
+                servOpTitulo.saveOpcionTituloTmp(op);
+            }
+            for (OpcionInterpreteTmp op : opcionesInterpretesCanciones(ronda, true)) {
+                servOpInterprete.saveOpcionInterpreteTmp(op);
+            }
+            for (OpcionAnyoTmp op
+                    : opcionesAnyosCanciones(ronda, rangoAnyos[0], rangoAnyos[1])) {
+                servOpAnyo.saveOpcionAnyoTmp(op);
+            }
+        }
+        registrarNuevaPartidaEnTema(newPartida);
+
+        return newPartida;
+    }
+
+    private String crearPartidaGrupo(Partida partida,
+            Model modelo, HttpServletRequest req, Usuario usu) {
+
         Partida newPartida = null;
+        int nrondas = Integer.parseInt(req.getParameter("nrondas"));
 
         try {
 
@@ -1234,34 +1385,7 @@ public class ControladorVista {
             if (!usu.sePuedeCrearPartidaMaster()) {
                 throw new Exception(mensaje(modelo, "general.partidayacreada"));
             }
-            if (partida.getAnyoFinal() <= partida.getAnyoInicial()) {
-                throw new Exception(mensaje(modelo, "general.fechaserr"));
-            }
-            if (partida.getAnyoFinal() > anyoActual) {
-                throw new Exception(mensaje(modelo, "general.fechafinerr"));
-            }
-            if (partida.getAnyoInicial() < 1950) {
-                throw new Exception(mensaje(modelo, "general.fechainierr"));
-            }
-            if ((partida.getAnyoFinal() - partida.getAnyoInicial()) < 5) {
-                throw new Exception(mensaje(modelo, "general.periodoerr"));
-            }
-            if (nrondas < 10 || nrondas > 30) {
-                throw new Exception(mensaje(modelo, "general.rondaserr"));
-            }
-
-            List<Cancion> canciones = servCancion.obtenerCanciones(partida);
-
-            if (canciones.size() < nrondas) {
-                throw new Exception(mensaje(modelo, "general.cancionesinsuficientes"));
-            }
-
-            partida.setInvitados(new ArrayList());
-            partida.setNCanciones(canciones.size());
-            partida.setMaster(usu);
-            partida.setRondaActual(1);
-            partida.setGrupo(usu.getGrupo());
-            newPartida = servPartida.savePartida(partida);
+            newPartida = CreaDatosPartida(req, modelo, partida, usu, nrondas);
             usu.getPartidasMaster().add(newPartida);
             modelo.addAttribute("id_partidaSesion", newPartida);
 
@@ -1282,50 +1406,6 @@ public class ControladorVista {
                 }
             }
 
-            //crear las rondas con nrondas
-            partida.setRondas(new ArrayList());
-            for (int i = 1; i <= nrondas; i++) {
-                Ronda newRonda = new Ronda();
-                newRonda.setNumero(i);
-                newRonda.setPartida(partida);
-                newRonda.setRespuestas(new ArrayList());
-                Ronda ronda = servRonda.saveRonda(newRonda);
-                //Crear las respuestas
-                for (Usuario usuario : partida.usuariosPartida()) {
-                    usuario.setRespuestas(new ArrayList());
-                    Respuesta newResp = new Respuesta();
-                    newResp.setRonda(ronda);
-                    newResp.setUsuario(usuario);
-                    servRespuesta.saveRespuesta(newResp);
-                }
-
-                servRonda.updateRonda(ronda.getId(), ronda);
-                partida.getRondas().add(ronda);
-
-            }
-            asignarCancionesAleatorias(partida, canciones);
-            for (Ronda ronda : partida.getRondas()) {
-                servRonda.updateRonda(ronda.getId(), ronda);
-            }
-            partida.setStatus(StatusPartida.EnCurso);
-            servPartida.updatePartida(partida.getId(), partida);
-
-            int[] rangoAnyos = rangoAnyosCanciones((ArrayList<Cancion>) canciones);
-            // Crear las opciones para las respuestas
-            for (Ronda ronda : partida.getRondas()) {
-                for (OpcionTituloTmp op : opcionesTitulosCanciones(ronda, true)) {
-                    servOpTitulo.saveOpcionTituloTmp(op);
-                }
-                for (OpcionInterpreteTmp op : opcionesInterpretesCanciones(ronda, true)) {
-                    servOpInterprete.saveOpcionInterpreteTmp(op);
-                }
-                for (OpcionAnyoTmp op
-                        : opcionesAnyosCanciones(ronda, rangoAnyos[0], rangoAnyos[1])) {
-                    servOpAnyo.saveOpcionAnyoTmp(op);
-                }
-            }
-            registrarNuevaPartidaEnTema(partida);
-
         } catch (Exception ex) {
             if (newPartida != null) {
                 servPartida.deletePartida(newPartida.getId());
@@ -1340,7 +1420,6 @@ public class ControladorVista {
         }
 
         return "redirect:/partidaMaster";
-
     }
 
     private String crearPartidaPersonal(Partida partida,
