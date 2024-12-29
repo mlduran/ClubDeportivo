@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -270,15 +271,21 @@ public class Partida {
 
         return this.getDificultad().equals(Dificultad.Entreno);
 
-    }
-    
+    }    
     
     public String getCuentaAtras(){
         
-        return "xxx";
+        Date actual = new Date();
+        long differenceInMillis = actual.getTime() - this.fecha.getTime();
         
-        
-    }
-    
+        if (differenceInMillis > 0) {
+            // Convertir la diferencia a horas y minutos
+            long hours = TimeUnit.MILLISECONDS.toHours(differenceInMillis);
+            long minutes = TimeUnit.MILLISECONDS.toMinutes(differenceInMillis) % 60;
 
+            return hours + "h " + minutes + "m";
+        } else {
+            return "";
+        }
+    }
 }

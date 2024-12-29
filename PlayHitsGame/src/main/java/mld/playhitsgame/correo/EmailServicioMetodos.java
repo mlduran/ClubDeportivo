@@ -65,6 +65,7 @@ public class EmailServicioMetodos implements EmailServicio {
                 = templateEngine.process(plantilla, context);
         helper.setText(contenttHTML, true);
         javaMailSender.send(message);
+        System.out.println("Se envia correo a " + mail.getNombre());
 
     }
 

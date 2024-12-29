@@ -12,7 +12,6 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -29,6 +28,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -944,7 +944,8 @@ public class ControladorVista {
                 usuario.setRoles(roles);
                 usuario.setActivo(false);
                 usuario.setContrasenya(passEncrip);
-                usuario.setPreferencias("");
+                usuario.setSegEspera(5);
+                usuario.setDobleTouch(false);
                 usuario = servUsuario.save(usuario);
                 String token = passwordEncoder.encode(usuario.getUsuario());
                 String enlace = customIp + "/validarUsuario?id=" + String.valueOf(usuario.getId())
@@ -1007,7 +1008,8 @@ public class ControladorVista {
                 usuario.setRoles(roles);
                 usuario.setActivo(false);
                 usuario.setContrasenya(passEncrip);
-                usuario.setPreferencias("");
+                usuario.setSegEspera(5);
+                usuario.setDobleTouch(false);
                 usuario.setActivo(true);
                 servUsuario.save(usuario);
                 resp = "Se ha creado el usuario ".concat(usuario.getUsuario());
@@ -1024,27 +1026,37 @@ public class ControladorVista {
     @PostMapping("/enviarMailMasivo")
     public String enviarMailMasivo(Model modelo, HttpServletRequest req) {
 
-        String txtMail = req.getParameter("txtMail");
+        CompletableFuture.runAsync(() -> {
 
-        String enviar = req.getParameter("enviar");
-        String prueba = req.getParameter("prueba");
-        
-        if (prueba != null) {
-            Utilidades.enviarMail(servEmail, mailAdmin, "",mensaje(modelo, "general.avisoplay"),
-                            txtMail, "Correo");
-        }
-        if (enviar != null) {
-            List<Usuario> usuarios = servUsuario.findAll();
-            for (Usuario usu : usuarios) {
-                if (!usu.getUsuario().contains(".")) {
-                    continue;
-                }
-                if (usu.isActivo()) {
-                    Utilidades.enviarMail(servEmail, usu, mensaje(modelo, "general.avisoplay"),
-                            txtMail, "Correo");
+            String txtMail = req.getParameter("txtMail");
+            String enviar = req.getParameter("enviar");
+            String prueba = req.getParameter("prueba");
+
+            if (prueba != null) {
+                Utilidades.enviarMail(servEmail, mailAdmin, "", mensaje(modelo, "general.avisoplay"),
+                        txtMail, "Correo");
+            }
+            if (enviar != null) {
+                List<Usuario> usuarios = servUsuario.findAll();
+                int tiempoEspera = 9000; //Para enviar 400 mails por hora
+                for (Usuario usu : usuarios) {
+                    if (!usu.getUsuario().contains(".")) {
+                        continue;
+                    }
+                    if (usu.isActivo()) {
+                        Utilidades.enviarMail(servEmail, usu, mensaje(modelo, "general.avisoplay"),
+                                txtMail, "Correo");
+                        try {
+                            Thread.sleep(tiempoEspera); // Pausa de 1 segundo
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            System.err.println("La espera fue interrumpida: " + e.getMessage());
+                        }
+                    }
                 }
             }
-        }
+        });
+
         return "redirect:/administracion";
     }
 
@@ -1109,8 +1121,17 @@ public class ControladorVista {
                 }
                 usuSesion.setAlias(usuario.getAlias());
                 usuSesion.setGrupo(usuario.getGrupo());
+                if (usuario.getIdioma() != null && !"".equals(usuario.getIdioma())) {
+                    usuSesion.setIdioma(usuario.getIdioma());
+                }
+                if (usuario.getSegEspera() < 5 || usuario.getSegEspera() > 30) {
+                    err = mensaje(modelo, "general.errsegespera");
+                }else{
+                    usuSesion.setSegEspera(usuario.getSegEspera());
+                }
+                usuSesion.setDobleTouch(usuario.isDobleTouch());
                 servUsuario.update(usuSesion.getId(), usuSesion);
-                resp = "Se han modificado los datos";
+                resp = mensaje(modelo, "general.datosmodificados");
             } catch (Exception ex) {
                 err = "ERROR " + ex.getMessage();
             }
@@ -1257,8 +1278,9 @@ public class ControladorVista {
 
             newPartida = CreaDatosPartida(req, modelo, partida, usu, nrondas);
             // retrasamos 1 dia la fecha para poder añadirse
-            LocalDate newfecha = LocalDate.now().plusDays(1);
-            newPartida.setFecha(Date.from(newfecha.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            LocalDateTime newfecha = LocalDateTime.now();
+            newfecha = newfecha.plusHours(24);
+            newPartida.setFecha(Date.from(newfecha.atZone(ZoneId.systemDefault()).toInstant()));
             newPartida.setTipo(TipoPartida.batalla);
             newPartida.setStatus(StatusPartida.Creada);
             newPartida.setGrupo("");

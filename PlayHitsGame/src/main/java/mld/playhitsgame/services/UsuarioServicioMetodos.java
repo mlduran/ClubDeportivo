@@ -65,15 +65,10 @@ public class UsuarioServicioMetodos implements UsuarioServicio {
             obj.setContrasenya(usuario.getContrasenya());
         }
 
-        if (Objects.nonNull(usuario.getIdioma()) && !"".equalsIgnoreCase(usuario.getIdioma())) {
-            obj.setIdioma(usuario.getIdioma());
-        }
-
+        obj.setIdioma(usuario.getIdioma());
+        usuario.setDobleTouch(usuario.isDobleTouch());
+        obj.setSegEspera(usuario.getSegEspera());
         obj.setGrupo(usuario.getGrupo());
-
-        if (Objects.nonNull(usuario.getPreferencias()) && !"".equalsIgnoreCase(usuario.getPreferencias())) {
-            obj.setPreferencias(usuario.getPreferencias());
-        }
 
         obj.setPuntos(usuario.getPuntos());
         obj.setEstrellas(usuario.getEstrellas());

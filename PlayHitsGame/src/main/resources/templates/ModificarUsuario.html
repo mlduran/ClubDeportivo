@@ -40,7 +40,23 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="grupo" th:text="#{general.grupo}"/>
                                         <input th:field="*{grupo}" type="text" class="form-control" id="grupo"/>
-                                    </div>   
+                                    </div> 
+                                    
+                                    <div class="mb-3">
+                                        <span th:text="#{general.idioma}"></span>
+                                        <select th:field="*{idioma}" title="Idioma">
+                                            <option th:each="idiomaOpt : ${T(mld.playhitsgame.exemplars.Idioma).values()}" 
+                                                    th:value="${idiomaOpt}" th:text="${idiomaOpt}"></option>
+                                        </select>
+                                    </div>     
+                                    <div class="mb-3">
+                                        <label th:text="#{general.dobleTouch}"/>
+                                        <input type="checkbox" th:field="*{dobleTouch}" id="dobleTouch">   
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="mb-2 text-muted" for="segEspera" th:text="#{general.segespera}"/>
+                                        <input th:field="*{segEspera}" type="number" id="segEspera" size="2"/>
+                                    </div>
 
                                     <div class="d-flex align-items-center">
                                         <button type="submit" class="btn btn-primary ms-auto" th:text="#{general.modificar}"/>

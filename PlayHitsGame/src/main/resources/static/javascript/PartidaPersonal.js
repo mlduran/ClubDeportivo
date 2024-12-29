@@ -68,10 +68,14 @@ function esperar(ms) {
 
 async function ocultarResultado() {
 
+    var segEspera = document.getElementById("segespera").value;
+    
+    var segEsperaInt = (segEspera !== null && segEspera.trim() !== "") ? parseInt(segEspera, 10) : 5;
+    
     if (respOk.value === 'true')
-        await esperar(2000);
+        await esperar(segEsperaInt * 500);
     else
-        await esperar(5000);
+        await esperar(segEsperaInt * 1000);
     verificacion.style.display = 'none';
 }
 

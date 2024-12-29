@@ -46,9 +46,11 @@ public class Usuario {
     private String contrasenya;
     private String grupo;
     private String idioma;
+    private boolean dobleTouch;
+    private int segEspera;
     private int puntos;
     private int estrellas;
-    private String preferencias;
+    
     
     @OneToMany(mappedBy = "usuario")
     private List<Tema> temas;
@@ -78,12 +80,7 @@ public class Usuario {
     private List<Partida> partidasInvitado;
  
     
-    public boolean isTouchstart(){
-        // Esto modificarlo cuando ponga las opciones en la pantalla
-        
-        return false;
-    }    
-
+   
     public String getActivoTxt() {
 
         if (this.activo) {

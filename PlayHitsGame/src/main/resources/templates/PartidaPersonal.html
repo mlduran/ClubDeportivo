@@ -28,12 +28,13 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <section class="h-100">            
             <input type="hidden" id="fichAjuda" 
                    th:value="${locale != null ? '/ayuda/PartidaPersonal_' + locale.language + '.html' : '/ayuda/PartidaPersonal_es.html'}" />
-            <input type="hidden" id="idusuario" th:value="${usuarioSesion.id}" />
+            <input type="hidden" id="idusuario" th:value="${usuarioSesion.id}" />            
             <input type="hidden" id="idpartida" th:value="${partidaSesion.id}" />
             <input type="hidden" id="respuestaOK" th:value="${respuestaOK}" />
             <input type="hidden" id="todoFallo" th:value="${todoFallo}" />
             <input type="hidden" id="esRecord" th:value="${esRecord}" />
-            <input type="hidden" id="touchstart" th:value="${usuarioSesion.touchstart}" />
+            <input type="hidden" id="segespera" th:value="${usuarioSesion.segEspera}" />
+            <input type="hidden" id="touchstart" th:value="${usuarioSesion.dobleTouch}" />
             <div th:if="${partidaSesion.sonidos != null || partidaSesion.sonidos == true}">
                 <input type="hidden" id="soundOK" th:value="${soundOK}" />
                 <input type="hidden" id="soundErrTitulo" th:value="${soundErrTitulo}" />
