@@ -70,7 +70,9 @@ async function ocultarResultado() {
 
     var segEspera = document.getElementById("segespera").value;
     
-    var segEsperaInt = (segEspera !== null && segEspera.trim() !== "") ? parseInt(segEspera, 10) : 5;
+    var segEsperaInt = (segEspera !== null && segEspera.trim() !== "" && parseInt(segEspera, 10) !== 0) 
+    ? parseInt(segEspera, 10) 
+    : 5;
     
     if (respOk.value === 'true')
         await esperar(segEsperaInt * 500);

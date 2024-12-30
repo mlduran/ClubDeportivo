@@ -22,13 +22,16 @@ public interface PartidaDAO extends JpaRepository<Partida, Long> {
     @Override
     Optional<Partida> findById(Long id);
 
-    @Query(value = "SELECT * FROM partidas WHERE master_id=:idusuario AND (status <> 'Terminada' AND status <> 'Historico')", nativeQuery = true)
+    @Query(value = "SELECT * FROM partidas WHERE master_id=:idusuario AND (status <> 'Terminada' AND status <> 'Historico') ;", nativeQuery = true)
     Optional<Partida> partidaUsuarioMaster(Long idusuario);
     
-    @Query(value = "SELECT * FROM partidas WHERE tipo='grupo' AND  status <> 'Historico' ORDER BY fecha DESC", nativeQuery = true)
+    @Query(value = "SELECT * FROM partidas WHERE tipo='grupo' AND  status <> 'Historico' ORDER BY fecha DESC ;", nativeQuery = true)
     ArrayList<Partida> partidasGrupo();
     
-    @Query(value = "SELECT * FROM partidas WHERE tipo='batalla' AND  status = 'Creada' ", nativeQuery = true)
+    @Query(value = "SELECT * FROM partidas WHERE tipo='batalla' ;", nativeQuery = true)
+    ArrayList<Partida> partidasBatalla();
+    
+    @Query(value = "SELECT * FROM partidas WHERE tipo='batalla' AND  status = 'Creada' ;", nativeQuery = true)
     ArrayList<Partida> partidasBatallaCreadas();
 
     @Modifying

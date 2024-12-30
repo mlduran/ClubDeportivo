@@ -111,6 +111,11 @@ public class PartidaServicioMetodos implements PartidaServicio{
     }
 
     @Override
+    public List<Partida> partidasBatalla() {
+        return DAO.partidasBatalla();
+    }
+    
+    @Override
     public List<Partida> partidasBatallaCreadas() {
         return DAO.partidasBatallaCreadas();
     }

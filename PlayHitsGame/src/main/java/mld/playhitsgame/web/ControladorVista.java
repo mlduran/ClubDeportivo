@@ -409,10 +409,21 @@ public class ControladorVista {
         informarUsuarioModelo(modelo, usu);
 
         List<Partida> batallas = servPartida.partidasBatallaCreadas();
+        List<Partida> batallasDisponibles = new ArrayList<>();
+        List<Partida> batallasInscritas = new ArrayList<>();
+
+        for (Partida partida : batallas) {
+            if (partida.getInvitados().contains(usu)) {
+                batallasInscritas.add(partida);
+            } else {
+                batallasDisponibles.add(partida);
+            }
+        }
 
         modelo.addAttribute("serverWebsocket", this.serverWebsocket);
         modelo.addAttribute("spotifyimagenTmp", "");
-        modelo.addAttribute("batallas", batallas);
+        modelo.addAttribute("batallasDisponibles", batallasDisponibles);
+        modelo.addAttribute("batallasInscritas", batallasInscritas);
 
         return "Panel";
     }
@@ -1126,7 +1137,7 @@ public class ControladorVista {
                 }
                 if (usuario.getSegEspera() < 5 || usuario.getSegEspera() > 30) {
                     err = mensaje(modelo, "general.errsegespera");
-                }else{
+                } else {
                     usuSesion.setSegEspera(usuario.getSegEspera());
                 }
                 usuSesion.setDobleTouch(usuario.isDobleTouch());
@@ -1282,7 +1293,7 @@ public class ControladorVista {
             newfecha = newfecha.plusHours(24);
             newPartida.setFecha(Date.from(newfecha.atZone(ZoneId.systemDefault()).toInstant()));
             newPartida.setTipo(TipoPartida.batalla);
-            newPartida.setStatus(StatusPartida.Creada);
+            newPartida.setStatus(StatusPartida.EnEspera);
             newPartida.setGrupo("");
             servPartida.updatePartida(newPartida.getId(), newPartida);
             modelo.addAttribute("result", mensaje(modelo, "general.btallacreada"));
@@ -2386,5 +2397,28 @@ public class ControladorVista {
 
         return "PartidasGrupo";
     }
+    
+    @GetMapping("/unirseABatalla/{batalla_id}")
+    public String unirseABatalla(Model modelo,
+            @PathVariable("batalla_id") Long batalla_id) {
 
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "/";
+        }
+        
+        Optional<Partida> findById = servPartida.findById(batalla_id);
+        Partida partida;
+        
+        if (findById.isPresent()){
+            partida = findById.get();
+            partida.getInvitados().add(usu);
+            usu.getPartidasInvitado().add(partida);
+            servPartida.updatePartida(partida.getId(), partida);
+            servUsuario.update(usu.getId(), usu);
+        }
+        
+        return "redirect:/panel";
+    }
+    
 }

@@ -117,7 +117,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                         </p>
                                     </div>
                                 </div>  
-                                <div th:unless="${batallas.isEmpty()}" class="text-center my-2">                                
+                                <div th:unless="${batallasDisponibles.isEmpty()}" class="text-center my-2">                                
                                     <div class="table-responsive-lg ">
                                         <table class="table table-sm table-striped table-bordered" > 
                                             <thead class="table-light" style="text-align:center;">
@@ -140,7 +140,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                 </tr>                                            
                                             </thead>
                                             <tbody>
-                                                <tr th:each="batalla : ${batallas}">
+                                                <tr th:each="batalla : ${batallasDisponibles}">
                                                     <td>
                                                         <p th:text="${batalla.cuentaAtras}"/>   
                                                     </td>
@@ -155,6 +155,43 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                             <p th:text="#{general.unirme}"/>
                                                         </a>
                                                     </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div th:unless="${batallasInscritas.isEmpty()}" class="text-center my-2">                                
+                                    <div class="table-responsive-lg ">
+                                        <table class="table table-sm table-striped table-bordered" > 
+                                            <thead class="table-light" style="text-align:center;">
+                                                <tr>
+                                                    <th colspan="4">
+                                                        <p th:text="#{general.batallasinscritas}"/>
+                                                    </th>                   
+                                                </tr> 
+                                                <tr>
+                                                    <th>
+                                                        <p th:text="#{general.empiezaen}"/> 
+                                                    </th>
+                                                    <th>
+                                                        <p th:text="#{general.configuracion}"/> 
+                                                    </th>
+                                                    <th>
+                                                        <p th:text="#{general.participantes}"/> 
+                                                    </th>
+                                                </tr>                                            
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="batalla : ${batallasInscritas}">
+                                                    <td>
+                                                        <p th:text="${batalla.cuentaAtras}"/>   
+                                                    </td>
+                                                    <td>
+                                                        <p th:each="txt : ${batalla.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
+                                                    </td>
+                                                    <td>                                                        
+                                                        <p th:text="${batalla.usuariosTxT}"/>                                                        
+                                                    </td>                                                    
                                                 </tr>
                                             </tbody>
                                         </table>

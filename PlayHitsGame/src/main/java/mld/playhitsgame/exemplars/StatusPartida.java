@@ -10,6 +10,7 @@ package mld.playhitsgame.exemplars;
  */
 public enum StatusPartida {
     
+    EnEspera,
     Creada,
     EnCurso,
     Terminada,
