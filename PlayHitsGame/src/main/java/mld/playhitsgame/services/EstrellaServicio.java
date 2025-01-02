@@ -2,18 +2,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
-package mld.playhitsgame.DAO;
+package mld.playhitsgame.services;
 
-
-import mld.playhitsgame.exemplars.Config;
-import org.springframework.data.jpa.repository.JpaRepository;
+import mld.playhitsgame.exemplars.Estrella;
 
 /**
  *
  * @author miguel
  */
+public interface EstrellaServicio {
 
-public interface ConfigDAO extends JpaRepository<Config, Long>{   
-    
-    
+    Estrella update(Long id, Estrella estrella);
+    Estrella save(Estrella estrella);
+
 }

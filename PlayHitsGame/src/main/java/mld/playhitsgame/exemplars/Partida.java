@@ -7,11 +7,12 @@ package mld.playhitsgame.exemplars;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,11 +32,13 @@ public class Partida {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    private boolean publica;
+    private String nombre;
 
-    @Temporal(TemporalType.DATE)
-    @Column(name = "fecha", nullable = false, updatable = false)
+    @Column(name = "fecha", nullable = false)
     @CreationTimestamp
-    private Date fecha;
+    private LocalDateTime fecha;
 
     @Enumerated(EnumType.STRING)
     private StatusPartida status;
@@ -101,10 +104,8 @@ public class Partida {
 
     public String fechaFormateada() {
 
-        //String strDateFormat = "hh:mm:ss a dd-MMM-yyyy"; 
-        String strDateFormat = "dd/MMM/yyyy";
-        SimpleDateFormat objSDF = new SimpleDateFormat(strDateFormat);
-        return objSDF.format(this.getFecha());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy");
+        return this.getFecha().format(formatter);
 
     }
 
@@ -275,13 +276,13 @@ public class Partida {
     
     public String getCuentaAtras(){
         
-        Date actual = new Date();
-        long differenceInMillis = actual.getTime() - this.fecha.getTime();
+        LocalDateTime actual = LocalDateTime.now();
+        Duration duration = Duration.between(actual, this.getFecha());
         
-        if (differenceInMillis > 0) {
+        if (actual.isBefore(this.getFecha())) {
             // Convertir la diferencia a horas y minutos
-            long hours = TimeUnit.MILLISECONDS.toHours(differenceInMillis);
-            long minutes = TimeUnit.MILLISECONDS.toMinutes(differenceInMillis) % 60;
+            long hours = duration.toHours();
+            long minutes = duration.toMinutes() % 60;
 
             return hours + "h " + minutes + "m";
         } else {

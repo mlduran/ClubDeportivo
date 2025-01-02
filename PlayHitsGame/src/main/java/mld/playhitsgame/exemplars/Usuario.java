@@ -45,7 +45,8 @@ public class Usuario {
     @NotBlank
     private String contrasenya;
     private String grupo;
-    private String idioma;
+    @Enumerated(EnumType.STRING)
+    private Idioma idioma;
     private boolean dobleTouch;
     private int segEspera;
     private int puntos;
@@ -203,6 +204,9 @@ public class Usuario {
         List<Partida> result = new ArrayList<>();
 
         for (Partida elem : this.getPartidasInvitado()) {
+            if (elem.getTipo() != TipoPartida.grupo) {
+                continue;
+            }
             if (elem.getStatus() == StatusPartida.EnCurso) {
                 result.add(elem);
             }
@@ -228,6 +232,9 @@ public class Usuario {
         }
 
         for (Partida elem : this.getPartidasInvitado()) {
+            if (elem.getTipo() != TipoPartida.grupo) {
+                continue;
+            }
             if (elem.getStatus() == StatusPartida.Terminada) {
                 result.add(elem);
             }
@@ -242,6 +249,48 @@ public class Usuario {
     public boolean hayPartidasTerminadasGrupo() {
 
         return !partidasTerminadasGrupo().isEmpty();
+    }
+    
+    public List<Partida> batallasEnCurso() {
+
+        List<Partida> result = new ArrayList<>();
+
+        for (Partida elem : this.getPartidasInvitado()) {
+            if (elem.getTipo() != TipoPartida.batalla) {
+                continue;
+            }
+            if (elem.getStatus() == StatusPartida.EnCurso) {
+                result.add(elem);
+            }
+        }
+        return result;
+    }
+    
+    public boolean hayBatallasEnCurso() {
+
+        return !batallasEnCurso().isEmpty();
+    } 
+        
+   
+    
+    public List<Partida> batallasTerminadas() {
+
+        List<Partida> result = new ArrayList<>();
+
+        for (Partida elem : this.getPartidasInvitado()) {
+            if (elem.getTipo() != TipoPartida.batalla) {
+                continue;
+            }
+            if (elem.getStatus() == StatusPartida.Terminada) {
+                result.add(elem);
+            }
+        }
+        return result;
+    }
+    
+    public boolean hayBatallasTerminadas() {
+
+        return !batallasTerminadas().isEmpty();
     }
 
     public List<Partida> partidasTerminadasPersonales() {

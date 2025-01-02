@@ -40,15 +40,30 @@ public class ControladorScripts {
     
     private void tratarBatallas(){
         
+        // para los cambios de status asumimos que este script
+        // se lanzara diariamente a la misma hora
+        
         List<Partida> batallas = servPartida.partidasBatalla();
         
         for (Partida batalla : batallas){
-            if (batalla.getStatus().equals(StatusPartida.EnEspera)){
-                batalla.setStatus(StatusPartida.Creada);
-                LocalDateTime newfecha = LocalDateTime.now();
-                newfecha = newfecha.plusHours(24);
-                batalla.setFecha(Date.from(newfecha.atZone(ZoneId.systemDefault()).toInstant()));
-                servPartida.updatePartida(batalla.getId(), batalla);
+            switch (batalla.getStatus()) {
+                case EnEspera -> {
+                    batalla.setStatus(StatusPartida.Creada);
+                    LocalDateTime newfecha = LocalDateTime.now();
+                    newfecha = newfecha.plusHours(24);
+                    batalla.setFecha(newfecha);
+                    servPartida.updatePartida(batalla.getId(), batalla);
+                }
+                case Creada -> {
+                    batalla.setStatus(StatusPartida.EnCurso);
+                    servPartida.updatePartida(batalla.getId(), batalla);
+                }
+                case EnCurso -> {
+                    batalla.setStatus(StatusPartida.Terminada);
+                    servPartida.updatePartida(batalla.getId(), batalla);
+                }
+                default -> {
+                }
             }
         }        
     }    

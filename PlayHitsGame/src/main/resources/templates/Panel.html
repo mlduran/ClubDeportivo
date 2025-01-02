@@ -85,6 +85,28 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                 </div>
                             </div>
                             <div class="card-body p-0" >
+                                <div th:if="*{hayBatallasEnCurso()} == true" class="text-center my-2">
+                                    <div class="table-responsive-lg">
+                                        <table class="table" > 
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        <p th:text="#{general.batallasencurso}"/>
+                                                    </th>                   
+                                                </tr>   
+                                                <tr th:each="unapartida : *{batallasEnCurso()}">
+                                                    <td>
+                                                        <a th:href="'/batalla/'+${unapartida.id}" class="button" id="${unapartida.id}">
+                                                            <p th:each="txt : ${unapartida.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>  
+                            <div class="card-body p-0" >
                                 <div th:if="*{hayPartidasInvitadoPendientes()} == true" class="text-center my-2">
                                     <div class="table-responsive-lg">
                                         <table class="table" > 
@@ -179,6 +201,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                     <th>
                                                         <p th:text="#{general.participantes}"/> 
                                                     </th>
+                                                    <th></th>
                                                 </tr>                                            
                                             </thead>
                                             <tbody>
@@ -191,12 +214,74 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                     </td>
                                                     <td>                                                        
                                                         <p th:text="${batalla.usuariosTxT}"/>                                                        
-                                                    </td>                                                    
+                                                    </td> 
+                                                    <td>
+                                                        <a th:href="'/salirDeBatalla/' + ${batalla.id}" class="button"> 
+                                                            <p th:text="#{general.noparticipar}"/>
+                                                        </a>
+                                                    </td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
+                                <div th:if="*{hayBatallasTerminadas()} == true" class="text-center my-2" >
+
+                                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#tablabatallas" 
+                                            aria-expanded="false" aria-controls="tablabatallas" th:text="#{general.batallasterminadas}"/>                                       
+                                    </button>
+                                    <div class="collapse" id="tablabatallas">
+                                        <div class="table-responsive-lg ">
+                                            <table class="table table-sm table-striped table-bordered" style="max-width: 100%; width: 100%; table-layout: fixed;" > 
+                                                <thead class="table-light" style="text-align:center;">
+                                                    <tr>
+                                                        <th colspan="4">
+                                                            <p th:text="#{general.batallasterminadas}"/>
+                                                        </th>                   
+                                                    </tr> 
+                                                    <tr>
+                                                        <th>
+                                                            <p th:text="#{general.fecha}"/> 
+                                                        </th>
+                                                        <th>
+                                                            <p th:text="#{general.configuracion}"/> 
+                                                        </th>
+                                                        <th>
+                                                            <p th:text="#{general.usuarios}"/> 
+                                                        </th>
+                                                        <th>
+                                                            <p th:text="#{general.ganador}"/> 
+                                                        </th>
+                                                    </tr>                                            
+                                                </thead>
+                                                <tbody>
+                                                    <tr th:each="unapartida : *{batallasTerminadas()}">
+                                                        <td>
+                                                            <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
+                                                                <p th:text="${unapartida.fechaFormateada}"/>
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
+                                                                <p th:each="txt : ${unapartida.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
+                                                                <p th:text="${unapartida.usuariosTxT}"/>
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
+                                                                <p th:text="${unapartida.ganador}"/>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>  
                                 <div th:if="*{hayPartidasTerminadasPersonales()} == true" class="text-center my-2" >
 
                                     <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#tablapartidaspersonales" 

@@ -33,6 +33,7 @@ public final class Config  {
     private String mensajeInicio_es;
     private String mensajeInicio_en;
     private String nCanciones;
+    private int numMaxEstrellas;
     private boolean mantenimiento;
     private LocalDateTime fechaMantenimiento;
 

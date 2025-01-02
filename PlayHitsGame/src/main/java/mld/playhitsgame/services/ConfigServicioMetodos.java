@@ -49,6 +49,7 @@ public class ConfigServicioMetodos implements ConfigServicio{
         settings.setId(1L);
         settings.setIpRouter("");
         settings.setMantenimiento(false);
+        settings.setNumMaxEstrellas(100);
         return DAO.save(settings);
     }
     

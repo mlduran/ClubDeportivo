@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.Optional;
 import mld.playhitsgame.DAO.PartidaDAO;
 import mld.playhitsgame.exemplars.Partida;
-import mld.playhitsgame.exemplars.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -68,6 +67,11 @@ public class PartidaServicioMetodos implements PartidaServicio{
             obj.setGanador(partida.getGanador());
         }
         
+        if(Objects.nonNull(partida.getNombre()) && !"".equalsIgnoreCase(partida.getNombre())){
+            obj.setNombre(partida.getNombre());
+        }
+        
+        obj.setPublica(partida.isPublica());
         obj.setFecha(partida.getFecha());
         obj.setAnyoInicial(partida.getAnyoInicial());
         obj.setAnyoFinal(partida.getAnyoFinal());

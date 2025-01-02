@@ -43,7 +43,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </div> 
                                     
                                     <div class="mb-3">
-                                        <span th:text="#{general.idioma}"></span>
+                                        <span th:text="#{general.idiomatemasinfo}"></span>
                                         <select th:field="*{idioma}" title="Idioma">
                                             <option th:each="idiomaOpt : ${T(mld.playhitsgame.exemplars.Idioma).values()}" 
                                                     th:value="${idiomaOpt}" th:text="${idiomaOpt}"></option>
@@ -55,7 +55,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </div>
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="segEspera" th:text="#{general.segespera}"/>
-                                        <input th:field="*{segEspera}" type="number" id="segEspera" size="2"/>
+                                        <input th:field="*{segEspera}" type="number" id="segEspera" min="5" max="30" size="2"/>
                                     </div>
 
                                     <div class="d-flex align-items-center">

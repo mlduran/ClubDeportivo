@@ -116,6 +116,7 @@ public class ControladorVista {
     private final int[] NUMERO_RONDAS = {10, 15, 20, 25, 30};
     private final int SEG_PARA_INICIO_RESPUESTA = 15;
     private final int REG_POR_PAG = 100;
+    private int numMaxEstrellas;
 
     private String urlLoginSpotify;
 
@@ -165,14 +166,18 @@ public class ControladorVista {
         String ipRouterActual = Utilidades.ejecutarComando("curl ifconfig.me");
         System.out.print("IP Router Actual : " + ipRouterActual);
 
+        Config laConfig = servConfig.getSettings();
         if (!ipRouterConfigurada.equals(ipRouterActual)) {
-            Config newConfig = servConfig.getSettings();
-            newConfig.setIpRouter(ipRouterActual);
-            servConfig.saveSettings(newConfig);
+            laConfig.setIpRouter(ipRouterActual);
+            servConfig.saveSettings(laConfig);
             Utilidades.enviarMail(servEmail, mailAdmin, "", "Cambio de IP Router",
                     "Se modifica la IP de " + ipRouterConfigurada + " a " + ipRouterActual, "Correo");
 
         }
+
+        // para que este valor se refresque si se cambia en la BD
+        // habria que reiniciar la APP
+        numMaxEstrellas = laConfig.getNumMaxEstrellas();
 
     }
 
@@ -185,6 +190,23 @@ public class ControladorVista {
         }
 
         return idioma;
+    }
+
+    private void asignarIdiomaUsuario(Model modelo, Usuario usuario) {
+
+        Locale localeUsu = null;
+
+        if (usuario.getIdioma() != null) {
+            if (usuario.getIdioma().equals(Idioma.English)) {
+                localeUsu = new Locale("en");
+            } else if (usuario.getIdioma().equals(Idioma.Spanish)) {
+                localeUsu = new Locale("es");
+            }
+        }
+        if (localeUsu != null) {
+            modelo.addAttribute("locale", localeUsu);
+        }
+
     }
 
     private String mensaje(Model modelo, String idMensaje) {
@@ -391,6 +413,9 @@ public class ControladorVista {
             if (!usuarioSesion.isAdmin()) {
                 servRegistro.registrar(TipoRegistro.Login, ipCliente(request), usuarioSesion.getUsuario());
             }
+
+            asignarIdiomaUsuario(modelo, usuarioSesion);
+
             return "redirect:/panel";
         }
     }
@@ -1132,7 +1157,7 @@ public class ControladorVista {
                 }
                 usuSesion.setAlias(usuario.getAlias());
                 usuSesion.setGrupo(usuario.getGrupo());
-                if (usuario.getIdioma() != null && !"".equals(usuario.getIdioma())) {
+                if (usuario.getIdioma() != null) {
                     usuSesion.setIdioma(usuario.getIdioma());
                 }
                 if (usuario.getSegEspera() < 5 || usuario.getSegEspera() > 30) {
@@ -1143,6 +1168,7 @@ public class ControladorVista {
                 usuSesion.setDobleTouch(usuario.isDobleTouch());
                 servUsuario.update(usuSesion.getId(), usuSesion);
                 resp = mensaje(modelo, "general.datosmodificados");
+                asignarIdiomaUsuario(modelo, usuario);
             } catch (Exception ex) {
                 err = "ERROR " + ex.getMessage();
             }
@@ -1291,7 +1317,8 @@ public class ControladorVista {
             // retrasamos 1 dia la fecha para poder añadirse
             LocalDateTime newfecha = LocalDateTime.now();
             newfecha = newfecha.plusHours(24);
-            newPartida.setFecha(Date.from(newfecha.atZone(ZoneId.systemDefault()).toInstant()));
+            newPartida.setFecha(newfecha);
+            newPartida.setPublica(true);
             newPartida.setTipo(TipoPartida.batalla);
             newPartida.setStatus(StatusPartida.EnEspera);
             newPartida.setGrupo("");
@@ -2397,7 +2424,7 @@ public class ControladorVista {
 
         return "PartidasGrupo";
     }
-    
+
     @GetMapping("/unirseABatalla/{batalla_id}")
     public String unirseABatalla(Model modelo,
             @PathVariable("batalla_id") Long batalla_id) {
@@ -2406,19 +2433,42 @@ public class ControladorVista {
         if (usu == null) {
             return "/";
         }
-        
+
         Optional<Partida> findById = servPartida.findById(batalla_id);
         Partida partida;
-        
-        if (findById.isPresent()){
+
+        if (findById.isPresent()) {
             partida = findById.get();
             partida.getInvitados().add(usu);
             usu.getPartidasInvitado().add(partida);
             servPartida.updatePartida(partida.getId(), partida);
             servUsuario.update(usu.getId(), usu);
         }
-        
+
         return "redirect:/panel";
     }
-    
+
+    @GetMapping("/salirDeBatalla/{batalla_id}")
+    public String salirDeBatalla(Model modelo,
+            @PathVariable("batalla_id") Long batalla_id) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "/";
+        }
+
+        Optional<Partida> findById = servPartida.findById(batalla_id);
+        Partida partida;
+
+        if (findById.isPresent()) {
+            partida = findById.get();
+            partida.getInvitados().remove(usu);
+            usu.getPartidasInvitado().remove(partida);
+            servPartida.updatePartida(partida.getId(), partida);
+            servUsuario.update(usu.getId(), usu);
+        }
+
+        return "redirect:/panel";
+    }
+
 }

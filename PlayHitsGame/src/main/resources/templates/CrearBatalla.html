@@ -27,6 +27,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                 <form method="post" th:action="@{/crearBatalla}" th:object="${newpartida}" id="form">  
                                     <input type="hidden" th:field="*{tipo}" th:value="${newpartida.tipo}"/>
                                     <div class="mb-3">
+                                        <label class="mb-2 text-muted" for="nombre" th:text="#{general.nombre}"/>
+                                        <input  id="nombre" type="text" th:field="*{nombre}" th:value="${newpartida.nombre}"  size="22"/>
+                                    </div>
+                                    <div class="mb-3">
                                         <label class="mb-2 text-muted" for="tema" th:text="#{general.tema}"/>
                                         <select th:field="*{tema}" title="Tema" id="tema" > 
                                             <option th:each="elem : ${temas}" 
@@ -51,9 +55,12 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     <div class="d-flex align-items-center">
                                         <button type="submit" class="btn btn-primary ms-auto" value="Crear" th:text="#{general.crear}"/>
                                     </div>
-                                    <div class="mb-3">
-                                        <p th:text="${result}" style="color:red"/>
-                                    </div>                                    
+                                    <div class="mb-3" th:if="${error != null and error != ''}">
+                                        <p th:text="${error}" style="color:red"></p>
+                                    </div>
+                                    <div class="mb-3" th:if="${result != null and result != ''}">
+                                        <p th:text="${result}" style="color:green" />
+                                    </div>  
                                 </form>
                             </div>
                             <div class="card-body p-0 text-center">
