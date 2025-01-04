@@ -35,6 +35,8 @@ public class Respuesta{
     private boolean interpreteOk;
     private int puntos;
     private LocalTime inicio;
+    private LocalTime fin;
+    private boolean completada;
     
     @ManyToOne(fetch=FetchType.EAGER)
     private Ronda ronda;
@@ -56,6 +58,19 @@ public class Respuesta{
                 this.getRonda().getInicio() != null
                 ){
             Duration duration = Duration.between(this.getRonda().getInicio(), this.getInicio());
+            Long segundos = duration.getSeconds();
+            tiempo = segundos.toString(); 
+        }        
+        
+        return tiempo;
+    }
+    
+    public String getTiempoEmpleadoBatalla(){
+        
+        String tiempo = "";
+        
+        if (this.getInicio() != null && this.getFin() != null){
+            Duration duration = Duration.between(this.getInicio(), this.getFin());
             Long segundos = duration.getSeconds();
             tiempo = segundos.toString(); 
         }        

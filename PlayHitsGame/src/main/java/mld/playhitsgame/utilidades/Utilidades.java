@@ -40,11 +40,9 @@ import mld.playhitsgame.exemplars.Usuario;
 import mld.playhitsgame.web.ControladorVista;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.MailSendException;
-import org.springframework.stereotype.Component;
     
 /**
  *

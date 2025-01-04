@@ -14,13 +14,11 @@ import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -116,7 +114,7 @@ public class ControladorVista {
     private final int[] NUMERO_RONDAS = {10, 15, 20, 25, 30};
     private final int SEG_PARA_INICIO_RESPUESTA = 15;
     private final int REG_POR_PAG = 100;
-    private int numMaxEstrellas;
+    public int numMaxEstrellas;
 
     private String urlLoginSpotify;
 
@@ -617,7 +615,7 @@ public class ControladorVista {
             try {
                 ultimaRonda = darDeAltaRonda(partida);
             } catch (IndexOutOfBoundsException ex) {
-                boolean esRecord = finalizarPartidaPersonal(partida, usu);
+                boolean esRecord = UtilidadesWeb.finalizarPartidaPersonal(partida, usu, this);
                 ultimaRonda = partida.ultimaRonda();
                 todoFallo = true;
                 modelo.addAttribute("esRecord", esRecord);
@@ -686,77 +684,10 @@ public class ControladorVista {
             return "redirect:/panel";
         }
 
-        finalizarPartidaPersonal(partida, usu);
+        UtilidadesWeb.finalizarPartidaPersonal(partida, usu, this);
 
         return "redirect:/panel";
 
-    }
-
-    private void altaPuntuacion(Tema elTema, Usuario usuario,
-            Partida partida, int pts) {
-
-        // de momento solo damos da talta la puntuacion 
-        // si no exite esa puntuacion y usuario, mas adelante se 
-        // podria hacer solo con un usuario
-        List<Puntuacion> listaPts = sevrPuntuacion.obtenerPuntuacionesUsuario(
-                elTema.getId(), usuario.getId());
-
-        if (!listaPts.isEmpty()) {
-            for (Puntuacion puntuacion : listaPts) {
-                if (puntuacion.getPuntos() == pts) {
-                    return; // si ya esxite salimos
-                }
-            }
-        }
-        Puntuacion newPts = new Puntuacion();
-        newPts.setTema(elTema);
-        newPts.setPuntos(pts);
-        newPts.setTipoPartida(TipoPartida.personal);
-        newPts.setIdUsuario(usuario.getId());
-        newPts.setDificultad(partida.getDificultad());
-        newPts.setAnyoInicial(partida.getAnyoInicial());
-        newPts.setAnyoFinal(partida.getAnyoFinal());
-        sevrPuntuacion.save(newPts);
-    }
-
-    private boolean finalizarPartidaPersonal(Partida partida, Usuario usuario) {
-
-        // Devuelve true si se ha conseguido un record
-        boolean esRecord = false;
-
-        partida.setStatus(StatusPartida.Terminada);
-        servPartida.updatePartida(partida.getId(), partida);
-        eliminarOpcionesPartida(partida);
-
-        if (partida.isEntreno()) {
-            return esRecord;
-        }
-
-        int pts = partida.ptsUsuario(usuario);
-
-        if (partida.getTema() != null && !"".equals(partida.getTema())) {
-            Optional<Tema> tema = servTema.findBytema(partida.getTema());
-            if (tema.isPresent()) {
-                Tema elTema = tema.get();
-                if (elTema.getPuntos() < pts) {
-                    elTema.setPuntos(pts);
-                    elTema.setUsuarioRecord(usuario.getId());
-                    servTema.update(elTema.getId(), elTema);
-                    usuario.setEstrellas(usuario.getEstrellas() + 1);
-                    servUsuario.update(usuario.getId(), usuario);
-                    esRecord = true;
-                }
-                if (pts > 0) {
-                    try {
-                        altaPuntuacion(elTema, usuario, partida, pts);
-                    } catch (Exception e) {
-                        Logger.getLogger(ControladorVista.class.getName()).
-                                log(Level.SEVERE, "Error en alta de puntacion", e);
-                    }
-                }
-            }
-        }
-        return esRecord;
     }
 
     @PostMapping("/partidaPersonal")
@@ -879,7 +810,7 @@ public class ControladorVista {
 
             // si por ejemplo no se acierta nada, podemos finalizar partida
             if (hasPerdido) {
-                boolean esRecord = finalizarPartidaPersonal(partida, usu);
+                boolean esRecord = UtilidadesWeb.finalizarPartidaPersonal(partida, usu, this);
                 modelo.addAttribute("esRecord", esRecord);
             }
 
@@ -2166,14 +2097,6 @@ public class ControladorVista {
         return "Records";
     }
 
-    private void eliminarOpcionesPartida(Partida partida) {
-
-        servOpTitulo.deleteByPartida(partida.getId());
-        servOpInterprete.deleteByPartida(partida.getId());
-        servOpAnyo.deleteByPartida(partida.getId());
-
-    }
-
     @GetMapping("/consultaPuntuacionesTema/{tema_id}")
     public String consultaPuntuacionesTema(@PathVariable Long tema_id, Model modelo) {
 
@@ -2469,6 +2392,270 @@ public class ControladorVista {
         }
 
         return "redirect:/panel";
+    }
+
+    private Respuesta rondaSinRespuestas(Usuario usu, Partida partida) {
+
+        Respuesta respuesta = null;
+
+        for (Ronda r : partida.getRondas()) {
+            for (Respuesta resp : r.getRespuestas()) {
+                if (resp.getUsuario().equals(usu)) {
+                    if (!resp.isCompletada()) {
+                        respuesta = resp;
+                    }
+                    break;
+                }
+            }
+            if (respuesta != null) {
+                break;
+            }
+        }
+
+        return respuesta;
+    }
+
+    private List<Respuesta> rondasRespuestas(Usuario usu, Partida partida) {
+
+        ArrayList<Respuesta> respuestas = new ArrayList();
+
+        for (Ronda r : partida.getRondas()) {
+            for (Respuesta resp : r.getRespuestas()) {
+                if (resp.getUsuario().equals(usu)) {
+                    if (resp.isCompletada()) {
+                        respuestas.add(resp);
+                    }
+                    break;
+                }
+            }
+        }
+
+        return respuestas;
+    }
+
+    @GetMapping("/batalla/{id}")
+    public String batalla(Model modelo, @PathVariable Long id) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/logout";
+        }
+        informarUsuarioModelo(modelo, usu);
+
+        Partida partida = partidaModelo(modelo);
+
+        if (partida == null) {
+            Optional<Partida> findPartida = servPartida.findById(id);
+            if (findPartida.isPresent()) {
+                partida = findPartida.get();
+            }
+        }
+        if (partida == null) {
+            if (!partida.getMaster().equals(usu)
+                    || !partida.getInvitados().contains(usu)) {
+                return "redirect:/panel";
+            }
+        }
+        informarPartidaModelo(modelo, partida);
+
+        Respuesta respuestasUltimaRonda = rondaSinRespuestas(usu, partida);
+        boolean todoFallo = false;
+        if (modelo.getAttribute("todoFallo") != null) {
+            todoFallo = (boolean) modelo.getAttribute("todoFallo");
+        }
+        if (modelo.getAttribute("esRecord") != null) {
+            todoFallo = (boolean) modelo.getAttribute("esRecord");
+        }
+
+        if (respuestasUltimaRonda == null) {
+            // Ya se han completado todas las respuestas redirigir a consulta
+            modelo.addAttribute("partidaSesion", partida);
+            modelo.addAttribute("pts", partida.ptsUsuario(usu));
+            modelo.addAttribute("respuestas",
+                    rondasRespuestas(usu, partida));
+            return "BatallaConsulta";
+        }
+
+        Ronda ultimaRonda = respuestasUltimaRonda.getRonda();
+
+        List<OpcionTituloTmp> opcTitulos;
+        List<OpcionInterpreteTmp> opcInterpretes;
+        List<OpcionAnyoTmp> opcAnyos;
+        if (!todoFallo) {
+            opcTitulos = servOpTitulo.findByPartidaRonda(partida.getId(), ultimaRonda.getId());
+            opcInterpretes = servOpInterprete.findByPartidaRonda(partida.getId(), ultimaRonda.getId());
+            opcAnyos = servOpAnyo.findByPartidaRonda(partida.getId(), ultimaRonda.getId());
+        } else {
+            opcTitulos = new ArrayList();
+            opcInterpretes = new ArrayList();
+            opcAnyos = new ArrayList();
+        }
+
+        modelo.addAttribute("respuestas",
+                rondasRespuestas(usu, partida));
+
+        modelo.addAttribute("partidaSesion", partida);
+        modelo.addAttribute("pts", partida.ptsUsuario(usu));
+        modelo.addAttribute("ronda", ultimaRonda);
+        modelo.addAttribute("opcTitulos", opcTitulos);
+        modelo.addAttribute("opcInterpretes", opcInterpretes);
+        modelo.addAttribute("opcAnyos", opcAnyos);
+        if (modelo.getAttribute("mensajeRespuesta") == null) {
+            modelo.addAttribute("mensajeRespuesta", "");
+        }
+        if (modelo.getAttribute("respuestaOK") == null) {
+            modelo.addAttribute("respuestaOK", true);
+        }
+        if (modelo.getAttribute("todoFallo") == null) {
+            modelo.addAttribute("todoFallo", false);
+        }
+        if (modelo.getAttribute("esRecord") == null) {
+            modelo.addAttribute("esRecord", false);
+        }
+
+        long seconds = 0;
+        if (respuestasUltimaRonda.getInicio() != null) {
+            Duration duration = Duration.between(respuestasUltimaRonda.getInicio(), LocalTime.now());
+            seconds = duration.getSeconds();
+        } else {
+            respuestasUltimaRonda.setInicio(LocalTime.now());
+            servRespuesta.updateRespuesta(respuestasUltimaRonda.getId(), respuestasUltimaRonda);
+        }
+
+        modelo.addAttribute("contador", seconds - SEG_PARA_INICIO_RESPUESTA);
+
+        return "Batalla";
+    }
+
+    @PostMapping("/batalla")
+    public String batalla(Model modelo,
+            @RequestParam("titulo") String titulo,
+            @RequestParam("interprete") String interprete,
+            @RequestParam("anyo") String anyo) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/logout";
+        }
+        Partida partida = partidaModelo(modelo);
+        if (partida == null) {
+            return "redirect:/panel";
+        }
+        ArrayList<String> mensajeRespuesta = new ArrayList();
+        boolean respuestaOK = false;
+        int fallos = 0;
+        boolean soundOK = false;
+        boolean soundEliminado = false;
+        boolean soundErrTitulo = false;
+        boolean soundErrInterp = false;
+        boolean soundErrAnyo = false;
+
+        try {
+
+            Respuesta resp = rondaSinRespuestas(usu, partida);
+            Cancion cancion = resp.getRonda().getCancion();
+
+            int ptsTitulo = 0, ptsInterp = 0;
+
+            resp.setAnyo(Integer.parseInt(anyo));
+            int ptsAnyo = Utilidades.calcularPtsPorAnyo(
+                    Integer.parseInt(anyo), cancion, Dificultad.Normal);
+            if (ptsAnyo > 0) {
+                resp.setAnyoOk(true);
+            } else {
+                mensajeRespuesta.add(mensaje(modelo, "general.anyocorrecto")
+                        + String.valueOf(cancion.getAnyo()) + " " + mensaje(modelo, "general.turespondiste") + anyo);
+                fallos = fallos + 1;
+                soundErrAnyo = true;
+            }
+            Optional<Cancion> canTit = servCancion.findById(Long.valueOf(titulo));
+            if (canTit.isPresent()) {
+                resp.setTitulo(canTit.get().getTitulo());
+                ptsTitulo = Utilidades.calcularPtsPorTitulo(
+                        canTit.get().getTitulo(), cancion, Dificultad.Normal, false);
+                if (ptsTitulo > 0) {
+                    resp.setTituloOk(true);
+                } else {
+                    mensajeRespuesta.add(mensaje(modelo, "general.titulocorrecto")
+                            + cancion.getTitulo() + " " + mensaje(modelo, "general.turespondiste") + canTit.get().getTitulo());
+                    fallos = fallos + 1;
+                    soundErrTitulo = true;
+                }
+            }
+            Optional<Cancion> canInt = servCancion.findById(Long.valueOf(interprete));
+            if (canInt.isPresent()) {
+                resp.setInterprete(canInt.get().getInterprete());
+                ptsInterp = Utilidades.calcularPtsPorInterprete(
+                        canInt.get().getInterprete(), cancion, Dificultad.Normal, false);
+                if (ptsInterp > 0) {
+                    resp.setInterpreteOk(true);
+                } else {
+                    mensajeRespuesta.add(mensaje(modelo, "general.intercorrecto")
+                            + cancion.getInterprete() + " " + mensaje(modelo, "general.turespondiste") + canInt.get().getInterprete());
+                    fallos = fallos + 1;
+                    soundErrInterp = true;
+                }
+            }
+
+            if (fallos == 0) {
+                mensajeRespuesta.add(mensaje(modelo, "general.todoacertado"));
+                respuestaOK = true;
+                soundOK = true;
+            }
+
+            LocalTime actual = LocalTime.now();
+            resp.setFin(actual);
+            Duration duration = Duration.between(resp.getInicio(), actual);
+            Long segundos = duration.getSeconds();
+            Long pts = (long) (ptsAnyo + ptsTitulo + ptsInterp);
+            if (segundos >= 0 && segundos < pts) {
+                pts = pts - segundos;
+            } else {
+                pts = 0L;
+            }
+            int ptsFinales = pts.intValue();
+
+            resp.setPuntos(ptsFinales);
+            resp.setCompletada(true);
+            servRespuesta.saveRespuesta(resp);
+
+            modelo.addAttribute("spotifyimagenTmp", cancion.getSpotifyimagen());
+
+        } catch (Exception ex) {
+            Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        modelo.addAttribute("mensajeRespuesta", mensajeRespuesta);
+        modelo.addAttribute("respuestaOK", respuestaOK);
+
+        if (partida.isSonidos()) {
+            if (soundOK) {
+                modelo.addAttribute("soundOK", "Aplausos.mp3");
+            } else {
+                modelo.addAttribute("soundOK", "");
+            }
+            if (soundErrTitulo) {
+                modelo.addAttribute("soundErrTitulo", "ErrorTitulo.mp3");
+            } else {
+                modelo.addAttribute("soundErrTitulo", "");
+            }
+            if (soundErrInterp) {
+                modelo.addAttribute("soundErrInterp", "ErrorInterprete.mp3");
+            } else {
+                modelo.addAttribute("soundErrInterp", "");
+            }
+            if (soundErrAnyo) {
+                modelo.addAttribute("soundErrAnyo", "ErrorAnyo.mp3");
+            } else {
+                modelo.addAttribute("soundErrAnyo", "");
+            }
+            if (soundEliminado) {
+                modelo.addAttribute("soundEliminado", "Eliminado.mp3");
+            } else {
+                modelo.addAttribute("soundEliminado", "");
+            }
+        }
+
+        return "redirect:/batalla/" + String.valueOf(partida.getId());
     }
 
 }

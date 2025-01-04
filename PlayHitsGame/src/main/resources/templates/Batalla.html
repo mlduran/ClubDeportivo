@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+    <head>
+        <title th:text="#{general.partida}"></title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+        <style>
+            td[data-value='true'] {
+                background-color: lightgreen;
+            }
+            td[data-value='false'] {
+                background-color: lightgrey;
+            }
+
+        </style>
+
+    </head>
+
+    <body>        
+        <section class="h-100">            
+            <input type="hidden" id="fichAjuda" 
+                   th:value="${locale != null ? '/ayuda/PartidaPersonal_' + locale.language + '.html' : '/ayuda/PartidaPersonal_es.html'}" />
+            <input type="hidden" id="idusuario" th:value="${usuarioSesion.id}" />            
+            <input type="hidden" id="idpartida" th:value="${partidaSesion.id}" />
+            <input type="hidden" id="respuestaOK" th:value="${respuestaOK}" />
+            <input type="hidden" id="todoFallo" th:value="${todoFallo}" />
+            <input type="hidden" id="esRecord" th:value="${esRecord}" />
+            <input type="hidden" id="segespera" th:value="${usuarioSesion.segEspera}" />
+            <input type="hidden" id="touchstart" th:value="${usuarioSesion.dobleTouch}" />
+            <div th:if="${partidaSesion.sonidos != null || partidaSesion.sonidos == true}">
+                <input type="hidden" id="soundOK" th:value="${soundOK}" />
+                <input type="hidden" id="soundErrTitulo" th:value="${soundErrTitulo}" />
+                <input type="hidden" id="soundErrInterp" th:value="${soundErrInterp}" />
+                <input type="hidden" id="soundErrAnyo" th:value="${soundErrAnyo}" />
+                <input type="hidden" id="soundEliminado" th:value="${soundEliminado}" />
+                <div th:if="${soundOK != null && soundOK != ''}">
+                    <audio controls autoplay style="display: none;">
+                        <source th:src="@{/sounds/{file}(file=${soundOK})}" type="audio/mpeg">
+                    </audio>
+                </div>
+                <div th:if="${soundErrTitulo != null && soundErrTitulo != ''}">
+                    <audio controls autoplay style="display: none;">
+                        <source th:src="@{/sounds/{file}(file=${soundErrTitulo})}" type="audio/mpeg">
+                    </audio>
+                </div>
+                <div th:if="${soundErrInterp != null && soundErrInterp != ''}">
+                    <audio controls autoplay style="display: none;">
+                        <source th:src="@{/sounds/{file}(file=${soundErrInterp})}" type="audio/mpeg">
+                    </audio>
+                </div>
+                <div th:if="${soundErrAnyo != null && soundErrAnyo != ''}">
+                    <audio controls autoplay style="display: none;">
+                        <source th:src="@{/sounds/{file}(file=${soundErrAnyo})}" type="audio/mpeg">
+                    </audio>
+                </div>
+                <div th:if="${soundEliminado != null && soundEliminado != ''}">
+                    <audio controls autoplay style="display: none;">
+                        <source th:src="@{/sounds/{file}(file=${soundEliminado})}" type="audio/mpeg">
+                    </audio>
+                </div>
+            </div>
+            <input type="hidden" id="txtrecordtema" th:value="#{general.recordtema}" />
+            <audio controls id="reproductorConsulta" style="display: none;">
+                <source src="" type="audio/mpeg" />                                                            
+            </audio>
+            <div class="container h-100">
+                <div class="row justify-content-sm-center h-100">
+                    <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
+                        <div class="card shadow-lg">
+                            <div class="card-body p-4" >
+                                <table class="table-responsive table-bordered" style="max-width: 100%; width: 100%; table-layout: fixed;">
+                                    <tr>
+                                        <td colspan="3" style="text-align:center;">
+                                            <img th:src="@{'/images/playhitsgame.webp'}" class="img-fluid" alt="PLAYHITSGAME" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="3" style="text-align:center;">
+                                            <span th:text="#{general.jugador} + ' : ' + ${usuarioSesion.nombre}" />
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3"  style="text-align:center; background-color: lightpink;">
+                                    <spawn th:text="#{general.batalla}" />
+                                    </td>
+                                    </tr>
+                                    <tr>                                        
+                                        <td colspan="2">                                            
+                                            <p th:each="txt : ${partidaSesion.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
+                                        </td>
+                                        <td>  
+                                            <table>
+                                                <tr>
+                                                    <td>
+                                                        <label for="contador" th:text="#{general.tiempo}"/>
+                                                        <input type="text" id="contador" th:value="${contador}" size="5" disabled/>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <label for="puntos" th:text="#{general.puntos}"/>
+                                                        <input type="text" id="puntos" th:value="${pts}" size="5" disabled/>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <label for="nrondas" th:text="#{general.ronda}"/>
+                                                        <input type="text" id="nrondas" th:value="${#lists.size(partidaSesion.rondas)}" size="5" disabled/>
+                                                    </td>
+                                                </tr>    
+                                                <tr>
+                                                    <td>
+                                                        <div class="btn text-center">
+                                                            <input type="image" class="btn" id="imageInfo" alt="Info"  data-bs-toggle="modal" data-bs-target="#ayuda" th:src="@{'/images/info.png'}"  width="60" height="60" /> 
+                                                        </div>                            
+                                                        <div class="modal fade" id="ayuda" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                                            <div class="modal-dialog">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h1 class="modal-title fs-5" id="ayudaModalLabel">Info</h1>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div id="info" class="modal-body" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <div class="modal fade" id="ayuda" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h1 class="modal-title fs-5" id="ayudaModalLabel">Info</h1>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p th:each="lin : ${ayuda}" th:text="${lin}" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>  
+                                </table>
+                                <table class="table-responsive table-bordered" style="max-width: 100%; width: 100%; table-layout: fixed;">                                    
+                                    <tr>
+                                        <td colspan="3">
+                                            <form method="post" id="respuestas" th:action="@{/batalla}"> 
+                                                <table class="table table-sm" style="text-align:center; max-width: 100%; width: 100%; table-layout: fixed;">
+                                                    <tr>
+                                                        <td colspan='3' style="background-color: aqua;">
+                                                            <audio controls id="reproductor">
+                                                                <source th:src="${ronda.cancion.spotifyplay}" type="audio/mpeg" />
+                                                            </audio>
+                                                        </td>
+                                                    </tr>                                                     
+                                                    <tr>
+                                                        <td colspan='3' id="verificacion">  
+                                                            <div th:if="${mensajeRespuesta} != null and ${mensajeRespuesta} != ''">
+                                                                <p th:each="txt : ${mensajeRespuesta}" th:text="${txt}" style="font-size: 25px;"/>
+                                                            </div>
+                                                            <div th:if="${mensajeRespuesta} == null or ${mensajeRespuesta} == ''">
+                                                                <p th:text="#{general.puedesresponder}" style="font-size: 25px;"/>
+                                                            </div>
+                                                            <div th:if="${todoFallo} == true">
+                                                                <a href="/panel" class="text-dark">
+                                                                    <p th:text="#{general.volver}" />
+                                                                </a>
+                                                            </div>
+                                                            <div>
+                                                                <img th:src="${spotifyimagenTmp}" alt="PLAYHITSGAME" class="img-fluid" />
+                                                            </div>              
+                                                        </td>
+                                                    </tr>
+                                                    <tr> 
+                                                        <td colspan="3"  style="text-align:center; background-color: lightpink;" 
+                                                            th:text="#{general.ronda} + ' ' + ${ronda.numero}" />   
+                                                    </tr>
+                                                    <table th:if="${todoFallo} == false" class="table-responsive table-bordered" style="max-width: 100%; width: 100%; table-layout: fixed;">
+                                                        <tr>
+                                                            <th style="background-color: lightpink;width: 40%;text-align:center;">
+                                                                <p th:text="#{general.titulo}" /> 
+                                                            </th>
+                                                            <th style="background-color: lightpink;width: 35%;text-align:center;">
+                                                                <p th:text="#{general.interprete}" /> 
+                                                            </th>
+                                                            <th style="background-color: lightpink;width: 25%;text-align:center;">
+                                                                <p th:text="#{general.anyo}" /> 
+                                                            </th>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="background-color:#dcdcdc;width: 40%;">
+                                                                <input type="hidden" name="titulo" id="titulo" value=""/>
+                                                                <table class="table">
+                                                                    <div th:each="opTitulo : ${opcTitulos}">
+                                                                        <tr>
+                                                                            <td style="background-color:#dcdcdc;">                                                                
+                                                                                <button style="background-color: white;" type="button" class="btn btn-outline-primary" th:data-name="${opTitulo.cancion}" 
+                                                                                        th:onclick="respuestaTitulo(this.getAttribute('data-name'))" th:id="'titulo_' + ${opTitulo.cancion}">
+                                                                                    <p th:text="${opTitulo.opTitulo}" />
+                                                                                </button>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </div>
+                                                                </table>
+                                                            </td>
+                                                            <td style="background-color:#dcdcdc;width: 35%;">
+                                                                <input type="hidden" name="interprete" id="interprete" value=""/>
+                                                                <table class="table" border='none'>
+                                                                    <div th:each="opcInterprete : ${opcInterpretes}">
+                                                                        <tr>
+                                                                            <td style="background-color:#dcdcdc;">                                                                
+                                                                                <button style="background-color: white;" type="button" class="btn btn-outline-primary" th:data-name="${opcInterprete.cancion}" 
+                                                                                        th:onclick="respuestaInterprete(this.getAttribute('data-name'))" th:id="'interprete_' + ${opcInterprete.cancion}">
+                                                                                    <p th:text="${opcInterprete.opInterprete}" />
+                                                                                </button>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </div>
+                                                                </table>
+                                                            </td>
+                                                            <td style="background-color:#dcdcdc;width: 25%;">  
+                                                                <input type="hidden" name="anyo" id="anyo" value=""/>
+                                                                <table class="table" border='none'>
+                                                                    <div th:each="opAnyo : ${opcAnyos}">
+                                                                        <tr>
+                                                                            <td style="background-color:#dcdcdc;">                                                                
+                                                                                <button style="background-color: white;" type="button" class="btn btn-outline-primary" th:data-name="${opAnyo.opAnyo}" 
+                                                                                        th:onclick="respuestaAnyo(this.getAttribute('data-name'))" th:id="'anyo_' + ${opAnyo.opAnyo}">
+                                                                                    <p th:text="${opAnyo.opAnyo}" />
+                                                                                </button>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </div>
+                                                                </table>
+                                                            </td>                                                            
+                                                        </tr>                                          
+                                                    </table>
+                                            </form>
+                                        </td>
+                                    </tr>                                    
+                                    <tr>
+                                        <th colspan="3" style="text-align:center; background-color: lightpink;">
+                                            <p th:text="#{general.respondido}" />
+                                        </th>
+                                    </tr>
+                                    <tr th:each="respuesta : ${respuestas}">
+                                        <td colspan="3"> 
+                                            <table style="width: 100%;">
+                                                <tr>
+                                                    <th style="text-align:center; background-color: lightblue; width:70%;">                                
+                                                        <p th:text="#{general.ronda} + ' ' + ${respuesta.ronda.numero}" />
+                                                    </th>
+                                                    <th style="width:30%;">
+                                                        <img th:src="${respuesta.ronda.cancion.spotifyimagen}" alt="PLAYHITSGAME" class="img-fluid"
+                                                             th:data-name="${respuesta.ronda.cancion.spotifyplay}"
+                                                             th:onclick="reproducir(this.getAttribute('data-name'))"/>
+                                                    </th>
+                                                <tr>
+                                                <tr>
+                                                    <td style="width:70%;">
+                                                        <table style="width: 100%;">
+                                                            <tr>
+                                                                <td th:data-value="${respuesta.tituloOk}" th:text="${respuesta.titulo}" />
+                                                            </tr>
+                                                            <tr>
+                                                                <td th:data-value="${respuesta.interpreteOk}" th:text="${respuesta.interprete}" />
+                                                            </tr>
+                                                            <tr>
+                                                                <td th:data-value="${respuesta.anyoOk}" th:text="${respuesta.anyo}" /> 
+                                                            </tr>                                                                
+                                                        </table>
+
+                                                    </td>
+                                                    <td style="width:30%;">
+                                                        <table style="width: 100%;">
+                                                            <tr>
+                                                                <td th:text="#{general.puntos} + ' : ' + ${respuesta.puntos}" />                                                                
+                                                            </tr>
+                                                            <tr>
+                                                                <td th:text="#{general.tiempo} + ' : ' + ${respuesta.tiempoEmpleadoBatalla}" />
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </table>                                            
+                                        </td>                                        
+
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">
+                                            <div class="text-center">
+                                                <a href="/panel" class="text-dark">
+                                                    <p th:text="#{general.volver}" />
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">
+                                            <div class="text-center text-muted">
+                                                <p th:text="#{general.version}" />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>     
+                            </div>
+                        </div>
+                    </div>  
+                </div>
+            </div>
+        </section>         
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        <script type="text/javascript" th:src="@{/javascript/Info.js}"></script>
+        <script type="text/javascript" th:src="@{/javascript/Batalla.js}"></script> 
+    </body>
+
+</html>
