@@ -96,6 +96,26 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                 </tr>   
                                                 <tr th:each="unapartida : *{batallasEnCurso()}">
                                                     <td>
+                                                        <a th:href="'/batallaResultados/'+${unapartida.id}" class="button" id="${unapartida.id}">
+                                                            <p th:each="txt : ${unapartida.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div th:if="*{hayBatallasEnCursoPendientes()} == true" class="text-center my-2">
+                                    <div class="table-responsive-lg">
+                                        <table class="table" > 
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        <p th:text="#{general.batallasencurso}"/>
+                                                    </th>                   
+                                                </tr>   
+                                                <tr th:each="unapartida : *{batallasEnCursoPendientes()}">
+                                                    <td>
                                                         <a th:href="'/batalla/'+${unapartida.id}" class="button" id="${unapartida.id}">
                                                             <p th:each="txt : ${unapartida.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
                                                         </a>

@@ -33,6 +33,7 @@ import mld.playhitsgame.exemplars.OpcionAnyoTmp;
 import mld.playhitsgame.exemplars.OpcionInterpreteTmp;
 import mld.playhitsgame.exemplars.OpcionTituloTmp;
 import mld.playhitsgame.exemplars.Partida;
+import mld.playhitsgame.exemplars.PtsUsuario;
 import mld.playhitsgame.exemplars.Respuesta;
 import mld.playhitsgame.exemplars.Ronda;
 import mld.playhitsgame.exemplars.Tema;
@@ -43,14 +44,13 @@ import org.json.JSONObject;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.MailSendException;
-    
+
 /**
  *
  * @author miguel
  */
+public class Utilidades {
 
-public class Utilidades {    
-   
     private static final int NUMERO_OPCIONES = 5;
     private static final double UMBRAL_SIMILITUD = 0.90;
 
@@ -72,7 +72,7 @@ public class Utilidades {
         return pts;
     }
 
-    public static int calcularPtsPorTitulo(String titulo, Cancion cancion, 
+    public static int calcularPtsPorTitulo(String titulo, Cancion cancion,
             Dificultad dificultad, boolean sinOfuscar) {
 
         int pts = 0;
@@ -87,8 +87,8 @@ public class Utilidades {
         if (dificultad.equals(Dificultad.Dificil)) {
             pts = pts * 2;
         }
-        
-        if (sinOfuscar){
+
+        if (sinOfuscar) {
             pts = pts / 2;
         }
 
@@ -96,7 +96,7 @@ public class Utilidades {
 
     }
 
-    public static int calcularPtsPorInterprete(String interprete, Cancion cancion, 
+    public static int calcularPtsPorInterprete(String interprete, Cancion cancion,
             Dificultad dificultad, boolean sinOfuscar) {
 
         int pts = 0;
@@ -111,8 +111,8 @@ public class Utilidades {
         if (dificultad.equals(Dificultad.Dificil)) {
             pts = pts * 2;
         }
-        
-        if (sinOfuscar){
+
+        if (sinOfuscar) {
             pts = pts / 2;
         }
 
@@ -202,7 +202,7 @@ public class Utilidades {
         return obtenerOpcionesTitulosCanciones(ronda, cancionesParaOpciones, isEncriptar);
     }
 
-    private static List<OpcionTituloTmp> obtenerOpcionesTitulosCanciones(Ronda ronda, 
+    private static List<OpcionTituloTmp> obtenerOpcionesTitulosCanciones(Ronda ronda,
             List<Cancion> cancionesParaOpciones, boolean isEncriptar) {
 
         ArrayList<OpcionTituloTmp> opciones = new ArrayList();
@@ -212,10 +212,11 @@ public class Utilidades {
             newObj.setPartida(ronda.getPartida().getId());
             newObj.setRonda(ronda.getId());
             newObj.setCancion(cancion.getId());
-            if (isEncriptar)
+            if (isEncriptar) {
                 newObj.setOpTitulo(encriptarString(cancion.getTitulo()));
-            else 
+            } else {
                 newObj.setOpTitulo(cancion.getTitulo());
+            }
             opciones.add(newObj);
         }
 
@@ -254,10 +255,11 @@ public class Utilidades {
             newObj.setPartida(ronda.getPartida().getId());
             newObj.setRonda(ronda.getId());
             newObj.setCancion(cancion.getId());
-            if (isEncriptar)
+            if (isEncriptar) {
                 newObj.setOpInterprete(encriptarString(cancion.getInterprete()));
-            else
+            } else {
                 newObj.setOpInterprete(cancion.getInterprete());
+            }
             opciones.add(newObj);
         }
 
@@ -512,7 +514,7 @@ public class Utilidades {
 
         return cancionExistente;
     }
-    
+
     public static CancionTmp existeCancionTmp(CancionTmp newCancion, List<CancionTmp> canciones) {
 
         CancionTmp cancionExistente = null;
@@ -530,7 +532,7 @@ public class Utilidades {
 
         return cancionExistente;
     }
-    
+
     public static Cancion existeCancion(CancionTmp newCancion, List<Cancion> canciones) {
 
         Cancion cancionExistente = null;
@@ -548,7 +550,7 @@ public class Utilidades {
 
         return cancionExistente;
     }
-    
+
     public static boolean isExisteCancionTmp(CancionTmp newCancion, List<Cancion> canciones) {
 
         boolean cancionExistente = false;
@@ -663,14 +665,14 @@ public class Utilidades {
 
         return resultado.toString();
     }
-    
+
     public static String getCountryFromIP(String ipAddress) {
         String apiURL = "http://ip-api.com/json/" + ipAddress;
         try {
             URL url = new URL(apiURL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
-            
+
             StringBuilder response;
             try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                 String inputLine;
@@ -689,10 +691,9 @@ public class Utilidades {
             return "Desconocido";
         }
     }
-        
-    
-    public static String filtrarTitulo(String titulo){
-        
+
+    public static String filtrarTitulo(String titulo) {
+
         String[] phrasesToRemove = {
             "- Original mix",
             "- Radio Edit",
@@ -712,16 +713,16 @@ public class Utilidades {
         for (String phrase : phrasesToRemove) {
             titulo = titulo.replaceAll("\\s*" + phrase + "\\s*", "");
         }
-        
+
         titulo = titulo.replaceAll("- .*? Remaster", "");
         titulo = titulo.replaceAll("\\(From.*", "");
         titulo = titulo.replaceAll("\\- From.*", "");
         titulo = titulo.replaceAll("\\(Theme from.*", "");
-        
-        return titulo.trim();  
-        
+
+        return titulo.trim();
+
     }
-    
+
     public static boolean enviarMail(EmailServicioMetodos emailServicio,
             Usuario usuario, String asunto, String txt, String plantilla) {
         return enviarMail(emailServicio, usuario.getUsuario(), usuario.getNombre(), asunto, txt, plantilla);
@@ -744,7 +745,7 @@ public class Utilidades {
         }
         return ok;
     }
-    
+
     private static boolean isURLValid(String urlString) {
         try {
             // Crear un objeto URL
@@ -762,13 +763,13 @@ public class Utilidades {
 
             // Conectar al servidor
             connection.connect();
-            
+
             // Verificar el código de respuesta HTTP
             int responseCode = connection.getResponseCode();
             if (responseCode != HttpURLConnection.HTTP_OK) {
                 return false; // No es accesible
             }
-            
+
             // Verificar el encabezado Content-Type
             String contentType = connection.getContentType();
             if (contentType != null && contentType.equals("audio/mpeg")) {
@@ -778,18 +779,27 @@ public class Utilidades {
             System.out.println("Se ha detectado una URL no valida : " + urlString);
             return false;
         }
-        
+
         return false;
     }
-    
-    public static boolean validarReproduccion(Cancion cancion){
-        
+
+    public static boolean validarReproduccion(Cancion cancion) {
+
         return isURLValid(cancion.getSpotifyplay());
     }
-    
-    public static boolean validarReproduccion(CancionTmp cancion){
-        
+
+    public static boolean validarReproduccion(CancionTmp cancion) {
+
         return isURLValid(cancion.getSpotifyplay());
+    }
+
+    public static PtsUsuario ptsFindByUsuario(List<PtsUsuario> list, Usuario usuarioBuscado) {
+        for (PtsUsuario ptsUsuario : list) {
+            if (ptsUsuario.getUsuario().equals(usuarioBuscado)) {
+                return ptsUsuario;
+            }
+        }
+        return null; // No encontrado
     }
 
 }

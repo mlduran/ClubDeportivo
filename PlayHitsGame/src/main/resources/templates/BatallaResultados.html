@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>PlayHitsGame</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+
+    </head>
+    <body>
+        <section>
+            <div class="container h-100"> 
+
+                <div class="row justify-content-sm-center h-100">
+                    <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
+                        <div class="card shadow-lg">
+                            <div class="card-body p-4" >
+                                <table class="table-responsive table-bordered" border="2" style="text-align:center;">
+                                    <tr>
+                                        <td style="text-align:center;">
+                                            <img th:src="@{'/images/playhitsgamePresentacion.png'}" class="img-fluid" alt="PLAYHITSGAME" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="text-center">
+                                                <a href="/panel" class="text-dark">
+                                                    <p th:text="#{general.volver}" />
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <table border="2" style="max-width: 100%; width: 100%; table-layout: fixed;" > 
+                                        <tr>
+                                            <td colspan="2" style="text-align:center; background-color: lightpink;">
+                                                <p th:text="#{general.batalla}"/>
+                                                <p th:text="${partidaSesion.nombre}"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <p th:each="txt : ${partidaSesion.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
+                                            </td>
+                                            <td>
+                                                <p th:text="#{general.participantes}" />                                                
+                                                <p th:text="${partidaSesion.usuariosTxT}" /> 
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table border="2" style="max-width: 100%; width: 100%; table-layout: fixed;"> 
+                                        <tr>
+                                            <th style="text-align:center; background-color: lightpink;">
+                                                <p th:text="#{general.jugador}"/>
+                                            </th>
+                                            <th style="text-align:center; background-color: lightpink;">
+                                                <p th:text="#{general.puntos}"/>
+                                            </th>
+                                        </tr>
+                                        <tr th:each="result : ${resultados}">
+                                            <td>
+                                                <a th:href="${result.link}" class="button"> 
+                                                    <p th:text="${result.usuario.nombre}"/>
+                                                </a>
+                                            </td>
+                                            <td style="text-align:center;">
+                                                <p th:text="${result.puntosTxt}"/>
+                                            </td>                                        
+                                        </tr>
+                                    </table>
+                                    <tr>
+                                        <td>
+                                            <div class="text-center">
+                                                <a href="/panel" class="text-dark">
+                                                    <p th:text="#{general.volver}" />
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="text-center text-muted">
+                                                <p th:text="#{general.version}" />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>     
+                        </div>
+                    </div>
+                </div>
+            </div>     
+        </section>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    </body>
+</html>

@@ -1702,37 +1702,6 @@ public class ControladorVista {
         return "redirect:/partidaInvitado";
     }
 
-    private void resultadosPartida(Partida partidaSesion, Model modelo) {
-
-        HashMap<String, List<Respuesta>> resultadosPartida = new HashMap();
-        HashMap<String, Integer> totales = new HashMap();
-        String nomUsu;
-        ArrayList lista;
-
-        for (Ronda ronda : partidaSesion.getRondas()) {
-            for (Respuesta respuesta : ronda.getRespuestas()) {
-                nomUsu = respuesta.getUsuario().getNombre();
-                if (!resultadosPartida.containsKey(nomUsu)) {
-                    resultadosPartida.put(nomUsu, new ArrayList());
-                }
-                lista = (ArrayList) resultadosPartida.get(nomUsu);
-                lista.add(respuesta);
-                resultadosPartida.put(nomUsu, lista);
-            }
-        }
-        //Crear la suma total
-        for (String usu : resultadosPartida.keySet()) {
-            int total = 0;
-            for (Respuesta resp : resultadosPartida.get(usu)) {
-                total = total + resp.getPuntos();
-            }
-            totales.put(usu, total);
-        }
-
-        modelo.addAttribute("ptstotales", totales);
-        modelo.addAttribute("resultados", resultadosPartida);
-    }
-
     @GetMapping("/partidaConsultaGrupo/{id}")
     public String partidaConsultaGrupo(@PathVariable Long id, Model modelo) {
 
@@ -1751,7 +1720,7 @@ public class ControladorVista {
         if (partidaSesion == null) {
             return "redirect:/panel";
         }
-        resultadosPartida(partidaSesion, modelo);
+        UtilidadesWeb.resultadosPartida(partidaSesion, modelo);
         modelo.addAttribute("partidaSesion", partidaSesion);
         informarPartidaModelo(modelo, partidaSesion);
 
@@ -2433,6 +2402,34 @@ public class ControladorVista {
         return respuestas;
     }
 
+    @GetMapping("/batallaConsulta/{id_batalla}/{id_usu}")
+    public String batallaConsulta(Model modelo,
+            @PathVariable Long id_batalla, @PathVariable Long id_usu) {
+
+        Partida partida = null;
+        Usuario usu = null;
+
+        Optional<Partida> findPartida = servPartida.findById(id_batalla);
+        if (findPartida.isPresent()) {
+            partida = findPartida.get();
+        }
+
+        Optional<Usuario> findusu = servUsuario.findById(id_usu);
+        if (findusu.isPresent()) {
+            usu = findusu.get();
+        }
+
+        if (partida != null && usu != null) {
+            modelo.addAttribute("partidaSesion", partida);
+            modelo.addAttribute("usuarioSesion", usu);
+            modelo.addAttribute("pts", partida.ptsUsuario(usu));
+            modelo.addAttribute("respuestas",
+                    rondasRespuestas(usu, partida));
+            return "BatallaConsulta";
+        }
+        return "redirect:/panel";
+    }
+
     @GetMapping("/batalla/{id}")
     public String batalla(Model modelo, @PathVariable Long id) {
 
@@ -2468,12 +2465,9 @@ public class ControladorVista {
         }
 
         if (respuestasUltimaRonda == null) {
-            // Ya se han completado todas las respuestas redirigir a consulta
-            modelo.addAttribute("partidaSesion", partida);
-            modelo.addAttribute("pts", partida.ptsUsuario(usu));
-            modelo.addAttribute("respuestas",
-                    rondasRespuestas(usu, partida));
-            return "BatallaConsulta";
+            // Ya se han completado todas las respuestas redirigir a consulta            
+            return "redirect:/batallaConsulta/" + String.valueOf(partida.getId())
+                    + "/" + String.valueOf(usu.getId());
         }
 
         Ronda ultimaRonda = respuestasUltimaRonda.getRonda();
@@ -2656,6 +2650,31 @@ public class ControladorVista {
         }
 
         return "redirect:/batalla/" + String.valueOf(partida.getId());
+    }
+
+    @GetMapping("/batallaResultados/{id}")
+    public String batallaResultados(Model modelo, @PathVariable Long id) {
+
+        Usuario usu = usuarioModelo(modelo);
+        if (usu == null) {
+            return "redirect:/logout";
+        }
+
+        informarUsuarioModelo(modelo, usu);
+
+        Partida batalla = null;
+        Optional<Partida> findPartida = servPartida.findById(id);
+        if (findPartida.isPresent()) {
+            batalla = findPartida.get();
+        }
+        if (batalla == null) {
+            return "redirect:/panel";
+        }
+        modelo.addAttribute("partidaSesion", batalla);
+        UtilidadesWeb.resultadosBatalla(batalla, modelo);
+
+        return "BatallaResultados";
+
     }
 
 }

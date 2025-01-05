@@ -21,10 +21,25 @@ public class PtsUsuario implements Comparable<PtsUsuario>{
     Usuario usuario;
     Integer pts;
     String puntos;
+    String link;
+    
+    
+    public String getPuntosTxt(){
+        
+        if (this.puntos == null)
+            if (this.pts != null)
+                return String.valueOf(this.pts);
+            else
+                return "";
+        else
+            return this.puntos;
+        
+    }
     
     @Override
     public int compareTo(PtsUsuario o) {
         return o.pts.compareTo(this.pts);
-    }
+    }    
+    
     
 }

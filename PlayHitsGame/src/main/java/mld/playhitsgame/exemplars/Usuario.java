@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -51,8 +53,7 @@ public class Usuario {
     private int segEspera;
     private int puntos;
     private int estrellas;
-    
-    
+
     @OneToMany(mappedBy = "usuario")
     private List<Tema> temas;
 
@@ -79,9 +80,18 @@ public class Usuario {
             inverseJoinColumns = @JoinColumn(name = "partida_id", referencedColumnName = "id")
     )
     private List<Partida> partidasInvitado;
- 
-    
-   
+
+    public List<Partida> batallas() {
+        
+        List<Partida> batallas = new ArrayList<>(this.getPartidasInvitado());
+        batallas.addAll(this.getPartidasMaster());        
+
+        // Filtrar solo las partidas del tipo batalla
+        return batallas.stream()
+                .filter(Partida::isTipoBatalla)
+                .collect(Collectors.toList());
+    }
+
     public String getActivoTxt() {
 
         if (this.activo) {
@@ -239,10 +249,10 @@ public class Usuario {
                 result.add(elem);
             }
         }
-        
-        Collections.sort(result, (Partida e1, Partida e2) 
+
+        Collections.sort(result, (Partida e1, Partida e2)
                 -> e2.getFecha().compareTo(e1.getFecha()));
-        
+
         return result;
     }
 
@@ -250,29 +260,40 @@ public class Usuario {
 
         return !partidasTerminadasGrupo().isEmpty();
     }
-    
-    public List<Partida> batallasEnCurso() {
 
-        List<Partida> result = new ArrayList<>();
-
-        for (Partida elem : this.getPartidasInvitado()) {
-            if (elem.getTipo() != TipoPartida.batalla) {
-                continue;
-            }
-            if (elem.getStatus() == StatusPartida.EnCurso) {
-                result.add(elem);
-            }
-        }
-        return result;
+    private boolean batallaCompletada(Partida partida) {
+        return partida.getRondas().stream()
+                .flatMap(r -> r.getRespuestas().stream())
+                .filter(resp -> resp.getUsuario().equals(this))
+                .allMatch(Respuesta::isCompletada);
     }
-    
+
+    private List<Partida> filtrarBatallasEnCurso(Predicate<Partida> condicion) {
+
+        return this.batallas().stream()
+                .filter(elem -> elem.getStatus() == StatusPartida.EnCurso)
+                .filter(condicion)
+                .collect(Collectors.toList());
+    }
+
+    public List<Partida> batallasEnCurso() {
+        return filtrarBatallasEnCurso(this::batallaCompletada);
+    }
+
+    public List<Partida> batallasEnCursoPendientes() {
+        return filtrarBatallasEnCurso(elem -> !batallaCompletada(elem));
+    }
+
     public boolean hayBatallasEnCurso() {
 
         return !batallasEnCurso().isEmpty();
-    } 
-        
-   
-    
+    }
+
+    public boolean hayBatallasEnCursoPendientes() {
+
+        return !batallasEnCursoPendientes().isEmpty();
+    }
+
     public List<Partida> batallasTerminadas() {
 
         List<Partida> result = new ArrayList<>();
@@ -287,7 +308,7 @@ public class Usuario {
         }
         return result;
     }
-    
+
     public boolean hayBatallasTerminadas() {
 
         return !batallasTerminadas().isEmpty();
@@ -305,8 +326,8 @@ public class Usuario {
                 result.add(elem);
             }
         }
-        
-        Collections.sort(result, (Partida e1, Partida e2) 
+
+        Collections.sort(result, (Partida e1, Partida e2)
                 -> e2.getFecha().compareTo(e1.getFecha()));
 
         return result;
@@ -325,16 +346,16 @@ public class Usuario {
             return this.getGrupo();
         }
     }
-    
+
     public int getPuntosPartida(Partida partida) {
 
         int pts = Utilidades.calcularPtsUsuario(this, partida, false);
 
         return pts;
     }
-    
-    public boolean isTieneTema(){
-        
+
+    public boolean isTieneTema() {
+
         return this.getTemas() != null && !this.getTemas().isEmpty();
     }
 
