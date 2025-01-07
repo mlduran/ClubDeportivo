@@ -38,7 +38,7 @@ public class EstrellaServicioMetodos implements EstrellaServicio {
 
         Estrella newEstrella;
 
-        if (DAO.count() >= maxEstrellas) {
+        if (DAO.count() > maxEstrellas - 1) {
             newEstrella = DAO.fechaMasAntigua();
         } else {
             newEstrella = new Estrella();
@@ -46,6 +46,12 @@ public class EstrellaServicioMetodos implements EstrellaServicio {
         newEstrella.setFecha(LocalDateTime.now());
         newEstrella.setUsuario(idUsuario);
         return DAO.save(newEstrella);
+    }
+    
+    public long numEstrellas(){
+        
+        return DAO.count();
+        
     }
 
 }

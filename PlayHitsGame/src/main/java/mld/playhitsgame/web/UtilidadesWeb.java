@@ -5,14 +5,12 @@
 package mld.playhitsgame.web;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mld.playhitsgame.exemplars.Partida;
-import mld.playhitsgame.exemplars.PtsUsuario;
 import mld.playhitsgame.exemplars.Puntuacion;
 import mld.playhitsgame.exemplars.Respuesta;
 import mld.playhitsgame.exemplars.Ronda;
@@ -20,7 +18,6 @@ import mld.playhitsgame.exemplars.StatusPartida;
 import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.exemplars.TipoPartida;
 import mld.playhitsgame.exemplars.Usuario;
-import mld.playhitsgame.utilidades.Utilidades;
 import org.springframework.ui.Model;
 
 /**
@@ -93,7 +90,7 @@ public class UtilidadesWeb {
                     elTema.setPuntos(pts);
                     elTema.setUsuarioRecord(usuario.getId());
                     ctrlVista.servTema.update(elTema.getId(), elTema);
-                    usuario.setEstrellas(usuario.getEstrellas() + 1);
+                    ctrlVista.servEstrella.darEstrella(usuario.getId(), ctrlVista.numMaxEstrellas);
                     ctrlVista.servUsuario.update(usuario.getId(), usuario);
                     esRecord = true;
                 }
@@ -139,30 +136,6 @@ public class UtilidadesWeb {
 
         modelo.addAttribute("ptstotales", totales);
         modelo.addAttribute("resultados", resultadosPartida);
-    }
-
-    public static void resultadosBatalla(Partida partidaSesion, Model modelo) {
-
-        List<PtsUsuario> resultadosPartida = new ArrayList();
-
-        for (Usuario usu : partidaSesion.usuariosPartida()) {
-            PtsUsuario resultUsu = new PtsUsuario();
-            resultUsu.setUsuario(usu);
-            resultUsu.setLink("/batallaConsulta/" + String.valueOf(partidaSesion.getId())
-                    + "/" + String.valueOf(usu.getId()));
-            resultUsu.setPts(0);
-            resultadosPartida.add(resultUsu);
-        }
-        for (Ronda ronda : partidaSesion.getRondas()) {
-            for (Respuesta respuesta : ronda.getRespuestas()) {
-                PtsUsuario resultUsu = Utilidades.ptsFindByUsuario(resultadosPartida, respuesta.getUsuario());
-                resultUsu.setPts(resultUsu.getPts() + respuesta.getPuntos());
-            }
-        }
-
-        Collections.sort(resultadosPartida);
-
-        modelo.addAttribute("resultados", resultadosPartida);
-    }
+    }    
 
 }

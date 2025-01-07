@@ -4,21 +4,28 @@
  */
 package mld.playhitsgame.web;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import mld.playhitsgame.correo.EmailServicioMetodos;
+import mld.playhitsgame.exemplars.Config;
 import mld.playhitsgame.exemplars.Partida;
+import mld.playhitsgame.exemplars.PtsUsuario;
 import mld.playhitsgame.exemplars.Respuesta;
 import mld.playhitsgame.exemplars.Ronda;
 import mld.playhitsgame.exemplars.StatusPartida;
 import mld.playhitsgame.exemplars.Usuario;
+import mld.playhitsgame.services.ConfigServicioMetodos;
+import mld.playhitsgame.services.EstrellaServicioMetodos;
 import mld.playhitsgame.services.OpcionAnyoTmpServicioMetodos;
 import mld.playhitsgame.services.OpcionInterpreteTmpServicioMetodos;
 import mld.playhitsgame.services.OpcionTituloTmpServicioMetodos;
 import mld.playhitsgame.services.PartidaServicioMetodos;
 import mld.playhitsgame.services.RespuestaServicioMetodos;
+import mld.playhitsgame.services.UsuarioServicioMetodos;
 import mld.playhitsgame.utilidades.Utilidades;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,6 +46,8 @@ public class ControladorScripts {
     @Autowired
     EmailServicioMetodos servEmail;
     @Autowired
+    UsuarioServicioMetodos servUsuario;
+    @Autowired
     PartidaServicioMetodos servPartida;
     @Autowired
     RespuestaServicioMetodos servRespuesta;
@@ -48,8 +57,59 @@ public class ControladorScripts {
     OpcionInterpreteTmpServicioMetodos servOpInterprete;
     @Autowired
     OpcionAnyoTmpServicioMetodos servOpAnyo;
+    @Autowired
+    EstrellaServicioMetodos servEstrella;
+    @Autowired
+    ConfigServicioMetodos servConfig;
 
-    private final String tokenValidacion = "a3b2f10c-482d-4d7e-a5ed-2f9b7e8bcfd0";
+    private final String tokenValidacion = "a3b2f10c-482d-4d7e-a5ed-2f9b7e8bcfd0"; 
+    private int numMaxEstrellas;
+    
+    @PostConstruct
+    public void init() {
+        // Código a ejecutar al arrancar la aplicación
+        System.out.println("Aplicación iniciada (PostConstruct ControladorScripts). Ejecutando tareas de inicio...");
+
+        Config laConfig = servConfig.getSettings();
+        // para que este valor se refresque si se cambia en la BD
+        // habria que reiniciar la APP
+        numMaxEstrellas = laConfig.getNumMaxEstrellas();  
+    }
+    
+    private void inicializarEstrellas(){
+        
+        if (servEstrella.numEstrellas() == 0){
+            for (Usuario usu : servUsuario.findAll()){
+                if (!usu.isActivo()) continue;
+                for (int i = 1; i <= usu.getEstrellas(); i++) {
+                    servEstrella.darEstrella(usu.getId(), numMaxEstrellas);
+                }
+            }
+        }        
+    }
+    
+    
+
+    private void finalizarBatalla(Partida batalla) {
+        
+        // ASIGNAMOS PUNTOS
+        for (Usuario usu : batalla.usuariosPartida()) {
+            int pts = Utilidades.calcularPtsUsuario(usu, batalla, true);
+            usu.setPuntos(usu.getPuntos() + pts);
+            servUsuario.update(usu.getId(), usu);
+        }
+        
+        //Damos ESTRELLA al primero
+        PtsUsuario ptsPrimero = Utilidades.resultadosBatalla(batalla).getFirst();
+        servEstrella.darEstrella(ptsPrimero.getUsuario().getId(), numMaxEstrellas);
+
+        batalla.setStatus(StatusPartida.Terminada);
+        servPartida.updatePartida(batalla.getId(), batalla);
+        servOpTitulo.deleteByPartida(batalla.getId());
+        servOpInterprete.deleteByPartida(batalla.getId());
+        servOpAnyo.deleteByPartida(batalla.getId());
+
+    }
 
     private void tratarBatallas() {
 
@@ -80,11 +140,7 @@ public class ControladorScripts {
                     servPartida.updatePartida(batalla.getId(), batalla);
                 }
                 case EnCurso -> {
-                    batalla.setStatus(StatusPartida.Terminada);
-                    servPartida.updatePartida(batalla.getId(), batalla);
-                    servOpTitulo.deleteByPartida(batalla.getId());
-                    servOpInterprete.deleteByPartida(batalla.getId());
-                    servOpAnyo.deleteByPartida(batalla.getId());
+                    finalizarBatalla(batalla);
                 }
 
                 default -> {
@@ -113,7 +169,8 @@ public class ControladorScripts {
             String token = (String) req.getParameter("token");
             if (token.equals(tokenValidacion)) {
                 try {
-                    // METODOS A EJECUTAR
+                    // METODOS A EJECUTAR                    
+                    inicializarEstrellas(); // comentar cuando este hecho
                     tratarBatallas();
                     /////////////////////// FIN
                     txtCorreo = "Lanzamiento de scripts OK";

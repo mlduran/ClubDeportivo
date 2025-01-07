@@ -344,7 +344,7 @@ public class WebsocketControler {
         }
 
         if (acabar) {
-            asignarPuntuacionesUsuario(idPartida);
+            //asignarPuntuacionesUsuario(idPartida);
             asignarGanador(idPartida);
             limpiarPartida(idPartida);
             obJsonSalida.put("op", "acabar");
@@ -490,20 +490,7 @@ public class WebsocketControler {
             servRespuesta.updateRespuesta(resp.getId(), resp);
         }
         return jsonRespuesta;
-    }
-
-    private void asignarPuntuacionesUsuario(Long idPartida) {
-
-        Optional<Partida> partida = servPartida.findById(idPartida);
-        Partida p = partida.get();
-
-        for (Usuario usu : p.usuariosPartida()) {
-            int pts = Utilidades.calcularPtsUsuario(usu, p, true);
-            usu.setPuntos(usu.getPuntos() + pts);
-            servUsuario.update(usu.getId(), usu);
-        }
-
-    }
+    }    
 
     private void asignarGanador(Long idPartida) {
 

@@ -18,6 +18,7 @@ import java.net.UnknownHostException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -44,6 +45,7 @@ import org.json.JSONObject;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.MailSendException;
+import org.springframework.ui.Model;
 
 /**
  *
@@ -800,6 +802,30 @@ public class Utilidades {
             }
         }
         return null; // No encontrado
+    }
+    
+    public static List<PtsUsuario> resultadosBatalla(Partida partidaSesion) {
+
+        List<PtsUsuario> resultadosPartida = new ArrayList();
+
+        for (Usuario usu : partidaSesion.usuariosPartida()) {
+            PtsUsuario resultUsu = new PtsUsuario();
+            resultUsu.setUsuario(usu);
+            resultUsu.setLink("/batallaConsulta/" + String.valueOf(partidaSesion.getId())
+                    + "/" + String.valueOf(usu.getId()));
+            resultUsu.setPts(0);
+            resultadosPartida.add(resultUsu);
+        }
+        for (Ronda ronda : partidaSesion.getRondas()) {
+            for (Respuesta respuesta : ronda.getRespuestas()) {
+                PtsUsuario resultUsu = Utilidades.ptsFindByUsuario(resultadosPartida, respuesta.getUsuario());
+                resultUsu.setPts(resultUsu.getPts() + respuesta.getPuntos());
+            }
+        }
+
+        Collections.sort(resultadosPartida);
+        
+        return resultadosPartida;        
     }
 
 }

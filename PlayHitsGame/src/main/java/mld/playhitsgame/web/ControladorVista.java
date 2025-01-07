@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -67,6 +66,7 @@ import mld.playhitsgame.exemplars.TipoRegistro;
 import mld.playhitsgame.seguridad.Roles;
 import mld.playhitsgame.seguridad.UsuarioRol;
 import mld.playhitsgame.services.ConfigServicioMetodos;
+import mld.playhitsgame.services.EstrellaServicioMetodos;
 import mld.playhitsgame.services.OpcionAnyoTmpServicioMetodos;
 import mld.playhitsgame.services.OpcionInterpreteTmpServicioMetodos;
 import mld.playhitsgame.services.OpcionTituloTmpServicioMetodos;
@@ -152,11 +152,13 @@ public class ControladorVista {
     ConfigServicioMetodos servConfig;
     @Autowired
     RegistroServicioMetodos servRegistro;
+    @Autowired
+    EstrellaServicioMetodos servEstrella;
 
     @PostConstruct
     public void init() {
         // Código a ejecutar al arrancar la aplicación
-        System.out.println("Aplicación iniciada (PostConstruct). Ejecutando tareas de inicio...");
+        System.out.println("Aplicación iniciada (PostConstruct ControladorVista). Ejecutando tareas de inicio...");
 
         String ipRouterConfigurada = servConfig.getSettings().getIpRouter();
         System.out.print("IP Router Configurada : " + ipRouterConfigurada);
@@ -2671,7 +2673,9 @@ public class ControladorVista {
             return "redirect:/panel";
         }
         modelo.addAttribute("partidaSesion", batalla);
-        UtilidadesWeb.resultadosBatalla(batalla, modelo);
+                
+        modelo.addAttribute("resultados", 
+                Utilidades.resultadosBatalla(batalla));
 
         return "BatallaResultados";
 
