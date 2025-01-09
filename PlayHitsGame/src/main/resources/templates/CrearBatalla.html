@@ -24,11 +24,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         <div class="card shadow-lg">
                             <div class="card-body p-5">
                                 <h1 class="fs-4 card-title fw-bold mb-4" th:text="#{general.crearbatalla}"/>
-                                <form method="post" th:action="@{/crearBatalla}" th:object="${newpartida}" id="form">  
-                                    <input type="hidden" th:field="*{tipo}" th:value="${newpartida.tipo}"/>
+                                <form method="post" th:action="@{/crearBatalla}" th:object="${newBatalla}" id="form">  
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="nombre" th:text="#{general.nombre}"/>
-                                        <input  id="nombre" type="text" th:field="*{nombre}" th:value="${newpartida.nombre}"  size="22"/>
+                                        <input  id="nombre" type="text" th:field="*{nombre}" th:value="${newBatalla.nombre}"  size="22"/>
                                     </div>
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="tema" th:text="#{general.tema}"/>
@@ -39,11 +38,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </div>                                    
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="anyoini" th:text="#{general.anyoini}"/>
-                                        <input  id="anyoini" type="number" th:field="*{anyoInicial}" th:value="${newpartida.anyoInicial}"  size="4" required="required"/>
+                                        <input  id="anyoini" type="number" th:field="*{anyoInicial}" th:value="${newBatalla.anyoInicial}"  size="4" required="required"/>
                                     </div>
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="anyofin" th:text="#{general.anyofin}"/>
-                                        <input id="anyofin" type="number" th:field="*{anyoFinal}" th:value="${newpartida.anyoFinal}"  size="4" required="required"/>
+                                        <input id="anyofin" type="number" th:field="*{anyoFinal}" th:value="${newBatalla.anyoFinal}"  size="4" required="required"/>
                                     </div>
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="nrondas" th:text="#{general.nrondas}"/>

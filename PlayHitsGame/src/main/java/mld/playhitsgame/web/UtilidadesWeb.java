@@ -90,7 +90,7 @@ public class UtilidadesWeb {
                     elTema.setPuntos(pts);
                     elTema.setUsuarioRecord(usuario.getId());
                     ctrlVista.servTema.update(elTema.getId(), elTema);
-                    ctrlVista.servEstrella.darEstrella(usuario.getId(), ctrlVista.numMaxEstrellas);
+                    ctrlVista.servEstrella.darEstrella(usuario, ctrlVista.numMaxEstrellas);
                     ctrlVista.servUsuario.update(usuario.getId(), usuario);
                     esRecord = true;
                 }

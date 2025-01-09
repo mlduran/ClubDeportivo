@@ -96,6 +96,12 @@ public class PartidaServicioMetodos implements PartidaServicio{
     public Optional<Partida> partidaUsuarioMaster(Long idUsuario) {
         return DAO.partidaUsuarioMaster(idUsuario);
     }
+    
+    @Override
+    public ArrayList<Partida> partidaBatallaUsuario(Long id_batalla, Long id_usuario){
+        
+        return DAO.partidaBatallaUsuario(id_batalla, id_usuario);
+    }
 
     @Override
     public Page<Partida> partidasGrupo(int numeroPagina, int tamanioPagina){
@@ -114,15 +120,6 @@ public class PartidaServicioMetodos implements PartidaServicio{
    
     }
 
-    @Override
-    public List<Partida> partidasBatalla() {
-        return DAO.partidasBatalla();
-    }
-    
-    @Override
-    public List<Partida> partidasBatallaCreadas() {
-        return DAO.partidasBatallaCreadas();
-    }
-  
+ 
  
 }

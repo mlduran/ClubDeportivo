@@ -4,7 +4,6 @@
  */
 package mld.playhitsgame.DAO;
 
-
 import java.util.List;
 import java.util.Optional;
 import mld.playhitsgame.exemplars.Usuario;
@@ -17,24 +16,28 @@ import org.springframework.data.jpa.repository.Query;
  *
  * @author miguel
  */
+public interface UsuarioDAO extends JpaRepository<Usuario, Long> {
 
-public interface UsuarioDAO extends JpaRepository<Usuario, Long>{
-    
     List<UsuarioAmpliadaView> findBy();
-    
-    Optional <Usuario> findByUsuario(String usuario);
-    
+
+    Optional<Usuario> findByUsuario(String usuario);
+
     @Override
     Optional<Usuario> findById(Long id);
-    
-    
-    @Query(value = "SELECT * FROM usuarios WHERE usuario=:elusuario AND contrasenya=:lacontrasenya ;", nativeQuery=true)
+
+    @Query(value = "SELECT * FROM usuarios WHERE usuario=:elusuario AND contrasenya=:lacontrasenya ;", nativeQuery = true)
     Optional<Usuario> usuarioLogin(String elusuario, String lacontrasenya);
-    
-    @Query(value = "SELECT * FROM usuarios WHERE grupo=:grupo ;", nativeQuery=true)
+
+    @Query(value = "SELECT * FROM usuarios WHERE grupo=:grupo ;", nativeQuery = true)
     List<Usuario> usuariosGrupo(String grupo);
 
-    @Query(value = "SELECT * FROM usuarios WHERE estrellas > 0 ORDER BY estrellas DESC LIMIT 50;", nativeQuery=true)
+    @Query(value = "SELECT u.*, COUNT(e.id) AS estrellas_count "
+            + "FROM usuarios u "
+            + "LEFT JOIN estrellas e ON u.id = e.usuario_id "
+            + "GROUP BY u.id "
+            + "HAVING estrellas_count > 0 "
+            + "ORDER BY estrellas_count DESC "
+            + "LIMIT 50;", nativeQuery = true)
     List<Usuario> usuariosEstrella();
-    
+
 }

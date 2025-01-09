@@ -28,12 +28,9 @@ public interface PartidaDAO extends JpaRepository<Partida, Long> {
     @Query(value = "SELECT * FROM partidas WHERE tipo='grupo' AND  status <> 'Historico' ORDER BY fecha DESC ;", nativeQuery = true)
     ArrayList<Partida> partidasGrupo();
     
-    @Query(value = "SELECT * FROM partidas WHERE tipo='batalla'AND publica=true ;", nativeQuery = true)
-    ArrayList<Partida> partidasBatalla();
+    @Query(value = "SELECT * FROM partidas WHERE id_batalla=:id_batalla AND master_id=:id_usuario ;", nativeQuery = true)
+    ArrayList<Partida> partidaBatallaUsuario(Long id_batalla, Long id_usuario);
     
-    @Query(value = "SELECT * FROM partidas WHERE tipo='batalla' AND  status = 'Creada' AND publica=true ;", nativeQuery = true)
-    ArrayList<Partida> partidasBatallaCreadas();
-
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM respuestas WHERE ronda_id IN (SELECT id FROM rondas WHERE partida_id=:idPartida);", nativeQuery = true)

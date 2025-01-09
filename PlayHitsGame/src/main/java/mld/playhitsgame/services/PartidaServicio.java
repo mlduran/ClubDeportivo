@@ -29,6 +29,5 @@ public interface PartidaServicio {
     
     Optional<Partida> partidaUsuarioMaster(Long idUsuario);
     Page<Partida> partidasGrupo(int numeroPagina, int tamanioPagina);
-    List<Partida> partidasBatalla();
-    List<Partida> partidasBatallaCreadas();
+    ArrayList<Partida> partidaBatallaUsuario(Long id_batalla, Long id_usuario);
 }

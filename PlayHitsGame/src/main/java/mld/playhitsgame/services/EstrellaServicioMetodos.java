@@ -7,6 +7,7 @@ package mld.playhitsgame.services;
 import java.time.LocalDateTime;
 import mld.playhitsgame.DAO.EstrellaDAO;
 import mld.playhitsgame.exemplars.Estrella;
+import mld.playhitsgame.exemplars.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,9 +35,10 @@ public class EstrellaServicioMetodos implements EstrellaServicio {
         return DAO.save(estrella);
     }
 
-    public Estrella darEstrella(Long idUsuario, int maxEstrellas) {
+    public Estrella darEstrella(Usuario usu, int maxEstrellas) {
 
         Estrella newEstrella;
+        Long usuQuitar = null;
 
         if (DAO.count() > maxEstrellas - 1) {
             newEstrella = DAO.fechaMasAntigua();
@@ -44,7 +46,7 @@ public class EstrellaServicioMetodos implements EstrellaServicio {
             newEstrella = new Estrella();
         }
         newEstrella.setFecha(LocalDateTime.now());
-        newEstrella.setUsuario(idUsuario);
+        newEstrella.setUsuario(usu);
         return DAO.save(newEstrella);
     }
     

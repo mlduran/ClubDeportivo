@@ -71,7 +71,6 @@ public class UsuarioServicioMetodos implements UsuarioServicio {
         obj.setGrupo(usuario.getGrupo());
 
         obj.setPuntos(usuario.getPuntos());
-        obj.setEstrellas(usuario.getEstrellas());
         obj.setActivo(usuario.isActivo());
         obj.setAlta(usuario.getAlta());
         obj.setRoles(usuario.getRoles());

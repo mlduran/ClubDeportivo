@@ -8,16 +8,27 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import mld.playhitsgame.correo.EmailServicioMetodos;
+import mld.playhitsgame.exemplars.Batalla;
+import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.Config;
+import mld.playhitsgame.exemplars.Dificultad;
+import mld.playhitsgame.exemplars.OpcionAnyoTmp;
+import mld.playhitsgame.exemplars.OpcionInterpreteTmp;
+import mld.playhitsgame.exemplars.OpcionTituloTmp;
 import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.PtsUsuario;
 import mld.playhitsgame.exemplars.Respuesta;
 import mld.playhitsgame.exemplars.Ronda;
+import mld.playhitsgame.exemplars.StatusBatalla;
 import mld.playhitsgame.exemplars.StatusPartida;
+import mld.playhitsgame.exemplars.TipoPartida;
 import mld.playhitsgame.exemplars.Usuario;
+import mld.playhitsgame.services.BatallaServicioMetodos;
+import mld.playhitsgame.services.CancionServicioMetodos;
 import mld.playhitsgame.services.ConfigServicioMetodos;
 import mld.playhitsgame.services.EstrellaServicioMetodos;
 import mld.playhitsgame.services.OpcionAnyoTmpServicioMetodos;
@@ -25,8 +36,14 @@ import mld.playhitsgame.services.OpcionInterpreteTmpServicioMetodos;
 import mld.playhitsgame.services.OpcionTituloTmpServicioMetodos;
 import mld.playhitsgame.services.PartidaServicioMetodos;
 import mld.playhitsgame.services.RespuestaServicioMetodos;
+import mld.playhitsgame.services.RondaServicioMetodos;
 import mld.playhitsgame.services.UsuarioServicioMetodos;
 import mld.playhitsgame.utilidades.Utilidades;
+import static mld.playhitsgame.utilidades.Utilidades.asignarCancionesAleatorias;
+import static mld.playhitsgame.utilidades.Utilidades.opcionesAnyosCanciones;
+import static mld.playhitsgame.utilidades.Utilidades.opcionesInterpretesCanciones;
+import static mld.playhitsgame.utilidades.Utilidades.opcionesTitulosCanciones;
+import static mld.playhitsgame.utilidades.Utilidades.rangoAnyosCanciones;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +65,13 @@ public class ControladorScripts {
     @Autowired
     UsuarioServicioMetodos servUsuario;
     @Autowired
+    CancionServicioMetodos servCancion;
+    @Autowired
+    BatallaServicioMetodos servBatalla;
+    @Autowired
     PartidaServicioMetodos servPartida;
+    @Autowired
+    RondaServicioMetodos servRonda;
     @Autowired
     RespuestaServicioMetodos servRespuesta;
     @Autowired
@@ -62,9 +85,9 @@ public class ControladorScripts {
     @Autowired
     ConfigServicioMetodos servConfig;
 
-    private final String tokenValidacion = "a3b2f10c-482d-4d7e-a5ed-2f9b7e8bcfd0"; 
+    private final String tokenValidacion = "a3b2f10c-482d-4d7e-a5ed-2f9b7e8bcfd0";
     private int numMaxEstrellas;
-    
+
     @PostConstruct
     public void init() {
         // Código a ejecutar al arrancar la aplicación
@@ -73,71 +96,128 @@ public class ControladorScripts {
         Config laConfig = servConfig.getSettings();
         // para que este valor se refresque si se cambia en la BD
         // habria que reiniciar la APP
-        numMaxEstrellas = laConfig.getNumMaxEstrellas();  
+        numMaxEstrellas = laConfig.getNumMaxEstrellas();
     }
-    
-    private void inicializarEstrellas(){
-        
-        if (servEstrella.numEstrellas() == 0){
-            for (Usuario usu : servUsuario.findAll()){
-                if (!usu.isActivo()) continue;
-                for (int i = 1; i <= usu.getEstrellas(); i++) {
-                    servEstrella.darEstrella(usu.getId(), numMaxEstrellas);
+
+    private void inicializarEstrellas() {
+
+        if (servEstrella.numEstrellas() == 0) {
+            for (Usuario usu : servUsuario.findAll()) {
+                if (!usu.isActivo()) {
+                    continue;
+                }
+                for (int i = 1; i <= usu.getEstrellas_old(); i++) {
+                    servEstrella.darEstrella(usu, numMaxEstrellas);
                 }
             }
-        }        
-    }
-    
-    
-
-    private void finalizarBatalla(Partida batalla) {
-        
-        // ASIGNAMOS PUNTOS
-        for (Usuario usu : batalla.usuariosPartida()) {
-            int pts = Utilidades.calcularPtsUsuario(usu, batalla, true);
-            usu.setPuntos(usu.getPuntos() + pts);
-            servUsuario.update(usu.getId(), usu);
         }
-        
-        //Damos ESTRELLA al primero
-        PtsUsuario ptsPrimero = Utilidades.resultadosBatalla(batalla).getFirst();
-        servEstrella.darEstrella(ptsPrimero.getUsuario().getId(), numMaxEstrellas);
+    }
 
-        batalla.setStatus(StatusPartida.Terminada);
-        servPartida.updatePartida(batalla.getId(), batalla);
-        servOpTitulo.deleteByPartida(batalla.getId());
-        servOpInterprete.deleteByPartida(batalla.getId());
-        servOpAnyo.deleteByPartida(batalla.getId());
+    private void crearPartidasBatalla(Batalla batalla) {
 
+        List<Cancion> canciones = servCancion.obtenerCanciones(batalla);
+
+        for (Usuario usu : batalla.getUsuarios()) {
+            Partida newPartida = new Partida();
+            newPartida.setNombre(batalla.getNombre());
+            newPartida.setTipo(TipoPartida.batalla);
+            newPartida.setNCanciones(canciones.size());
+            newPartida.setAnyoInicial(batalla.getAnyoInicial());
+            newPartida.setAnyoFinal(batalla.getAnyoFinal());
+            newPartida.setDificultad(Dificultad.Normal);
+            newPartida.setFecha(batalla.getFecha());
+            newPartida.setMaster(usu);
+            newPartida.setPublica(batalla.isPublica());
+            newPartida.setRondaActual(1);
+            newPartida.setInvitados(new ArrayList());
+            newPartida.setBatalla(batalla);
+            newPartida = servPartida.savePartida(newPartida);
+            newPartida.setRondas(new ArrayList());
+            for (int i = 1; i <= batalla.getNRondas(); i++) {
+                Ronda newRonda = new Ronda();
+                newRonda.setNumero(i);
+                newRonda.setPartida(newPartida);
+                newRonda.setRespuestas(new ArrayList());
+                Ronda ronda = servRonda.saveRonda(newRonda);
+                //Crear las respuestas
+                for (Usuario usuario : newPartida.usuariosPartida()) {
+                    usuario.setRespuestas(new ArrayList());
+                    Respuesta newResp = new Respuesta();
+                    newResp.setRonda(ronda);
+                    newResp.setUsuario(usuario);
+                    servRespuesta.saveRespuesta(newResp);
+                }
+
+                servRonda.updateRonda(ronda.getId(), ronda);
+                newPartida.getRondas().add(ronda);
+
+            }
+            asignarCancionesAleatorias(newPartida, canciones);
+            for (Ronda ronda : newPartida.getRondas()) {
+                servRonda.updateRonda(ronda.getId(), ronda);
+            }
+            newPartida.setStatus(StatusPartida.EnCurso);
+            servPartida.updatePartida(newPartida.getId(), newPartida);
+            batalla.getPartidas().add(newPartida);
+            servBatalla.update(batalla.getId(), batalla);
+            int[] rangoAnyos = rangoAnyosCanciones((ArrayList<Cancion>) canciones);
+            // Crear las opciones para las respuestas
+            for (Ronda ronda : newPartida.getRondas()) {
+                for (OpcionTituloTmp op : opcionesTitulosCanciones(ronda, true)) {
+                    servOpTitulo.saveOpcionTituloTmp(op);
+                }
+                for (OpcionInterpreteTmp op : opcionesInterpretesCanciones(ronda, true)) {
+                    servOpInterprete.saveOpcionInterpreteTmp(op);
+                }
+                for (OpcionAnyoTmp op
+                        : opcionesAnyosCanciones(ronda, rangoAnyos[0], rangoAnyos[1])) {
+                    servOpAnyo.saveOpcionAnyoTmp(op);
+                }
+            }
+
+        }
+
+    }
+
+    private void finalizarBatalla(Batalla batalla) {
+
+        // ASIGNAMOS PUNTOS
+//        for (Usuario usu : batalla.usuariosPartida()) {
+//            int pts = Utilidades.calcularPtsUsuario(usu, batalla, true);
+//            usu.setPuntos(usu.getPuntos() + pts);
+//            servUsuario.update(usu.getId(), usu);
+//        }
+//        
+//        //Damos ESTRELLA al primero
+//        PtsUsuario ptsPrimero = Utilidades.resultadosBatalla(batalla).getFirst();
+//        servEstrella.darEstrella(ptsPrimero.getUsuario(), numMaxEstrellas);
+//
+//        batalla.setStatus(StatusPartida.Terminada);
+//        servPartida.updatePartida(batalla.getId(), batalla);
+//        servOpTitulo.deleteByPartida(batalla.getId());
+//        servOpInterprete.deleteByPartida(batalla.getId());
+//        servOpAnyo.deleteByPartida(batalla.getId());
     }
 
     private void tratarBatallas() {
 
         // para los cambios de status asumimos que este script
         // se lanzara diariamente a la misma hora
-        List<Partida> batallas = servPartida.partidasBatalla();
+        List<Batalla> batallas = servBatalla.findAll();
 
-        for (Partida batalla : batallas) {
+        for (Batalla batalla : batallas) {
             switch (batalla.getStatus()) {
-                case EnEspera -> {
-                    batalla.setStatus(StatusPartida.Creada);
+                case Programada -> {
+                    batalla.setStatus(StatusBatalla.Inscripcion);
                     LocalDateTime newfecha = LocalDateTime.now();
                     newfecha = newfecha.plusHours(24);
                     batalla.setFecha(newfecha);
-                    servPartida.updatePartida(batalla.getId(), batalla);
+                    servBatalla.update(batalla.getId(), batalla);
                 }
-                case Creada -> {
-                    for (Ronda ronda : batalla.getRondas()) {
-                        for (Usuario usuario : batalla.getInvitados()) {
-                            usuario.setRespuestas(new ArrayList());
-                            Respuesta newResp = new Respuesta();
-                            newResp.setRonda(ronda);
-                            newResp.setUsuario(usuario);
-                            servRespuesta.saveRespuesta(newResp);
-                        }
-                    }
-                    batalla.setStatus(StatusPartida.EnCurso);
-                    servPartida.updatePartida(batalla.getId(), batalla);
+                case Inscripcion -> {
+                    crearPartidasBatalla(batalla);
+                    batalla.setStatus(StatusBatalla.EnCurso);
+                    servBatalla.update(batalla.getId(), batalla);
                 }
                 case EnCurso -> {
                     finalizarBatalla(batalla);
@@ -169,8 +249,9 @@ public class ControladorScripts {
             String token = (String) req.getParameter("token");
             if (token.equals(tokenValidacion)) {
                 try {
-                    // METODOS A EJECUTAR                    
-                    inicializarEstrellas(); // comentar cuando este hecho
+                    //inicializarEstrellas(); // comentar cuando este hecho
+
+                    // METODOS A EJECUTAR  
                     tratarBatallas();
                     /////////////////////// FIN
                     txtCorreo = "Lanzamiento de scripts OK";
@@ -188,4 +269,5 @@ public class ControladorScripts {
         return ResponseEntity.ok().build();
 
     }
+
 }

@@ -6,7 +6,6 @@ package mld.playhitsgame.exemplars;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -48,6 +47,10 @@ public class Partida {
 
     @Enumerated(EnumType.STRING)
     private Dificultad dificultad;
+    
+    @ManyToOne
+    @JoinColumn(name = "batalla_id", nullable = true)
+    private Batalla batalla;
 
     @ManyToOne// poner LAZY para no cargar hasta hacer un get
     private Usuario master;
@@ -274,19 +277,5 @@ public class Partida {
 
     }    
     
-    public String getCuentaAtras(){
-        
-        LocalDateTime actual = LocalDateTime.now();
-        Duration duration = Duration.between(actual, this.getFecha());
-        
-        if (actual.isBefore(this.getFecha())) {
-            // Convertir la diferencia a horas y minutos
-            long hours = duration.toHours();
-            long minutes = duration.toMinutes() % 60;
-
-            return hours + "h " + minutes + "m";
-        } else {
-            return "";
-        }
-    }
+    
 }

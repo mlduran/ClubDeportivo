@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import mld.playhitsgame.DAO.CancionDAO;
+import mld.playhitsgame.exemplars.Batalla;
 import mld.playhitsgame.exemplars.SearchCriteria;
 import mld.playhitsgame.exemplars.SearchOperation;
 import mld.playhitsgame.exemplars.SearchSpecifications;
@@ -166,7 +167,21 @@ public class CancionServicioMetodos implements CancionServicio {
         }
 
         return canciones;
+    }
+    
+    public List<Cancion> obtenerCanciones(Batalla batalla) {
 
+        List<Cancion> canciones;
+
+        if (!batalla.getTema().isBlank()) {
+            canciones = DAO.findByFiltroConTema(batalla.getTema(), batalla.getAnyoInicial(),
+                    batalla.getAnyoFinal(), false);
+        } else {
+            canciones = DAO.findByFiltroBasico(batalla.getAnyoInicial(),
+                    batalla.getAnyoFinal(), false);
+        }
+
+        return canciones;
     }
 
 }

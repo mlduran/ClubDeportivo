@@ -8,9 +8,10 @@ package mld.playhitsgame.exemplars;
  *
  * @author miguel
  */
-public enum StatusPartida {
+public enum StatusBatalla {
     
-    Creada,
+    Programada,
+    Inscripcion,
     EnCurso,
     Terminada,
     Historico

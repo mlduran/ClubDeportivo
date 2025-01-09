@@ -85,7 +85,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                 </div>
                             </div>
                             <div class="card-body p-0" >
-                                <div th:if="*{hayBatallasEnCurso()} == true" class="text-center my-2">
+                                <div th:if="*{hayBatallasEnCursoPendientes()} == true" class="text-center my-2">
                                     <div class="table-responsive-lg">
                                         <table class="table" > 
                                             <thead>
@@ -94,7 +94,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                         <p th:text="#{general.batallasencurso}"/>
                                                     </th>                   
                                                 </tr>   
-                                                <tr th:each="unapartida : *{batallasEnCurso()}">
+                                                <tr th:each="unapartida : *{batallasEnCursoPendientes()}">
                                                     <td>
                                                         <a th:href="'/batallaResultados/'+${unapartida.id}" class="button" id="${unapartida.id}">
                                                             <p th:each="txt : ${unapartida.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
@@ -103,6 +103,16 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                 </tr>
                                             </thead>
                                         </table>
+                                    </div>
+                                </div>
+                                <div th:if="*{hayBatallasEnCurso()} == false and *{ultimaBatalla()} != null" class="text-center my-2">
+                                    <div class="table-responsive-lg">                                       
+                                        <button 
+                                            th:onclick="'window.location.href=\'/batallaResultados/\' + ' + ${ultimaBatalla.id}" 
+                                            class="btn btn-primary" 
+                                            role="button" 
+                                            th:text="#{general.resulultimabatalla} + ' ' + ${ultimaBatalla.nombre}">
+                                        </button>
                                     </div>
                                 </div>
                                 <div th:if="*{hayBatallasEnCursoPendientes()} == true" class="text-center my-2">

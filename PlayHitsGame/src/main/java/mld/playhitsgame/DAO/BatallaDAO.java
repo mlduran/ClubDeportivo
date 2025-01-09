@@ -1,0 +1,35 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
+ */
+package mld.playhitsgame.DAO;
+
+import java.util.ArrayList;
+import java.util.Optional;
+import mld.playhitsgame.exemplars.Batalla;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+/**
+ *
+ * @author miguel
+ */
+public interface BatallaDAO extends JpaRepository<Batalla, Long> {
+
+    @Override
+    Optional<Batalla> findById(Long id);
+
+    @Query(value = "SELECT * FROM batallas WHERE status='Programada'AND publica=true ;", nativeQuery = true)
+    ArrayList<Batalla> BatallasProgramadasPublicas();
+
+    @Query(value = "SELECT * FROM batallas WHERE status='Inscripcion'AND publica=true ;", nativeQuery = true)
+    ArrayList<Batalla> BatallasEnInscripcionPublicas();
+
+    @Query(value = "SELECT b.*"
+            + "FROM batallas b"
+            + "INNER JOIN usuarios u ON b.id_usuario = u.id"
+            + "WHERE u.id = :id_usuario;", nativeQuery = true)
+    ArrayList<Batalla> BatallasUsuario(Long id_usuario);
+
+}

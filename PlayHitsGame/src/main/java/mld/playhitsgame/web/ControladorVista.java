@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import mld.playhitsgame.correo.EmailServicioMetodos;
+import mld.playhitsgame.exemplars.Batalla;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.Config;
 import mld.playhitsgame.exemplars.Dificultad;
@@ -61,10 +62,12 @@ import mld.playhitsgame.exemplars.PtsUsuario;
 import mld.playhitsgame.exemplars.Puntuacion;
 import mld.playhitsgame.exemplars.PuntuacionTMP;
 import mld.playhitsgame.exemplars.Registro;
+import mld.playhitsgame.exemplars.StatusBatalla;
 import mld.playhitsgame.exemplars.TipoPartida;
 import mld.playhitsgame.exemplars.TipoRegistro;
 import mld.playhitsgame.seguridad.Roles;
 import mld.playhitsgame.seguridad.UsuarioRol;
+import mld.playhitsgame.services.BatallaServicioMetodos;
 import mld.playhitsgame.services.ConfigServicioMetodos;
 import mld.playhitsgame.services.EstrellaServicioMetodos;
 import mld.playhitsgame.services.OpcionAnyoTmpServicioMetodos;
@@ -130,6 +133,8 @@ public class ControladorVista {
     UsuarioServicioMetodos servUsuario;
     @Autowired
     UsuarioRolServicioMetodos servRolUsuario;
+    @Autowired
+    BatallaServicioMetodos servBatalla;
     @Autowired
     PartidaServicioMetodos servPartida;
     @Autowired
@@ -433,15 +438,15 @@ public class ControladorVista {
         }
         informarUsuarioModelo(modelo, usu);
 
-        List<Partida> batallas = servPartida.partidasBatallaCreadas();
-        List<Partida> batallasDisponibles = new ArrayList<>();
-        List<Partida> batallasInscritas = new ArrayList<>();
+        List<Batalla> batallas = servBatalla.BatallasEnInscripcionPublicas();
+        List<Batalla> batallasDisponibles = new ArrayList<>();
+        List<Batalla> batallasInscritas = new ArrayList<>();
 
-        for (Partida partida : batallas) {
-            if (partida.getInvitados().contains(usu)) {
-                batallasInscritas.add(partida);
+        for (Batalla batalla : batallas) {
+            if (batalla.getUsuarios().contains(usu)) {
+                batallasInscritas.add(batalla);
             } else {
-                batallasDisponibles.add(partida);
+                batallasDisponibles.add(batalla);
             }
         }
 
@@ -449,6 +454,7 @@ public class ControladorVista {
         modelo.addAttribute("spotifyimagenTmp", "");
         modelo.addAttribute("batallasDisponibles", batallasDisponibles);
         modelo.addAttribute("batallasInscritas", batallasInscritas);
+        modelo.addAttribute("ultimaBatalla", usu.ultimaBatalla());
 
         return "Panel";
     }
@@ -1221,14 +1227,21 @@ public class ControladorVista {
             return "redirect:/logout";
         }
 
-        Partida newPartida = new Partida();
-        crearPartida(modelo, newPartida, usu);
+        Batalla newBatalla = new Batalla();
+        Calendar fecha = Calendar.getInstance();
+        newBatalla.setAnyoInicial(1950);
+        newBatalla.setAnyoFinal(fecha.get(Calendar.YEAR));
+        modelo.addAttribute("newBatalla", newBatalla);
+        anyadirTemas(modelo);
+        modelo.addAttribute("oprondas", NUMERO_RONDAS);
+        modelo.addAttribute("nronda", 10);
+        informarUsuarioModelo(modelo, usu);
 
         return "CrearBatalla";
     }
 
     @PostMapping("/crearBatalla")
-    public String crearBatalla(@ModelAttribute("newpartida") Partida partida,
+    public String crearBatalla(@ModelAttribute("newBatalla") Batalla batalla,
             Model modelo,
             HttpServletRequest req
     ) {
@@ -1237,7 +1250,8 @@ public class ControladorVista {
             return "redirect:/logout";
         }
 
-        Partida newPartida = null;
+        Calendar cal = Calendar.getInstance();
+        int anyoActual = cal.get(Calendar.YEAR);
         int nrondas = Integer.parseInt(req.getParameter("nrondas"));
 
         try {
@@ -1246,22 +1260,41 @@ public class ControladorVista {
                 throw new Exception(mensaje(modelo, "general.usuarionopermitido"));
             }
 
-            newPartida = CreaDatosPartida(req, modelo, partida, usu, nrondas);
+            if (batalla.getAnyoFinal() <= batalla.getAnyoInicial()) {
+                throw new Exception(mensaje(modelo, "general.fechaserr"));
+            }
+            if (batalla.getAnyoFinal() > anyoActual) {
+                throw new Exception(mensaje(modelo, "general.fechafinerr"));
+            }
+            if (batalla.getAnyoInicial() < 1950) {
+                throw new Exception(mensaje(modelo, "general.fechainierr"));
+            }
+            if ((batalla.getAnyoFinal() - batalla.getAnyoInicial()) < 5) {
+                throw new Exception(mensaje(modelo, "general.periodoerr"));
+            }
+            if (nrondas < 10 || nrondas > 30) {
+                throw new Exception(mensaje(modelo, "general.rondaserr"));
+            }
+
+            List<Cancion> canciones = servCancion.obtenerCanciones(batalla);
+
+            if (canciones.size() < nrondas) {
+                throw new Exception(mensaje(modelo, "general.cancionesinsuficientes"));
+            }
+
+            batalla.setUsuarios(new ArrayList());
+            batalla.setNCanciones(canciones.size());
             // retrasamos 1 dia la fecha para poder añadirse
             LocalDateTime newfecha = LocalDateTime.now();
             newfecha = newfecha.plusHours(24);
-            newPartida.setFecha(newfecha);
-            newPartida.setPublica(true);
-            newPartida.setTipo(TipoPartida.batalla);
-            newPartida.setStatus(StatusPartida.EnEspera);
-            newPartida.setGrupo("");
-            servPartida.updatePartida(newPartida.getId(), newPartida);
+            batalla.setFecha(newfecha);
+            batalla.setPublica(true);
+            batalla.setStatus(StatusBatalla.Programada);
+            batalla.setNRondas(nrondas);
+            servBatalla.save(batalla);
             modelo.addAttribute("result", mensaje(modelo, "general.btallacreada"));
 
-        } catch (Exception ex) {
-            if (newPartida != null) {
-                servPartida.deletePartida(newPartida.getId());
-            }
+        } catch (Exception ex) {            
             String resp = "ERROR " + ex.getMessage();
             modelo.addAttribute("result", resp);
         }
@@ -2328,14 +2361,14 @@ public class ControladorVista {
             return "/";
         }
 
-        Optional<Partida> findById = servPartida.findById(batalla_id);
-        Partida partida;
+        Optional<Batalla> findById = servBatalla.findById(batalla_id);
+        Batalla batalla;
 
         if (findById.isPresent()) {
-            partida = findById.get();
-            partida.getInvitados().add(usu);
-            usu.getPartidasInvitado().add(partida);
-            servPartida.updatePartida(partida.getId(), partida);
+            batalla = findById.get();
+            batalla.getUsuarios().add(usu);
+            usu.getBatallas().add(batalla);
+            servBatalla.update(batalla.getId(), batalla);
             servUsuario.update(usu.getId(), usu);
         }
 
@@ -2351,14 +2384,14 @@ public class ControladorVista {
             return "/";
         }
 
-        Optional<Partida> findById = servPartida.findById(batalla_id);
-        Partida partida;
+        Optional<Batalla> findById = servBatalla.findById(batalla_id);
+        Batalla batalla;
 
         if (findById.isPresent()) {
-            partida = findById.get();
-            partida.getInvitados().remove(usu);
-            usu.getPartidasInvitado().remove(partida);
-            servPartida.updatePartida(partida.getId(), partida);
+            batalla = findById.get();
+            batalla.getUsuarios().remove(usu);
+            usu.getBatallas().remove(batalla);
+            servBatalla.update(batalla.getId(), batalla);
             servUsuario.update(usu.getId(), usu);
         }
 
@@ -2673,8 +2706,8 @@ public class ControladorVista {
             return "redirect:/panel";
         }
         modelo.addAttribute("partidaSesion", batalla);
-                
-        modelo.addAttribute("resultados", 
+
+        modelo.addAttribute("resultados",
                 Utilidades.resultadosBatalla(batalla));
 
         return "BatallaResultados";

@@ -8,8 +8,10 @@ import mld.playhitsgame.seguridad.UsuarioRol;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -52,7 +54,9 @@ public class Usuario {
     private boolean dobleTouch;
     private int segEspera;
     private int puntos;
-    private int estrellas;
+    private int estrellas_old;
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Estrella> estrellas;
 
     @OneToMany(mappedBy = "usuario")
     private List<Tema> temas;
@@ -65,7 +69,15 @@ public class Usuario {
     @Temporal(TemporalType.DATE)
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
-    private Date alta;
+    private Date alta;    
+ 
+    @ManyToMany
+    @JoinTable(
+        name = "usuario_batalla",
+        joinColumns = @JoinColumn(name = "usuario_id"),
+        inverseJoinColumns = @JoinColumn(name = "batalla_id")
+    )
+    private List<Batalla> batallas;
 
     @OneToMany(mappedBy = "master")
     private List<Partida> partidasMaster;
@@ -81,17 +93,7 @@ public class Usuario {
     )
     private List<Partida> partidasInvitado;
 
-    public List<Partida> batallas() {
-        
-        List<Partida> batallas = new ArrayList<>(this.getPartidasInvitado());
-        batallas.addAll(this.getPartidasMaster());        
-
-        // Filtrar solo las partidas del tipo batalla
-        return batallas.stream()
-                .filter(Partida::isTipoBatalla)
-                .collect(Collectors.toList());
-    }
-
+   
     public String getActivoTxt() {
 
         if (this.activo) {
@@ -261,29 +263,38 @@ public class Usuario {
         return !partidasTerminadasGrupo().isEmpty();
     }
 
-    private boolean batallaCompletada(Partida partida) {
-        return partida.getRondas().stream()
-                .flatMap(r -> r.getRespuestas().stream())
-                .filter(resp -> resp.getUsuario().equals(this))
-                .allMatch(Respuesta::isCompletada);
+    
+    public List<Batalla> batallasEnCurso() {
+        
+        ArrayList<Batalla> batallasEnCurso = new ArrayList();
+        for (Batalla batalla : this.getBatallas())
+            if (batalla.getStatus().equals(StatusBatalla.EnCurso))
+                batallasEnCurso.add(batalla);
+        return batallasEnCurso;
     }
 
-    private List<Partida> filtrarBatallasEnCurso(Predicate<Partida> condicion) {
-
-        return this.batallas().stream()
-                .filter(elem -> elem.getStatus() == StatusPartida.EnCurso)
-                .filter(condicion)
-                .collect(Collectors.toList());
+    public List<Batalla> batallasEnCursoPendientes() {
+        
+        ArrayList<Batalla> batallasEnCursoPendientes = new ArrayList();
+        for (Batalla batalla : batallasEnCurso()){
+            for (Partida partida : batalla.getPartidas() )
+                if (partida.isEnCurso())
+                    batallasEnCursoPendientes.add(batalla);
+        }
+        return batallasEnCursoPendientes;        
     }
-
-    public List<Partida> batallasEnCurso() {
-        return filtrarBatallasEnCurso(this::batallaCompletada);
-    }
-
-    public List<Partida> batallasEnCursoPendientes() {
-        return filtrarBatallasEnCurso(elem -> !batallaCompletada(elem));
-    }
-
+    
+    public List<Batalla> batallasEnCursoAcabadas() {
+        
+        ArrayList<Batalla> batallasEnCursoAcabadas = new ArrayList();
+        for (Batalla batalla : batallasEnCurso()){
+            for (Partida partida : batalla.getPartidas() )
+                if (partida.isTerminada())
+                    batallasEnCursoAcabadas.add(batalla);
+        }
+        return batallasEnCursoAcabadas;        
+    }  
+    
     public boolean hayBatallasEnCurso() {
 
         return !batallasEnCurso().isEmpty();
@@ -293,20 +304,26 @@ public class Usuario {
 
         return !batallasEnCursoPendientes().isEmpty();
     }
+    
+    public boolean hayBatallasEnCursoAcabadas() {
 
-    public List<Partida> batallasTerminadas() {
+        return !batallasEnCursoAcabadas().isEmpty();
+    }
 
-        List<Partida> result = new ArrayList<>();
+    public List<Batalla> batallasTerminadas() {
 
-        for (Partida elem : this.getPartidasInvitado()) {
-            if (elem.getTipo() != TipoPartida.batalla) {
-                continue;
-            }
-            if (elem.getStatus() == StatusPartida.Terminada) {
-                result.add(elem);
-            }
-        }
-        return result;
+        ArrayList<Batalla> batallasTerminadas = new ArrayList();
+        for (Batalla batalla : this.getBatallas())
+            if (batalla.getStatus().equals(StatusBatalla.Terminada))
+                batallasTerminadas.add(batalla);
+        return batallasTerminadas;
+    }
+
+    public Batalla ultimaBatalla() {
+        return batallasTerminadas().stream()
+                .min(Comparator.comparing(partida -> Math.abs(
+                partida.getFecha().until(LocalDateTime.now(), java.time.temporal.ChronoUnit.SECONDS))))
+                .orElse(null);
     }
 
     public boolean hayBatallasTerminadas() {
@@ -357,6 +374,12 @@ public class Usuario {
     public boolean isTieneTema() {
 
         return this.getTemas() != null && !this.getTemas().isEmpty();
+    }
+
+    public int getNestrellas() {
+
+        return this.estrellas.size();
+
     }
 
 }
