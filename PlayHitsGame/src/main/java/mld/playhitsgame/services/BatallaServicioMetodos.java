@@ -38,6 +38,7 @@ public class BatallaServicioMetodos implements BatallaServicio {
             obj.setNombre(batalla.getNombre());
         }
 
+        obj.setFase(batalla.getFase());
         obj.setPublica(batalla.isPublica());
         obj.setFecha(batalla.getFecha());
         obj.setAnyoInicial(batalla.getAnyoInicial());

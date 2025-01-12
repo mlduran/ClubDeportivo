@@ -40,6 +40,7 @@ import mld.playhitsgame.services.RondaServicioMetodos;
 import mld.playhitsgame.services.UsuarioServicioMetodos;
 import mld.playhitsgame.utilidades.Utilidades;
 import static mld.playhitsgame.utilidades.Utilidades.asignarCancionesAleatorias;
+import static mld.playhitsgame.utilidades.Utilidades.cancionRandom;
 import static mld.playhitsgame.utilidades.Utilidades.opcionesAnyosCanciones;
 import static mld.playhitsgame.utilidades.Utilidades.opcionesInterpretesCanciones;
 import static mld.playhitsgame.utilidades.Utilidades.opcionesTitulosCanciones;
@@ -113,7 +114,7 @@ public class ControladorScripts {
         }
     }
 
-    private void crearPartidasBatalla(Batalla batalla) {
+    private void iniciarBatalla(Batalla batalla) {
 
         List<Cancion> canciones = servCancion.obtenerCanciones(batalla);
 
@@ -121,6 +122,7 @@ public class ControladorScripts {
             Partida newPartida = new Partida();
             newPartida.setNombre(batalla.getNombre());
             newPartida.setTipo(TipoPartida.batalla);
+            newPartida.setTema(batalla.getTema());
             newPartida.setNCanciones(canciones.size());
             newPartida.setAnyoInicial(batalla.getAnyoInicial());
             newPartida.setAnyoFinal(batalla.getAnyoFinal());
@@ -131,6 +133,7 @@ public class ControladorScripts {
             newPartida.setRondaActual(1);
             newPartida.setInvitados(new ArrayList());
             newPartida.setBatalla(batalla);
+
             newPartida = servPartida.savePartida(newPartida);
             newPartida.setRondas(new ArrayList());
             for (int i = 1; i <= batalla.getNRondas(); i++) {
@@ -139,6 +142,7 @@ public class ControladorScripts {
                 newRonda.setPartida(newPartida);
                 newRonda.setRespuestas(new ArrayList());
                 Ronda ronda = servRonda.saveRonda(newRonda);
+
                 //Crear las respuestas
                 for (Usuario usuario : newPartida.usuariosPartida()) {
                     usuario.setRespuestas(new ArrayList());
@@ -159,7 +163,6 @@ public class ControladorScripts {
             newPartida.setStatus(StatusPartida.EnCurso);
             servPartida.updatePartida(newPartida.getId(), newPartida);
             batalla.getPartidas().add(newPartida);
-            servBatalla.update(batalla.getId(), batalla);
             int[] rangoAnyos = rangoAnyosCanciones((ArrayList<Cancion>) canciones);
             // Crear las opciones para las respuestas
             for (Ronda ronda : newPartida.getRondas()) {
@@ -169,13 +172,14 @@ public class ControladorScripts {
                 for (OpcionInterpreteTmp op : opcionesInterpretesCanciones(ronda, true)) {
                     servOpInterprete.saveOpcionInterpreteTmp(op);
                 }
-                for (OpcionAnyoTmp op
-                        : opcionesAnyosCanciones(ronda, rangoAnyos[0], rangoAnyos[1])) {
+                for (OpcionAnyoTmp op : opcionesAnyosCanciones(ronda, rangoAnyos[0], rangoAnyos[1])) {
                     servOpAnyo.saveOpcionAnyoTmp(op);
                 }
             }
-
         }
+        batalla.setStatus(StatusBatalla.EnCurso);
+        batalla.setFase(1);
+        servBatalla.update(batalla.getId(), batalla);
 
     }
 
@@ -215,12 +219,18 @@ public class ControladorScripts {
                     servBatalla.update(batalla.getId(), batalla);
                 }
                 case Inscripcion -> {
-                    crearPartidasBatalla(batalla);
-                    batalla.setStatus(StatusBatalla.EnCurso);
+                    batalla.setUsuarios(new ArrayList());
+                    List<Usuario> usuariosInscritos = batalla.getUsuariosInscritos();
+                    for (Usuario usu : usuariosInscritos) {
+                        usu.getBatallas().add(batalla);
+                        batalla.getUsuarios().add(usu);
+                        servUsuario.update(usu.getId(), usu);
+                    }
                     servBatalla.update(batalla.getId(), batalla);
+                    iniciarBatalla(batalla);
                 }
                 case EnCurso -> {
-                    finalizarBatalla(batalla);
+                    //finalizarBatalla(batalla);
                 }
 
                 default -> {

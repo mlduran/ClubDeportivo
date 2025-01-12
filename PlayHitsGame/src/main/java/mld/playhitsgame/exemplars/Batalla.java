@@ -32,7 +32,8 @@ public class Batalla {
     
     private boolean publica;
     private String nombre;
-
+    private int fase; // para hacer diferentes rondas con los que vayan ganando
+    
     @Column(name = "fecha", nullable = false)
     @CreationTimestamp
     private LocalDateTime fecha;
@@ -42,6 +43,9 @@ public class Batalla {
 
     @OneToMany(mappedBy = "batalla", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Partida> partidas;
+    
+    @ManyToMany(mappedBy = "batallasInscritas")
+    private List<Usuario> usuariosInscritos;
     
     @ManyToMany(mappedBy = "batallas")
     private List<Usuario> usuarios;
@@ -100,6 +104,23 @@ public class Batalla {
         des.setValor(String.valueOf(String.valueOf(this.getAnyoFinal())));
         txt.add(des);
 
+        return txt;
+    }
+    
+    public String getUsuariosInscritosTxT() {
+
+        String txt = "";
+
+        boolean primero = true;
+
+        for (Usuario usu : this.getUsuariosInscritos()) {
+            if (primero) {
+                primero = false;
+            } else {
+                txt = txt.concat(", ");
+            }
+            txt = txt.concat(usu.getNombre());
+        }
         return txt;
     }
     

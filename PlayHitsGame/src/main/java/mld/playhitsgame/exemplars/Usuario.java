@@ -15,8 +15,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -69,15 +67,23 @@ public class Usuario {
     @Temporal(TemporalType.DATE)
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
-    private Date alta;    
- 
+    private Date alta;
+
     @ManyToMany
     @JoinTable(
-        name = "usuario_batalla",
-        joinColumns = @JoinColumn(name = "usuario_id"),
-        inverseJoinColumns = @JoinColumn(name = "batalla_id")
+            name = "usuario_batalla",
+            joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "batalla_id")
     )
     private List<Batalla> batallas;
+
+    @ManyToMany
+    @JoinTable(
+            name = "usuario_batallainscrita",
+            joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "batalla_id")
+    )
+    private List<Batalla> batallasInscritas;
 
     @OneToMany(mappedBy = "master")
     private List<Partida> partidasMaster;
@@ -93,7 +99,6 @@ public class Usuario {
     )
     private List<Partida> partidasInvitado;
 
-   
     public String getActivoTxt() {
 
         if (this.activo) {
@@ -263,38 +268,65 @@ public class Usuario {
         return !partidasTerminadasGrupo().isEmpty();
     }
 
-    
     public List<Batalla> batallasEnCurso() {
-        
+
         ArrayList<Batalla> batallasEnCurso = new ArrayList();
-        for (Batalla batalla : this.getBatallas())
-            if (batalla.getStatus().equals(StatusBatalla.EnCurso))
+        for (Batalla batalla : this.getBatallasInscritas()) {
+            if (batalla.getStatus().equals(StatusBatalla.EnCurso)) {
                 batallasEnCurso.add(batalla);
+            }
+        }
         return batallasEnCurso;
     }
 
     public List<Batalla> batallasEnCursoPendientes() {
-        
+
         ArrayList<Batalla> batallasEnCursoPendientes = new ArrayList();
-        for (Batalla batalla : batallasEnCurso()){
-            for (Partida partida : batalla.getPartidas() )
-                if (partida.isEnCurso())
-                    batallasEnCursoPendientes.add(batalla);
+        for (Batalla batalla : batallasEnCurso()) {
+            for (Partida partida : batalla.getPartidas()) {
+                if (partida.getMaster().equals(this)) {
+                    if (partida.isEnCurso()) {
+                        batallasEnCursoPendientes.add(batalla);
+                        break;
+                    }
+                }
+            }
         }
-        return batallasEnCursoPendientes;        
+        return batallasEnCursoPendientes;
     }
     
-    public List<Batalla> batallasEnCursoAcabadas() {
-        
-        ArrayList<Batalla> batallasEnCursoAcabadas = new ArrayList();
-        for (Batalla batalla : batallasEnCurso()){
-            for (Partida partida : batalla.getPartidas() )
-                if (partida.isTerminada())
-                    batallasEnCursoAcabadas.add(batalla);
+    public List<Partida> partidasBatallasEnCursoPendientes() {
+
+        ArrayList<Partida> batallasEnCursoPendientes = new ArrayList();
+        for (Batalla batalla : batallasEnCurso()) {
+            for (Partida partida : batalla.getPartidas()) {
+                if (partida.getMaster().equals(this)) {
+                    if (partida.isEnCurso()) {
+                        batallasEnCursoPendientes.add(partida);
+                        break;
+                    }
+                }
+            }
         }
-        return batallasEnCursoAcabadas;        
-    }  
-    
+        return batallasEnCursoPendientes;
+    }
+
+    public List<Batalla> batallasEnCursoAcabadas() {
+
+        ArrayList<Batalla> batallasEnCursoAcabadas = new ArrayList();
+        for (Batalla batalla : batallasEnCurso()) {
+            for (Partida partida : batalla.getPartidas()) {
+                if (partida.getMaster().equals(this)) {
+                    if (partida.isTerminada()) {
+                        batallasEnCursoAcabadas.add(batalla);
+                        break;
+                    }
+                }
+            }
+        }
+        return batallasEnCursoAcabadas;
+    }
+
     public boolean hayBatallasEnCurso() {
 
         return !batallasEnCurso().isEmpty();
@@ -305,6 +337,11 @@ public class Usuario {
         return !batallasEnCursoPendientes().isEmpty();
     }
     
+    public boolean haypartidasBatallasEnCursoPendientes() {
+
+        return !partidasBatallasEnCursoPendientes().isEmpty();
+    }
+
     public boolean hayBatallasEnCursoAcabadas() {
 
         return !batallasEnCursoAcabadas().isEmpty();
@@ -313,9 +350,11 @@ public class Usuario {
     public List<Batalla> batallasTerminadas() {
 
         ArrayList<Batalla> batallasTerminadas = new ArrayList();
-        for (Batalla batalla : this.getBatallas())
-            if (batalla.getStatus().equals(StatusBatalla.Terminada))
+        for (Batalla batalla : this.getBatallasInscritas()) {
+            if (batalla.getStatus().equals(StatusBatalla.Terminada)) {
                 batallasTerminadas.add(batalla);
+            }
+        }
         return batallasTerminadas;
     }
 
