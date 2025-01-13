@@ -101,7 +101,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
     "partidaInvitado", "cancionInvitado", "spotifyimagenTmp", "locale"})
 @Slf4j
 public class ControladorVista {
-    
+
     @Value("${custom.entorno}")
     public String entorno;
 
@@ -1298,7 +1298,7 @@ public class ControladorVista {
             servBatalla.save(batalla);
             modelo.addAttribute("result", mensaje(modelo, "general.btallacreada"));
 
-        } catch (Exception ex) {            
+        } catch (Exception ex) {
             String resp = "ERROR " + ex.getMessage();
             modelo.addAttribute("result", resp);
         }
@@ -1443,7 +1443,6 @@ public class ControladorVista {
         return "redirect:/partidaMaster";
 
     }
-
 
     private String crearPartidaPersonal(Partida partida,
             Model modelo, HttpServletRequest req, Usuario usu) {
@@ -2645,6 +2644,18 @@ public class ControladorVista {
             resp.setCompletada(true);
             servRespuesta.saveRespuesta(resp);
 
+            Ronda ronda = resp.getRonda();
+
+            // Ultima respuesta
+            if (ronda.getNumero() == partida.getRondas().size()) {
+                partida.setStatus(StatusPartida.Terminada);
+                servPartida.updatePartida(partida.getId(), partida);
+            } else {
+                // Nueva ronda           
+                ronda.setNumero(ronda.getNumero() + 1);
+                servRonda.updateRonda(ronda.getId(), ronda);
+            }
+
             modelo.addAttribute("spotifyimagenTmp", cancion.getSpotifyimagen());
 
         } catch (Exception ex) {
@@ -2706,7 +2717,6 @@ public class ControladorVista {
 
         //modelo.addAttribute("resultados",
         //        Utilidades.resultadosBatalla(batalla));
-
         return "BatallaResultados";
 
     }

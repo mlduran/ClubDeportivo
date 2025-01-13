@@ -284,18 +284,16 @@ public class Usuario {
         ArrayList<Batalla> batallasEnCursoPendientes = new ArrayList();
         for (Batalla batalla : batallasEnCurso()) {
             for (Partida partida : batalla.getPartidas()) {
-                if (partida.getMaster().equals(this)) {
-                    if (partida.isEnCurso()) {
+                if (partida.getMaster().equals(this)) {                    
                         batallasEnCursoPendientes.add(batalla);
-                        break;
-                    }
+                        break;                    
                 }
             }
         }
         return batallasEnCursoPendientes;
     }
-    
-    public List<Partida> partidasBatallasEnCursoPendientes() {
+  
+    public List<Partida> batallasEnCursoPendientesJugar() {
 
         ArrayList<Partida> batallasEnCursoPendientes = new ArrayList();
         for (Batalla batalla : batallasEnCurso()) {
@@ -337,11 +335,11 @@ public class Usuario {
         return !batallasEnCursoPendientes().isEmpty();
     }
     
-    public boolean haypartidasBatallasEnCursoPendientes() {
+    public boolean hayBatallasEnCursoPendientesJugar() {
 
-        return !partidasBatallasEnCursoPendientes().isEmpty();
+        return !batallasEnCursoPendientesJugar().isEmpty();
     }
-
+    
     public boolean hayBatallasEnCursoAcabadas() {
 
         return !batallasEnCursoAcabadas().isEmpty();

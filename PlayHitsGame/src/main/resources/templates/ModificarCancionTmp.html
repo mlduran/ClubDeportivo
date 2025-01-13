@@ -33,6 +33,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     <p>spotifyimagen<input type="text" th:field="*{spotifyimagen}" required="required" size="50"/></p>
                                     <p>Revisar<input type="checkbox" th:field="*{revisar}" /></p>
                                     <p>SoloTemas<input type="checkbox" th:field="*{soloTemas}" /></p>
+                                    <p>
+                                        <img th:src="*{spotifyimagen}" alt="PLAYHITSGAME" class="img-fluid"
+                                             th:data-name="*{spotifyplay}"
+                                             th:onclick="reproducir(this.getAttribute('data-name'))"/>
+                                    </p>
                                     <input type="submit" value="Modificar Cancion"/>    
                                     <p th:text="${result}"></p>
                                 </form>
@@ -50,8 +55,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         </div>
                     </div>
                 </div>
-            </div>  
-
-        </div>
-</body>
+            </div>
+        </section>
+        <script type="text/javascript" th:src="@{/javascript/Reproductor.js}"></script>
+    </body>
 </html>

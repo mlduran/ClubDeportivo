@@ -85,16 +85,16 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                 </div>
                             </div>
                             <div class="card-body p-0" >
-                                <div th:if="*{haypartidasBatallasEnCursoPendientes()} == true" class="text-center my-2">
+                                <div th:if="*{hayBatallasEnCursoPendientesJugar()} == true" class="text-center my-2">
                                     <div class="table-responsive-lg">
                                         <table class="table" > 
                                             <thead>
                                                 <tr>
                                                     <th>
-                                                        <p th:text="#{general.batallasencurso}"/>
+                                                        <p th:text="#{general.batallasencursopendientejugar}"/>
                                                     </th>                   
                                                 </tr>   
-                                                <tr th:each="unapartida : *{partidasBatallasEnCursoPendientes()}">
+                                                <tr th:each="unapartida : *{batallasEnCursoPendientesJugar()}">
                                                     <td>
                                                         <a th:href="'/batalla/'+${unapartida.id}" class="button" id="${unapartida.id}" 
                                                            onclick="return confirm('¿Estás preparado para emprezar a responder?');">
@@ -106,7 +106,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                         </table>
                                     </div>
                                 </div>
-                                <div th:if="*{haypartidasBatallasEnCursoPendientes()} == false and *{hayBatallasEnCursoPendientes()} == true" class="text-center my-2">
+                                <div th:if="*{hayBatallasEnCursoPendientesJugar()} == false and *{hayBatallasEnCursoPendientes()} == true" class="text-center my-2">
                                     <div class="table-responsive-lg">
                                         <table class="table" > 
                                             <thead>
