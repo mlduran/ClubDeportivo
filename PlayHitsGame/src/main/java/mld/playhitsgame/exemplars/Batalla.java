@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -58,9 +59,16 @@ public class Batalla {
     private int nCanciones;
     private int nRondas;
     
-    @OneToOne
+    @ManyToOne // Relación muchas batallas a un ganador
+    @JoinColumn(name = "ganador_id") 
     private Usuario ganador;
     
+    public String fechaFormateada() {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy");
+        return this.getFecha().format(formatter);
+
+    }
     
     public String getCuentaAtras(){
         
@@ -103,6 +111,23 @@ public class Batalla {
         des.setEtiqueta("general.anyofin");
         des.setValor(String.valueOf(String.valueOf(this.getAnyoFinal())));
         txt.add(des);
+
+        return txt;
+    }
+    
+    public String getDescripcionTxT() {
+
+        String txt = "";
+    
+        if (this.getTema() != null && !this.getTema().isEmpty()) {
+            txt = txt + "TEMA " + this.getTema() + " - ";
+        }
+        if (this.nCanciones > 0) {
+            txt = txt + "CANCIONES " + String.valueOf(this.getNCanciones()) + " - ";
+        }
+        
+        txt = txt + "Año Inicial " + this.getAnyoInicial() + " - ";
+        txt = txt + "Año Final " + this.getAnyoFinal();        
 
         return txt;
     }

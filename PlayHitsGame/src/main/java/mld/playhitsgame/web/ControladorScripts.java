@@ -8,9 +8,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import mld.playhitsgame.correo.EmailServicioMetodos;
 import mld.playhitsgame.exemplars.Batalla;
@@ -41,7 +39,6 @@ import mld.playhitsgame.services.RondaServicioMetodos;
 import mld.playhitsgame.services.UsuarioServicioMetodos;
 import mld.playhitsgame.utilidades.Utilidades;
 import static mld.playhitsgame.utilidades.Utilidades.asignarCancionesAleatorias;
-import static mld.playhitsgame.utilidades.Utilidades.cancionRandom;
 import static mld.playhitsgame.utilidades.Utilidades.opcionesAnyosCanciones;
 import static mld.playhitsgame.utilidades.Utilidades.opcionesInterpretesCanciones;
 import static mld.playhitsgame.utilidades.Utilidades.opcionesTitulosCanciones;
@@ -107,18 +104,18 @@ public class ControladorScripts {
     private void informarNuevaBatalla(Batalla batalla) {
 
         CompletableFuture.runAsync(() -> {
-            
-            ArrayList<String> txtsMail = new ArrayList();
-            
-            txtsMail.add("Se ha creado una nueva batalla musical y ha comenzado el periodo para inscribirse");
-            txtsMail.add("Batalla " + batalla.getNombre());
-            txtsMail.add(batalla.getDescripcion().toString());
-            txtsMail.add("Si quieres participar, date prisa, solo tienes unas horas para unirte");
 
-            if (entorno != null && !entorno.equals("Desarrollo")) {
+            ArrayList<String> txtsMail = new ArrayList();
+
+            txtsMail.add("Se ha creado una nueva batalla musical y ha comenzado el periodo para inscribirse:");
+            txtsMail.add("Batalla " + batalla.getNombre());
+            txtsMail.add(batalla.getDescripcionTxT());
+            txtsMail.add("Si quieres participar, date prisa, solo tienes unas horas para unirte.");
+
+            if (entorno != null && entorno.equals("Desarrollo")) {
                 Utilidades.enviarMail(servEmail, mailAdmin, "", "PLAYHITSGAME NEW MUSICAL WAR",
                         txtsMail, "CorreoPlus");
-            }else{
+            } else {
                 List<Usuario> usuarios = servUsuario.usuariosListaCorreoMasiva();
                 int tiempoEspera = 9000; //Para enviar 400 mails por hora
                 for (Usuario usu : usuarios) {
@@ -212,8 +209,7 @@ public class ControladorScripts {
                 }
             }
         }
-        batalla.setStatus(StatusBatalla.EnCurso);
-        batalla.setFase(batalla.getFase() + 1);
+        batalla.setStatus(StatusBatalla.EnCurso);        
         servBatalla.update(batalla.getId(), batalla);
 
     }
@@ -230,10 +226,12 @@ public class ControladorScripts {
         }
 
         //Damos ESTRELLA al primero
-        PtsUsuario ptsPrimero = Utilidades.resultadosBatalla(batalla, batalla.getFase()).getFirst();
-        servEstrella.darEstrella(ptsPrimero.getUsuario(), numMaxEstrellas);
-
-        batalla.setGanador(ptsPrimero.getUsuario());
+        List<PtsUsuario> resultadosBatalla = Utilidades.resultadosBatalla(batalla, batalla.getFase());
+        if (!resultadosBatalla.isEmpty()) {
+            PtsUsuario ptsPrimero = Utilidades.resultadosBatalla(batalla, batalla.getFase()).getFirst();
+            servEstrella.darEstrella(ptsPrimero.getUsuario(), numMaxEstrellas);
+            batalla.setGanador(ptsPrimero.getUsuario());
+        }
         batalla.setStatus(StatusBatalla.Terminada);
         servBatalla.update(batalla.getId(), batalla);
 
@@ -263,15 +261,23 @@ public class ControladorScripts {
                         batalla.getUsuarios().add(usu);
                         servUsuario.update(usu.getId(), usu);
                     }
+                    batalla.setFase(1);
                     servBatalla.update(batalla.getId(), batalla);
                     iniciarBatalla(batalla);
                 }
                 case EnCurso -> {
                     // Si podemos hacer otra batalla la hacemos
-                    int nUsuAClasifiar = batalla.getUsuarios().size() / 2;
+                    int nUsuAClasifiar = 0;
+                    int totalUsuarios = batalla.getUsuarios().size();
+
+                    if (totalUsuarios > 2) {
+                        nUsuAClasifiar = totalUsuarios / 2;
+                    }
                     if (nUsuAClasifiar > 1) {
                         batalla = Utilidades.pasarUsuariosBatallaDeFase(
                                 batalla, nUsuAClasifiar, batalla.getFase());
+                        batalla.setFase(batalla.getFase() + 1);
+                        servBatalla.update(batalla.getId(), batalla);
                         iniciarBatalla(batalla);
                     } else {
                         finalizarBatalla(batalla);

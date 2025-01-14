@@ -40,7 +40,7 @@ public interface UsuarioDAO extends JpaRepository<Usuario, Long> {
             + "LIMIT 50;", nativeQuery = true)
     List<Usuario> usuariosEstrella();
     
-    @Query(value = "SELECT * FROM usuarios WHERE noAceptaCorreos=false AND activo=true ;", nativeQuery = true)
+    @Query(value = "SELECT * FROM usuarios WHERE no_acepta_correos=false AND activo=true ;", nativeQuery = true)
     List<Usuario> usuariosListaCorreoMasiva();
 
 }

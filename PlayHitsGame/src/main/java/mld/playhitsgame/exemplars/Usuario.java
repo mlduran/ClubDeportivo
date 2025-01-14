@@ -85,6 +85,9 @@ public class Usuario {
             inverseJoinColumns = @JoinColumn(name = "batalla_id")
     )
     private List<Batalla> batallasInscritas;
+    
+    @OneToMany(mappedBy = "ganador") // Relación inversa con Batalla
+    private List<Batalla> batallasGanadas;
 
     @OneToMany(mappedBy = "master")
     private List<Partida> partidasMaster;

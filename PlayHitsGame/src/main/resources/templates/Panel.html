@@ -201,7 +201,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                         <p th:each="txt : ${batalla.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
                                                     </td>
                                                     <td>                                                        
-                                                        <p th:text="${batalla.usuariosTxT}"/>                                                        
+                                                        <p th:text="${batalla.usuariosInscritosTxT}"/>                                                        
                                                     </td>
                                                     <td>
                                                         <a th:href="'/unirseABatalla/' + ${batalla.id}" class="button"> 
@@ -244,7 +244,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                         <p th:each="txt : ${batalla.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
                                                     </td>
                                                     <td>                                                        
-                                                        <p th:text="${batalla.usuariosTxT}"/>                                                        
+                                                        <p th:text="${batalla.usuariosInscritosTxT}"/>                                                        
                                                     </td> 
                                                     <td>
                                                         <a th:href="'/salirDeBatalla/' + ${batalla.id}" class="button"> 
@@ -286,25 +286,25 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                     </tr>                                            
                                                 </thead>
                                                 <tbody>
-                                                    <tr th:each="unapartida : *{batallasTerminadas()}">
+                                                    <tr th:each="unabatalla : *{batallasTerminadas()}">
                                                         <td>
-                                                            <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
-                                                                <p th:text="${unapartida.fechaFormateada}"/>
+                                                            <a th:href="'/batallaResultados/' + ${unabatalla.id}" class="button"> 
+                                                                <p th:text="${unabatalla.fechaFormateada}"/>
                                                             </a>
                                                         </td>
                                                         <td>
-                                                            <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
-                                                                <p th:each="txt : ${unapartida.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
+                                                            <a th:href="'/batallaResultados/' + ${unabatalla.id}" class="button"> 
+                                                                <p th:each="txt : ${unabatalla.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
                                                             </a>
                                                         </td>
                                                         <td>
-                                                            <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
-                                                                <p th:text="${unapartida.usuariosTxT}"/>
+                                                            <a th:href="'/batallaResultados/' + ${unabatalla.id}" class="button"> 
+                                                                <p th:text="${unabatalla.usuariosTxT}"/>
                                                             </a>
                                                         </td>
                                                         <td>
-                                                            <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
-                                                                <p th:text="${unapartida.ganador}"/>
+                                                            <a th:href="'/batallaResultados/' + ${unabatalla.id}" class="button"> 
+                                                               <!-- <p th:text="${unabatalla.ganador}"/> -->
                                                             </a>
                                                         </td>
                                                     </tr>

@@ -859,14 +859,14 @@ public class Utilidades {
         return resultadosPartida;
     }
     
-    public static Batalla pasarUsuariosBatallaDeFase(Batalla batalla, int fase, int nUsuAClasifiar) {
+    public static Batalla pasarUsuariosBatallaDeFase(Batalla batalla, int nUsuAClasifiar, int fase) {
         
         List<PtsUsuario> resultadosBatalla = resultadosBatalla(batalla, fase);
         
         ArrayList<Usuario> usuarios = new ArrayList();
         
         for (PtsUsuario pts : 
-                resultadosBatalla.subList(1, batalla.getUsuarios().size())){
+                resultadosBatalla.subList(0, batalla.getUsuarios().size() - 1)){
             usuarios.add(pts.getUsuario());
             nUsuAClasifiar = nUsuAClasifiar - 1;
             if (nUsuAClasifiar == 0)

@@ -1295,6 +1295,7 @@ public class ControladorVista {
             batalla.setPublica(true);
             batalla.setStatus(StatusBatalla.Programada);
             batalla.setNRondas(nrondas);
+            batalla.setFase(1);
             servBatalla.save(batalla);
             modelo.addAttribute("result", mensaje(modelo, "general.btallacreada"));
 
@@ -2651,12 +2652,9 @@ public class ControladorVista {
                 partida.setStatus(StatusPartida.Terminada);
                 servPartida.updatePartida(partida.getId(), partida);
                 UtilidadesWeb.eliminarOpcionesPartida(partida, this);
-            } else {
-                // Nueva ronda           
-                ronda.setNumero(ronda.getNumero() + 1);
-                servRonda.updateRonda(ronda.getId(), ronda);
-            }
-
+                return "redirect:/batallaResultados/" + String.valueOf(partida.getBatalla().getId());
+            } 
+            
             modelo.addAttribute("spotifyimagenTmp", cancion.getSpotifyimagen());
 
         } catch (Exception ex) {
