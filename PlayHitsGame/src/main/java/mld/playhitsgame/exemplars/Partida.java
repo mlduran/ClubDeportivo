@@ -6,7 +6,6 @@ package mld.playhitsgame.exemplars;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -34,6 +33,7 @@ public class Partida {
     
     private boolean publica;
     private String nombre;
+    private int fase;    
 
     @Column(name = "fecha", nullable = false)
     @CreationTimestamp

@@ -25,8 +25,8 @@ public interface BatallaServicio {
     Batalla update(Long id, Batalla batalla);
     void delete(Batalla batalla);
     
-    ArrayList<Batalla> BatallasProgramadasPublicas();
-    ArrayList<Batalla> BatallasEnInscripcionPublicas();
-    ArrayList<Batalla> BatallasUsuario(Long id_usuario);
+    ArrayList<Batalla> batallasProgramadasPublicas();
+    ArrayList<Batalla> batallasEnInscripcionPublicas();
+    ArrayList<Batalla> batallasUsuario(Long id_usuario);
 
 }

@@ -71,6 +71,7 @@ public class PartidaServicioMetodos implements PartidaServicio{
             obj.setNombre(partida.getNombre());
         }
         
+        obj.setFase(partida.getFase());
         obj.setPublica(partida.isPublica());
         obj.setFecha(partida.getFecha());
         obj.setAnyoInicial(partida.getAnyoInicial());

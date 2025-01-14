@@ -68,6 +68,7 @@ public class UsuarioServicioMetodos implements UsuarioServicio {
         obj.setIdioma(usuario.getIdioma());
         usuario.setDobleTouch(usuario.isDobleTouch());
         obj.setSegEspera(usuario.getSegEspera());
+        obj.setNoAceptaCorreos(usuario.isNoAceptaCorreos());
         obj.setGrupo(usuario.getGrupo());
 
         obj.setPuntos(usuario.getPuntos());
@@ -133,5 +134,10 @@ public class UsuarioServicioMetodos implements UsuarioServicio {
     @Override
     public List<Usuario> usuariosEstrella() {
         return DAO.usuariosEstrella();
+    }
+    
+    @Override
+    public List<Usuario> usuariosListaCorreoMasiva(){
+        return DAO.usuariosListaCorreoMasiva();
     }
 }

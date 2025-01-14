@@ -441,7 +441,7 @@ public class ControladorVista {
         }
         informarUsuarioModelo(modelo, usu);
 
-        List<Batalla> batallas = servBatalla.BatallasEnInscripcionPublicas();
+        List<Batalla> batallas = servBatalla.batallasEnInscripcionPublicas();
         List<Batalla> batallasDisponibles = new ArrayList<>();
         List<Batalla> batallasInscritas = new ArrayList<>();
 
@@ -1015,7 +1015,7 @@ public class ControladorVista {
                         txtMail, "Correo");
             }
             if (enviar != null && (entorno == null || !entorno.equals("Desarrollo"))) {
-                List<Usuario> usuarios = servUsuario.findAll();
+                List<Usuario> usuarios = servUsuario.usuariosListaCorreoMasiva();
                 int tiempoEspera = 9000; //Para enviar 400 mails por hora
                 for (Usuario usu : usuarios) {
                     if (!usu.getUsuario().contains(".")) {
@@ -2650,6 +2650,7 @@ public class ControladorVista {
             if (ronda.getNumero() == partida.getRondas().size()) {
                 partida.setStatus(StatusPartida.Terminada);
                 servPartida.updatePartida(partida.getId(), partida);
+                UtilidadesWeb.eliminarOpcionesPartida(partida, this);
             } else {
                 // Nueva ronda           
                 ronda.setNumero(ronda.getNumero() + 1);
@@ -2715,8 +2716,14 @@ public class ControladorVista {
         }
         modelo.addAttribute("batalla", batalla);
 
-        //modelo.addAttribute("resultados",
-        //        Utilidades.resultadosBatalla(batalla));
+        List resultados = new ArrayList();
+
+        for (int i = 1; i <= batalla.getFase(); i++) {
+            List<PtsUsuario> resultadosBatalla = Utilidades.resultadosBatalla(batalla, i);
+            resultados.add(resultadosBatalla);
+        }
+
+        modelo.addAttribute("resultados", resultados);
         return "BatallaResultados";
 
     }

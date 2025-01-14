@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import mld.playhitsgame.correo.EmailServicioMetodos;
 import mld.playhitsgame.correo.Mail;
+import mld.playhitsgame.exemplars.Batalla;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.CancionTmp;
 import mld.playhitsgame.exemplars.Dificultad;
@@ -45,7 +46,6 @@ import org.json.JSONObject;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.MailSendException;
-import org.springframework.ui.Model;
 
 /**
  *
@@ -747,6 +747,29 @@ public class Utilidades {
         }
         return ok;
     }
+    
+    public static boolean enviarMail(EmailServicioMetodos emailServicio,
+            Usuario usuario, String asunto,  List<String> txt, String plantilla) {
+        return enviarMail(emailServicio, usuario.getUsuario(), usuario.getNombre(), asunto, txt, plantilla);    }
+
+    
+    public static boolean enviarMail(EmailServicioMetodos emailServicio,
+            String mailDestino, String nombre, String asunto, List<String> txt, String plantilla) {
+        boolean ok = true;
+        Mail mail = new Mail();
+        try {
+            mail.setAsunto(asunto);
+            mail.setDestinatario(mailDestino);
+            mail.setMensajes(txt);
+            mail.setPlantilla(plantilla);
+            mail.setNombre(nombre);
+            emailServicio.enviarCorreo(mail);
+        } catch (MessagingException | MailSendException ex) {
+            ok = false;
+            Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return ok;
+    }
 
     private static boolean isURLValid(String urlString) {
         try {
@@ -803,29 +826,57 @@ public class Utilidades {
         }
         return null; // No encontrado
     }
-    
-    public static List<PtsUsuario> resultadosBatalla(Partida partidaSesion) {
+
+    public static List<PtsUsuario> resultadosBatalla(Batalla batalla, int fase) {
 
         List<PtsUsuario> resultadosPartida = new ArrayList();
 
-        for (Usuario usu : partidaSesion.usuariosPartida()) {
-            PtsUsuario resultUsu = new PtsUsuario();
-            resultUsu.setUsuario(usu);
-            resultUsu.setLink("/batallaConsulta/" + String.valueOf(partidaSesion.getId())
-                    + "/" + String.valueOf(usu.getId()));
-            resultUsu.setPts(0);
-            resultadosPartida.add(resultUsu);
-        }
-        for (Ronda ronda : partidaSesion.getRondas()) {
-            for (Respuesta respuesta : ronda.getRespuestas()) {
-                PtsUsuario resultUsu = Utilidades.ptsFindByUsuario(resultadosPartida, respuesta.getUsuario());
-                resultUsu.setPts(resultUsu.getPts() + respuesta.getPuntos());
+        for (Usuario usuario : batalla.getUsuarios()) {
+
+            Partida partidaFase = batalla.getPartidaFase(usuario, fase);
+
+            if (partidaFase != null) {
+
+                for (Usuario usu : partidaFase.usuariosPartida()) {
+                    PtsUsuario resultUsu = new PtsUsuario();
+                    resultUsu.setUsuario(usu);
+                    resultUsu.setLink("/batallaConsulta/" + String.valueOf(partidaFase.getId())
+                            + "/" + String.valueOf(usu.getId()));
+                    resultUsu.setPts(0);
+                    resultadosPartida.add(resultUsu);
+                }
+                for (Ronda ronda : partidaFase.getRondas()) {
+                    for (Respuesta respuesta : ronda.getRespuestas()) {
+                        PtsUsuario resultUsu = Utilidades.ptsFindByUsuario(resultadosPartida, respuesta.getUsuario());
+                        resultUsu.setPts(resultUsu.getPts() + respuesta.getPuntos());
+                    }
+                }
             }
         }
 
         Collections.sort(resultadosPartida);
+
+        return resultadosPartida;
+    }
+    
+    public static Batalla pasarUsuariosBatallaDeFase(Batalla batalla, int fase, int nUsuAClasifiar) {
         
-        return resultadosPartida;        
+        List<PtsUsuario> resultadosBatalla = resultadosBatalla(batalla, fase);
+        
+        ArrayList<Usuario> usuarios = new ArrayList();
+        
+        for (PtsUsuario pts : 
+                resultadosBatalla.subList(1, batalla.getUsuarios().size())){
+            usuarios.add(pts.getUsuario());
+            nUsuAClasifiar = nUsuAClasifiar - 1;
+            if (nUsuAClasifiar == 0)
+                break;
+        }
+        
+        batalla.setUsuarios(usuarios);
+        
+        return batalla;        
+        
     }
 
 }

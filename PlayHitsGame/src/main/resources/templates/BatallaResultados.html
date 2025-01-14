@@ -36,22 +36,30 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </tr>
                                     <table border="2" style="max-width: 100%; width: 100%; table-layout: fixed;" > 
                                         <tr>
-                                            <td colspan="2" style="text-align:center; background-color: lightpink;">
+                                            <th colspan="2" style="text-align:center; background-color: lightpink;">
                                                 <p th:text="#{general.batalla}"/>
-                                                <p th:text="${partidaSesion.nombre}"/>
-                                            </td>
+                                                <p th:text="${batalla.nombre}"/>
+                                            </th>
+                                            <th th:if="${batalla.status == 'Terminada'}">
+                                                <p th:text="#{general.ganador} + ' ' + ${batalla.ganador.nombre}"/>
+                                            </th>
                                         </tr>
                                         <tr>
                                             <td>
-                                                <p th:each="txt : ${partidaSesion.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
+                                                <p th:each="txt : ${batalla.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
                                             </td>
                                             <td>
                                                 <p th:text="#{general.participantes}" />                                                
-                                                <p th:text="${partidaSesion.usuariosTxT}" /> 
+                                                <p th:text="${batalla.usuariosTxT}" /> 
                                             </td>
                                         </tr>
                                     </table>
-                                    <table border="2" style="max-width: 100%; width: 100%; table-layout: fixed;"> 
+                                    <table th:each="resultFase, faseStat : ${resultados}" border="2" style="max-width: 100%; width: 100%; table-layout: fixed;"> 
+                                        <tr>
+                                            <th colspan="2" style="text-align:center; background-color: lightpink;">
+                                                <p th:text="#{general.fase} + ' ' + ${faseStat.count}"/>
+                                            </th>
+                                        </tr>
                                         <tr>
                                             <th style="text-align:center; background-color: lightpink;">
                                                 <p th:text="#{general.jugador}"/>
@@ -60,7 +68,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                 <p th:text="#{general.puntos}"/>
                                             </th>
                                         </tr>
-                                        <tr th:each="result : ${resultados}">
+                                        <tr th:each="result : ${resultFase}">
                                             <td>
                                                 <a th:href="${result.link}" class="button"> 
                                                     <p th:text="${result.usuario.nombre}"/>

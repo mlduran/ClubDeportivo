@@ -140,6 +140,37 @@ public class Batalla {
         }
         return txt;
     }
+    
+    public Partida getUltimaPartida(Usuario usu){
+        
+        for (Partida partida : this.getPartidas() )
+            if (partida.getFase() == this.getFase() &&
+                    partida.getMaster().equals(usu))
+                return partida;
+        
+        return null;        
+    }
+    
+    public Partida getPartidaFase(Usuario usu, int fase){
+        
+        for (Partida partida : this.getPartidas() )
+            if (partida.getFase() == fase &&
+                    partida.getMaster().equals(usu))
+                return partida;
+        
+        return null;        
+    }
+    
+    public List<Partida> getPartidasFase(int num){
+        
+        ArrayList<Partida> partidasFase = new ArrayList();
+        
+        for (Partida partida : this.getPartidas())
+            if (partida.getFase() == num)
+                partidasFase.add(partida);
+        
+        return partidasFase;
+    }
 
 
 }

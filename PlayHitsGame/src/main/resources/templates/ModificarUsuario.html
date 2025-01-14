@@ -57,7 +57,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                         <label class="mb-2 text-muted" for="segEspera" th:text="#{general.segespera}"/>
                                         <input th:field="*{segEspera}" type="number" id="segEspera" min="5" max="30" size="2"/>
                                     </div>
-
+                                    <div class="mb-3">
+                                        <label th:text="#{general.noAceptaCorreos}"/>
+                                        <input type="checkbox" th:field="*{noAceptaCorreos}" id="noAceptaCorreos">   
+                                    </div>
                                     <div class="d-flex align-items-center">
                                         <button type="submit" class="btn btn-primary ms-auto" th:text="#{general.modificar}"/>
                                     </div>

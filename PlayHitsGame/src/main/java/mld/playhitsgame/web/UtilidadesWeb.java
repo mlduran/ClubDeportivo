@@ -26,7 +26,7 @@ import org.springframework.ui.Model;
  */
 public class UtilidadesWeb {
 
-    private static void eliminarOpcionesPartida(Partida partida,
+    public static void eliminarOpcionesPartida(Partida partida,
             ControladorVista ctrlVista
     ) {
 

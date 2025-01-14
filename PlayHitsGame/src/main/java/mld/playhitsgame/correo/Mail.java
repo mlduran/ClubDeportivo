@@ -4,6 +4,7 @@
  */
 package mld.playhitsgame.correo;
 
+import java.util.List;
 import lombok.Data;
 
 /**
@@ -17,6 +18,7 @@ public class Mail {
     private String destinatario;
     private String asunto;
     private String mensaje;   
+    private List<String> mensajes;
     private String plantilla;
     private String nombre;
     

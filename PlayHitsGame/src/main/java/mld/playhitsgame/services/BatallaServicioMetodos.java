@@ -77,18 +77,18 @@ public class BatallaServicioMetodos implements BatallaServicio {
     }
 
     @Override
-    public ArrayList<Batalla> BatallasProgramadasPublicas() {
-        return DAO.BatallasProgramadasPublicas();
+    public ArrayList<Batalla> batallasProgramadasPublicas() {
+        return DAO.batallasProgramadasPublicas();
     }
 
     @Override
-    public ArrayList<Batalla> BatallasEnInscripcionPublicas() {
-        return DAO.BatallasEnInscripcionPublicas();
+    public ArrayList<Batalla> batallasEnInscripcionPublicas() {
+        return DAO.batallasEnInscripcionPublicas();
     }
 
     @Override
-    public ArrayList<Batalla> BatallasUsuario(Long id_usuario) {
-        return DAO.BatallasUsuario(id_usuario);
+    public ArrayList<Batalla> batallasUsuario(Long id_usuario) {
+        return DAO.batallasUsuario(id_usuario);
     }
 
 }

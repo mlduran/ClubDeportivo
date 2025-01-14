@@ -45,7 +45,7 @@ public class EmailServicioMetodos implements EmailServicio {
                 = javaMailSender.createMimeMessage();
         MimeMessageHelper helper
                 = new MimeMessageHelper(message, true, "UTF-8");
-        
+
         helper.setFrom(mailApp);
         helper.setTo(mail.getDestinatario());
         helper.setSubject(mail.getAsunto());
@@ -57,9 +57,13 @@ public class EmailServicioMetodos implements EmailServicio {
         }
 
         Context context = new Context();
-        context.setVariable("imagen", customIp + "/images/playhitsgamePresentacion.png");       
+        context.setVariable("imagen", customIp + "/images/playhitsgamePresentacion.png");
         context.setVariable("mail", mailApp);
-        context.setVariable("mensaje", mail.getMensaje());
+        if (mail.getMensaje() != null) {
+            context.setVariable("mensaje", mail.getMensaje());
+        } else if (mail.getMensajes() != null) {
+            context.setVariable("mensajes", mail.getMensajes());
+        }
         context.setVariable("nombre", mail.getNombre());
         String contenttHTML
                 = templateEngine.process(plantilla, context);

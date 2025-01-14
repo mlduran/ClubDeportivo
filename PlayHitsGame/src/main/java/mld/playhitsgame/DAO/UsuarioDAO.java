@@ -39,5 +39,8 @@ public interface UsuarioDAO extends JpaRepository<Usuario, Long> {
             + "ORDER BY estrellas_count DESC "
             + "LIMIT 50;", nativeQuery = true)
     List<Usuario> usuariosEstrella();
+    
+    @Query(value = "SELECT * FROM usuarios WHERE noAceptaCorreos=false AND activo=true ;", nativeQuery = true)
+    List<Usuario> usuariosListaCorreoMasiva();
 
 }

@@ -21,15 +21,15 @@ public interface BatallaDAO extends JpaRepository<Batalla, Long> {
     Optional<Batalla> findById(Long id);
 
     @Query(value = "SELECT * FROM batallas WHERE status='Programada'AND publica=true ;", nativeQuery = true)
-    ArrayList<Batalla> BatallasProgramadasPublicas();
+    ArrayList<Batalla> batallasProgramadasPublicas();
 
     @Query(value = "SELECT * FROM batallas WHERE status='Inscripcion'AND publica=true ;", nativeQuery = true)
-    ArrayList<Batalla> BatallasEnInscripcionPublicas();
+    ArrayList<Batalla> batallasEnInscripcionPublicas();
 
     @Query(value = "SELECT b.*"
             + "FROM batallas b"
             + "INNER JOIN usuarios u ON b.id_usuario = u.id"
             + "WHERE u.id = :id_usuario;", nativeQuery = true)
-    ArrayList<Batalla> BatallasUsuario(Long id_usuario);
+    ArrayList<Batalla> batallasUsuario(Long id_usuario);
 
 }

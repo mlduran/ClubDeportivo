@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import mld.playhitsgame.correo.EmailServicioMetodos;
 import mld.playhitsgame.exemplars.Batalla;
 import mld.playhitsgame.exemplars.Cancion;
@@ -61,6 +62,9 @@ public class ControladorScripts {
 
     @Value("${custom.mailadmin}")
     private String mailAdmin;
+    @Value("${custom.entorno}")
+    public String entorno;
+
     @Autowired
     EmailServicioMetodos servEmail;
     @Autowired
@@ -100,18 +104,41 @@ public class ControladorScripts {
         numMaxEstrellas = laConfig.getNumMaxEstrellas();
     }
 
-    private void inicializarEstrellas() {
+    private void informarNuevaBatalla(Batalla batalla) {
 
-        if (servEstrella.numEstrellas() == 0) {
-            for (Usuario usu : servUsuario.findAll()) {
-                if (!usu.isActivo()) {
-                    continue;
-                }
-                for (int i = 1; i <= usu.getEstrellas_old(); i++) {
-                    servEstrella.darEstrella(usu, numMaxEstrellas);
+        CompletableFuture.runAsync(() -> {
+            
+            ArrayList<String> txtsMail = new ArrayList();
+            
+            txtsMail.add("Se ha creado una nueva batalla musical y ha comenzado el periodo para inscribirse");
+            txtsMail.add("Batalla " + batalla.getNombre());
+            txtsMail.add(batalla.getDescripcion().toString());
+            txtsMail.add("Si quieres participar, date prisa, solo tienes unas horas para unirte");
+
+            if (entorno != null && !entorno.equals("Desarrollo")) {
+                Utilidades.enviarMail(servEmail, mailAdmin, "", "PLAYHITSGAME NEW MUSICAL WAR",
+                        txtsMail, "CorreoPlus");
+            }else{
+                List<Usuario> usuarios = servUsuario.usuariosListaCorreoMasiva();
+                int tiempoEspera = 9000; //Para enviar 400 mails por hora
+                for (Usuario usu : usuarios) {
+                    if (!usu.getUsuario().contains(".")) {
+                        continue;
+                    }
+                    if (usu.isActivo()) {
+                        Utilidades.enviarMail(servEmail, usu, "PLAYHITSGAME NEW MUSICAL WAR",
+                                txtsMail, "CorreoPlus");
+                        try {
+                            Thread.sleep(tiempoEspera); // Pausa de 1 segundo
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            System.err.println("La espera fue interrumpida: " + e.getMessage());
+                        }
+                    }
                 }
             }
-        }
+        });
+
     }
 
     private void iniciarBatalla(Batalla batalla) {
@@ -120,6 +147,14 @@ public class ControladorScripts {
 
         for (Usuario usu : batalla.getUsuarios()) {
             Partida newPartida = new Partida();
+
+            // segun la fase en la que estemos aumentamos 
+            // el numero de rondas hasta un maximo de 30
+            int newRondas = (batalla.getNRondas() - 5) + (batalla.getFase() * 5);
+            if (newRondas > 30) {
+                newRondas = 30;
+            }
+            newPartida.setFase(batalla.getFase());
             newPartida.setNombre(batalla.getNombre());
             newPartida.setTipo(TipoPartida.batalla);
             newPartida.setTema(batalla.getTema());
@@ -136,7 +171,7 @@ public class ControladorScripts {
 
             newPartida = servPartida.savePartida(newPartida);
             newPartida.setRondas(new ArrayList());
-            for (int i = 1; i <= batalla.getNRondas(); i++) {
+            for (int i = 1; i <= newRondas; i++) {
                 Ronda newRonda = new Ronda();
                 newRonda.setNumero(i);
                 newRonda.setPartida(newPartida);
@@ -178,29 +213,30 @@ public class ControladorScripts {
             }
         }
         batalla.setStatus(StatusBatalla.EnCurso);
-        batalla.setFase(1);
+        batalla.setFase(batalla.getFase() + 1);
         servBatalla.update(batalla.getId(), batalla);
 
     }
 
     private void finalizarBatalla(Batalla batalla) {
 
-        // ASIGNAMOS PUNTOS
-//        for (Usuario usu : batalla.usuariosPartida()) {
-//            int pts = Utilidades.calcularPtsUsuario(usu, batalla, true);
-//            usu.setPuntos(usu.getPuntos() + pts);
-//            servUsuario.update(usu.getId(), usu);
-//        }
-//        
-//        //Damos ESTRELLA al primero
-//        PtsUsuario ptsPrimero = Utilidades.resultadosBatalla(batalla).getFirst();
-//        servEstrella.darEstrella(ptsPrimero.getUsuario(), numMaxEstrellas);
-//
-//        batalla.setStatus(StatusPartida.Terminada);
-//        servPartida.updatePartida(batalla.getId(), batalla);
-//        servOpTitulo.deleteByPartida(batalla.getId());
-//        servOpInterprete.deleteByPartida(batalla.getId());
-//        servOpAnyo.deleteByPartida(batalla.getId());
+        // Forzamos la finalizacion de todas las partidas
+        for (Partida partida : batalla.getPartidas()) {
+            partida.setStatus(StatusPartida.Terminada);
+            servPartida.updatePartida(partida.getId(), partida);
+            servOpTitulo.deleteByPartida(partida.getId());
+            servOpInterprete.deleteByPartida(partida.getId());
+            servOpAnyo.deleteByPartida(partida.getId());
+        }
+
+        //Damos ESTRELLA al primero
+        PtsUsuario ptsPrimero = Utilidades.resultadosBatalla(batalla, batalla.getFase()).getFirst();
+        servEstrella.darEstrella(ptsPrimero.getUsuario(), numMaxEstrellas);
+
+        batalla.setGanador(ptsPrimero.getUsuario());
+        batalla.setStatus(StatusBatalla.Terminada);
+        servBatalla.update(batalla.getId(), batalla);
+
     }
 
     private void tratarBatallas() {
@@ -217,6 +253,7 @@ public class ControladorScripts {
                     newfecha = newfecha.plusHours(24);
                     batalla.setFecha(newfecha);
                     servBatalla.update(batalla.getId(), batalla);
+                    informarNuevaBatalla(batalla);
                 }
                 case Inscripcion -> {
                     batalla.setUsuarios(new ArrayList());
@@ -230,7 +267,15 @@ public class ControladorScripts {
                     iniciarBatalla(batalla);
                 }
                 case EnCurso -> {
-                    //finalizarBatalla(batalla);
+                    // Si podemos hacer otra batalla la hacemos
+                    int nUsuAClasifiar = batalla.getUsuarios().size() / 2;
+                    if (nUsuAClasifiar > 1) {
+                        batalla = Utilidades.pasarUsuariosBatallaDeFase(
+                                batalla, nUsuAClasifiar, batalla.getFase());
+                        iniciarBatalla(batalla);
+                    } else {
+                        finalizarBatalla(batalla);
+                    }
                 }
 
                 default -> {
@@ -259,8 +304,6 @@ public class ControladorScripts {
             String token = (String) req.getParameter("token");
             if (token.equals(tokenValidacion)) {
                 try {
-                    //inicializarEstrellas(); // comentar cuando este hecho
-
                     // METODOS A EJECUTAR  
                     tratarBatallas();
                     /////////////////////// FIN
