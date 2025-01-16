@@ -97,6 +97,13 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                                 <p th:text="#{general.acabarronda}" />
                                                             </button>
                                                         </div>
+                                                        <!-- para desarrollar
+                                                        <div th:if="${rol == T(mld.playhitsgame.exemplars.Rol).invitado}">
+                                                            <input type="hidden" id="mensajeAcabar" th:value="#{general.confirmacabarpartida}" />
+                                                            <button class="button" th:onclick="forzarSalirDePartida()">
+                                                                <p th:text="#{general.dejarpartida}" />
+                                                            </button>
+                                                        </div> -->
                                                         <input type="image" th:src="@{'/images/actualizar.png'}" width="40" height="40" onclick="document.location.reload();" />
                                                         <div th:if="${partidaSesion.terminada}">
                                                             <a th:href="'/partidaConsulta/' + ${partidaSesion.id}" class="button" id="resultados">

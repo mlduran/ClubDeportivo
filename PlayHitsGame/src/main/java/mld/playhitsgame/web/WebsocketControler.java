@@ -30,6 +30,7 @@ import mld.playhitsgame.services.RespuestaServicioMetodos;
 import mld.playhitsgame.services.RondaServicioMetodos;
 import mld.playhitsgame.services.UsuarioServicioMetodos;
 import mld.playhitsgame.websocket.UsuarioWS;
+import mld.playhitsgame.seguridad.UsuarioRol;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -208,7 +209,7 @@ public class WebsocketControler {
             return obJsonSalida;
         }
         if ("cuentaAtrasResponder".equals(obJson.getString("op"))) {
-            if (!cuentaAtras.get(obJson.getLong("idPartida"))){
+            if (!cuentaAtras.get(obJson.getLong("idPartida"))) {
                 obJsonSalida.put("op", "cuentaAtrasResponder");
                 cuentaAtras.put(obJson.getLong("idPartida"), true);
             }
@@ -220,6 +221,10 @@ public class WebsocketControler {
         }
         if ("acabaronda".equals(obJson.getString("op"))) {
             pasarSiguienteRonda(obJson.getLong("idPartida"), obJsonSalida);
+            return obJsonSalida;
+        }
+        if ("salirdepartida".equals(obJson.getString("op"))) {
+            forzarSalirDePartida(obJson.getLong("idPartida"), obJson.getLong("idUsuario"), obJsonSalida);
             return obJsonSalida;
         }
 
@@ -357,6 +362,34 @@ public class WebsocketControler {
         return obJsonSalida;
     }
 
+    private JSONObject forzarSalirDePartida(Long idPartida, Long idUsuario, JSONObject obJsonSalida) {
+        // A este metodo llegamos si todos los usuarios conectados
+        // han respondido, eso no quiere decir que todos esten
+        // eso se tendra que tratar mas adelante pero de momento
+        // cambiaremos de ronda
+
+        Partida partida = obtenerPartida(idPartida);
+        Usuario usuario = obtenerUsuario(idUsuario);
+        
+        for (Ronda ronda : partida.getRondas()){
+            for (Respuesta resp : ronda.getRespuestas()){
+                if (resp.getUsuario().equals(usuario))
+                    servRespuesta.deleteRespuesta(resp.getId());
+                
+            }            
+        }        
+        
+        partida.getInvitados().remove(usuario);
+        servPartida.updatePartida(partida.getId(), partida);
+        //usuario.getPartidasInvitado().remove(partida);
+        //servUsuario.update(usuario.getId(), usuario);
+
+        obJsonSalida.put("op", "salirdepartida");
+        obJsonSalida.put("idPartida", idPartida);
+
+        return obJsonSalida;
+    }
+
     private Usuario primerUsuarioAcertarAnyo(Ronda rondaActiva) {
 
         List<Respuesta> respuestas = rondaActiva.getRespuestas();
@@ -490,7 +523,7 @@ public class WebsocketControler {
             servRespuesta.updateRespuesta(resp.getId(), resp);
         }
         return jsonRespuesta;
-    }    
+    }
 
     private void asignarGanador(Long idPartida) {
 

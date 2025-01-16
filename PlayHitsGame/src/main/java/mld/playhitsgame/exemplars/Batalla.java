@@ -27,6 +27,8 @@ import org.hibernate.annotations.CreationTimestamp;
 @Table(name = "batallas")
 public class Batalla {
 
+    public final int NUMERO_MAX_PARTICIPANTES = 32;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

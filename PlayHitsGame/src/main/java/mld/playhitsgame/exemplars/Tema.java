@@ -42,7 +42,11 @@ public class Tema {
     private Usuario usuario;
 
     private String listasSpotify;
-    private Long usuarioRecord;
+    private Long usuarioRecord; // para eliminar
+    @OneToOne
+    @JoinColumn(name = "usuario_id", unique = true) // Clave foránea y única
+    private Usuario recordUsuario;
+    
     private int puntos;
     private int nPartidas;
     private boolean activo;

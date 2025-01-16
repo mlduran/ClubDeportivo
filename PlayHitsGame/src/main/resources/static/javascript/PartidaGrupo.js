@@ -65,6 +65,9 @@ var procesar = function (mensaje) {
             window.alert(txt);
         location.reload();
     }
+    if (dataJson["op"] === "salirdepartida") {        
+        location.reload();
+    }    
     if (dataJson["op"] === "acabar") {
         txt = txtPrimeros(dataJson);
         if (txt !== undefined && txt !== "")
@@ -204,6 +207,11 @@ function forzarAcabarRonda() {
     sendmensaje(txtMensaje("acabaronda", null, null));
 }
 
+function forzarSalirDePartida() {
+    if(confirm(document.getElementById('mensajeAcabar').value))
+        sendmensaje(txtMensaje("salirdepartida", null, null));
+}
+
 function respuestaTitulo(codCancion) {
     if (botonTitulo === false) {
         sendmensaje(txtMensaje("titulo", codCancion));
@@ -297,4 +305,8 @@ if (touchstart === 'true') {
         // Actualizar el tiempo del último toque
         lastTouchTime = currentTime;
     });
+}
+
+function confirmarAccion() {
+    return confirm(document.getElementById('mensajeAcabar').value);
 }

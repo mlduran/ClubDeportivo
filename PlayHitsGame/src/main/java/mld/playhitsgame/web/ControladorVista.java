@@ -443,13 +443,18 @@ public class ControladorVista {
 
         List<Batalla> batallas = servBatalla.batallasEnInscripcionPublicas();
         List<Batalla> batallasDisponibles = new ArrayList<>();
+        List<Batalla> batallaCompletas = new ArrayList<>();
         List<Batalla> batallasInscritas = new ArrayList<>();
 
         for (Batalla batalla : batallas) {
             if (batalla.getUsuariosInscritos().contains(usu)) {
                 batallasInscritas.add(batalla);
             } else {
-                batallasDisponibles.add(batalla);
+                if (batalla.getUsuariosInscritos().size() < batalla.NUMERO_MAX_PARTICIPANTES) {
+                    batallasDisponibles.add(batalla);
+                } else {
+                    batallaCompletas.add(batalla);
+                }
             }
         }
 
@@ -458,6 +463,7 @@ public class ControladorVista {
         modelo.addAttribute("batallasDisponibles", batallasDisponibles);
         modelo.addAttribute("batallasInscritas", batallasInscritas);
         modelo.addAttribute("ultimaBatalla", usu.ultimaBatalla());
+        modelo.addAttribute("batallaCompletas", batallaCompletas);
 
         return "Panel";
     }
@@ -2363,10 +2369,13 @@ public class ControladorVista {
 
         if (findById.isPresent()) {
             batalla = findById.get();
-            batalla.getUsuariosInscritos().add(usu);
-            usu.getBatallasInscritas().add(batalla);
-            servBatalla.update(batalla.getId(), batalla);
-            servUsuario.update(usu.getId(), usu);
+            if (batalla.getStatus().equals(StatusBatalla.Inscripcion)
+                    && batalla.getUsuariosInscritos().size() < batalla.NUMERO_MAX_PARTICIPANTES) {
+                batalla.getUsuariosInscritos().add(usu);
+                usu.getBatallasInscritas().add(batalla);
+                servBatalla.update(batalla.getId(), batalla);
+                servUsuario.update(usu.getId(), usu);
+            }
         }
 
         return "redirect:/panel";
@@ -2386,10 +2395,12 @@ public class ControladorVista {
 
         if (findById.isPresent()) {
             batalla = findById.get();
-            batalla.getUsuariosInscritos().remove(usu);
-            usu.getBatallasInscritas().remove(batalla);
-            servBatalla.update(batalla.getId(), batalla);
-            servUsuario.update(usu.getId(), usu);
+            if (batalla.getStatus().equals(StatusBatalla.Inscripcion)) {
+                batalla.getUsuariosInscritos().remove(usu);
+                usu.getBatallasInscritas().remove(batalla);
+                servBatalla.update(batalla.getId(), batalla);
+                servUsuario.update(usu.getId(), usu);
+            }
         }
 
         return "redirect:/panel";
@@ -2414,24 +2425,6 @@ public class ControladorVista {
         }
 
         return respuesta;
-    }
-
-    private List<Respuesta> rondasRespuestas(Usuario usu, Partida partida) {
-
-        ArrayList<Respuesta> respuestas = new ArrayList();
-
-        for (Ronda r : partida.getRondas()) {
-            for (Respuesta resp : r.getRespuestas()) {
-                if (resp.getUsuario().equals(usu)) {
-                    if (resp.isCompletada()) {
-                        respuestas.add(resp);
-                    }
-                    break;
-                }
-            }
-        }
-
-        return respuestas;
     }
 
     @GetMapping("/batallaConsulta/{id_batalla}/{id_usu}")
@@ -2473,7 +2466,7 @@ public class ControladorVista {
 
         Partida partida = partidaModelo(modelo);
 
-        if (partida == null) {
+        if (partida == null || !Objects.equals(partida.getId(), id)) {
             Optional<Partida> findPartida = servPartida.findById(id);
             if (findPartida.isPresent()) {
                 partida = findPartida.get();
@@ -2518,7 +2511,7 @@ public class ControladorVista {
         }
 
         modelo.addAttribute("respuestas",
-                rondasRespuestas(usu, partida));
+                Utilidades.rondasRespuestas(usu, partida));
 
         modelo.addAttribute("partidaSesion", partida);
         modelo.addAttribute("pts", partida.ptsUsuario(usu));
@@ -2653,8 +2646,8 @@ public class ControladorVista {
                 servPartida.updatePartida(partida.getId(), partida);
                 UtilidadesWeb.eliminarOpcionesPartida(partida, this);
                 return "redirect:/batallaResultados/" + String.valueOf(partida.getBatalla().getId());
-            } 
-            
+            }
+
             modelo.addAttribute("spotifyimagenTmp", cancion.getSpotifyimagen());
 
         } catch (Exception ex) {

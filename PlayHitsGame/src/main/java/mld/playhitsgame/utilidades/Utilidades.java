@@ -827,11 +827,12 @@ public class Utilidades {
         return null; // No encontrado
     }
 
+    
     public static List<PtsUsuario> resultadosBatalla(Batalla batalla, int fase) {
 
         List<PtsUsuario> resultadosPartida = new ArrayList();
 
-        for (Usuario usuario : batalla.getUsuarios()) {
+        for (Usuario usuario : batalla.getUsuariosInscritos()) {
 
             Partida partidaFase = batalla.getPartidaFase(usuario, fase);
 
@@ -859,24 +860,24 @@ public class Utilidades {
         return resultadosPartida;
     }
     
-    public static Batalla pasarUsuariosBatallaDeFase(Batalla batalla, int nUsuAClasifiar, int fase) {
-        
-        List<PtsUsuario> resultadosBatalla = resultadosBatalla(batalla, fase);
-        
-        ArrayList<Usuario> usuarios = new ArrayList();
-        
-        for (PtsUsuario pts : 
-                resultadosBatalla.subList(0, batalla.getUsuarios().size() - 1)){
-            usuarios.add(pts.getUsuario());
-            nUsuAClasifiar = nUsuAClasifiar - 1;
-            if (nUsuAClasifiar == 0)
-                break;
+    public static List<Respuesta> rondasRespuestas(Usuario usu, Partida partida) {
+
+        ArrayList<Respuesta> respuestas = new ArrayList();
+
+        for (Ronda r : partida.getRondas()) {
+            for (Respuesta resp : r.getRespuestas()) {
+                if (resp.getUsuario().equals(usu)) {
+                    if (resp.isCompletada()) {
+                        respuestas.add(resp);
+                    }
+                    break;
+                }
+            }
         }
-        
-        batalla.setUsuarios(usuarios);
-        
-        return batalla;        
-        
+
+        return respuestas;
     }
+    
+    
 
 }
