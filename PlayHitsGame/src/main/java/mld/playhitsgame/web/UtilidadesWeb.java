@@ -87,10 +87,14 @@ public class UtilidadesWeb {
             if (tema.isPresent()) {
                 Tema elTema = tema.get();
                 if (elTema.getPuntos() < pts) {
+                    boolean darEstrella = !elTema.getRecordUsuario().equals(usuario);
                     elTema.setPuntos(pts);
-                    elTema.setUsuarioRecord(usuario.getId());
+                    elTema.setRecordUsuario(usuario);
                     ctrlVista.servTema.update(elTema.getId(), elTema);
-                    ctrlVista.servEstrella.darEstrella(usuario, ctrlVista.numMaxEstrellas);
+                    if (darEstrella) {
+                        // Damos estrella si el jugador es diferente al que posee el record
+                        ctrlVista.servEstrella.darEstrella(usuario, ctrlVista.numMaxEstrellas);
+                    }
                     ctrlVista.servUsuario.update(usuario.getId(), usuario);
                     esRecord = true;
                 }
@@ -136,6 +140,6 @@ public class UtilidadesWeb {
 
         modelo.addAttribute("ptstotales", totales);
         modelo.addAttribute("resultados", resultadosPartida);
-    }    
+    }
 
 }

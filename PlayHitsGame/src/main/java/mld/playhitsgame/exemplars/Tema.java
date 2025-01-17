@@ -44,7 +44,7 @@ public class Tema {
     private String listasSpotify;
     private Long usuarioRecord; // para eliminar
     @OneToOne
-    @JoinColumn(name = "usuario_id", unique = true) // Clave foránea y única
+    @JoinColumn(name = "record_usuario_id", nullable = true) 
     private Usuario recordUsuario;
     
     private int puntos;

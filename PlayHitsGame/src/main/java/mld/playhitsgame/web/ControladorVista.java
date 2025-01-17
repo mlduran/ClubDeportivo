@@ -248,9 +248,9 @@ public class ControladorVista {
             urlLogin = urlLectura.readLine();
             urlLoginSpotify = urlLogin;
         } catch (MalformedURLException ex) {
-            Logger.getLogger(ControladorSpotify.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ControladorSpotify.class.getName()).log(Level.SEVERE, "No se ha podido conectar con Spotify {0}", ex.getMessage());
         } catch (IOException ex) {
-            Logger.getLogger(ControladorSpotify.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ControladorSpotify.class.getName()).log(Level.SEVERE, "No se ha podido conectar con Spotify {0}", ex.getMessage());
         }
 
         return urlLogin;
@@ -2081,14 +2081,8 @@ public class ControladorVista {
             }
             newObj.setCanciones(tema.getCanciones().size());
             newObj.setPuntos(tema.getPuntos());
-            String usuRecord = "PlayHitsGame";
-            if (tema.getUsuarioRecord() != null) {
-                Optional<Usuario> usuario = servUsuario.findById(tema.getUsuarioRecord());
-                if (usuario.isPresent()) {
-                    usuRecord = usuario.get().getNombre();
-                }
-            }
-            newObj.setUsuarioRecord(usuRecord);
+            newObj.setUsuarioRecord(tema.getRecordUsuario());
+
             records.add(newObj);
         }
 

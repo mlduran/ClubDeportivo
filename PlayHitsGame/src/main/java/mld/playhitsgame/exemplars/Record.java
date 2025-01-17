@@ -21,7 +21,7 @@ public class Record {
     private Tema tema;
     private String descripcion;
     private int canciones;   
-    private String usuarioRecord;
+    private Usuario usuarioRecord;
     private int puntos;    
     
     

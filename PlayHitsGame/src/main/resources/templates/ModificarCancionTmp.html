@@ -11,6 +11,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     </head>
     <body>
+        <audio controls id="reproductor" style="display: none;">
+            <source src="" type="audio/mpeg" />                                                            
+        </audio>
         <section class="h-100">
             <div class="container h-100">
                 <div class="row justify-content-sm-center h-100">
@@ -22,25 +25,26 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <div class="card-body p-5">
                                 <h1 class="fs-4 card-title fw-bold mb-4" text="Modificar Cancion"/>         
 
-                                <form method="post" th:action="@{/modificarCancionTmp}" th:object="${cancion}">  
+                                <form method="post" th:action="@{/modificarCancion}" th:object="${cancion}">  
                                     <input type="hidden" th:field="*{id}" required="required"/></p>
-                                    <p>Titulo<input type="text" th:field="*{titulo}" required="required" size="50" /></p>
+                                    <p>Titulo<input type="text" th:field="*{titulo}" required="required" size="40" /></p>
                                     <p>Interprete<input type="text" th:field="*{interprete}" required="required"/></p>
                                     <p>Album<input type="text" th:field="*{album}"/></p>
-                                    <p>Año<input type="number" th:field="*{anyo}" required="required" size="4"/></p>                                   
+                                    <p>Año<input type="number" th:field="*{anyo}" required="required"/></p>                                   
                                     <p>spotifyid<input type="text" th:field="*{spotifyid}" required="required"/></p>
                                     <p>spotifyplay<input type="text" th:field="*{spotifyplay}" required="required" size="50"/></p>
-                                    <p>spotifyimagen<input type="text" th:field="*{spotifyimagen}" required="required" size="50"/></p>
-                                    <p>Revisar<input type="checkbox" th:field="*{revisar}" /></p>
-                                    <p>SoloTemas<input type="checkbox" th:field="*{soloTemas}" /></p>
-                                    <p>
-                                        <img th:src="*{spotifyimagen}" alt="PLAYHITSGAME" class="img-fluid"
-                                             th:data-name="*{spotifyplay}"
-                                             th:onclick="reproducir(this.getAttribute('data-name'))"/>
-                                    </p>
+                                    <p>spotifyimagen<input type="text" th:field="*{spotifyimagen}" required="required" size="50" /></p>
+                                    <p>Revisar<input type="checkbox" th:field="*{revisar}" /></p>                                    
                                     <input type="submit" value="Modificar Cancion"/>    
                                     <p th:text="${result}"></p>
                                 </form>
+                            </div>
+                            <div class="text-center">  
+                                <p>
+                                    <img th:src="${cancion.spotifyimagen}" alt="PLAYHITSGAME" class="img-fluid" width="200" height="200"
+                                         th:data-name="${cancion.spotifyplay}"
+                                         th:onclick="reproducir(this.getAttribute('data-name'))"/>
+                                </p>
                             </div>
                             <div class="card-footer py-3 border-0">
                                 <div class="text-center">                                   

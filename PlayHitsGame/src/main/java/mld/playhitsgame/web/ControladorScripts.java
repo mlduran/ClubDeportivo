@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import mld.playhitsgame.correo.EmailServicioMetodos;
 import mld.playhitsgame.exemplars.Batalla;
@@ -24,6 +25,7 @@ import mld.playhitsgame.exemplars.Respuesta;
 import mld.playhitsgame.exemplars.Ronda;
 import mld.playhitsgame.exemplars.StatusBatalla;
 import mld.playhitsgame.exemplars.StatusPartida;
+import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.exemplars.TipoPartida;
 import mld.playhitsgame.exemplars.Usuario;
 import mld.playhitsgame.services.BatallaServicioMetodos;
@@ -36,6 +38,7 @@ import mld.playhitsgame.services.OpcionTituloTmpServicioMetodos;
 import mld.playhitsgame.services.PartidaServicioMetodos;
 import mld.playhitsgame.services.RespuestaServicioMetodos;
 import mld.playhitsgame.services.RondaServicioMetodos;
+import mld.playhitsgame.services.TemaServicioMetodos;
 import mld.playhitsgame.services.UsuarioServicioMetodos;
 import mld.playhitsgame.utilidades.Utilidades;
 import static mld.playhitsgame.utilidades.Utilidades.asignarCancionesAleatorias;
@@ -85,6 +88,8 @@ public class ControladorScripts {
     OpcionAnyoTmpServicioMetodos servOpAnyo;
     @Autowired
     EstrellaServicioMetodos servEstrella;
+    @Autowired
+    TemaServicioMetodos servTema;
     @Autowired
     ConfigServicioMetodos servConfig;
 
@@ -301,7 +306,7 @@ public class ControladorScripts {
         }
 
         servBatalla.update(batalla.getId(), batalla);
-    }
+    }    
 
     private void tratarBatallas() {
 
@@ -364,6 +369,21 @@ public class ControladorScripts {
             }
         }
     }
+    
+    private void modificarUsuarioRecordTmp(){
+        
+        for (Tema tema : servTema.findAll()){
+            if (tema.getUsuarioRecord() != null){
+                Optional<Usuario> findById = servUsuario.findById(tema.getUsuarioRecord());
+                if (findById.isPresent()){
+                    Usuario usu = findById.get();
+                    tema.setRecordUsuario(usu);
+                    servTema.update(tema.getId(), tema);
+                }
+            }            
+        }
+        
+    }
 
     @GetMapping("/lanzarScripts")
     public ResponseEntity<Void> lanzarScripts(Model modelo, HttpServletRequest req
@@ -386,6 +406,7 @@ public class ControladorScripts {
             if (token.equals(tokenValidacion)) {
                 try {
                     // METODOS A EJECUTAR  
+                    modificarUsuarioRecordTmp();
                     tratarBatallas();
                     /////////////////////// FIN
                     txtCorreo = "Lanzamiento de scripts OK";

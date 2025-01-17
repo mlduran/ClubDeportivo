@@ -148,8 +148,9 @@ public class ControladorCancion {
             return "redirect:/logout";
         }
 
-        Optional<Cancion> cancion = servCancion.findById(id);
-        temasBD(modelo);
+        Cancion cancion = servCancion.findById(id).get();
+        temasBD(modelo);        
+        
 
         modelo.addAttribute("cancion", cancion);
         return "ModificarCancion";
@@ -183,7 +184,7 @@ public class ControladorCancion {
             return "redirect:/logout";
         }
 
-        Optional<CancionTmp> cancion = servCancionTmp.findById(id);
+        CancionTmp cancion = servCancionTmp.findById(id).get();
         temasBD(modelo);
 
         modelo.addAttribute("cancion", cancion);
