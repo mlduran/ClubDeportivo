@@ -23,9 +23,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <p th:text="#{mail.alta}"/>
                         </div>
                          <div class="card shadow-lg">
-                            <a th:href="${mensaje}">
-                                <p th:text="#{mail.activar}"/>
-                            </a>
+                           <p><a th:href="${url}" target="_blank" th:text="${textoUrl}"></a></p>  
                         </div>
                         <hr style="border: 0; height: 2px; background-color: #333; width: 100%;"/>
                         <div class="card shadow-lg">

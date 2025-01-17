@@ -179,7 +179,7 @@ public class ControladorVista {
             laConfig.setIpRouter(ipRouterActual);
             servConfig.saveSettings(laConfig);
             Utilidades.enviarMail(servEmail, mailAdmin, "", "Cambio de IP Router",
-                    "Se modifica la IP de " + ipRouterConfigurada + " a " + ipRouterActual, "Correo");
+                    "Se modifica la IP de " + ipRouterConfigurada + " a " + ipRouterActual, "Correo", null, null);
 
         }
 
@@ -436,7 +436,7 @@ public class ControladorVista {
             return "redirect:/logout";
         }
 
-        if (usu.isAdmin()) {
+        if (usu.isAdmin() && "Desarrollo".equals(entorno)) {
             modelo.addAttribute("urlSpotify", urlSpotify());
         }
         informarUsuarioModelo(modelo, usu);
@@ -934,8 +934,8 @@ public class ControladorVista {
                 String token = passwordEncoder.encode(usuario.getUsuario());
                 String enlace = customIp + "/validarUsuario?id=" + String.valueOf(usuario.getId())
                         + "&token=" + token;
-                boolean ok = Utilidades.enviarMail(servEmail, usuario, mensaje(modelo, "general.altaplay"),
-                        enlace, "CorreoAlta");
+                boolean ok = Utilidades.enviarMail(servEmail, usuario.getUsuario(), usuario.getNombre(), mensaje(modelo, "general.altaplay"),
+                        "", "CorreoAlta", enlace, "ACTIVAR CUENTA");
                 if (ok) {
                     resp = mensaje(modelo, "general.usuariocreado").concat(usuario.getUsuario());
                 } else {
@@ -1015,10 +1015,12 @@ public class ControladorVista {
             String txtMail = req.getParameter("txtMail");
             String enviar = req.getParameter("enviar");
             String prueba = req.getParameter("prueba");
+            String url = req.getParameter("url");
+            String textoUrl = req.getParameter("textoUrl");
 
             if (prueba != null) {
                 Utilidades.enviarMail(servEmail, mailAdmin, "", mensaje(modelo, "general.avisoplay"),
-                        txtMail, "Correo");
+                        txtMail, "Correo", url, textoUrl);
             }
             if (enviar != null && (entorno == null || !entorno.equals("Desarrollo"))) {
                 List<Usuario> usuarios = servUsuario.usuariosListaCorreoMasiva();
@@ -1028,8 +1030,8 @@ public class ControladorVista {
                         continue;
                     }
                     if (usu.isActivo()) {
-                        Utilidades.enviarMail(servEmail, usu, mensaje(modelo, "general.avisoplay"),
-                                txtMail, "Correo");
+                        Utilidades.enviarMail(servEmail, usu.getUsuario(), usu.getNombre(), mensaje(modelo, "general.avisoplay"),
+                                txtMail, "Correo", url, textoUrl);
                         try {
                             Thread.sleep(tiempoEspera); // Pausa de 1 segundo
                         } catch (InterruptedException e) {
@@ -1988,8 +1990,8 @@ public class ControladorVista {
             String token = usuario.get().getContrasenya();
             String enlace = mensaje(modelo, "general.txttokenrepssw") + token;
 
-            Utilidades.enviarMail(servEmail, usuario.get(), mensaje(modelo, "general.recupcontra"),
-                    enlace, "Correo");
+            Utilidades.enviarMail(servEmail, usuario.get().getUsuario(),  usuario.get().getNombre(), mensaje(modelo, "general.recupcontra"),
+                    enlace, "Correo", null, null);
 
             modelo.addAttribute("result", mensaje(modelo, "general.codigoenviado"));
             modelo.addAttribute("mail", mail);

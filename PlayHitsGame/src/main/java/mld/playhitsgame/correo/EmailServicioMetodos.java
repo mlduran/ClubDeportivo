@@ -64,6 +64,11 @@ public class EmailServicioMetodos implements EmailServicio {
         } else if (mail.getMensajes() != null) {
             context.setVariable("mensajes", mail.getMensajes());
         }
+        if (mail.getUrl() != null) {
+            context.setVariable("url", mail.getUrl());
+            context.setVariable("textoUrl", mail.getTextoUrl());
+        }
+
         context.setVariable("nombre", mail.getNombre());
         String contenttHTML
                 = templateEngine.process(plantilla, context);

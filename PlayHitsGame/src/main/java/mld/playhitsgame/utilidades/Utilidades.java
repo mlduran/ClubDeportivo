@@ -18,6 +18,7 @@ import java.net.UnknownHostException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -725,36 +726,15 @@ public class Utilidades {
 
     }
 
-    public static boolean enviarMail(EmailServicioMetodos emailServicio,
-            Usuario usuario, String asunto, String txt, String plantilla) {
-        return enviarMail(emailServicio, usuario.getUsuario(), usuario.getNombre(), asunto, txt, plantilla);
+   
+    public static boolean enviarMail(EmailServicioMetodos servEmail, String mail, String nombre, String mensaje, String txt, String correo, String url, String textoUrl) {
+        List<String> txts = Arrays.asList(txt.split("\\R"));
+        return enviarMail(servEmail, mail, nombre, mensaje, txts, correo, url, textoUrl);
     }
-
-    public static boolean enviarMail(EmailServicioMetodos emailServicio,
-            String mailDestino, String nombre, String asunto, String txt, String plantilla) {
-        boolean ok = true;
-        Mail mail = new Mail();
-        try {
-            mail.setAsunto(asunto);
-            mail.setDestinatario(mailDestino);
-            mail.setMensaje(txt);
-            mail.setPlantilla(plantilla);
-            mail.setNombre(nombre);
-            emailServicio.enviarCorreo(mail);
-        } catch (MessagingException | MailSendException ex) {
-            ok = false;
-            Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return ok;
-    }
-    
-    public static boolean enviarMail(EmailServicioMetodos emailServicio,
-            Usuario usuario, String asunto,  List<String> txt, String plantilla) {
-        return enviarMail(emailServicio, usuario.getUsuario(), usuario.getNombre(), asunto, txt, plantilla);    }
 
     
     public static boolean enviarMail(EmailServicioMetodos emailServicio,
-            String mailDestino, String nombre, String asunto, List<String> txt, String plantilla) {
+            String mailDestino, String nombre, String asunto, List<String> txt, String plantilla, String url, String textoUrl) {
         boolean ok = true;
         Mail mail = new Mail();
         try {
@@ -763,6 +743,8 @@ public class Utilidades {
             mail.setMensajes(txt);
             mail.setPlantilla(plantilla);
             mail.setNombre(nombre);
+            mail.setUrl(url);
+            mail.setTextoUrl(textoUrl);
             emailServicio.enviarCorreo(mail);
         } catch (MessagingException | MailSendException ex) {
             ok = false;
@@ -877,6 +859,8 @@ public class Utilidades {
 
         return respuestas;
     }
+
+   
     
     
 

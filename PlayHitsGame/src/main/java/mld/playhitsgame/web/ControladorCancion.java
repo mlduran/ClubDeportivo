@@ -381,7 +381,7 @@ public class ControladorCancion {
             }
 
             Utilidades.enviarMail(servEmail, mailAdmin, "", "Canciones no disponibles",
-                    cabecera + err.toString(), "Correo");
+                    cabecera + err.toString(), "Correo", null, null);
         }
 
     }

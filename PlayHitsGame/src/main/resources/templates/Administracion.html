@@ -53,6 +53,12 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <form th:action="@{/enviarMailMasivo}" method="post">
                                 <label for="txtMail">ENVIO DE MAIL MASIVO</label><br>
                                 <textarea id="txtMail" name="txtMail" cols="40" rows="10"></textarea><br><br>
+                                <label for="url">URL</label>
+                                <input id="url" name="url" type="text"/>
+                                <br/>                                
+                                <label for="textoUrl">Texto URL</label>
+                                <input id="textoUrl" name="textoUrl" type="text"/>
+                                <br/>
                                 <button type="submit" name="enviar" id="enviar">Enviar</button>
                                 <button type="submit" name="prueba" id="prueba">Prueba</button>
                             </form>

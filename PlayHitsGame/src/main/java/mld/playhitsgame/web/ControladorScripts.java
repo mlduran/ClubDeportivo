@@ -113,7 +113,7 @@ public class ControladorScripts {
 
             if (entorno != null && entorno.equals("Desarrollo")) {
                 Utilidades.enviarMail(servEmail, mailAdmin, "", asunto,
-                        txtsMail, "CorreoPlus");
+                        txtsMail, "Correo", null, null);
             } else {
 
                 int tiempoEspera = 9000; //Para enviar 400 mails por hora
@@ -122,8 +122,8 @@ public class ControladorScripts {
                         continue;
                     }
                     if (usu.isActivo()) {
-                        Utilidades.enviarMail(servEmail, usu, asunto,
-                                txtsMail, "CorreoPlus");
+                        Utilidades.enviarMail(servEmail, usu.getUsuario(), usu.getNombre(),asunto,
+                                txtsMail, "Correo", null, null);
                         try {
                             Thread.sleep(tiempoEspera); // Pausa de 1 segundo
                         } catch (InterruptedException e) {
@@ -370,21 +370,6 @@ public class ControladorScripts {
         }
     }
     
-    private void modificarUsuarioRecordTmp(){
-        
-        for (Tema tema : servTema.findAll()){
-            if (tema.getUsuarioRecord() != null){
-                Optional<Usuario> findById = servUsuario.findById(tema.getUsuarioRecord());
-                if (findById.isPresent()){
-                    Usuario usu = findById.get();
-                    tema.setRecordUsuario(usu);
-                    servTema.update(tema.getId(), tema);
-                }
-            }            
-        }
-        
-    }
-
     @GetMapping("/lanzarScripts")
     public ResponseEntity<Void> lanzarScripts(Model modelo, HttpServletRequest req
     ) {
@@ -406,7 +391,6 @@ public class ControladorScripts {
             if (token.equals(tokenValidacion)) {
                 try {
                     // METODOS A EJECUTAR  
-                    modificarUsuarioRecordTmp();
                     tratarBatallas();
                     /////////////////////// FIN
                     txtCorreo = "Lanzamiento de scripts OK";
@@ -419,7 +403,7 @@ public class ControladorScripts {
         }
 
         Utilidades.enviarMail(servEmail, mailAdmin, "", "Jornada PlayHitsGame",
-                txtCorreo, "Correo");
+                txtCorreo, "Correo", null, null);
 
         return ResponseEntity.ok().build();
 
