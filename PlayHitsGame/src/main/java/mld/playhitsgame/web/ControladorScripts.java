@@ -183,7 +183,10 @@ public class ControladorScripts {
         txtsMail.add("Batalla " + batalla.getNombre());
         txtsMail.add(batalla.getDescripcionTxT());
         txtsMail.add("Puedes acceder para visualizar los resultados.");
-        txtsMail.add("Enhorabuena al ganador " + batalla.getGanador().getNombre()
+        String ganador = "----";
+        if (batalla.getGanador() != null)
+            ganador = batalla.getGanador().getNombre();
+        txtsMail.add("Enhorabuena al ganador " + ganador
                 + " que ha añadido una Estrella a su palmares");
         List<Usuario> usuarios = batalla.getUsuariosInscritos();
 

@@ -443,7 +443,7 @@ public class ControladorVista {
 
         List<Batalla> batallas = servBatalla.batallasEnInscripcionPublicas();
         List<Batalla> batallasDisponibles = new ArrayList<>();
-        List<Batalla> batallaCompletas = new ArrayList<>();
+        List<Batalla> batallasCompletas = new ArrayList<>();
         List<Batalla> batallasInscritas = new ArrayList<>();
 
         for (Batalla batalla : batallas) {
@@ -453,7 +453,7 @@ public class ControladorVista {
                 if (batalla.getUsuariosInscritos().size() < batalla.NUMERO_MAX_PARTICIPANTES) {
                     batallasDisponibles.add(batalla);
                 } else {
-                    batallaCompletas.add(batalla);
+                    batallasCompletas.add(batalla);
                 }
             }
         }
@@ -463,7 +463,7 @@ public class ControladorVista {
         modelo.addAttribute("batallasDisponibles", batallasDisponibles);
         modelo.addAttribute("batallasInscritas", batallasInscritas);
         modelo.addAttribute("ultimaBatalla", usu.ultimaBatalla());
-        modelo.addAttribute("batallaCompletas", batallaCompletas);
+        modelo.addAttribute("batallasCompletas", batallasCompletas);
 
         return "Panel";
     }

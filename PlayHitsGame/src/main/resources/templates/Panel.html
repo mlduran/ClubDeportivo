@@ -213,12 +213,12 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                         </table>
                                     </div>
                                 </div>
-                                <div th:unless="${batallaCompletas.isEmpty()}" class="text-center my-2">                                
+                                <div th:unless="${batallasCompletas.isEmpty()}" class="text-center my-2">                                
                                     <div class="table-responsive-lg ">
                                         <table class="table table-sm table-striped table-bordered" style="max-width: 100%; width: 100%; table-layout: fixed;"> 
                                             <thead class="table-light" style="text-align:center;">
                                                 <tr>
-                                                    <th colspan="4">
+                                                    <th colspan="3">
                                                         <p th:text="#{general.batallascompletas}"/>
                                                     </th>                   
                                                 </tr> 
@@ -235,7 +235,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                 </tr>                                            
                                             </thead>
                                             <tbody>
-                                                <tr th:each="batalla : ${batallasDisponibles}">
+                                                <tr th:each="batalla : ${batallasCompletas}">
                                                     <td>
                                                         <p th:text="${batalla.cuentaAtras}"/>   
                                                     </td>
