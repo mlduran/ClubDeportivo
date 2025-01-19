@@ -25,7 +25,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <div class="card-body p-5">
                                 <h1 class="fs-4 card-title fw-bold mb-4" text="Modificar Cancion"/>         
 
-                                <form method="post" th:action="@{/modificarCancion}" th:object="${cancion}">  
+                                <form method="post" th:action="@{/modificarCancionTmp}" th:object="${cancion}">  
                                     <input type="hidden" th:field="*{id}" required="required"/></p>
                                     <p>Titulo<input type="text" th:field="*{titulo}" required="required" size="40" /></p>
                                     <p>Interprete<input type="text" th:field="*{interprete}" required="required"/></p>

@@ -53,7 +53,7 @@ public class Usuario {
     private int segEspera;
     private int puntos;
     private boolean noAceptaCorreos;
-    
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Estrella> estrellas;
 
@@ -85,7 +85,7 @@ public class Usuario {
             inverseJoinColumns = @JoinColumn(name = "batalla_id")
     )
     private List<Batalla> batallasInscritas;
-    
+
     @OneToMany(mappedBy = "ganador") // Relación inversa con Batalla
     private List<Batalla> batallasGanadas;
 
@@ -171,6 +171,10 @@ public class Usuario {
             nombre = x[0];
         } else {
             nombre = this.getAlias();
+        }
+
+        if (nombre.length() > 20) {
+            nombre = nombre.substring(0, 20);
         }
 
         return nombre;
@@ -288,15 +292,15 @@ public class Usuario {
         ArrayList<Batalla> batallasEnCursoPendientes = new ArrayList();
         for (Batalla batalla : batallasEnCurso()) {
             for (Partida partida : batalla.getPartidas()) {
-                if (partida.getMaster().equals(this)) {                    
-                        batallasEnCursoPendientes.add(batalla);
-                        break;                    
+                if (partida.getMaster().equals(this)) {
+                    batallasEnCursoPendientes.add(batalla);
+                    break;
                 }
             }
         }
         return batallasEnCursoPendientes;
     }
-  
+
     public List<Partida> batallasEnCursoPendientesJugar() {
 
         ArrayList<Partida> batallasEnCursoPendientes = new ArrayList();
@@ -338,12 +342,12 @@ public class Usuario {
 
         return !batallasEnCursoPendientes().isEmpty();
     }
-    
+
     public boolean hayBatallasEnCursoPendientesJugar() {
 
         return !batallasEnCursoPendientesJugar().isEmpty();
     }
-    
+
     public boolean hayBatallasEnCursoAcabadas() {
 
         return !batallasEnCursoAcabadas().isEmpty();

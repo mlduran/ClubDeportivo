@@ -95,6 +95,8 @@ public class ControladorScripts {
 
     private final String tokenValidacion = "a3b2f10c-482d-4d7e-a5ed-2f9b7e8bcfd0";
     private int numMaxEstrellas;
+    
+    private int PROCESOS_MASIVOS_CORREO = 0;
 
     @PostConstruct
     public void init() {
@@ -106,8 +108,13 @@ public class ControladorScripts {
         // habria que reiniciar la APP
         numMaxEstrellas = laConfig.getNumMaxEstrellas();
     }
+    
+    private int tiempoEsperaCorreo(){
+        
+        return 9000 * Math.max(PROCESOS_MASIVOS_CORREO, 1); //Para enviar 400 mails por hora
+    }
 
-    private void enviarMail(String asunto, ArrayList<String> txtsMail, List<Usuario> usuarios) {
+    private void enviarMail(String asunto, ArrayList<String> txtsMail, List<Usuario> usuarios) {       
 
         CompletableFuture.runAsync(() -> {
 
@@ -116,22 +123,23 @@ public class ControladorScripts {
                         txtsMail, "Correo", null, null);
             } else {
 
-                int tiempoEspera = 9000; //Para enviar 400 mails por hora
+                PROCESOS_MASIVOS_CORREO = PROCESOS_MASIVOS_CORREO + 1;
                 for (Usuario usu : usuarios) {
                     if (!usu.getUsuario().contains(".")) {
                         continue;
                     }
-                    if (usu.isActivo()) {
+                    if (usu.isActivo() && !usu.isNoAceptaCorreos()) {
                         Utilidades.enviarMail(servEmail, usu.getUsuario(), usu.getNombre(),asunto,
                                 txtsMail, "Correo", null, null);
                         try {
-                            Thread.sleep(tiempoEspera); // Pausa de 1 segundo
+                            Thread.sleep(tiempoEsperaCorreo()); // Pausa de 1 segundo
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                             System.err.println("La espera fue interrumpida: " + e.getMessage());
                         }
                     }
                 }
+                PROCESOS_MASIVOS_CORREO = PROCESOS_MASIVOS_CORREO - 1;
             }
         });
     }

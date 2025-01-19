@@ -49,12 +49,15 @@ public class EmailServicioMetodos implements EmailServicio {
         helper.setFrom(mailApp);
         helper.setTo(mail.getDestinatario());
         helper.setSubject(mail.getAsunto());
-        String plantilla = "correo/";
+        String plantilla = "";
         if (mail.getPlantilla() != null) {
             plantilla = plantilla + mail.getPlantilla();
         } else {
             plantilla = plantilla + "Correo";
         }
+
+        // DEBUG: Imprime el nombre final de la plantilla
+        System.out.println("Plantilla generada: " + plantilla);
 
         Context context = new Context();
         context.setVariable("imagen", customIp + "/images/playhitsgamePresentacion.png");
@@ -70,11 +73,17 @@ public class EmailServicioMetodos implements EmailServicio {
         }
 
         context.setVariable("nombre", mail.getNombre());
-        String contenttHTML
-                = templateEngine.process(plantilla, context);
-        helper.setText(contenttHTML, true);
-        javaMailSender.send(message);
-        System.out.println("Se envia correo a " + mail.getDestinatario());
+
+        // Procesar plantilla
+        try {
+            String contenttHTML = templateEngine.process(plantilla, context);
+            helper.setText(contenttHTML, true);
+            javaMailSender.send(message);
+            System.out.println("Se envió correo a " + mail.getDestinatario());
+        } catch (Exception e) {
+            System.out.println("Error procesando la plantilla: " + plantilla);            
+            throw e; // Vuelve a lanzar la excepción para gestionarla adecuadamente
+        }
 
     }
 
