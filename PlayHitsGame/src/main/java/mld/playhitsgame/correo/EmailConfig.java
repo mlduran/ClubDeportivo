@@ -20,9 +20,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 
 @Configuration
-public class EmailConfig {
-    
-    
+public class EmailConfig {    
     
     @Value("${mail.smtp.auth}")
     private String auth;    

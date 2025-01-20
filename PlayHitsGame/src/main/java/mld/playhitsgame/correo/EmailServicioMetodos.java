@@ -4,20 +4,27 @@
  */
 package mld.playhitsgame.correo;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ *
+ * @author miguel
+ */
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-/**
- *
- * @author miguel
- */
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
+
 @Service
 public class EmailServicioMetodos implements EmailServicio {
 
@@ -29,44 +36,86 @@ public class EmailServicioMetodos implements EmailServicio {
 
     @Value("${mail.username}")
     private String mailApp;
+    
+    private final int TIEMPO_ESPERA_ENVIO = 9000;  //Para enviar 400 mails por hora
 
-    public EmailServicioMetodos(JavaMailSender javaMailSender,
-            TemplateEngine templateEngine) {
+    private final BlockingQueue<Mail> mailQueue = new PriorityBlockingQueue<>();
+    private volatile boolean running = true;
+    private Thread emailProcessorThread;
 
+    public EmailServicioMetodos(JavaMailSender javaMailSender, TemplateEngine templateEngine) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
+    }
 
+    @PostConstruct
+    public void startProcessing() {
+        emailProcessorThread = new Thread(() -> {
+            while (running) {
+                try {
+                    // Toma un correo de la cola (bloquea si está vacía)
+                    Mail mail = mailQueue.take();
+                    enviaCorreo(mail); // Envía el correo
+                    Thread.sleep(TIEMPO_ESPERA_ENVIO); 
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                } catch (Exception e) {
+                    // Maneja cualquier excepción del envío
+                    System.err.println("Error enviando correo: " + e.getMessage());
+                }
+            }
+        });
+        emailProcessorThread.start();
+    }
+
+    @PreDestroy
+    public void stopProcessing() {
+        running = false;
+        emailProcessorThread.interrupt(); // Detiene el hilo
+    }
+
+    /**
+     * Agrega un correo a la cola para ser procesado.
+     *
+     * @param mail
+     */
+    @Override
+    public void encolarMail(Mail mail) {
+        try {
+            mailQueue.put(mail);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Error al agregar correo a la cola", e);
+        }
     }
 
     @Override
-    public void enviarCorreo(Mail mail) throws MessagingException, MailSendException {
+    public void encolarMails(List<Mail> mails) {
+        for (Mail mail : mails) {
+            encolarMail(mail);
+        }
+    }
 
-        MimeMessage message
-                = javaMailSender.createMimeMessage();
-        MimeMessageHelper helper
-                = new MimeMessageHelper(message, true, "UTF-8");
+    private void enviaCorreo(Mail mail) throws MessagingException {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
         helper.setFrom(mailApp);
         helper.setTo(mail.getDestinatario());
         helper.setSubject(mail.getAsunto());
-        String plantilla = "";
-        if (mail.getPlantilla() != null) {
-            plantilla = plantilla + mail.getPlantilla();
-        } else {
-            plantilla = plantilla + "Correo";
-        }
 
-        // DEBUG: Imprime el nombre final de la plantilla
-        System.out.println("Plantilla generada: " + plantilla);
-
+        String plantilla = mail.getPlantilla() != null ? mail.getPlantilla() : "Correo";
         Context context = new Context();
         context.setVariable("imagen", customIp + "/images/playhitsgamePresentacion.png");
         context.setVariable("mail", mailApp);
+
         if (mail.getMensaje() != null) {
-            context.setVariable("mensaje", mail.getMensaje());
+            List<String> txts = Arrays.asList(mail.getMensaje().split("\\R"));
+            context.setVariable("mensajes", txts);
         } else if (mail.getMensajes() != null) {
             context.setVariable("mensajes", mail.getMensajes());
         }
+
         if (mail.getUrl() != null) {
             context.setVariable("url", mail.getUrl());
             context.setVariable("textoUrl", mail.getTextoUrl());
@@ -74,17 +123,14 @@ public class EmailServicioMetodos implements EmailServicio {
 
         context.setVariable("nombre", mail.getNombre());
 
-        // Procesar plantilla
         try {
             String contenttHTML = templateEngine.process(plantilla, context);
             helper.setText(contenttHTML, true);
             javaMailSender.send(message);
-            System.out.println("Se envió correo a " + mail.getDestinatario());
+            System.out.println("Se envió correo " + mail.getAsunto() + " a " + mail.getDestinatario());
         } catch (Exception e) {
-            System.out.println("Error procesando la plantilla: " + plantilla);            
-            throw e; // Vuelve a lanzar la excepción para gestionarla adecuadamente
+            System.err.println("Error procesando la plantilla: " + plantilla);
+            throw e;
         }
-
     }
-
 }

@@ -4,7 +4,7 @@
  */
 package mld.playhitsgame.correo;
 
-import jakarta.mail.MessagingException;
+import java.util.List;
 
 /**
  *
@@ -12,6 +12,7 @@ import jakarta.mail.MessagingException;
  */
 public interface EmailServicio {
     
-     public void enviarCorreo(Mail mail) throws MessagingException;
+     public void encolarMail(Mail mail);
+     public void encolarMails(List<Mail> mails);
     
 }

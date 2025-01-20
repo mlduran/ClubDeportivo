@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import lombok.extern.slf4j.Slf4j;
 import mld.playhitsgame.correo.EmailServicioMetodos;
+import mld.playhitsgame.correo.Mail;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.CancionTmp;
 import mld.playhitsgame.exemplars.Config;
@@ -380,8 +381,14 @@ public class ControladorCancion {
                 cabecera = "Se han detectado los siguientes errores y las canciones se han dejado pendientes de validar \n \n";
             }
 
-            Utilidades.enviarMail(servEmail, mailAdmin, "", "Canciones no disponibles",
-                    cabecera + err.toString(), "Correo", null, null);
+            Mail mail = new Mail();
+            mail.setAsunto("Canciones no disponibles");
+            mail.setDestinatario(mailAdmin);
+            mail.setMensaje(cabecera + err.toString());
+            mail.setPlantilla("Correo");
+            mail.setNombre("");
+            mail.setPrioritario(true);
+            servEmail.encolarMail(mail);            
         }
 
     }

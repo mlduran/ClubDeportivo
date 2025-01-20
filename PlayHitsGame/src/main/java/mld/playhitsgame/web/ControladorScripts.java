@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import mld.playhitsgame.correo.EmailServicioMetodos;
+import mld.playhitsgame.correo.Mail;
 import mld.playhitsgame.exemplars.Batalla;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.Config;
@@ -95,8 +96,6 @@ public class ControladorScripts {
 
     private final String tokenValidacion = "a3b2f10c-482d-4d7e-a5ed-2f9b7e8bcfd0";
     private int numMaxEstrellas;
-    
-    private int PROCESOS_MASIVOS_CORREO = 0;
 
     @PostConstruct
     public void init() {
@@ -108,40 +107,33 @@ public class ControladorScripts {
         // habria que reiniciar la APP
         numMaxEstrellas = laConfig.getNumMaxEstrellas();
     }
-    
-    private int tiempoEsperaCorreo(){
-        
-        return 9000 * Math.max(PROCESOS_MASIVOS_CORREO, 1); //Para enviar 400 mails por hora
-    }
 
-    private void enviarMail(String asunto, ArrayList<String> txtsMail, List<Usuario> usuarios) {       
+    private void enviarMail(String asunto, ArrayList<String> txtsMail, List<Usuario> usuarios) {
 
-        CompletableFuture.runAsync(() -> {
-
-            if (entorno != null && entorno.equals("Desarrollo")) {
-                Utilidades.enviarMail(servEmail, mailAdmin, "", asunto,
-                        txtsMail, "Correo", null, null);
-            } else {
-
-                PROCESOS_MASIVOS_CORREO = PROCESOS_MASIVOS_CORREO + 1;
-                for (Usuario usu : usuarios) {
-                    if (!usu.getUsuario().contains(".")) {
-                        continue;
-                    }
-                    if (usu.isActivo() && !usu.isNoAceptaCorreos()) {
-                        Utilidades.enviarMail(servEmail, usu.getUsuario(), usu.getNombre(),asunto,
-                                txtsMail, "Correo", null, null);
-                        try {
-                            Thread.sleep(tiempoEsperaCorreo()); // Pausa de 1 segundo
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                            System.err.println("La espera fue interrumpida: " + e.getMessage());
-                        }
-                    }
+        if (entorno != null && entorno.equals("Desarrollo")) {
+            Mail mail = new Mail();
+            mail.setAsunto(asunto);
+            mail.setDestinatario(mailAdmin);
+            mail.setMensajes(txtsMail);
+            mail.setPlantilla("Correo");
+            servEmail.encolarMail(mail);
+        } else {
+            for (Usuario usu : usuarios) {
+                if (!usu.getUsuario().contains(".")) {
+                    continue;
                 }
-                PROCESOS_MASIVOS_CORREO = PROCESOS_MASIVOS_CORREO - 1;
+                if (usu.isActivo() && !usu.isNoAceptaCorreos()) {
+                    Mail mail = new Mail();
+                    mail.setAsunto(asunto);
+                    mail.setDestinatario(usu.getUsuario());
+                    mail.setNombre(usu.getNombre());
+                    mail.setMensajes(txtsMail);
+                    mail.setPlantilla("Correo");
+                    servEmail.encolarMail(mail);
+                }
             }
-        });
+        }
+
     }
 
     private void informarNuevaBatalla(Batalla batalla) {
@@ -192,8 +184,9 @@ public class ControladorScripts {
         txtsMail.add(batalla.getDescripcionTxT());
         txtsMail.add("Puedes acceder para visualizar los resultados.");
         String ganador = "----";
-        if (batalla.getGanador() != null)
+        if (batalla.getGanador() != null) {
             ganador = batalla.getGanador().getNombre();
+        }
         txtsMail.add("Enhorabuena al ganador " + ganador
                 + " que ha añadido una Estrella a su palmares");
         List<Usuario> usuarios = batalla.getUsuariosInscritos();
@@ -317,7 +310,7 @@ public class ControladorScripts {
         }
 
         servBatalla.update(batalla.getId(), batalla);
-    }    
+    }
 
     private void tratarBatallas() {
 
@@ -380,7 +373,7 @@ public class ControladorScripts {
             }
         }
     }
-    
+
     @GetMapping("/lanzarScripts")
     public ResponseEntity<Void> lanzarScripts(Model modelo, HttpServletRequest req
     ) {
@@ -413,8 +406,14 @@ public class ControladorScripts {
             }
         }
 
-        Utilidades.enviarMail(servEmail, mailAdmin, "", "Jornada PlayHitsGame",
-                txtCorreo, "Correo", null, null);
+        Mail mail = new Mail();
+        mail.setAsunto("Jornada PlayHitsGame");
+        mail.setDestinatario(mailAdmin);
+        mail.setMensaje(txtCorreo);
+        mail.setPlantilla("Correo");
+        mail.setNombre("");
+        mail.setPrioritario(true);
+        servEmail.encolarMail(mail);
 
         return ResponseEntity.ok().build();
 

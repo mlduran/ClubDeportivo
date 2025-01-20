@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import mld.playhitsgame.correo.EmailServicioMetodos;
+import mld.playhitsgame.correo.Mail;
 import mld.playhitsgame.exemplars.Batalla;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.Config;
@@ -178,10 +179,24 @@ public class ControladorVista {
         if (!ipRouterConfigurada.equals(ipRouterActual)) {
             laConfig.setIpRouter(ipRouterActual);
             servConfig.saveSettings(laConfig);
-            Utilidades.enviarMail(servEmail, mailAdmin, "", "Cambio de IP Router",
-                    "Se modifica la IP de " + ipRouterConfigurada + " a " + ipRouterActual, "Correo", null, null);
+            Mail mail = new Mail();
+            mail.setAsunto("Cambio de IP Router");
+            mail.setDestinatario(mailAdmin);
+            mail.setMensaje("Se modifica la IP de " + ipRouterConfigurada + " a " + ipRouterActual);
+            mail.setPlantilla("Correo");
+            mail.setNombre("");
+            mail.setPrioritario(true);
+            servEmail.encolarMail(mail);
 
         }
+        Mail mail = new Mail();
+        mail.setAsunto("Inicio Servidor " + entorno);
+        mail.setDestinatario(mailAdmin);
+        mail.setMensaje("Se inicia servicio Tomcat PLAYHITSGAME " + entorno);
+        mail.setPlantilla("Correo");
+        mail.setNombre("");
+        mail.setPrioritario(true);
+        servEmail.encolarMail(mail);
 
         // para que este valor se refresque si se cambia en la BD
         // habria que reiniciar la APP
@@ -934,13 +949,19 @@ public class ControladorVista {
                 String token = passwordEncoder.encode(usuario.getUsuario());
                 String enlace = customIp + "/validarUsuario?id=" + String.valueOf(usuario.getId())
                         + "&token=" + token;
-                boolean ok = Utilidades.enviarMail(servEmail, usuario.getUsuario(), usuario.getNombre(), mensaje(modelo, "general.altaplay"),
-                        "", "CorreoAlta", enlace, "ACTIVAR CUENTA");
-                if (ok) {
-                    resp = mensaje(modelo, "general.usuariocreado").concat(usuario.getUsuario());
-                } else {
-                    err = mensaje(modelo, "general.mailinvalido");
-                }
+                Mail mail = new Mail();
+                mail.setAsunto(mensaje(modelo, "general.altaplay"));
+                mail.setDestinatario(usuario.getUsuario());
+                mail.setMensaje("");
+                mail.setPlantilla("CorreoAlta");
+                mail.setNombre(usuario.getNombre());
+                mail.setPrioritario(true);
+                mail.setUrl(enlace);
+                mail.setTextoUrl(mensaje(modelo, "mail.activar"));
+                servEmail.encolarMail(mail);
+
+                resp = mensaje(modelo, "general.usuariocreado").concat(usuario.getUsuario());
+
             } catch (Exception ex) {
                 err = "ERROR " + ex.getMessage();
             }
@@ -1019,25 +1040,34 @@ public class ControladorVista {
             String textoUrl = req.getParameter("textoUrl");
 
             if (prueba != null) {
-                Utilidades.enviarMail(servEmail, mailAdmin, "", mensaje(modelo, "general.avisoplay"),
-                        txtMail, "Correo", url, textoUrl);
+                Mail mail = new Mail();
+                mail.setAsunto(mensaje(modelo, "general.avisoplay"));
+                mail.setDestinatario(mailAdmin);
+                mail.setMensaje(txtMail);
+                mail.setPlantilla("Correo");
+                mail.setNombre("");
+                mail.setPrioritario(false);
+                mail.setUrl(url);
+                mail.setTextoUrl(textoUrl);
+                servEmail.encolarMail(mail);
             }
             if (enviar != null && (entorno == null || !entorno.equals("Desarrollo"))) {
                 List<Usuario> usuarios = servUsuario.usuariosListaCorreoMasiva();
-                int tiempoEspera = 9000; //Para enviar 400 mails por hora
                 for (Usuario usu : usuarios) {
                     if (!usu.getUsuario().contains(".")) {
                         continue;
                     }
                     if (usu.isActivo()) {
-                        Utilidades.enviarMail(servEmail, usu.getUsuario(), usu.getNombre(), mensaje(modelo, "general.avisoplay"),
-                                txtMail, "Correo", url, textoUrl);
-                        try {
-                            Thread.sleep(tiempoEspera); // Pausa de 1 segundo
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                            System.err.println("La espera fue interrumpida: " + e.getMessage());
-                        }
+                        Mail mail = new Mail();
+                        mail.setAsunto(mensaje(modelo, "general.avisoplay"));
+                        mail.setDestinatario(usu.getUsuario());
+                        mail.setMensaje(txtMail);
+                        mail.setPlantilla("Correo");
+                        mail.setNombre(usu.getNombre());
+                        mail.setPrioritario(false);
+                        mail.setUrl(url);
+                        mail.setTextoUrl(textoUrl);
+                        servEmail.encolarMail(mail);
                     }
                 }
             }
@@ -1990,8 +2020,14 @@ public class ControladorVista {
             String token = usuario.get().getContrasenya();
             String enlace = mensaje(modelo, "general.txttokenrepssw") + token;
 
-            Utilidades.enviarMail(servEmail, usuario.get().getUsuario(),  usuario.get().getNombre(), mensaje(modelo, "general.recupcontra"),
-                    enlace, "Correo", null, null);
+            Mail email = new Mail();
+            email.setAsunto(mensaje(modelo, "general.codrecuperacion") + " PLAYHITSGAME");
+            email.setDestinatario(usuario.get().getUsuario());
+            email.setMensaje(enlace);
+            email.setPlantilla("Correo");
+            email.setNombre(usuario.get().getNombre());
+            email.setPrioritario(true);
+            servEmail.encolarMail(email);
 
             modelo.addAttribute("result", mensaje(modelo, "general.codigoenviado"));
             modelo.addAttribute("mail", mail);
@@ -2365,12 +2401,14 @@ public class ControladorVista {
 
         if (findById.isPresent()) {
             batalla = findById.get();
-            if (batalla.getStatus().equals(StatusBatalla.Inscripcion)
-                    && batalla.getUsuariosInscritos().size() < batalla.NUMERO_MAX_PARTICIPANTES) {
-                batalla.getUsuariosInscritos().add(usu);
-                usu.getBatallasInscritas().add(batalla);
-                servBatalla.update(batalla.getId(), batalla);
-                servUsuario.update(usu.getId(), usu);
+            if (!batalla.getUsuariosInscritos().contains(usu)) {
+                if (batalla.getStatus().equals(StatusBatalla.Inscripcion)
+                        && batalla.getUsuariosInscritos().size() < batalla.NUMERO_MAX_PARTICIPANTES) {
+                    batalla.getUsuariosInscritos().add(usu);
+                    usu.getBatallasInscritas().add(batalla);
+                    servBatalla.update(batalla.getId(), batalla);
+                    servUsuario.update(usu.getId(), usu);
+                }
             }
         }
 

@@ -726,33 +726,6 @@ public class Utilidades {
 
     }
 
-   
-    public static boolean enviarMail(EmailServicioMetodos servEmail, String mail, String nombre, String mensaje, String txt, String correo, String url, String textoUrl) {
-        List<String> txts = Arrays.asList(txt.split("\\R"));
-        return enviarMail(servEmail, mail, nombre, mensaje, txts, correo, url, textoUrl);
-    }
-
-    
-    public static boolean enviarMail(EmailServicioMetodos emailServicio,
-            String mailDestino, String nombre, String asunto, List<String> txt, String plantilla, String url, String textoUrl) {
-        boolean ok = true;
-        Mail mail = new Mail();
-        try {
-            mail.setAsunto(asunto);
-            mail.setDestinatario(mailDestino);
-            mail.setMensajes(txt);
-            mail.setPlantilla(plantilla);
-            mail.setNombre(nombre);
-            mail.setUrl(url);
-            mail.setTextoUrl(textoUrl);
-            emailServicio.enviarCorreo(mail);
-        } catch (MessagingException | MailSendException ex) {
-            ok = false;
-            Logger.getLogger(ControladorVista.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return ok;
-    }
-
     private static boolean isURLValid(String urlString) {
         try {
             // Crear un objeto URL

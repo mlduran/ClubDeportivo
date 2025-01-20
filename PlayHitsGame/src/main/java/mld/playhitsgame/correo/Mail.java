@@ -13,7 +13,7 @@ import lombok.Data;
  */
 
 @Data
-public class Mail {
+public class Mail implements Comparable<Mail>{
     
     private String destinatario;
     private String asunto;
@@ -23,6 +23,14 @@ public class Mail {
     private String textoUrl;
     private String plantilla;
     private String nombre;
+    private boolean prioritario;
+    
+    
+    @Override
+    public int compareTo(Mail o) {
+        // Prioritarios (true) deben ir antes que no prioritarios (false)
+        return Boolean.compare(o.prioritario, this.prioritario);
+    }
     
     
 }
