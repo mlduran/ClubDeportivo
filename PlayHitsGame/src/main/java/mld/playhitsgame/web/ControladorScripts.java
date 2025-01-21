@@ -9,8 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import mld.playhitsgame.correo.EmailServicioMetodos;
 import mld.playhitsgame.correo.Mail;
 import mld.playhitsgame.exemplars.Batalla;
@@ -26,7 +24,6 @@ import mld.playhitsgame.exemplars.Respuesta;
 import mld.playhitsgame.exemplars.Ronda;
 import mld.playhitsgame.exemplars.StatusBatalla;
 import mld.playhitsgame.exemplars.StatusPartida;
-import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.exemplars.TipoPartida;
 import mld.playhitsgame.exemplars.Usuario;
 import mld.playhitsgame.services.BatallaServicioMetodos;
@@ -114,6 +111,7 @@ public class ControladorScripts {
             Mail mail = new Mail();
             mail.setAsunto(asunto);
             mail.setDestinatario(mailAdmin);
+            mail.setNombre("");
             mail.setMensajes(txtsMail);
             mail.setPlantilla("Correo");
             servEmail.encolarMail(mail);
@@ -290,7 +288,9 @@ public class ControladorScripts {
         List<PtsUsuario> resultadosBatalla = Utilidades.resultadosBatalla(batalla, batalla.getFase());
         if (!resultadosBatalla.isEmpty()) {
             PtsUsuario ptsPrimero = Utilidades.resultadosBatalla(batalla, batalla.getFase()).getFirst();
-            servEstrella.darEstrella(ptsPrimero.getUsuario(), numMaxEstrellas);
+            if (batalla.isPublica()) {
+                servEstrella.darEstrella(ptsPrimero.getUsuario(), numMaxEstrellas);
+            }
             batalla.setGanador(ptsPrimero.getUsuario());
         }
         batalla.setStatus(StatusBatalla.Terminada);

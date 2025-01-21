@@ -25,8 +25,16 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <div class="card-body p-5">                                
                                 <h1 th:if="${newpartida.tipoGrupo}" class="fs-4 card-title fw-bold mb-4" th:text="#{general.crearpartidagrupo}"/>
                                 <h1 th:if="${newpartida.tipoPersonal}" class="fs-4 card-title fw-bold mb-4" th:text="#{general.crearpartidapersonal}"/>
-                                <form method="post" th:action="@{/crearPartida}" th:object="${newpartida}" id="form">  
-                                    <input type="hidden" th:field="*{tipo}" th:value="${newpartida.tipo}"/>
+                                <form method="post" th:action="@{/crearPartida}" th:object="${newpartida}" id="form">                                    
+                                    <div class="mb-3" th:if="${newpartida.tipoPersonal == false}">
+                                        <label class="mb-2 text-muted" for="tipo" th:text="#{general.tipo}"/>
+                                        <select th:field="*{tipo}" title="tipo" id="tipo">
+                                            <option th:value="batalla" th:text="#{general.opbatalla}"></option>
+                                            <div th:if="${serverWebsocket} != ''">
+                                                <option th:value="grupo" th:text="#{general.opgrupo}"></option>                                            
+                                            </div>
+                                        </select>
+                                    </div>
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="tema" th:text="#{general.tema}"/>
                                         <select th:field="*{tema}" title="Tema" id="tema" > 
@@ -47,6 +55,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                         -->
                                     </div>
                                     <div class="mb-3" th:if="${newpartida.tipoPersonal}">
+                                        <input type="hidden" th:field="*{tipo}" th:value="${newpartida.tipo}"/>
                                         <label class="mb-2 text-muted" for="dificultad" th:text="#{general.dificultad}"/>
                                         <select th:field="*{dificultad}" title="Dificultad" id="dificultad">
                                             <option th:each="dificultadOpt : ${T(mld.playhitsgame.exemplars.Dificultad).values()}" 
@@ -66,7 +75,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                         <label class="mb-2 text-muted" for="anyofin" th:text="#{general.anyofin}"/>
                                         <input id="anyofin" type="number" th:field="*{anyoFinal}" th:value="${newpartida.anyoFinal}"  size="4" required="required"/>
                                     </div>                                    
-                                    <div th:if="${newpartida.tipoGrupo}">
+                                    <div th:if="${newpartida.tipoPersonal == false}">
                                         <div class="mb-3">
                                             <label class="mb-2 text-muted" for="nrondas" th:text="#{general.nrondas}"/>
                                             <select th:name="nrondas"  title="nrondas" th:id="nrondas" >                                                
@@ -92,8 +101,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     <div class="d-flex align-items-center">
                                         <button type="submit" class="btn btn-primary ms-auto" value="Crear" th:text="#{general.crear}"/>
                                     </div>
-                                    <div class="mb-3">
-                                        <p th:text="${result}" style="color:red"/>
+                                    <div th:if="${result != null}" class="mb-3">
+                                        <p th:text="${result}" style="color:green"/>
+                                    </div> 
+                                    <div th:if="${error != null}" class="mb-3">
+                                        <p th:text="${error}" style="color:red"/>
                                     </div>                                    
                                 </form>
                             </div>

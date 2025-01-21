@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -189,14 +190,16 @@ public class ControladorVista {
             servEmail.encolarMail(mail);
 
         }
-        Mail mail = new Mail();
-        mail.setAsunto("Inicio Servidor " + entorno);
-        mail.setDestinatario(mailAdmin);
-        mail.setMensaje("Se inicia servicio Tomcat PLAYHITSGAME " + entorno);
-        mail.setPlantilla("Correo");
-        mail.setNombre("");
-        mail.setPrioritario(true);
-        servEmail.encolarMail(mail);
+        if (!"Desarrollo".equals(entorno)) {
+            Mail mail = new Mail();
+            mail.setAsunto("Inicio Servidor " + entorno);
+            mail.setDestinatario(mailAdmin);
+            mail.setMensaje("Se inicia servicio Tomcat PLAYHITSGAME " + entorno);
+            mail.setPlantilla("Correo");
+            mail.setNombre("");
+            mail.setPrioritario(true);
+            servEmail.encolarMail(mail);
+        }
 
         // para que este valor se refresque si se cambia en la BD
         // habria que reiniciar la APP
@@ -434,6 +437,7 @@ public class ControladorVista {
             modelo.addAttribute("id_usuarioSesion", usuarioSesion.getId());
             informarUsuarioModelo(modelo, usuarioSesion);
             if (!usuarioSesion.isAdmin()) {
+                usuarioSesion.setUltimoAcceso(new Date());
                 servRegistro.registrar(TipoRegistro.Login, ipCliente(request), usuarioSesion.getUsuario());
             }
 
@@ -473,7 +477,9 @@ public class ControladorVista {
             }
         }
 
-        modelo.addAttribute("serverWebsocket", this.serverWebsocket);
+        ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) usuariosGrupo(usu);
+
+        modelo.addAttribute("usuariosGrupo", !posiblesInvitados.isEmpty());
         modelo.addAttribute("spotifyimagenTmp", "");
         modelo.addAttribute("batallasDisponibles", batallasDisponibles);
         modelo.addAttribute("batallasInscritas", batallasInscritas);
@@ -1206,7 +1212,7 @@ public class ControladorVista {
     }
 
     @GetMapping("/crearPartida")
-    public String crearPartida(Model modelo) {
+    public String crearPartidaGrupo(Model modelo) {
 
         Usuario usu = usuarioModelo(modelo);
         if (usu == null) {
@@ -1214,7 +1220,7 @@ public class ControladorVista {
         }
 
         Partida newPartida = new Partida();
-        newPartida.setTipo(TipoPartida.grupo);
+        newPartida.setTipo(TipoPartida.batalla);
         crearPartida(modelo, newPartida, usu);
 
         ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) usuariosGrupo(usu);
@@ -1222,8 +1228,11 @@ public class ControladorVista {
         if (!posiblesInvitados.isEmpty()) {
             modelo.addAttribute("posiblesinvitados", posiblesInvitados);
         } else {
-            modelo.addAttribute("posiblesinvitados", null);
+            modelo.addAttribute("posiblesinvitados", posiblesInvitados);
+            return "redirect:/panel";
         }
+
+        modelo.addAttribute("serverWebsocket", this.serverWebsocket);
         return "CrearPartida";
     }
 
@@ -1537,10 +1546,78 @@ public class ControladorVista {
         return "redirect:/partidaPersonal";
     }
 
+    private void crearBatallaPrivada(HttpServletRequest req, Model modelo, Partida partida, Usuario usu) throws Exception {
+
+        Calendar cal = Calendar.getInstance();
+        int anyoActual = cal.get(Calendar.YEAR);
+        int nrondas = Integer.parseInt(req.getParameter("nrondas"));
+        List<Cancion> canciones = servCancion.obtenerCanciones(partida);
+        try {
+
+            // Validaciones
+            if (!usu.sePuedeCrearBatalla()) {
+                throw new Exception(mensaje(modelo, "general.partidayacreada"));
+            }
+            if (partida.getAnyoFinal() <= partida.getAnyoInicial()) {
+                throw new Exception(mensaje(modelo, "general.fechaserr"));
+            }
+            if (partida.getAnyoFinal() > anyoActual) {
+                throw new Exception(mensaje(modelo, "general.fechafinerr"));
+            }
+            if (partida.getAnyoInicial() < 1950) {
+                throw new Exception(mensaje(modelo, "general.fechainierr"));
+            }
+            if ((partida.getAnyoFinal() - partida.getAnyoInicial()) < 5) {
+                throw new Exception(mensaje(modelo, "general.periodoerr"));
+            }
+            if (nrondas < 10 || nrondas > 30) {
+                throw new Exception(mensaje(modelo, "general.rondaserr"));
+            }
+            Batalla batalla = new Batalla();
+            batalla.setNombre(usu.getNombre());
+            batalla.setAnyoInicial(partida.getAnyoInicial());
+            batalla.setAnyoFinal(partida.getAnyoFinal());
+            batalla.setTema(partida.getTema());
+            batalla.setUsuariosInscritos(new ArrayList());
+            batalla.setNCanciones(canciones.size());
+            LocalDateTime newfecha = LocalDateTime.now();
+            batalla.setFecha(newfecha);
+            batalla.setPublica(false);
+            batalla.setStatus(StatusBatalla.Inscripcion);
+            batalla.setNRondas(nrondas);
+            batalla.setFase(1);
+            batalla = servBatalla.save(batalla);
+            ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) modelo.getAttribute("posiblesinvitados");
+            if (posiblesInvitados != null) {
+                for (Usuario usuarioInv : posiblesInvitados) {
+
+                    String valor = req.getParameter(usuarioInv.nombreId());
+                    if ("on".equals(valor)) {
+
+                        Optional<Usuario> usuario = servUsuario.findById(usuarioInv.getId());
+                        if (!usuario.isEmpty()) {
+                            Usuario usuInv = usuario.get();
+                            usuInv.getBatallasInscritas().add(batalla);
+                            batalla.getUsuariosInscritos().add(usuInv);
+                            servUsuario.update(usuInv.getId(), usuInv);
+                        }
+                    }
+                }
+                // por ultimo añadimos al usuario que crea la partida
+                batalla.getUsuariosInscritos().add(usu);
+                usu.getBatallasInscritas().add(batalla);
+                servUsuario.update(usu.getId(), usu);
+                servBatalla.save(batalla);
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+
     @PostMapping("/crearPartida")
     public String crearPartida(@ModelAttribute("newpartida") Partida partida,
             Model modelo,
-            HttpServletRequest req
+             HttpServletRequest req
     ) {
 
         Usuario usu = usuarioModelo(modelo);
@@ -1556,16 +1633,33 @@ public class ControladorVista {
             modelo.addAttribute("todoFallo", false);
             return crearPartidaPersonal(partida, modelo, req, usu);
         }
-        modelo.addAttribute("result", mensaje(modelo, "general.errtipopartida"));
-        modelo.addAttribute("spotifyimagenTmp", "");
-        return "CrearPartida";
+        if (partida.isTipoBatalla()) {
+            int nrondas = 0;
+            String resp;
+            try {
+                nrondas = Integer.parseInt(req.getParameter("nrondas"));
+                crearBatallaPrivada(req, modelo, partida, usu);
+                resp = mensaje(modelo, "general.batallaprivadacreada");
+                modelo.addAttribute("result", resp);
+            } catch (Exception ex) {
+                modelo.addAttribute("error", "ERROR : " + ex.getMessage());
+            }
+            anyadirTemas(modelo);
+            informarUsuarioModelo(modelo, usu);
+            modelo.addAttribute("oprondas", NUMERO_RONDAS);
+            modelo.addAttribute("nronda", nrondas);
+            return "CrearPartida";
+        }
 
+        // No deberia llegar aqui
+        return "redirect:/panel";
     }
 
     @PostMapping("/crearPartidaInvitado")
     public String crearPartidaInvitado(@ModelAttribute("newpartida") Partida partida,
             Model modelo,
-            HttpServletRequest req) {
+             HttpServletRequest req
+    ) {
         modelo.addAttribute("mensajeRespuesta", "");
         modelo.addAttribute("respuestaOK", true);
         modelo.addAttribute("todoFallo", false);

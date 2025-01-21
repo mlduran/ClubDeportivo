@@ -74,6 +74,7 @@ public class UsuarioServicioMetodos implements UsuarioServicio {
         obj.setPuntos(usuario.getPuntos());
         obj.setActivo(usuario.isActivo());
         obj.setAlta(usuario.getAlta());
+        obj.setUltimoAcceso(usuario.getUltimoAcceso());
         obj.setRoles(usuario.getRoles());
 
         return DAO.save(obj);

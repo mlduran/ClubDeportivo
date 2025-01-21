@@ -69,6 +69,9 @@ public class Usuario {
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
     private Date alta;
+    
+    @CreationTimestamp
+    private Date ultimoAcceso;    
 
     @ManyToMany
     @JoinTable(
@@ -216,12 +219,54 @@ public class Usuario {
         }
         return result;
     }
+    
+    
+    public List<Batalla> batallasPrivadasenCurso(){
+        
+        List<Batalla> lista = new ArrayList();
+        
+        for (Batalla batalla : this.batallasEnCurso()){
+            if (!batalla.isPublica())
+                lista.add(batalla);
+        }
+        
+        return lista;
+    }
+    
+    public boolean hayBatallasPrivadasenCurso(){
+        
+        return !batallasPrivadasenCurso().isEmpty();
+    }
+    
+    public List<Batalla> batallasPrivadasenInscripcion(){
+        
+        List<Batalla> lista = new ArrayList();
+        
+        for (Batalla batalla : this.getBatallasInscritas()){
+            if (!batalla.isPublica() && batalla.getStatus().equals(StatusBatalla.Inscripcion))
+                lista.add(batalla);
+        }
+        
+        return lista;
+    }
+    
+    public boolean hayBatallasPrivadasenInscripcion(){
+        
+        return !batallasPrivadasenInscripcion().isEmpty();
+    }
+    
+    public boolean sePuedeCrearBatalla() {        
 
-    public boolean sePuedeCrearPartidaMaster() {
+        return !hayBatallasPrivadasenCurso()
+                && !hayBatallasPrivadasenInscripcion();
+
+    }
+    
+
+    public boolean sePuedeCrearPartidaMaster() {        
 
         return partidaMasterEnCurso() == null
                 && partidaPersonalEnCurso() == null;
-
     }
 
     public List<Partida> partidasInvitadoPendientes() {
