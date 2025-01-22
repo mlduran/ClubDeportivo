@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -122,6 +123,7 @@ public class ControladorVista {
     private final int[] NUMERO_RONDAS = {10, 15, 20, 25, 30};
     private final int SEG_PARA_INICIO_RESPUESTA = 15;
     private final int REG_POR_PAG = 100;
+    public final LocalTime HORA_LANZAMIENTO_JORNADA = LocalTime.of(13, 0, 0);
     public int numMaxEstrellas;
 
     private String urlLoginSpotify;
@@ -1580,7 +1582,16 @@ public class ControladorVista {
             batalla.setTema(partida.getTema());
             batalla.setUsuariosInscritos(new ArrayList());
             batalla.setNCanciones(canciones.size());
-            LocalDateTime newfecha = LocalDateTime.now();
+            LocalDateTime ahora = LocalDateTime.now();            
+            LocalDateTime lanzamientoHoy = LocalDateTime.of(ahora.toLocalDate(), HORA_LANZAMIENTO_JORNADA);
+            LocalDateTime newfecha;
+            if (ahora.isBefore(lanzamientoHoy)) {
+                // Si la hora actual es antes de las 13:00, devolver hoy a las 13:00
+                newfecha = lanzamientoHoy;
+            } else {
+                // Si ya pasó, devolver mañana a las 13:00
+                newfecha = LocalDateTime.of(ahora.toLocalDate().plusDays(1), HORA_LANZAMIENTO_JORNADA);
+            }
             batalla.setFecha(newfecha);
             batalla.setPublica(false);
             batalla.setStatus(StatusBatalla.Inscripcion);
@@ -1617,7 +1628,7 @@ public class ControladorVista {
     @PostMapping("/crearPartida")
     public String crearPartida(@ModelAttribute("newpartida") Partida partida,
             Model modelo,
-             HttpServletRequest req
+            HttpServletRequest req
     ) {
 
         Usuario usu = usuarioModelo(modelo);
@@ -1658,7 +1669,7 @@ public class ControladorVista {
     @PostMapping("/crearPartidaInvitado")
     public String crearPartidaInvitado(@ModelAttribute("newpartida") Partida partida,
             Model modelo,
-             HttpServletRequest req
+            HttpServletRequest req
     ) {
         modelo.addAttribute("mensajeRespuesta", "");
         modelo.addAttribute("respuestaOK", true);

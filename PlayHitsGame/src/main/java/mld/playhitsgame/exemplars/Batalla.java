@@ -38,7 +38,6 @@ public class Batalla {
     private int fase; // para hacer diferentes rondas con los que vayan ganando
     
     @Column(name = "fecha", nullable = false)
-    @CreationTimestamp
     private LocalDateTime fecha;
 
     @Enumerated(EnumType.STRING)

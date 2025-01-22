@@ -177,6 +177,43 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                         </button>
                                     </p>                                                                    
                                 </div>
+                                <div th:if="*{hayBatallasPrivadasenInscripcion()}" class="text-center my-2">                                
+                                    <div class="table-responsive-lg ">
+                                        <table class="table table-sm table-striped table-bordered" style="max-width: 100%; width: 100%; table-layout: fixed;"> 
+                                            <thead class="table-light" style="text-align:center;">
+                                                <tr>
+                                                    <th colspan="3">
+                                                        <p th:text="#{general.batallasprivadasinscritas}"/>
+                                                    </th>                   
+                                                </tr> 
+                                                <tr>
+                                                    <th>
+                                                        <p th:text="#{general.empiezaen}"/> 
+                                                    </th>
+                                                    <th>
+                                                        <p th:text="#{general.configuracion}"/> 
+                                                    </th>
+                                                    <th>
+                                                        <p th:text="#{general.participantes}"/> 
+                                                    </th>
+                                                </tr>                                            
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="batalla : *{batallasPrivadasenInscripcion()}">
+                                                    <td>
+                                                        <p th:text="${batalla.cuentaAtras}"/>   
+                                                    </td>
+                                                    <td>
+                                                        <p th:each="txt : ${batalla.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
+                                                    </td>
+                                                    <td>                                                        
+                                                        <p th:text="${batalla.usuariosInscritosTxT}"/>                                                        
+                                                    </td>                                                    
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                                 <div th:unless="${batallasDisponibles.isEmpty()}" class="text-center my-2">                                
                                     <div class="table-responsive-lg ">
                                         <table class="table table-sm table-striped table-bordered" style="max-width: 100%; width: 100%; table-layout: fixed;"> 

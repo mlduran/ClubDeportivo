@@ -8,7 +8,9 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 import mld.playhitsgame.correo.EmailServicioMetodos;
 import mld.playhitsgame.correo.Mail;
 import mld.playhitsgame.exemplars.Batalla;
@@ -23,7 +25,9 @@ import mld.playhitsgame.exemplars.PtsUsuario;
 import mld.playhitsgame.exemplars.Respuesta;
 import mld.playhitsgame.exemplars.Ronda;
 import mld.playhitsgame.exemplars.StatusBatalla;
+import static mld.playhitsgame.exemplars.StatusBatalla.Programada;
 import mld.playhitsgame.exemplars.StatusPartida;
+import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.exemplars.TipoPartida;
 import mld.playhitsgame.exemplars.Usuario;
 import mld.playhitsgame.services.BatallaServicioMetodos;
@@ -144,7 +148,7 @@ public class ControladorScripts {
         txtsMail.add("Si quieres participar, date prisa, solo tienes unas horas para unirte.");
         List<Usuario> usuarios = servUsuario.usuariosListaCorreoMasiva();
 
-        enviarMail("PLAYHITSGAME NEW MUSICAL WAR", txtsMail, usuarios);
+        enviarMail("PLAYHITSGAME NEW MUSICAL WAR " + batalla.getNombre(), txtsMail, usuarios);
     }
 
     private void informarComienzoBatalla(Batalla batalla) {
@@ -297,7 +301,18 @@ public class ControladorScripts {
         servBatalla.update(batalla.getId(), batalla);
     }
 
-    public void pasarUsuariosBatallaDeFase(Batalla batalla, int nUsuAClasifiar, int fase) {
+    private void cancelarBatalla(Batalla batalla) {
+
+        List<Usuario> usuariosInscritos = batalla.getUsuariosInscritos();
+        for (Usuario usu : usuariosInscritos) {
+            usu.getBatallasInscritas().remove(batalla);
+            servUsuario.update(usu.getId(), usu);
+        }
+        batalla.setStatus(StatusBatalla.Terminada);
+        servBatalla.update(batalla.getId(), batalla);
+    }
+
+    private void pasarUsuariosBatallaDeFase(Batalla batalla, int nUsuAClasifiar, int fase) {
 
         List<PtsUsuario> resultadosBatalla = resultadosBatalla(batalla, fase);
 
@@ -312,7 +327,41 @@ public class ControladorScripts {
         servBatalla.update(batalla.getId(), batalla);
     }
 
+    private void crearNuevaBatallaPublica() {
+
+        ArrayList<Tema> temas = new ArrayList();
+        for (Tema tema : servTema.findAll()) {
+            if (tema.isActivo()) {
+                temas.add(tema);
+            }
+        }
+        Random random = new Random();
+        int indTemaAleatorio = random.nextInt(temas.size());
+        Tema temaAleatorio = temas.get(indTemaAleatorio);
+
+        Batalla newBatalla = new Batalla();
+        newBatalla.setUsuariosInscritos(new ArrayList());
+        newBatalla.setTema(temaAleatorio.getTema());
+        Calendar fecha = Calendar.getInstance();
+        newBatalla.setAnyoInicial(1950);
+        newBatalla.setAnyoFinal(fecha.get(Calendar.YEAR));
+        List<Cancion> canciones = servCancion.obtenerCanciones(newBatalla);
+        newBatalla.setNCanciones(canciones.size());
+        LocalDateTime newfecha = LocalDateTime.now();
+        newfecha = newfecha.plusHours(24);
+        newBatalla.setFecha(newfecha);
+        newBatalla.setPublica(true);
+        newBatalla.setStatus(StatusBatalla.Programada);
+        newBatalla.setNRondas(10);
+        newBatalla.setFase(1);
+        newBatalla = servBatalla.save(newBatalla);
+        newBatalla.setNombre(temaAleatorio.getTema() + " " + String.valueOf(newBatalla.getId()));
+        servBatalla.update(newBatalla.getId(), newBatalla);
+    }
+
     private void tratarBatallas() {
+
+        crearNuevaBatallaPublica();
 
         // para los cambios de status asumimos que este script
         // se lanzara diariamente a la misma hora
@@ -320,26 +369,23 @@ public class ControladorScripts {
 
         for (Batalla batalla : batallas) {
             switch (batalla.getStatus()) {
-                case Programada -> {
-                    batalla.setStatus(StatusBatalla.Inscripcion);
-                    LocalDateTime newfecha = LocalDateTime.now();
-                    newfecha = newfecha.plusHours(24);
-                    batalla.setFecha(newfecha);
-                    servBatalla.update(batalla.getId(), batalla);
-                    informarNuevaBatalla(batalla);
-                }
                 case Inscripcion -> {
                     batalla.setUsuarios(new ArrayList());
                     List<Usuario> usuariosInscritos = batalla.getUsuariosInscritos();
-                    for (Usuario usu : usuariosInscritos) {
-                        usu.getBatallas().add(batalla);
-                        batalla.getUsuarios().add(usu);
-                        servUsuario.update(usu.getId(), usu);
+                    // si no hay al menos 2 inscritos cancelamos la batalla
+                    if (usuariosInscritos.size() < 2) {
+                        cancelarBatalla(batalla);
+                    } else {
+                        for (Usuario usu : usuariosInscritos) {
+                            usu.getBatallas().add(batalla);
+                            batalla.getUsuarios().add(usu);
+                            servUsuario.update(usu.getId(), usu);
+                        }
+                        batalla.setFase(1);
+                        servBatalla.update(batalla.getId(), batalla);
+                        iniciarBatalla(batalla);
+                        informarComienzoBatalla(batalla);
                     }
-                    batalla.setFase(1);
-                    servBatalla.update(batalla.getId(), batalla);
-                    iniciarBatalla(batalla);
-                    informarComienzoBatalla(batalla);
                 }
                 case EnCurso -> {
                     // Si podemos hacer otra batalla la hacemos
@@ -366,6 +412,14 @@ public class ControladorScripts {
                         finalizarBatalla(batalla);
                         informarFinBatalla(batalla);
                     }
+                }
+                case Programada -> {
+                    batalla.setStatus(StatusBatalla.Inscripcion);
+                    LocalDateTime newfecha = LocalDateTime.now();
+                    newfecha = newfecha.plusHours(24);
+                    batalla.setFecha(newfecha);
+                    servBatalla.update(batalla.getId(), batalla);
+                    informarNuevaBatalla(batalla);
                 }
 
                 default -> {
