@@ -1154,6 +1154,7 @@ public class ControladorVista {
                     usuSesion.setSegEspera(usuario.getSegEspera());
                 }
                 usuSesion.setDobleTouch(usuario.isDobleTouch());
+                usuSesion.setNoCorreos(usuario.isNoCorreos());
                 servUsuario.update(usuSesion.getId(), usuSesion);
                 resp = mensaje(modelo, "general.datosmodificados");
                 asignarIdiomaUsuario(modelo, usuario);

@@ -52,7 +52,7 @@ public class Usuario {
     private boolean dobleTouch;
     private int segEspera;
     private int puntos;
-    private boolean noAceptaCorreos;
+    private boolean noCorreos;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Estrella> estrellas;

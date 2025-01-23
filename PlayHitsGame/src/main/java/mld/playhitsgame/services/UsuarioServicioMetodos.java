@@ -68,7 +68,7 @@ public class UsuarioServicioMetodos implements UsuarioServicio {
         obj.setIdioma(usuario.getIdioma());
         usuario.setDobleTouch(usuario.isDobleTouch());
         obj.setSegEspera(usuario.getSegEspera());
-        obj.setNoAceptaCorreos(usuario.isNoAceptaCorreos());
+        obj.setNoCorreos(usuario.isNoCorreos());
         obj.setGrupo(usuario.getGrupo());
 
         obj.setPuntos(usuario.getPuntos());

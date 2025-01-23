@@ -124,7 +124,7 @@ public class ControladorScripts {
                 if (!usu.getUsuario().contains(".")) {
                     continue;
                 }
-                if (usu.isActivo() && !usu.isNoAceptaCorreos()) {
+                if (usu.isActivo() && !usu.isNoCorreos()) {
                     Mail mail = new Mail();
                     mail.setAsunto(asunto);
                     mail.setDestinatario(usu.getUsuario());
