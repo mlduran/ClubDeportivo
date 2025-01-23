@@ -74,6 +74,13 @@ public class Partida {
     private boolean activarPlay;
     private boolean sinOfuscar;
     private boolean sonidos;
+    
+    public String getDescripcionLog(){
+        
+        return String.valueOf(this.getId() + " " +
+                this.getTipo().name() + " " + this.getFecha().toString());
+        
+    }
 
     public boolean isTipoGrupo() {
 

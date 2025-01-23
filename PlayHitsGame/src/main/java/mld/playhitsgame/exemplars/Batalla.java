@@ -14,7 +14,6 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 
 /**
  *
@@ -63,6 +62,13 @@ public class Batalla {
     @ManyToOne // Relación muchas batallas a un ganador
     @JoinColumn(name = "ganador_id") 
     private Usuario ganador;
+    
+    public String getDescripcionLog(){
+        
+        return String.valueOf(this.getId() + " " +
+                this.getNombre() + " " + this.getFecha().toString());
+        
+    }
     
     public String fechaFormateada() {
 

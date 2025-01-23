@@ -22,6 +22,8 @@ public interface PartidaServicio {
    
     //Optional<Cancion> findCancionById(Long id); //si retorna solo 1 reg, sino poner list
     Optional<Partida> findById(Long id);
+    ArrayList<Partida> partidasActuales();
+    ArrayList<Partida> partidasFinalizadas();
     
     Partida savePartida(Partida partida);    
     Partida updatePartida(Long id, Partida partida);

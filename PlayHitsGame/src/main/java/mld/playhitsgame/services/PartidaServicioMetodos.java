@@ -121,6 +121,16 @@ public class PartidaServicioMetodos implements PartidaServicio{
    
     }
 
+    @Override
+    public ArrayList<Partida> partidasActuales() {
+        return DAO.partidasActuales();
+    }
+
+    @Override
+    public ArrayList<Partida> partidasFinalizadas() {
+        return DAO.partidasFinalizadas();
+    }
+
  
  
 }

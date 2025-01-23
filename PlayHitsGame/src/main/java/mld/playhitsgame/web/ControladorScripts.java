@@ -428,6 +428,46 @@ public class ControladorScripts {
         }
     }
 
+    private void finalizarPartidasObsoletas() {
+
+        // Se finalizan las partidas que tengan mas de 30 dias
+        LocalDateTime fechaHace30Dias = LocalDateTime.now().minusDays(30);
+        for (Partida partida : servPartida.partidasActuales()) {
+            if (partida.isTipoGrupo() || partida.isTipoPersonal()) {
+                if (partida.getFecha().isBefore(fechaHace30Dias)) {
+                    String txt = partida.getDescripcionLog();
+                    partida.setStatus(StatusPartida.Terminada);
+                    servPartida.updatePartida(partida.getId(), partida);
+                    System.out.println("Se finaliza partida " + txt);
+                }
+            }
+        }
+    }
+
+    private void pasarAHistoricoPartidasYBatallas() {
+
+        // Se pasan a Historico las partidas / Batallas que tengan mas de 90 dias
+        LocalDateTime fechaHace90Dias = LocalDateTime.now().minusDays(90);
+        for (Partida partida : servPartida.partidasFinalizadas()) {
+            if (partida.isTipoGrupo() || partida.isTipoPersonal()) {
+                if (partida.getFecha().isBefore(fechaHace90Dias)) {
+                    String txt = partida.getDescripcionLog();
+                    partida.setStatus(StatusPartida.Historico);
+                    servPartida.updatePartida(partida.getId(), partida);
+                    System.out.println("Se pasa a Historico partida " + txt);
+                }
+            }
+        }
+        for (Batalla batalla : servBatalla.batallasFinalizadas()) {
+            if (batalla.getFecha().isBefore(fechaHace90Dias)) {
+                String txt = batalla.getDescripcionLog();
+                batalla.setStatus(StatusBatalla.Historico);
+                servBatalla.update(batalla.getId(), batalla);
+                System.out.println("Se pasa a Historico batalla " + txt);
+            }
+        }
+    }
+
     @GetMapping("/lanzarScripts")
     public ResponseEntity<Void> lanzarScripts(Model modelo, HttpServletRequest req
     ) {
@@ -450,6 +490,8 @@ public class ControladorScripts {
                 try {
                     // METODOS A EJECUTAR  
                     tratarBatallas();
+                    pasarAHistoricoPartidasYBatallas();
+                    finalizarPartidasObsoletas();
                     /////////////////////// FIN
                     txtCorreo = "Lanzamiento de scripts OK";
                 } catch (Exception ex) {

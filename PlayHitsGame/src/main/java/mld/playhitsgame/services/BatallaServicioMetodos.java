@@ -91,4 +91,14 @@ public class BatallaServicioMetodos implements BatallaServicio {
         return DAO.batallasUsuario(id_usuario);
     }
 
+    @Override
+    public ArrayList<Batalla> batallasActuales() {
+        return DAO.batallasActuales();
+    }
+
+    @Override
+    public ArrayList<Batalla> batallasFinalizadas() {
+        return DAO.batallasFinalizadas();
+    }
+
 }

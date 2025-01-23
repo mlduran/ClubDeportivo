@@ -20,6 +20,8 @@ public interface BatallaServicio {
     List<Batalla> findAll();     
    
     Optional<Batalla> findById(Long id);
+    ArrayList<Batalla> batallasActuales();
+    ArrayList<Batalla> batallasFinalizadas();
     
     Batalla save(Batalla batalla);    
     Batalla update(Long id, Batalla batalla);
