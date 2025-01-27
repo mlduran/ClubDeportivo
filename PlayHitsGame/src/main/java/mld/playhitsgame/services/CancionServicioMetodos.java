@@ -4,6 +4,7 @@
  */
 package mld.playhitsgame.services;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -36,9 +37,9 @@ public class CancionServicioMetodos implements CancionServicio {
         return DAO.findAll();
 
     }
-    
-    public long numRegs(){
-        
+
+    public long numRegs() {
+
         return DAO.count();
     }
 
@@ -89,11 +90,11 @@ public class CancionServicioMetodos implements CancionServicio {
         if (Objects.nonNull(cancion.getSpotifyid()) && !"".equalsIgnoreCase(cancion.getSpotifyid())) {
             cancionObj.setSpotifyid(cancion.getSpotifyid());
         }
-        
+
         if (Objects.nonNull(cancion.getSpotifyplay()) && !"".equalsIgnoreCase(cancion.getSpotifyplay())) {
             cancionObj.setSpotifyplay(cancion.getSpotifyplay());
         }
-        
+
         if (Objects.nonNull(cancion.getSpotifyimagen()) && !"".equalsIgnoreCase(cancion.getSpotifyimagen())) {
             cancionObj.setSpotifyimagen(cancion.getSpotifyimagen());
         }
@@ -123,7 +124,7 @@ public class CancionServicioMetodos implements CancionServicio {
         DAO.deleteById(id);
     }
 
-    public List<Cancion> buscarCancionesPorCriterios(List<String> generos, List<String> idiomas,
+    public List<Cancion> buscarCancionesPorCriterios_borrar(List<String> generos, List<String> idiomas,
             List<String> temas, int anyoInicial, int anyofinal) {
 
         SearchSpecifications searchSpecifications = new SearchSpecifications();
@@ -147,20 +148,31 @@ public class CancionServicioMetodos implements CancionServicio {
     public List<Cancion> buscarCancionesPorFiltro(FiltroCanciones filtro) {
 
         if (!"".equals(filtro.getTema())) {
-            return DAO.findByFiltroConTema(filtro.getTema(), filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar());
+            String[] temas = filtro.getTema().split(",");
+            Set<Cancion> cancionesTema = new HashSet<>();
+            for (String tema : temas) {
+                cancionesTema.addAll( DAO.findByFiltroConTema(tema.trim(), filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar()));
+            }
+            return new ArrayList<>(cancionesTema);
         } else {
             return DAO.findByFiltroBasico(filtro.getAnyoInicial(), filtro.getAnyoFinal(), filtro.isRevisar());
         }
 
     }
-    
+
     public List<Cancion> obtenerCanciones(Partida partida) {
 
         List<Cancion> canciones;
 
         if (!partida.getTema().isBlank()) {
-            canciones = DAO.findByFiltroConTema(partida.getTema(), partida.getAnyoInicial(),
-                    partida.getAnyoFinal(), false);
+            String[] temas = partida.getTema().split(",");
+            Set<Cancion> cancionesTema = new HashSet<>();
+            for (String tema : temas) {
+                canciones = DAO.findByFiltroConTema(tema.trim(), partida.getAnyoInicial(),
+                        partida.getAnyoFinal(), false);
+                cancionesTema.addAll(canciones);
+            }
+            canciones = new ArrayList<>(cancionesTema);
         } else {
             canciones = DAO.findByFiltroBasico(partida.getAnyoInicial(),
                     partida.getAnyoFinal(), false);
@@ -168,14 +180,20 @@ public class CancionServicioMetodos implements CancionServicio {
 
         return canciones;
     }
-    
+
     public List<Cancion> obtenerCanciones(Batalla batalla) {
 
         List<Cancion> canciones;
 
         if (!batalla.getTema().isBlank()) {
-            canciones = DAO.findByFiltroConTema(batalla.getTema(), batalla.getAnyoInicial(),
-                    batalla.getAnyoFinal(), false);
+            String[] temas = batalla.getTema().split(",");
+            Set<Cancion> cancionesTema = new HashSet<>();
+            for (String tema : temas) {
+                canciones = DAO.findByFiltroConTema(tema.trim(), batalla.getAnyoInicial(),
+                        batalla.getAnyoFinal(), false);
+                cancionesTema.addAll(canciones);
+            }
+            canciones = new ArrayList<>(cancionesTema);
         } else {
             canciones = DAO.findByFiltroBasico(batalla.getAnyoInicial(),
                     batalla.getAnyoFinal(), false);

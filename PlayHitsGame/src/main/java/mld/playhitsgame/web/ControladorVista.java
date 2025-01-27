@@ -107,6 +107,12 @@ public class ControladorVista {
 
     @Value("${custom.entorno}")
     public String entorno;
+    
+    @Value("${custom.videoyoutube_es}")
+    public String videoyoutube_es;
+    
+    @Value("${custom.videoyoutube_en}")
+    public String videoyoutube_en;
 
     @Value("${custom.server.websocket}")
     private String serverWebsocket;
@@ -336,6 +342,11 @@ public class ControladorVista {
         servRegistro.registrar(TipoRegistro.Visita, ipCliente(request));
         modelo.addAttribute("invitadosON", invitadosON);
         modelo.addAttribute("locale", locale);
+        if ("es".equals(locale.getLanguage()))
+            modelo.addAttribute("videoyoutube", videoyoutube_es);
+        else
+            modelo.addAttribute("videoyoutube", videoyoutube_en);
+            
         try {
             Config config = servConfig.getSettings();
 

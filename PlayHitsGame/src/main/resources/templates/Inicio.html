@@ -66,6 +66,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             </div>
                             <div class="btn text-center">
                                 <input type="image" class="btn" id="imageInfo" alt="Info"  data-bs-toggle="modal" data-bs-target="#ayuda" th:src="@{'/images/info.png'}"  width="60" height="60" /> 
+                                <a th:if="${videoyoutube != ''}" th:href="${videoyoutube}" target="_blank" th:title="#{general.videoyoutube}">
+                                    <img th:src="@{'/images/youtube.png'}" th:alt="#{general.videoyoutube}" style="width: auto; height: 60px;"/>
+                                </a>
                             </div>  
                             <h1 class="h6 btn text-center" th:text="#{general.titulojuego}"/>
                             <div class="btn text-center" th:if="${invitadosON} == 'true'"> 
@@ -76,9 +79,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <h1 class="modal-title fs-5" id="ayudaModalLabel">Info</h1>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>                                            
                                         </div>
-                                        <div id="info" class="modal-body" />
+                                        <div id="info" class="modal-body" />                                                                             
                                     </div>
                                 </div>
                             </div>
