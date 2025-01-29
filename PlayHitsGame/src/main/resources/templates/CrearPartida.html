@@ -36,19 +36,28 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                         </select>
                                     </div>
                                     <div class="mb-3">
-                                        <!-- Etiqueta del campo -->
-                                        <label class="mb-2 text-muted" for="tema" th:text="#{general.temas}"></label>
+                                        <div th:if="${newpartida.tipoPersonal}">
+                                            <label class="mb-2 text-muted" for="tema" th:text="#{general.tema}"/>
+                                            <select th:field="*{tema}" title="Tema" id="tema" > 
+                                                <option th:each="elem : ${temas}" 
+                                                        th:value="${elem.tema}" th:text="${elem.descripcion}" ></option>
+                                            </select>
+                                        </div>
+                                        <div th:if="${!newpartida.tipoPersonal}">
+                                            <!-- Etiqueta del campo -->
+                                            <label class="mb-2 text-muted" for="tema" th:text="#{general.temas}"></label>
 
-                                        <!-- Campo oculto para almacenar los temas seleccionados -->
-                                        <input type="hidden" th:field="*{tema}" id="tema" />
+                                            <!-- Campo oculto para almacenar los temas seleccionados -->
+                                            <input type="hidden" th:field="*{tema}" id="tema" />
 
-                                        <!-- Lista de selección múltiple con los temas -->
-                                        <select class="form-select mb-2" id="listaTemas" multiple size="5" title="Temas" onchange="actualizarSeleccion()">
-                                            <option th:each="elem : ${temas}" 
-                                                    th:value="${elem.tema}" 
-                                                    th:text="${elem.descripcion}" 
-                                                    th:selected="${elem.tema == 'PlayHitsGame'}"></option>
-                                        </select>
+                                            <!-- Lista de selección múltiple con los temas -->
+                                            <select class="form-select mb-2" id="listaTemas" multiple size="5" title="Temas" onchange="actualizarSeleccion()">
+                                                <option th:each="elem : ${temas}" 
+                                                        th:value="${elem.tema}" 
+                                                        th:text="${elem.descripcion}" 
+                                                        th:selected="${elem.tema == 'PlayHitsGame'}"></option>
+                                            </select>
+                                        </div>
                                         <!--
                                         <div th:if="${!usuarioSesion.tieneTema}">
                                             <a href="/crearTematica" class="text-dark">

@@ -385,7 +385,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                         </td>
                                                         <td>
                                                             <a th:href="'/batallaResultados/' + ${unabatalla.id}" class="button"> 
-                                                                <!-- <p th:text="${unabatalla.ganador}"/> -->
+                                                                <p th:if="${unabatalla.ganador != null}" th:text="${unabatalla.ganador.nombre}"/> 
                                                             </a>
                                                         </td>
                                                     </tr>
