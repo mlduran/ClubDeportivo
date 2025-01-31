@@ -18,8 +18,6 @@ var respInterprete = document.getElementById("interprete");
 var verificacion = document.getElementById('verificacion');
 verificacion.style.display = 'table-cell';
 var respOk = document.getElementById('respuestaOK');
-var todoFallo = document.getElementById('todoFallo');
-var esRecord = document.getElementById('esRecord');
 var touchstart = document.getElementById("touchstart").value;
 
 var reproductor = document.getElementById("reproductor");
@@ -69,11 +67,11 @@ function esperar(ms) {
 async function ocultarResultado() {
 
     var segEspera = document.getElementById("segespera").value;
-    
-    var segEsperaInt = (segEspera !== null && segEspera.trim() !== "" && parseInt(segEspera, 10) !== 0) 
-    ? parseInt(segEspera, 10) 
-    : 5;
-    
+
+    var segEsperaInt = (segEspera !== null && segEspera.trim() !== "" && parseInt(segEspera, 10) !== 0)
+            ? parseInt(segEspera, 10)
+            : 5;
+
     if (respOk.value === 'true')
         await esperar(segEsperaInt * 500);
     else
@@ -90,10 +88,7 @@ window.addEventListener('load', function () {
         verificacion.style.color = "white";
         verificacion.style.backgroundColor = "orange";
     }
-    if (todoFallo.value === 'false')
-        ocultarResultado();
-    if (esRecord.value === 'true')
-        window.alert(document.getElementById("txtrecordtema").value);
+    ocultarResultado();
 
 });
 
@@ -160,17 +155,14 @@ let secondsElapsed = secondsCounter.value;
 // Creamos el intervalo que incrementa el contador cada segundo (1000 ms)
 const intervalId = setInterval(() => {
     // Incrementamos el número de segundos
-    if (todoFallo.value === 'false') {
-        secondsElapsed++;
 
-        // Actualizamos el contenido del elemento HTML
-        if (secondsElapsed > 0)
-            secondsCounter.value = secondsElapsed;
-        else
-            secondsCounter.value = "... " + Math.abs(secondsElapsed);
-    } else {
-        secondsCounter.value = "";
-    }
+    secondsElapsed++;
+
+    // Actualizamos el contenido del elemento HTML
+    if (secondsElapsed > 0)
+        secondsCounter.value = secondsElapsed;
+    else
+        secondsCounter.value = "... " + Math.abs(secondsElapsed);
 
 }, 1000);
 

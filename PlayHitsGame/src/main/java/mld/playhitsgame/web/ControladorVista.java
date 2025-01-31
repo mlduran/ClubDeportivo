@@ -107,10 +107,10 @@ public class ControladorVista {
 
     @Value("${custom.entorno}")
     public String entorno;
-    
+
     @Value("${custom.videoyoutube_es}")
     public String videoyoutube_es;
-    
+
     @Value("${custom.videoyoutube_en}")
     public String videoyoutube_en;
 
@@ -342,11 +342,12 @@ public class ControladorVista {
         servRegistro.registrar(TipoRegistro.Visita, ipCliente(request));
         modelo.addAttribute("invitadosON", invitadosON);
         modelo.addAttribute("locale", locale);
-        if ("es".equals(locale.getLanguage()))
+        if ("es".equals(locale.getLanguage())) {
             modelo.addAttribute("videoyoutube", videoyoutube_es);
-        else
+        } else {
             modelo.addAttribute("videoyoutube", videoyoutube_en);
-            
+        }
+
         try {
             Config config = servConfig.getSettings();
 
@@ -1594,7 +1595,7 @@ public class ControladorVista {
             batalla.setTema(partida.getTema());
             batalla.setUsuariosInscritos(new ArrayList());
             batalla.setNCanciones(canciones.size());
-            LocalDateTime ahora = LocalDateTime.now();            
+            LocalDateTime ahora = LocalDateTime.now();
             LocalDateTime lanzamientoHoy = LocalDateTime.of(ahora.toLocalDate(), HORA_LANZAMIENTO_JORNADA);
             LocalDateTime newfecha;
             if (ahora.isBefore(lanzamientoHoy)) {
@@ -2621,6 +2622,8 @@ public class ControladorVista {
             Optional<Partida> findPartida = servPartida.findById(id);
             if (findPartida.isPresent()) {
                 partida = findPartida.get();
+                modelo.addAttribute("mensajeRespuesta", "");
+                modelo.addAttribute("respuestaOK", true);
             }
         }
         if (partida == null) {
@@ -2632,13 +2635,6 @@ public class ControladorVista {
         informarPartidaModelo(modelo, partida);
 
         Respuesta respuestasUltimaRonda = rondaSinRespuestas(usu, partida);
-        boolean todoFallo = false;
-        if (modelo.getAttribute("todoFallo") != null) {
-            todoFallo = (boolean) modelo.getAttribute("todoFallo");
-        }
-        if (modelo.getAttribute("esRecord") != null) {
-            todoFallo = (boolean) modelo.getAttribute("esRecord");
-        }
 
         if (respuestasUltimaRonda == null) {
             // Ya se han completado todas las respuestas redirigir a consulta            
@@ -2651,15 +2647,9 @@ public class ControladorVista {
         List<OpcionTituloTmp> opcTitulos;
         List<OpcionInterpreteTmp> opcInterpretes;
         List<OpcionAnyoTmp> opcAnyos;
-        if (!todoFallo) {
-            opcTitulos = servOpTitulo.findByPartidaRonda(partida.getId(), ultimaRonda.getId());
-            opcInterpretes = servOpInterprete.findByPartidaRonda(partida.getId(), ultimaRonda.getId());
-            opcAnyos = servOpAnyo.findByPartidaRonda(partida.getId(), ultimaRonda.getId());
-        } else {
-            opcTitulos = new ArrayList();
-            opcInterpretes = new ArrayList();
-            opcAnyos = new ArrayList();
-        }
+        opcTitulos = servOpTitulo.findByPartidaRonda(partida.getId(), ultimaRonda.getId());
+        opcInterpretes = servOpInterprete.findByPartidaRonda(partida.getId(), ultimaRonda.getId());
+        opcAnyos = servOpAnyo.findByPartidaRonda(partida.getId(), ultimaRonda.getId());
 
         modelo.addAttribute("respuestas",
                 Utilidades.rondasRespuestas(usu, partida));
@@ -2675,12 +2665,6 @@ public class ControladorVista {
         }
         if (modelo.getAttribute("respuestaOK") == null) {
             modelo.addAttribute("respuestaOK", true);
-        }
-        if (modelo.getAttribute("todoFallo") == null) {
-            modelo.addAttribute("todoFallo", false);
-        }
-        if (modelo.getAttribute("esRecord") == null) {
-            modelo.addAttribute("esRecord", false);
         }
 
         long seconds = 0;

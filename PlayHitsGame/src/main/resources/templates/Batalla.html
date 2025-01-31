@@ -31,8 +31,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
             <input type="hidden" id="idusuario" th:value="${usuarioSesion.id}" />            
             <input type="hidden" id="idpartida" th:value="${partidaSesion.id}" />
             <input type="hidden" id="respuestaOK" th:value="${respuestaOK}" />
-            <input type="hidden" id="todoFallo" th:value="${todoFallo}" />
-            <input type="hidden" id="esRecord" th:value="${esRecord}" />
             <input type="hidden" id="segespera" th:value="${usuarioSesion.segEspera}" />
             <input type="hidden" id="touchstart" th:value="${usuarioSesion.dobleTouch}" />
             <div th:if="${partidaSesion.sonidos != null || partidaSesion.sonidos == true}">
@@ -170,12 +168,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                             </div>
                                                             <div th:if="${mensajeRespuesta} == null or ${mensajeRespuesta} == ''">
                                                                 <p th:text="#{general.puedesresponder}" style="font-size: 25px;"/>
-                                                            </div>
-                                                            <div th:if="${todoFallo} == true">
-                                                                <a href="/panel" class="text-dark">
-                                                                    <p th:text="#{general.volver}" />
-                                                                </a>
-                                                            </div>
+                                                            </div>                                                            
                                                             <div>
                                                                 <img th:src="${spotifyimagenTmp}" alt="PLAYHITSGAME" class="img-fluid" />
                                                             </div>              
@@ -185,7 +178,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                         <td colspan="3"  style="text-align:center; background-color: lightpink;" 
                                                             th:text="#{general.ronda} + ' ' + ${ronda.numero}" />   
                                                     </tr>
-                                                    <table th:if="${todoFallo} == false" class="table-responsive table-bordered" style="max-width: 100%; width: 100%; table-layout: fixed;">
+                                                    <table class="table-responsive table-bordered" style="max-width: 100%; width: 100%; table-layout: fixed;">
                                                         <tr>
                                                             <th style="background-color: lightpink;width: 40%;text-align:center;">
                                                                 <p th:text="#{general.titulo}" /> 

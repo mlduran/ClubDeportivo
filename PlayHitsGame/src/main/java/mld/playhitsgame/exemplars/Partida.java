@@ -6,6 +6,7 @@ package mld.playhitsgame.exemplars;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -80,6 +81,23 @@ public class Partida {
         return String.valueOf(this.getId() + " " +
                 this.getTipo().name() + " " + this.getFecha().toString());
         
+    }
+    
+    public String getCuentaAtras(){
+        
+        LocalDateTime actual = LocalDateTime.now();
+        LocalDateTime fechaFin = this.getFecha().plusHours(24);
+        Duration duration = Duration.between(actual, fechaFin);
+        
+        if (actual.isBefore(fechaFin)) {
+            // Convertir la diferencia a horas y minutos
+            long hours = duration.toHours();
+            long minutes = duration.toMinutes() % 60;
+
+            return hours + "h " + minutes + "m";
+        } else {
+            return "";
+        }
     }
 
     public boolean isTipoGrupo() {

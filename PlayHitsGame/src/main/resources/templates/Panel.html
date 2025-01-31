@@ -99,6 +99,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                         <a th:href="'/batalla/'+${unapartida.id}" class="button" id="${unapartida.id}" 
                                                            onclick="return confirm('¿Estás preparado para emprezar a responder?');">
                                                             <p th:each="txt : ${unapartida.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
+                                                            <p th:utext="'<b>' + #{general.acabaen} + ' : ' + ${unapartida.cuentaAtras} + '</b>'"></p> 
                                                         </a>
                                                     </td>
                                                 </tr>
