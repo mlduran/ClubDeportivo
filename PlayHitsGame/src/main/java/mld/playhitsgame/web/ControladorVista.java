@@ -1551,7 +1551,7 @@ public class ControladorVista {
             registrarNuevaPartidaEnTema(partida);
         } catch (Exception ex) {
             String resp = "ERROR " + ex.getMessage();
-            modelo.addAttribute("result", resp);
+            modelo.addAttribute("error", resp);
             anyadirTemas(modelo);
             informarUsuarioModelo(modelo, usu);
             return "CrearPartida";
@@ -1693,7 +1693,7 @@ public class ControladorVista {
         List<Cancion> canciones = servCancion.buscarCancionesPorFiltro(filtro);
         if (canciones.size() <= 5) {
             modelo.addAttribute("result",
-                    "No hay suficientes canciones para iniciar la partida");
+                    mensaje(modelo, "general.cancionesinsuficientes"));
             modelo.addAttribute("newpartida", partida);
             anyadirTemas(modelo);
             return "CrearPartidaInvitado";
