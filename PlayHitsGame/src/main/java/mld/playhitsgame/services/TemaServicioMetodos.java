@@ -59,7 +59,7 @@ public class TemaServicioMetodos implements TemaServicio {
                 obj.setListasSpotify(tema.getListasSpotify());
                 
         obj.setPuntos(tema.getPuntos());
-        obj.setUsuarioRecord(tema.getUsuarioRecord());
+        obj.setRecordUsuario(tema.getRecordUsuario());
         obj.setActivo(tema.isActivo());
         obj.setNPartidas(tema.getNPartidas());
         

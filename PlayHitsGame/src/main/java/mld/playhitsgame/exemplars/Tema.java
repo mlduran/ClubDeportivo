@@ -42,7 +42,7 @@ public class Tema {
     private Usuario usuario;
 
     private String listasSpotify;
-    private Long usuarioRecord; // para eliminar
+    //private Long usuarioRecord; // para eliminar
     @OneToOne
     @JoinColumn(name = "record_usuario_id", nullable = true) 
     private Usuario recordUsuario;

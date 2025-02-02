@@ -12,7 +12,6 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -1695,6 +1694,8 @@ public class ControladorVista {
         if (canciones.size() <= 5) {
             modelo.addAttribute("result",
                     "No hay suficientes canciones para iniciar la partida");
+            modelo.addAttribute("newpartida", partida);
+            anyadirTemas(modelo);
             return "CrearPartidaInvitado";
         }
 
