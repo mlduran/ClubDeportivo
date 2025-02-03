@@ -221,12 +221,12 @@ public class ControladorCancion {
         }
 
         Optional<Tema> tema = servTema.findById(id);
-        modelo.addAttribute("temaUpdate", tema);
+        modelo.addAttribute("temaUpdate", tema.get());
         return "ModificarTema";
     }
 
     @PostMapping("/modificarTema")
-    public String modificarCancion(@ModelAttribute("temaUpdate") Tema tema, Model modelo) {
+    public String modificarTema(@ModelAttribute("temaUpdate") Tema tema, Model modelo) {
 
         if (!usuarioCorrecto(modelo)) {
             return "redirect:/logout";
@@ -235,11 +235,11 @@ public class ControladorCancion {
         String resp = "OK";
 
         try {
-            servTema.update(tema.getId(), tema);
+            tema = servTema.update(tema.getId(), tema);
         } catch (Exception ex) {
             resp = "ERROR " + ex;
         }
-
+        modelo.addAttribute("temaUpdate", tema);
         modelo.addAttribute("result", resp);
 
         return "ModificarTema";

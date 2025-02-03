@@ -24,7 +24,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                 <form method="post" th:action="@{/modificarTema}" th:object="${temaUpdate}">  
                                     <input type="hidden" th:field="*{id}" required="required"/>
                                     <p>Tema<input type="text" th:field="*{tema}" required="required"/></p>
-                                    <p>Descripción<input type="text" th:field="*{descripcion}"/></p>
+                                    <p><label th:text="${temaUpdate.descripcion}"></label></p>
                                     <p>Genero
                                         <select th:field="*{genero}" title="Genero">
                                             <option th:each="generoOpt : ${T(mld.playhitsgame.exemplars.Genero).values()}" 

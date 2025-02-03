@@ -61,8 +61,7 @@ public class TemaServicioMetodos implements TemaServicio {
         obj.setPuntos(tema.getPuntos());
         obj.setRecordUsuario(tema.getRecordUsuario());
         obj.setActivo(tema.isActivo());
-        obj.setNPartidas(tema.getNPartidas());
-        
+        obj.setNPartidas(tema.getNPartidas());        
 
         return DAO.save(obj);
     }
