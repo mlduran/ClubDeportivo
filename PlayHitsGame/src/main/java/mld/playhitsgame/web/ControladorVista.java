@@ -2118,6 +2118,48 @@ public class ControladorVista {
             return "error";
         }
     }
+    
+    @GetMapping("/noRecibirCorreo")
+    public String noRecibirCorreo(Model modelo, HttpServletRequest req) {
+
+        if (req.getParameter("id") == null
+                || req.getParameter("token") == null) {
+            String url;
+            StringBuffer requestURL = req.getRequestURL(); // Obtiene la URL completa hasta el path
+            String queryString = req.getQueryString(); // Obtiene la cadena de consulta (query parameters)
+            if (queryString == null) {
+                url = requestURL.toString();
+            } else {
+                url = requestURL.append("?").append(queryString).toString();
+            }
+            System.out.println("MLD Error noRecibirCorreo " + url);
+            return "error";
+        }
+
+        Optional<Usuario> usu = null;
+        String token = null;
+        Long id = null;
+        try {
+            id = Long.valueOf(req.getParameter("id"));
+            token = (String) req.getParameter("token");
+
+            usu = servUsuario.findById(id);
+        } catch (NumberFormatException numberFormatException) {
+        }
+
+        if (usu != null && usu.isPresent()) {
+            Usuario usuario = usu.get();
+            if (passwordEncoder.matches(usuario.getUsuario(), token)) {
+                usuario.setNoCorreos(true);
+                servUsuario.update(id, usuario);
+                return "DesactivarCorreos";
+            } else {
+                return "error";
+            }
+        } else {
+            return "error";
+        }
+    }
 
     @GetMapping("/recuperarContrasenya")
     public String recuperarContrasenya(Model modelo) {

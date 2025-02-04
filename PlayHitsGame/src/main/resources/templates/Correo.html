@@ -24,7 +24,12 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         </div>    
                         <div th:if="${url != null}" class="card shadow-lg">
                             <p><a th:href="${url}" target="_blank" th:text="${textoUrl}"></a></p>  
-                        </div>   
+                        </div>  
+                        <div th:if="${urlCancelacion != null}" class="card shadow-lg">
+                            <a th:href="${urlCancelacion}">
+                                <p th:text="${textoUrlCancelacion}"/>
+                            </a>
+                        </div>
                         <hr style="border: 0; height: 2px; background-color: #333; width: 100%;"/>
                         <div class="card shadow-lg">
                             <a href="https://playhitsgame.es" class="text-dark">

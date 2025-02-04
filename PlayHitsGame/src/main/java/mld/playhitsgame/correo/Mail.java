@@ -23,6 +23,8 @@ public class Mail implements Comparable<Mail>{
     private String textoUrl;
     private String plantilla;
     private String nombre;
+    private String urlCancelacionCorreo;
+    private String textoUrlCancelacionCorreo;
     private boolean prioritario;
     
     

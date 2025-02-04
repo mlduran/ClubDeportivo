@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import mld.playhitsgame.correo.EmailServicioMetodos;
 import mld.playhitsgame.correo.Mail;
@@ -52,6 +53,7 @@ import static mld.playhitsgame.utilidades.Utilidades.resultadosBatalla;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -67,6 +69,8 @@ public class ControladorScripts {
     private String mailAdmin;
     @Value("${custom.entorno}")
     public String entorno;
+    @Value("${custom.server.ip}")
+    private String customIp;
 
     @Autowired
     EmailServicioMetodos servEmail;
@@ -94,6 +98,8 @@ public class ControladorScripts {
     TemaServicioMetodos servTema;
     @Autowired
     ConfigServicioMetodos servConfig;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private final String tokenValidacion = "a3b2f10c-482d-4d7e-a5ed-2f9b7e8bcfd0";
     private int numMaxEstrellas;
@@ -111,13 +117,20 @@ public class ControladorScripts {
 
     private void enviarMail(String asunto, ArrayList<String> txtsMail, List<Usuario> usuarios) {
 
-        if (entorno != null && entorno.equals("Desarrollo")) {
+        if (entorno != null && entorno.equals("Desarrollo")) {            
+            Optional<Usuario> findByUsuario = servUsuario.findByUsuario(mailAdmin);
+            Usuario usu = findByUsuario.get();
+            String token = passwordEncoder.encode(usu.getUsuario());
+            String enlace = customIp + "/noRecibirCorreo?id=" + String.valueOf(usu.getId())
+                    + "&token=" + token;
             Mail mail = new Mail();
             mail.setAsunto(asunto);
-            mail.setDestinatario(mailAdmin);
+            mail.setDestinatario(usu.getUsuario());
             mail.setNombre("");
             mail.setMensajes(txtsMail);
             mail.setPlantilla("Correo");
+            mail.setUrlCancelacionCorreo(enlace);
+            mail.setTextoUrlCancelacionCorreo("Quiero dejar de recibir estos correos");
             servEmail.encolarMail(mail);
         } else {
             for (Usuario usu : usuarios) {
@@ -125,12 +138,17 @@ public class ControladorScripts {
                     continue;
                 }
                 if (usu.isActivo() && !usu.isNoCorreos()) {
+                    String token = passwordEncoder.encode(usu.getUsuario());
+                    String enlace = customIp + "/noRecibirCorreo?id=" + String.valueOf(usu.getId())
+                            + "&token=" + token;
                     Mail mail = new Mail();
                     mail.setAsunto(asunto);
                     mail.setDestinatario(usu.getUsuario());
                     mail.setNombre(usu.getNombre());
                     mail.setMensajes(txtsMail);
                     mail.setPlantilla("Correo");
+                    mail.setUrlCancelacionCorreo(enlace);
+                    mail.setTextoUrlCancelacionCorreo("Quiero dejar de recibir estos correos");
                     servEmail.encolarMail(mail);
                 }
             }

@@ -120,6 +120,11 @@ public class EmailServicioMetodos implements EmailServicio {
             context.setVariable("url", mail.getUrl());
             context.setVariable("textoUrl", mail.getTextoUrl());
         }
+        
+        if (mail.getUrlCancelacionCorreo()!= null) {
+            context.setVariable("urlCancelacion", mail.getUrlCancelacionCorreo());
+            context.setVariable("textoUrlCancelacion", mail.getTextoUrlCancelacionCorreo());
+        }
 
         context.setVariable("nombre", mail.getNombre());
 
