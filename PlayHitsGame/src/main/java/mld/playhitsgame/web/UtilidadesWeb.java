@@ -87,7 +87,7 @@ public class UtilidadesWeb {
             if (tema.isPresent()) {
                 Tema elTema = tema.get();
                 if (elTema.getPuntos() < pts) {
-                    boolean darEstrella = !elTema.getRecordUsuario().equals(usuario);
+                    boolean darEstrella = elTema.getRecordUsuario() == null || !elTema.getRecordUsuario().equals(usuario);
                     elTema.setPuntos(pts);
                     elTema.setRecordUsuario(usuario);
                     ctrlVista.servTema.update(elTema.getId(), elTema);
