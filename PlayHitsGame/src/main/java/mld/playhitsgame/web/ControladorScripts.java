@@ -105,6 +105,9 @@ public class ControladorScripts {
 
     private final String tokenValidacion = "a3b2f10c-482d-4d7e-a5ed-2f9b7e8bcfd0";
     private int numMaxEstrellas;
+    private int diasHistorico;
+    private int diasEliminacion;
+    private int diasNocorreo;
 
     @PostConstruct
     public void init() {
@@ -115,6 +118,9 @@ public class ControladorScripts {
         // para que este valor se refresque si se cambia en la BD
         // habria que reiniciar la APP
         numMaxEstrellas = laConfig.getNumMaxEstrellas();
+        diasHistorico = laConfig.getDiasHistorico();
+        diasEliminacion = laConfig.getDiasEliminacion();
+        diasNocorreo = laConfig.getDiasNocorreo();
     }
 
     private void enviarMail(String asunto, ArrayList<String> txtsMail, List<Usuario> usuarios) {
@@ -467,7 +473,7 @@ public class ControladorScripts {
     private void pasarAHistoricoPartidasYBatallas() {
 
         // Se pasan a Historico las partidas / Batallas que tengan mas de 90 dias
-        LocalDateTime fechaHace90Dias = LocalDateTime.now().minusDays(90);
+        LocalDateTime fechaHace90Dias = LocalDateTime.now().minusDays(diasHistorico);
         for (Partida partida : servPartida.partidasFinalizadas()) {
             if (partida.isTipoGrupo() || partida.isTipoPersonal()) {
                 if (partida.getFecha().isBefore(fechaHace90Dias)) {
@@ -488,6 +494,28 @@ public class ControladorScripts {
         }
     }
     
+    private void eliminarPartidasYBatallas() {
+
+        // Eliminamos partidas / Batallas que tengan mas de 180 dias
+        LocalDateTime fechaHace180Dias = LocalDateTime.now().minusDays(diasEliminacion);
+        for (Partida partida : servPartida.partidasHistoricas()) {
+            if (partida.isTipoGrupo() || partida.isTipoPersonal()) {
+                if (partida.getFecha().isBefore(fechaHace180Dias)) {
+                    String txt = partida.getDescripcionLog();                    
+                    servPartida.deletePartida(partida.getId());
+                    System.out.println("Se elimina partida " + txt);
+                }
+            }
+        }
+        for (Batalla batalla : servBatalla.batallasHistoricas()) {
+            if (batalla.getFecha().isBefore(fechaHace180Dias)) {
+                String txt = batalla.getDescripcionLog();                
+                servBatalla.deleteBatalla(batalla);
+                System.out.println("Se elimina batalla " + txt);
+            }
+        }
+    }
+    
     private void eliminarUsuariosNoValidados(){
         
         // Se eliminan usuarios no activados si han pasado 30 dias desde que no a accedido
@@ -504,7 +532,7 @@ public class ControladorScripts {
     private void activarOpcionDeNoEnvioDeCorreo(){
         
         // Se activa opcion si han pasado 30 dias desde que no a accedido
-        LocalDateTime fechaHace30Dias = LocalDateTime.now().minusDays(30);
+        LocalDateTime fechaHace30Dias = LocalDateTime.now().minusDays(diasNocorreo);
         Date fecha = Date.from(fechaHace30Dias.atZone(ZoneId.systemDefault()).toInstant());        
         
         List<Usuario> usuariosListaCorreoMasiva = servUsuario.usuariosListaCorreoMasiva();
@@ -543,6 +571,7 @@ public class ControladorScripts {
                     finalizarPartidasObsoletas();
                     activarOpcionDeNoEnvioDeCorreo();
                     eliminarUsuariosNoValidados();
+                    eliminarPartidasYBatallas();
                     /////////////////////// FIN
                     txtCorreo = "Lanzamiento de scripts OK";
                 } catch (Exception ex) {

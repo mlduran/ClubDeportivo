@@ -19,19 +19,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @Service
-public class PartidaServicioMetodos implements PartidaServicio{
-    
+public class PartidaServicioMetodos implements PartidaServicio {
+
     @Autowired
     PartidaDAO DAO;
 
     @Override
     public List<Partida> findAll() {
         return DAO.findAll();
-    }   
-        
+    }
+
     @Override
     public Optional<Partida> findById(Long id) {
-        return DAO.findById(id);        
+        return DAO.findById(id);
     }
 
     @Override
@@ -42,35 +42,35 @@ public class PartidaServicioMetodos implements PartidaServicio{
     @Override
     public Partida updatePartida(Long id, Partida partida) {
         Partida obj = DAO.findById(id).get();
-        
-        if(Objects.nonNull(partida.getStatus())){
+
+        if (Objects.nonNull(partida.getStatus())) {
             obj.setStatus(partida.getStatus());
         }
 
-        if(Objects.nonNull(partida.getTipo())){
+        if (Objects.nonNull(partida.getTipo())) {
             obj.setTipo(partida.getTipo());
         }
-        
-        if(Objects.nonNull(partida.getDificultad())){
-            obj.setDificultad(partida.getDificultad());
-        } 
-        
-        if(Objects.nonNull(partida.getTema()) && !"".equalsIgnoreCase(partida.getTema())){
-            obj.setTema(partida.getTema());
-        }        
 
-        if(Objects.nonNull(partida.getGrupo())){
+        if (Objects.nonNull(partida.getDificultad())) {
+            obj.setDificultad(partida.getDificultad());
+        }
+
+        if (Objects.nonNull(partida.getTema()) && !"".equalsIgnoreCase(partida.getTema())) {
+            obj.setTema(partida.getTema());
+        }
+
+        if (Objects.nonNull(partida.getGrupo())) {
             obj.setGrupo(partida.getGrupo());
         }
-        
-        if(Objects.nonNull(partida.getGanador()) && !"".equalsIgnoreCase(partida.getGanador())){
+
+        if (Objects.nonNull(partida.getGanador()) && !"".equalsIgnoreCase(partida.getGanador())) {
             obj.setGanador(partida.getGanador());
         }
-        
-        if(Objects.nonNull(partida.getNombre()) && !"".equalsIgnoreCase(partida.getNombre())){
+
+        if (Objects.nonNull(partida.getNombre()) && !"".equalsIgnoreCase(partida.getNombre())) {
             obj.setNombre(partida.getNombre());
         }
-        
+
         obj.setFase(partida.getFase());
         obj.setPublica(partida.isPublica());
         obj.setFecha(partida.getFecha());
@@ -81,7 +81,7 @@ public class PartidaServicioMetodos implements PartidaServicio{
         obj.setActivarPlay(partida.isActivarPlay());
         obj.setSinOfuscar(partida.isSinOfuscar());
         obj.setSonidos(partida.isSonidos());
-        
+
         return DAO.save(obj);
     }
 
@@ -91,24 +91,24 @@ public class PartidaServicioMetodos implements PartidaServicio{
         DAO.eliminarRelacionRondas(id);
         DAO.eliminarRelacionUsuarios(id);
         DAO.deleteById(id);
-    }    
+    }
 
     @Override
     public Optional<Partida> partidaUsuarioMaster(Long idUsuario) {
         return DAO.partidaUsuarioMaster(idUsuario);
     }
-    
+
     @Override
-    public ArrayList<Partida> partidaBatallaUsuario(Long id_batalla, Long id_usuario){
-        
+    public ArrayList<Partida> partidaBatallaUsuario(Long id_batalla, Long id_usuario) {
+
         return DAO.partidaBatallaUsuario(id_batalla, id_usuario);
     }
 
     @Override
-    public Page<Partida> partidasGrupo(int numeroPagina, int tamanioPagina){
-        
+    public Page<Partida> partidasGrupo(int numeroPagina, int tamanioPagina) {
+
         ArrayList<Partida> partidas = DAO.partidasGrupo();
-        
+
         // Calcula los índices para paginación manual
         int start = numeroPagina * tamanioPagina;
         int end = Math.min(start + tamanioPagina, partidas.size());
@@ -118,7 +118,7 @@ public class PartidaServicioMetodos implements PartidaServicio{
 
         // Retorna un objeto Page creado a partir de los usuarios paginados
         return new PageImpl<>(partidasPaginadas, Pageable.ofSize(tamanioPagina).withPage(numeroPagina), partidasPaginadas.size());
-   
+
     }
 
     @Override
@@ -131,6 +131,9 @@ public class PartidaServicioMetodos implements PartidaServicio{
         return DAO.partidasFinalizadas();
     }
 
- 
- 
+    @Override
+    public ArrayList<Partida> partidasHistoricas() {
+        return DAO.partidasHistoricas();
+    }
+
 }

@@ -10,7 +10,9 @@ import java.util.Objects;
 import java.util.Optional;
 import mld.playhitsgame.DAO.BatallaDAO;
 import mld.playhitsgame.exemplars.Batalla;
+import mld.playhitsgame.exemplars.Partida;
 import mld.playhitsgame.exemplars.StatusBatalla;
+import mld.playhitsgame.exemplars.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,10 @@ public class BatallaServicioMetodos implements BatallaServicio {
 
     @Autowired
     BatallaDAO DAO;
+    @Autowired
+    PartidaServicioMetodos servPartida;
+    @Autowired
+    UsuarioServicioMetodos servUsuario;
 
     @Override
     public Batalla update(Long id, Batalla batalla) {
@@ -54,11 +60,27 @@ public class BatallaServicioMetodos implements BatallaServicio {
 
         if (batalla.getStatus().equals(StatusBatalla.Programada)) {
             DAO.delete(batalla);
+        }        
+    }
+    
+    @Override
+    public void deleteBatalla(Batalla batalla) {
+
+        for (Partida partida : batalla.getPartidas()){
+            servPartida.deletePartida(partida.getId());
         }
-        //DAO.eliminarRelacionRespuestas(id);
-        //DAO.eliminarRelacionRondas(id);
-        //DAO.eliminarRelacionUsuarios(id);
-        //DAO.deleteById(id);
+        
+        for (Usuario usuario : batalla.getUsuariosInscritos()) {
+            usuario.getBatallasInscritas().remove(batalla);
+            servUsuario.update(usuario.getId(), usuario); 
+        }
+        
+        for (Usuario usuario : batalla.getUsuarios()) {
+            usuario.getBatallas().remove(batalla);
+            servUsuario.update(usuario.getId(), usuario); 
+        }
+        
+        DAO.delete(batalla);            
     }
 
     @Override
@@ -99,6 +121,11 @@ public class BatallaServicioMetodos implements BatallaServicio {
     @Override
     public ArrayList<Batalla> batallasFinalizadas() {
         return DAO.batallasFinalizadas();
+    }
+    
+    @Override
+    public ArrayList<Batalla> batallasHistoricas() {
+        return DAO.batallasHistoricas();
     }
 
 }

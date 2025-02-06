@@ -24,6 +24,7 @@ public interface PartidaServicio {
     Optional<Partida> findById(Long id);
     ArrayList<Partida> partidasActuales();
     ArrayList<Partida> partidasFinalizadas();
+    ArrayList<Partida> partidasHistoricas();
     
     Partida savePartida(Partida partida);    
     Partida updatePartida(Long id, Partida partida);

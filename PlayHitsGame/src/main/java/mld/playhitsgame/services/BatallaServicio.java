@@ -22,10 +22,12 @@ public interface BatallaServicio {
     Optional<Batalla> findById(Long id);
     ArrayList<Batalla> batallasActuales();
     ArrayList<Batalla> batallasFinalizadas();
+    ArrayList<Batalla> batallasHistoricas();
     
     Batalla save(Batalla batalla);    
     Batalla update(Long id, Batalla batalla);
     void delete(Batalla batalla);
+    void deleteBatalla(Batalla batalla);
     
     ArrayList<Batalla> batallasProgramadasPublicas();
     ArrayList<Batalla> batallasEnInscripcionPublicas();

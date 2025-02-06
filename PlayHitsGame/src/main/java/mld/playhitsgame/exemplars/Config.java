@@ -36,6 +36,9 @@ public final class Config  {
     private int numMaxEstrellas;
     private boolean mantenimiento;
     private LocalDateTime fechaMantenimiento;
+    private int diasHistorico;
+    private int diasEliminacion;
+    private int diasNocorreo;
 
 }
 

@@ -25,6 +25,9 @@ public interface BatallaDAO extends JpaRepository<Batalla, Long> {
     
     @Query(value = "SELECT * FROM batallas WHERE status = 'Terminada' ;", nativeQuery = true)
     ArrayList<Batalla> batallasFinalizadas();
+    
+    @Query(value = "SELECT * FROM batallas WHERE status = 'Historico' ;", nativeQuery = true)
+    ArrayList<Batalla> batallasHistoricas();
 
     @Query(value = "SELECT * FROM batallas WHERE status='Programada'AND publica=true ;", nativeQuery = true)
     ArrayList<Batalla> batallasProgramadasPublicas();

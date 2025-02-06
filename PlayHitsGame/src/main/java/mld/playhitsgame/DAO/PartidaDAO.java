@@ -27,6 +27,9 @@ public interface PartidaDAO extends JpaRepository<Partida, Long> {
     
     @Query(value = "SELECT * FROM partidas WHERE status = 'Terminada' ;", nativeQuery = true)
     ArrayList<Partida> partidasFinalizadas();
+    
+    @Query(value = "SELECT * FROM partidas WHERE status = 'Historico' ;", nativeQuery = true)
+    ArrayList<Partida> partidasHistoricas();
 
     @Query(value = "SELECT * FROM partidas WHERE master_id=:idusuario AND (status <> 'Terminada' AND status <> 'Historico') AND tipo <> 'batalla';", nativeQuery = true)
     Optional<Partida> partidaUsuarioMaster(Long idusuario);
