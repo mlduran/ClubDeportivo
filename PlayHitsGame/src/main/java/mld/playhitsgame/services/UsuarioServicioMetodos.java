@@ -141,4 +141,9 @@ public class UsuarioServicioMetodos implements UsuarioServicio {
     public List<Usuario> usuariosListaCorreoMasiva(){
         return DAO.usuariosListaCorreoMasiva();
     }
+    
+    @Override
+    public List<Usuario> usuariosDesactivados(){
+        return DAO.usuariosDesactivados();
+    }
 }

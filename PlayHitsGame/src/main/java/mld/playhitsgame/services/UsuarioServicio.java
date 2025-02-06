@@ -35,5 +35,5 @@ public interface UsuarioServicio {
     List<Usuario> usuariosEstrella();
     
     List<Usuario> usuariosListaCorreoMasiva();
-    
+    List<Usuario> usuariosDesactivados();
 }

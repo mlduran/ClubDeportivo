@@ -440,6 +440,7 @@ public class ControladorVista {
 
             if (!usuarioSesion.isActivo()) {
                 modelo.addAttribute("error", mensaje(modelo, "general.activarcuenta"));
+                enviarCorreoActivacion(usuarioSesion, modelo);
                 return "Inicio";
             }
             usuarioSesion.getPartidasInvitado();
@@ -923,6 +924,24 @@ public class ControladorVista {
         return "AltaUsuarioAdm";
     }
 
+    private void enviarCorreoActivacion(Usuario usuario, Model modelo) {
+
+        String token = passwordEncoder.encode(usuario.getUsuario());
+        String enlace = customIp + "/validarUsuario?id=" + String.valueOf(usuario.getId())
+                + "&token=" + token;
+        Mail mail = new Mail();
+        mail.setAsunto(mensaje(modelo, "general.altaplay"));
+        mail.setDestinatario(usuario.getUsuario());
+        mail.setMensaje("");
+        mail.setPlantilla("CorreoAlta");
+        mail.setNombre(usuario.getNombre());
+        mail.setPrioritario(true);
+        mail.setUrl(enlace);
+        mail.setTextoUrl(mensaje(modelo, "mail.activar"));
+        servEmail.encolarMail(mail);
+
+    }
+
     @PostMapping("/altaUsuario")
     public String altaUsuario(@ModelAttribute("newusuario") Usuario usuario,
             @ModelAttribute("pws2") String pws2, Model modelo) {
@@ -943,7 +962,7 @@ public class ControladorVista {
 
         if (passwOK) {
             Optional<Usuario> usuLogin = servUsuario.findByUsuario(usuario.getUsuario());
-            if (!usuLogin.isEmpty()) {
+            if (!usuLogin.isEmpty()) {                
                 usuOK = false;
                 err = mensaje(modelo, "general.elusu") + usuario.getUsuario() + " " + mensaje(modelo, "general.yaexiste");
             }
@@ -965,19 +984,7 @@ public class ControladorVista {
                 usuario.setSegEspera(5);
                 usuario.setDobleTouch(false);
                 usuario = servUsuario.save(usuario);
-                String token = passwordEncoder.encode(usuario.getUsuario());
-                String enlace = customIp + "/validarUsuario?id=" + String.valueOf(usuario.getId())
-                        + "&token=" + token;
-                Mail mail = new Mail();
-                mail.setAsunto(mensaje(modelo, "general.altaplay"));
-                mail.setDestinatario(usuario.getUsuario());
-                mail.setMensaje("");
-                mail.setPlantilla("CorreoAlta");
-                mail.setNombre(usuario.getNombre());
-                mail.setPrioritario(true);
-                mail.setUrl(enlace);
-                mail.setTextoUrl(mensaje(modelo, "mail.activar"));
-                servEmail.encolarMail(mail);
+                enviarCorreoActivacion(usuario, modelo);
 
                 resp = mensaje(modelo, "general.usuariocreado").concat(usuario.getUsuario());
 
@@ -2118,7 +2125,7 @@ public class ControladorVista {
             return "error";
         }
     }
-    
+
     @GetMapping("/noRecibirCorreo")
     public String noRecibirCorreo(Model modelo, HttpServletRequest req) {
 
@@ -2235,6 +2242,8 @@ public class ControladorVista {
                 try {
                     if (!"".equals(newPassw)) {
                         usuCambio.setContrasenya(newPassw);
+                        // Pos si es un usuario que no estubiese activado lo activamos ahora
+                        usuCambio.setActivo(true);
                     }
                     servUsuario.update(usuCambio.getId(), usuCambio);
                     resp = mensaje(modelo, "general.cambiookpssw");

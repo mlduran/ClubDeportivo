@@ -42,5 +42,8 @@ public interface UsuarioDAO extends JpaRepository<Usuario, Long> {
     
     @Query(value = "SELECT * FROM usuarios WHERE no_correos=false AND activo=true ;", nativeQuery = true)
     List<Usuario> usuariosListaCorreoMasiva();
+    
+    @Query(value = "SELECT * FROM usuarios WHERE activo=false ;", nativeQuery = true)
+    List<Usuario> usuariosDesactivados();
 
 }

@@ -7,8 +7,10 @@ package mld.playhitsgame.web;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -485,6 +487,35 @@ public class ControladorScripts {
             }
         }
     }
+    
+    private void eliminarUsuariosNoValidados(){
+        
+        // Se eliminan usuarios no activados si han pasado 30 dias desde que no a accedido
+        LocalDateTime fechaHace30Dias = LocalDateTime.now().minusDays(30);
+        Date fecha = Date.from(fechaHace30Dias.atZone(ZoneId.systemDefault()).toInstant());        
+                
+        for (Usuario usu : servUsuario.usuariosDesactivados()){
+            if (usu.getAlta().before(fecha)){
+                servUsuario.deleteById(usu.getId());
+            }
+        }
+    }
+    
+    private void activarOpcionDeNoEnvioDeCorreo(){
+        
+        // Se activa opcion si han pasado 30 dias desde que no a accedido
+        LocalDateTime fechaHace30Dias = LocalDateTime.now().minusDays(30);
+        Date fecha = Date.from(fechaHace30Dias.atZone(ZoneId.systemDefault()).toInstant());        
+        
+        List<Usuario> usuariosListaCorreoMasiva = servUsuario.usuariosListaCorreoMasiva();
+        for (Usuario usu : usuariosListaCorreoMasiva){
+            if (usu.getUltimoAcceso().before(fecha)){
+                usu.setNoCorreos(true);
+                servUsuario.update(usu.getId(), usu);
+            }
+        }
+    }
+    
 
     @GetMapping("/lanzarScripts")
     public ResponseEntity<Void> lanzarScripts(Model modelo, HttpServletRequest req
@@ -510,6 +541,8 @@ public class ControladorScripts {
                     tratarBatallas();
                     pasarAHistoricoPartidasYBatallas();
                     finalizarPartidasObsoletas();
+                    activarOpcionDeNoEnvioDeCorreo();
+                    eliminarUsuariosNoValidados();
                     /////////////////////// FIN
                     txtCorreo = "Lanzamiento de scripts OK";
                 } catch (Exception ex) {
