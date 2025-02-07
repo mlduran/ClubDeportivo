@@ -108,19 +108,25 @@ public class ControladorScripts {
     private int diasHistorico;
     private int diasEliminacion;
     private int diasNocorreo;
+    
+    private void actualizarValoresConfig(){
+        
+        Config laConfig = servConfig.getSettings();
+        // para que estos valores se refresquen si se cambian en la BD
+        // habria que llamar a este metodo
+        numMaxEstrellas = laConfig.getNumMaxEstrellas();
+        diasHistorico = laConfig.getDiasHistorico();
+        diasEliminacion = laConfig.getDiasEliminacion();
+        diasNocorreo = laConfig.getDiasNocorreo();
+        
+    }
 
     @PostConstruct
     public void init() {
         // Código a ejecutar al arrancar la aplicación
         System.out.println("Aplicación iniciada (PostConstruct ControladorScripts). Ejecutando tareas de inicio...");
 
-        Config laConfig = servConfig.getSettings();
-        // para que este valor se refresque si se cambia en la BD
-        // habria que reiniciar la APP
-        numMaxEstrellas = laConfig.getNumMaxEstrellas();
-        diasHistorico = laConfig.getDiasHistorico();
-        diasEliminacion = laConfig.getDiasEliminacion();
-        diasNocorreo = laConfig.getDiasNocorreo();
+        actualizarValoresConfig();
     }
 
     private void enviarMail(String asunto, ArrayList<String> txtsMail, List<Usuario> usuarios) {
@@ -473,6 +479,7 @@ public class ControladorScripts {
     private void pasarAHistoricoPartidasYBatallas() {
 
         // Se pasan a Historico las partidas / Batallas que tengan mas de 90 dias
+        System.out.println("Se pasa a historico partidas y batallas anterirores a " + String.valueOf(diasHistorico) + " dias");
         LocalDateTime fechaHace90Dias = LocalDateTime.now().minusDays(diasHistorico);
         for (Partida partida : servPartida.partidasFinalizadas()) {
             if (partida.isTipoGrupo() || partida.isTipoPersonal()) {
@@ -496,6 +503,7 @@ public class ControladorScripts {
     
     private void eliminarPartidasYBatallas() {
 
+        System.out.println("Se eliminan partidas y batallas anterirores a " + String.valueOf(diasEliminacion) + " dias");
         // Eliminamos partidas / Batallas que tengan mas de 180 dias
         LocalDateTime fechaHace180Dias = LocalDateTime.now().minusDays(diasEliminacion);
         for (Partida partida : servPartida.partidasHistoricas()) {
@@ -565,7 +573,8 @@ public class ControladorScripts {
             String token = (String) req.getParameter("token");
             if (token.equals(tokenValidacion)) {
                 try {
-                    // METODOS A EJECUTAR  
+                    // METODOS A EJECUTAR
+                    actualizarValoresConfig();
                     tratarBatallas();
                     pasarAHistoricoPartidasYBatallas();
                     finalizarPartidasObsoletas();

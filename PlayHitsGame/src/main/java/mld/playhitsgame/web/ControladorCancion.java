@@ -759,18 +759,12 @@ public class ControladorCancion {
             isValidar = true;
         }
 
-        Pageable pageable = PageRequest.of(page, REG_POR_PAG);
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), canciones.size());
-
-        List sublist = canciones.subList(start, end);
-
         if (isTmp) {
-            ejecutarCambiosBDTmp(req, sublist, tema, opVerificar, opAnyadirTema,
+            ejecutarCambiosBDTmp(req, canciones, tema, opVerificar, opAnyadirTema,
                     opEliminarTema, opEliminarCanciones, isValidar);
             gestionCanciones(modelo, page, true);
         } else {
-            ejecutarCambiosBD(req, sublist, tema, opVerificar, opAnyadirTema,
+            ejecutarCambiosBD(req, canciones, tema, opVerificar, opAnyadirTema,
                     opEliminarTema, opEliminarCanciones, isValidar);
             gestionCanciones(modelo, page, false);
         }
