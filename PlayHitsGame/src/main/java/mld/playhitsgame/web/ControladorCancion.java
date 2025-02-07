@@ -7,6 +7,8 @@ package mld.playhitsgame.web;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -320,6 +322,8 @@ public class ControladorCancion {
         if (filtro.isDuplicados()) {
             canciones = Utilidades.buscarDuplicados(canciones, false, false);
         }
+        
+        Collections.sort(canciones, Comparator.comparingLong(Cancion::getId));
 
         Pageable pageable = PageRequest.of(page, REG_POR_PAG);
         int start = (int) pageable.getOffset();
