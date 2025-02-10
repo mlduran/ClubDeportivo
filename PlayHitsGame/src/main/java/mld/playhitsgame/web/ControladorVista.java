@@ -657,10 +657,7 @@ public class ControladorVista {
         boolean todoFallo = false;
         if (modelo.getAttribute("todoFallo") != null) {
             todoFallo = (boolean) modelo.getAttribute("todoFallo");
-        }
-        if (modelo.getAttribute("esRecord") != null) {
-            todoFallo = (boolean) modelo.getAttribute("esRecord");
-        }
+        }        
 
         if ((partida.ultimaRonda() == null || partida.ultimaRonda().isCompletada())
                 && !partida.isTerminada() && todoFallo == false) {
