@@ -152,8 +152,7 @@ public class ControladorCancion {
         }
 
         Cancion cancion = servCancion.findById(id).get();
-        temasBD(modelo);        
-        
+        temasBD(modelo);
 
         modelo.addAttribute("cancion", cancion);
         return "ModificarCancion";
@@ -322,8 +321,12 @@ public class ControladorCancion {
         if (filtro.isDuplicados()) {
             canciones = Utilidades.buscarDuplicados(canciones, false, false);
         }
-        
-        Collections.sort(canciones, Comparator.comparingLong(Cancion::getId));
+
+        if (isTmp) {
+            Collections.sort(canciones, Comparator.comparingLong(CancionTmp::getId));
+        } else {
+            Collections.sort(canciones, Comparator.comparingLong(Cancion::getId));
+        }
 
         Pageable pageable = PageRequest.of(page, REG_POR_PAG);
         int start = (int) pageable.getOffset();
@@ -392,13 +395,13 @@ public class ControladorCancion {
             mail.setPlantilla("Correo");
             mail.setNombre("");
             mail.setPrioritario(true);
-            servEmail.encolarMail(mail);            
+            servEmail.encolarMail(mail);
         }
 
     }
 
     private void validarReproducciones(List<Cancion> canciones) {
-        
+
         CompletableFuture.runAsync(() -> {
             StringBuilder err = new StringBuilder();
             String des;
