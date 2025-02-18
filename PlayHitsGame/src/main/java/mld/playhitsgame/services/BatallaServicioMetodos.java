@@ -51,6 +51,8 @@ public class BatallaServicioMetodos implements BatallaServicio {
         obj.setAnyoFinal(batalla.getAnyoFinal());
         obj.setNCanciones(batalla.getNCanciones());
         obj.setNRondas(batalla.getNRondas());
+        obj.setSinOfuscar(batalla.isSinOfuscar());
+        obj.setSonidos(batalla.isSonidos());
 
         return DAO.save(obj);
     }

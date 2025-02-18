@@ -253,6 +253,8 @@ public class ControladorScripts {
             newPartida.setMaster(usu);
             newPartida.setPublica(batalla.isPublica());
             newPartida.setRondaActual(1);
+            newPartida.setSinOfuscar(batalla.isSinOfuscar());
+            newPartida.setSonidos(batalla.isSonidos());
             newPartida.setInvitados(new ArrayList());
             newPartida.setBatalla(batalla);
 
@@ -288,10 +290,10 @@ public class ControladorScripts {
             int[] rangoAnyos = rangoAnyosCanciones((ArrayList<Cancion>) canciones);
             // Crear las opciones para las respuestas
             for (Ronda ronda : newPartida.getRondas()) {
-                for (OpcionTituloTmp op : opcionesTitulosCanciones(ronda, true)) {
+                for (OpcionTituloTmp op : opcionesTitulosCanciones(ronda, !newPartida.isSinOfuscar())) {
                     servOpTitulo.saveOpcionTituloTmp(op);
                 }
-                for (OpcionInterpreteTmp op : opcionesInterpretesCanciones(ronda, true)) {
+                for (OpcionInterpreteTmp op : opcionesInterpretesCanciones(ronda, !newPartida.isSinOfuscar())) {
                     servOpInterprete.saveOpcionInterpreteTmp(op);
                 }
                 for (OpcionAnyoTmp op : opcionesAnyosCanciones(ronda, rangoAnyos[0], rangoAnyos[1])) {

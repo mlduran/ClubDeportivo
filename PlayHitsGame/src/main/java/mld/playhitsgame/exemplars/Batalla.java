@@ -58,6 +58,8 @@ public class Batalla {
     private int anyoFinal;
     private int nCanciones;
     private int nRondas;
+    private boolean sinOfuscar;
+    private boolean sonidos;
     
     @ManyToOne // Relación muchas batallas a un ganador
     @JoinColumn(name = "ganador_id") 

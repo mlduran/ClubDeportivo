@@ -28,7 +28,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                 <form method="post" th:action="@{/crearPartida}" th:object="${newpartida}" id="form">                                    
                                     <div class="mb-3" th:if="${newpartida.tipoPersonal == false}">
                                         <label class="mb-2 text-muted" for="tipo" th:text="#{general.tipo}"/>
-                                        <select th:field="*{tipo}" title="tipo" id="tipo">
+                                        <select th:field="*{tipo}" title="tipo" id="tipo" onchange="toggleSonidos()">
                                             <option th:value="batalla" th:text="#{general.opbatalla}"></option>
                                             <div th:if="${serverWebsocket} != ''">
                                                 <option th:value="grupo" th:text="#{general.opgrupo}"></option>                                            
@@ -77,12 +77,18 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                         <select th:field="*{dificultad}" title="Dificultad" id="dificultad">
                                             <option th:each="dificultadOpt : ${T(mld.playhitsgame.exemplars.Dificultad).values()}" 
                                                     th:value="${dificultadOpt}" th:text="#{${dificultadOpt.messageKey}}"></option>
-                                        </select>
-                                        <br/>
+                                        </select>                                        
+                                    </div>
+                                    <div class="mb-3 d-flex align-items-center gap-3">
+                                        <!-- Checkbox 1 -->
                                         <label th:text="#{general.sinofuscar}"/>
-                                        <input type="checkbox" th:field="*{sinOfuscar}" id="sinOfuscar">                                        
-                                        <label th:text="#{general.sonidos}"/>
-                                        <input type="checkbox" th:field="*{sonidos}" id="sonidos">
+                                        <input type="checkbox" th:field="*{sinOfuscar}" id="sinOfuscar">    
+
+                                        <!-- Checkbox 2 (con visibilidad controlada) -->
+                                        <div id="sonidosContainer" th:style="${newpartida.tipo != 'grupo' ? '' : 'display: none;'}" class="d-flex align-items-center gap-2">
+                                            <label th:text="#{general.sonidos}"/>
+                                            <input type="checkbox" th:field="*{sonidos}" id="sonidos">
+                                        </div>
                                     </div>
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="anyoini" th:text="#{general.anyoini}"/>

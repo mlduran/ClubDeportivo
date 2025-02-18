@@ -27,6 +27,17 @@ function actualizarSeleccion() {
             .join(", ");
 }
 
+function toggleSonidos() {
+    let tipoSeleccionado = document.getElementById("tipo").value;
+    let sonidosDiv = document.getElementById("sonidosContainer");
+
+    if (tipoSeleccionado !== "grupo") { // Mostrar si es diferente de "grupo"
+        sonidosDiv.style.display = "block";
+    } else {
+        sonidosDiv.style.display = "none";
+    }
+}
+
 // Inicializar el campo oculto con el tema predeterminado al cargar la página
 document.addEventListener("DOMContentLoaded", () => {
     const listaTemas = document.getElementById("listaTemas");
@@ -42,4 +53,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Guardar la selección inicial en el campo oculto
     actualizarSeleccion();
+    toggleSonidos();
 });

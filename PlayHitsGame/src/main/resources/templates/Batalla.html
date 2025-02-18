@@ -93,6 +93,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     <tr>                                        
                                         <td colspan="2">                                            
                                             <p th:each="txt : ${partidaSesion.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
+                                            <p th:if="${partidaInvitado.sinOfuscar == true}" th:text="#{general.sinofuscar}" />
                                         </td>
                                         <td>  
                                             <table>

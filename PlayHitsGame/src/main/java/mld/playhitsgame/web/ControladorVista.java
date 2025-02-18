@@ -1480,10 +1480,10 @@ public class ControladorVista {
             int[] rangoAnyos = rangoAnyosCanciones((ArrayList<Cancion>) canciones);
             // Crear las opciones para las respuestas
             for (Ronda ronda : partida.getRondas()) {
-                for (OpcionTituloTmp op : opcionesTitulosCanciones(ronda, true)) {
+                for (OpcionTituloTmp op : opcionesTitulosCanciones(ronda, !newPartida.isSinOfuscar())) {
                     servOpTitulo.saveOpcionTituloTmp(op);
                 }
-                for (OpcionInterpreteTmp op : opcionesInterpretesCanciones(ronda, true)) {
+                for (OpcionInterpreteTmp op : opcionesInterpretesCanciones(ronda, !newPartida.isSinOfuscar())) {
                     servOpInterprete.saveOpcionInterpreteTmp(op);
                 }
                 for (OpcionAnyoTmp op
@@ -1612,6 +1612,8 @@ public class ControladorVista {
             batalla.setPublica(false);
             batalla.setStatus(StatusBatalla.Inscripcion);
             batalla.setNRondas(nrondas);
+            batalla.setSinOfuscar(partida.isSinOfuscar());
+            batalla.setSonidos(partida.isSonidos());
             batalla.setFase(1);
             batalla = servBatalla.save(batalla);
             ArrayList<Usuario> posiblesInvitados = (ArrayList<Usuario>) modelo.getAttribute("posiblesinvitados");
