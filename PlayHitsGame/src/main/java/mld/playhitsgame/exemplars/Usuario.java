@@ -406,9 +406,13 @@ public class Usuario {
                 batallasTerminadas.add(batalla);
             }
         }
+        
+        Collections.sort(batallasTerminadas, (Batalla e1, Batalla e2)
+                -> e2.getFecha().compareTo(e1.getFecha()));
+        
         return batallasTerminadas;
     }
-
+    
     public Batalla ultimaBatalla() {
         return batallasTerminadas().stream()
                 .min(Comparator.comparing(partida -> Math.abs(
