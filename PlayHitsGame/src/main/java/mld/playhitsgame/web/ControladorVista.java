@@ -124,6 +124,9 @@ public class ControladorVista {
 
     @Value("${custom.mailadmin}")
     private String mailAdmin;
+    
+    @Value("${spring.application.name}")
+    private String contextPath;
 
     private final int[] NUMERO_RONDAS = {10, 15, 20, 25, 30};
     private final int SEG_PARA_INICIO_RESPUESTA = 15;
@@ -268,7 +271,7 @@ public class ControladorVista {
         }
 
         try {
-            URL url = new URL(customIp + "/api/spotify/login");
+            URL url = new URL(customIp + "/" + contextPath + "/api/spotify/login");
             BufferedReader urlLectura = new BufferedReader(new InputStreamReader(url.openStream()));
             urlLogin = urlLectura.readLine();
             urlLoginSpotify = urlLogin;
@@ -345,8 +348,10 @@ public class ControladorVista {
             modelo.addAttribute("videoyoutube", videoyoutube_es);
         } else {
             modelo.addAttribute("videoyoutube", videoyoutube_en);
-        }
-
+        }        
+        
+        modelo.addAttribute("contextPath", contextPath);
+        
         try {
             Config config = servConfig.getSettings();
 
@@ -2293,9 +2298,9 @@ public class ControladorVista {
             records.add(newObj);
         }
 
-        String volver = "/panel";
+        String volver = "/" + contextPath + "/panel";
         if (rol != null) {
-            volver = "/accesoInvitado";
+            volver = "/" + contextPath + "/accesoInvitado";
         }
 
         modelo.addAttribute("jugadoresEstrella", jugadoresEstrella);

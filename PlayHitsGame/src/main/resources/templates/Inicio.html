@@ -26,7 +26,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 
     <body>
         <input type="hidden" id="fichAjuda" 
-               th:value="${locale != null ? '/ayuda/PlayHitsGame_' + locale.language + '.html' : '/ayuda/PlayHitsGame_es.html'}" />
+               th:value="|/playhitsgame/ayuda/PlayHitsGame_${locale != null ? locale.language : ''}.html|" /> 
         <section class="h-100">
             <div class="container h-100">
                 <div class="row justify-content-sm-center h-100">
@@ -44,7 +44,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     <div class="mb-3">
                                         <div class="mb-2 w-100">
                                             <label class="text-muted" for="password" th:text="#{general.passw}"/>
-                                            <a href="/recuperarContrasenya" class="float-end" th:text="#{general.passwolvidado}"/>
+                                            <a th:href="@{/recuperarContrasenya}" class="float-end" th:text="#{general.passwolvidado}"/>
                                         </div>
                                         <input id="laContrasenya" name="laContrasenya" type="password" class="form-control" required>
                                         <div>
@@ -72,7 +72,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             </div>  
                             <h1 class="h6 btn text-center" th:text="#{general.titulojuego}"/>
                             <div class="btn text-center" th:if="${invitadosON} == 'true'"> 
-                                <button th:onclick="window.location.href='/accesoInvitado'" class="btn btn-primary" role="button" th:text="#{general.accederinvitado}"/>
+                                <button th:onclick="window.location.href='/playhitsgame/accesoInvitado'" class="btn btn-primary" role="button" th:text="#{general.accederinvitado}"/>
                             </div>                            
                             <div class="modal fade" id="ayuda" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                 <div class="modal-dialog">

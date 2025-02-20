@@ -27,7 +27,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     <body>        
         <section class="h-100">            
             <input type="hidden" id="fichAjuda" 
-                   th:value="${locale != null ? '/ayuda/PartidaPersonal_' + locale.language + '.html' : '/ayuda/PartidaPersonal_es.html'}" />
+                   th:value="|/playhitsgame/ayuda/PartidaPersonal_${locale != null ? locale.language : ''}.html|" />
+                   
             <input type="hidden" id="idusuario" th:value="${usuarioSesion.id}" />            
             <input type="hidden" id="idpartida" th:value="${partidaSesion.id}" />
             <input type="hidden" id="respuestaOK" th:value="${respuestaOK}" />

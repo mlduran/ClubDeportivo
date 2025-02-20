@@ -13,7 +13,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     <body>
         <header th:insert="~{plantillas/playhitsgame :: encabezado}"></header>
 
-        <a href="/gestionCanciones" class="button" id="volver">VOLVER</a>
+        <a th:href="@{/gestionCanciones}" class="button" id="volver">VOLVER</a>
 
         <div th:if="${errores != null and errores.empty == false}">
             <p>ERRORES DETECTADOS :</p>

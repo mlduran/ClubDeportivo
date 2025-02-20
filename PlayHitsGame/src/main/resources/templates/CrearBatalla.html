@@ -13,7 +13,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     <body>
     <body>
         <input type="hidden" id="fichAjuda" 
-               th:value="${locale != null ? '/ayuda/CrearPartida_' + locale.language + '.html' : '/ayuda/CrearPartida_es.html'}" />
+               th:value="|/playhitsgame/ayuda/CrearPartida_${locale != null ? locale.language : ''}.html|" /> 
+              
         <section class="h-100">
             <div class="container h-100">
                 <div class="row justify-content-sm-center h-100">
@@ -80,7 +81,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             </div>
                             <div class="card-footer py-3 border-0">
                                 <div class="text-center">                        
-                                    <a href="/administracion" class="text-dark">
+                                    <a th:href="@{/administracion}" class="text-dark">
                                         <p th:text="#{general.volver}"/>  
                                     </a>
                                 </div>

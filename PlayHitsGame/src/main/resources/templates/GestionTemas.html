@@ -16,7 +16,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 
         <div th:if="${temas != null and !temas.empty}" style="align-content: center">
 
-            <a href="/panel" class="button" id="volver">VOLVER</a>     
+            <a th:href="@{/panel}" class="button" id="volver">VOLVER</a>     
 
             <table border="2">
                 <tr> 
@@ -51,7 +51,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         <p th:text="${result}"></p>
 
         <div class="text-center">
-            <a href="/panel" class="text-dark">
+            <a th:href="@{/panel}" class="text-dark">
                 <p th:text="#{general.volver}" />
             </a>
         </div>

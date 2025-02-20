@@ -16,6 +16,9 @@ public class SpotifyConfiguration {
 	
 	@Value("${redirect.server.ip}")
 	private String customIp;
+        @Value("${spring.application.name}")
+        private String contextPath;
+        
         @Autowired
 	private UserDetailsRepository userDetailsRepository;
 	
@@ -25,7 +28,7 @@ public class SpotifyConfiguration {
             
             String clientId = userDetails.getAccessToken();
             String clientSecret = userDetails.getRefSecret();
-            URI redirectedURL =  SpotifyHttpManager.makeUri(customIp + "/api/spotify/get-user-code" );          
+            URI redirectedURL =  SpotifyHttpManager.makeUri(customIp + "/" + contextPath + "/api/spotify/get-user-code" );          
 		 
 		 return new SpotifyApi
 				 .Builder()

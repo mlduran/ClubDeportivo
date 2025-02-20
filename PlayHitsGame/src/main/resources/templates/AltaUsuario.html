@@ -12,7 +12,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     </head>
     <body>
         <input type="hidden" id="fichAjuda" 
-               th:value="${locale != null ? '/ayuda/Registro_' + locale.language + '.html' : '/ayuda/Registro_es.html'}" />
+               th:value="|/playhitsgame/ayuda/Registro_${locale != null ? locale.language : ''}.html|" />               
         <section class="h-100">
             <div class="container h-100">
                 <div class="row justify-content-sm-center h-100">
@@ -60,7 +60,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <div class="card-footer py-3 border-0">
                                 <div class="text-center">
                                     <p th:text="#{general.yatieneusuario}"/>                                        
-                                    <a href="/logout" class="text-dark">
+                                    <a th:href="@{/logout}" class="text-dark">
                                         <p th:text="#{general.acceder}"/>  
                                     </a>
                                 </div>

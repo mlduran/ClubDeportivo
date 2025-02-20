@@ -45,22 +45,22 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                         </tr>        
                         <tr th:each="unapartida : ${partidas.content}">
                             <td>
-                                <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
+                                <a th:href="'/playhitsgame/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
                                     <p th:text="${unapartida.fechaFormateada}"/>
                                 </a>
                             </td>
                             <td>
-                                <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
+                                <a th:href="'/playhitsgame/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
                                     <p th:each="txt : ${unapartida.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
                                 </a>
                             </td>
                             <td>
-                                <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
+                                <a th:href="'/playhitsgame/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
                                     <p th:text="${unapartida.usuariosTxT}"/>
                                 </a>
                             </td>
                             <td>
-                                <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
+                                <a th:href="'/playhitsgame/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
                                     <p th:text="${unapartida.ganador}"/>
                                 </a>
                             </td>

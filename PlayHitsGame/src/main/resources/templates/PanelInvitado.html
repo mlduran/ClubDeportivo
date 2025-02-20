@@ -12,7 +12,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     </head>
     <body>
         <input type="hidden" id="fichAjuda" 
-               th:value="${locale != null ? '/ayuda/Panel_' + locale.language + '.html' : '/ayuda/Panel_es.html'}" />
+               th:value="|/playhitsgame/ayuda/Panel_${locale != null ? locale.language : ''}.html|" />
         <section class="h-120">
             <div class="container h-120" th:object="${usuarioSesion}">
                 <div class="row justify-content-sm-center h-120">
@@ -47,18 +47,18 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <div class="card-body p-0" >
                                 <div class="text-center">
                                     <p>
-                                        <button th:onclick="window.location.href='/crearPartidaPersonalInvitado'" class="btn btn-primary" role="button" th:text="#{general.crearpartidapersonal}"/>
+                                        <button th:onclick="window.location.href='/playhitsgame/crearPartidaPersonalInvitado'" class="btn btn-primary" role="button" th:text="#{general.crearpartidapersonal}"/>
                                     </p> 
                                 </div>
                             </div> 
                             <div  class="text-center my-2">
                                 <p>
-                                    <button th:onclick="window.location.href='/records'" class="btn btn-primary" role="button" th:text="#{general.records}"/>
+                                    <button th:onclick="window.location.href='/playhitsgame/records'" class="btn btn-primary" role="button" th:text="#{general.records}"/>
                                 </p>  
                             </div>
                             <div class="card-footer py-3 border-0">
                                 <div class="text-center">                       
-                                    <a href="/logout" class="text-dark">
+                                    <a th:href="@{/logout}" class="text-dark">
                                         <p th:text="#{general.salir}"/>  
                                     </a>
                                 </div>

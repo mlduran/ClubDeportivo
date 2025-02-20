@@ -18,7 +18,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     <body>
         <section>
             <input type="hidden" id="fichAjuda" 
-                   th:value="${locale != null ? '/ayuda/PartidaGrupo_' + locale.language + '.html' : '/ayuda/PartidaGrupo_es.html'}" />
+                   th:value="|/playhitsgame/ayuda/PartidaGrupo_${locale != null ? locale.language : ''}.html|" />
             <input type="hidden" id="serverWS" th:value="${serverWebsocket}" />
             <input type="hidden" id="idusuario" th:value="${usuarioSesion.id}" />
             <input type="hidden" id="idpartida" th:value="${partidaSesion.id}" />
@@ -106,7 +106,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                         </div> -->
                                                         <input type="image" th:src="@{'/images/actualizar.png'}" width="40" height="40" onclick="document.location.reload();" />
                                                         <div th:if="${partidaSesion.terminada}">
-                                                            <a th:href="'/partidaConsulta/' + ${partidaSesion.id}" class="button" id="resultados">
+                                                            <a th:href="'/playhitsgame/partidaConsulta/' + ${partidaSesion.id}" class="button" id="resultados">
                                                                 <p th:text="#{general.usurepondido}" />
                                                             </a>
                                                         </div>
@@ -261,7 +261,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     <tr>
                                         <td colspan="3">
                                             <div class="text-center">
-                                                <a href="/panel" class="text-dark">
+                                                <a th:href="@{/panel}" class="text-dark">
                                                     <p th:text="#{general.volver}" />
                                                 </a>
                                             </div>

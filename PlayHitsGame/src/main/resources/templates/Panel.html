@@ -12,7 +12,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     </head>
     <body>
         <input type="hidden" id="fichAjuda" 
-               th:value="${locale != null ? '/ayuda/Panel_' + locale.language + '.html' : '/ayuda/Panel_.html'}" />
+       th:value="|/playhitsgame/ayuda/Panel_${locale != null ? locale.language : ''}.html|" />
         <section class="h-120">
             <div class="container h-120" th:object="${usuarioSesion}">
                 <div class="row justify-content-sm-center h-120">
@@ -44,7 +44,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </tr>                                    
                                     <tr>
                                         <td colspan="2">
-                                            <a href="/modificarUsuario" class="text-dark">
+                                            <a th:href="@{/modificarUsuario}" class="text-dark">
                                                 <p th:text="#{general.modificardatos}"/>  
                                             </a>                                            
                                         </td>                                    
@@ -54,7 +54,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <div class="card-body p-2" >
                                 <div th:if="*{admin} == true" class="text-center my-2">
                                     <p>
-                                        <button th:onclick="window.location.href='/administracion'" class="btn btn-primary" role="button" th:text="#{general.administracion}"/>
+                                        <button th:onclick="window.location.href='/playhitsgame/administracion'" class="btn btn-primary" role="button" th:text="#{general.administracion}"/>
                                     </p>                                
                                     <div  th:if="${urlSpotify} != null"> 
                                         <p>
@@ -63,23 +63,23 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                     </div>
                                 </div>
                                 <div th:if="*{colaborador} == true" class="text-center my-2">
-                                    <button th:onclick="window.location.href='/gestionCancionesTmp'" class="btn btn-primary" role="button" th:text="#{general.gestioncancionestmp}"/>
+                                    <button th:onclick="window.location.href='/playhitsgame/gestionCancionesTmp'" class="btn btn-primary" role="button" th:text="#{general.gestioncancionestmp}"/>
                                 </div>
                                 <div th:if="*{colaborador} == true" class="text-center my-2">
-                                    <button th:onclick="window.location.href='/gestionCanciones'" class="btn btn-primary" role="button" th:text="#{general.gestioncanciones}"/>
+                                    <button th:onclick="window.location.href='/playhitsgame/gestionCanciones'" class="btn btn-primary" role="button" th:text="#{general.gestioncanciones}"/>
                                 </div>
                                 <div th:if="*{colaborador} == true" class="text-center my-2">
-                                    <button th:onclick="window.location.href='/gestionTemas'" class="btn btn-primary" role="button" th:text="#{general.gestiontemas}"/>
+                                    <button th:onclick="window.location.href='/playhitsgame/gestionTemas'" class="btn btn-primary" role="button" th:text="#{general.gestiontemas}"/>
                                 </div>
                                 <div th:if="*{partidaPersonalEnCurso()} != null" class="text-center my-2">
-                                    <button th:onclick="window.location.href='/partidaPersonal'" class="btn btn-primary" role="button" th:text="#{general.partidapersonalpendiente}"/>
+                                    <button th:onclick="window.location.href='/playhitsgame/partidaPersonal'" class="btn btn-primary" role="button" th:text="#{general.partidapersonalpendiente}"/>
                                 </div>
                                 <div th:if="*{partidaMasterEnCurso()} != null" class="text-center my-2">
-                                    <button th:onclick="window.location.href='/partidaMaster'" class="btn btn-primary" role="button" th:text="#{general.partidamasterpendiente}"/>
+                                    <button th:onclick="window.location.href='/playhitsgame/partidaMaster'" class="btn btn-primary" role="button" th:text="#{general.partidamasterpendiente}"/>
                                 </div>
                                 <div th:if="*{sinGrupo()} == false and *{hayPartidasInvitadoPendientes()} == false" class="text-center my-5">
                                     <p class="text-center" th:text='#{general.nohaypartinv}'/>
-                                    <a href="/panel"  class="text-dark">
+                                    <a th:href="@{/panel}"  class="text-dark">
                                         <p th:text="#{general.verificapartinv}"/>
                                     </a>
                                 </div>
@@ -96,7 +96,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                 </tr>   
                                                 <tr th:each="unapartida : *{batallasEnCursoPendientesJugar()}">
                                                     <td>
-                                                        <a th:href="'/batalla/'+${unapartida.id}" class="button" id="${unapartida.id}" 
+                                                        <a th:href="'/playhitsgame/batalla/'+${unapartida.id}" class="button" id="${unapartida.id}" 
                                                            onclick="return confirm('¿Estás preparado para emprezar a responder?');">
                                                             <p th:each="txt : ${unapartida.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
                                                             <p th:utext="'<b>' + #{general.acabaen} + ' : ' + ${unapartida.cuentaAtras} + '</b>'"></p> 
@@ -118,7 +118,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                 </tr>   
                                                 <tr th:each="unabatalla : *{batallasEnCursoPendientes()}">
                                                     <td>
-                                                        <a th:href="'/batallaResultados/'+${unabatalla.id}" class="button" id="${unabatalla.id}">
+                                                        <a th:href="'/playhitsgame/batallaResultados/'+${unabatalla.id}" class="button" id="${unabatalla.id}">
                                                             <p th:each="txt : ${unabatalla.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
                                                         </a>
                                                     </td>
@@ -130,7 +130,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                 <div th:if="*{hayBatallasEnCursoAcabadas()} == false and *{ultimaBatalla()} != null" class="text-center my-2">
                                     <div class="table-responsive-lg">                                       
                                         <button 
-                                            th:onclick="'window.location.href=\'/batallaResultados/\' + ' + ${ultimaBatalla.id}" 
+                                            th:onclick="'window.location.href=\'/playhitsgame/batallaResultados/\' + ' + ${ultimaBatalla.id}" 
                                             class="btn btn-primary" 
                                             role="button" 
                                             th:text="#{general.resulultimabatalla} + ' ' + ${ultimaBatalla.nombre}">
@@ -150,7 +150,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                 </tr>   
                                                 <tr th:each="unapartida : *{partidasInvitadoPendientes()}">
                                                     <td>
-                                                        <a th:href="'/partidaInvitado/'+${unapartida.id}" class="button" id="${unapartida.id}">
+                                                        <a th:href="'/playhitsgame/partidaInvitado/'+${unapartida.id}" class="button" id="${unapartida.id}">
                                                             <p th:each="txt : ${unapartida.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
                                                         </a>
                                                     </td>
@@ -163,7 +163,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <div class="card-body p-3" >
                                 <div th:if="*{sePuedeCrearPartidaMaster()} == true" class="text-center my-2">
                                     <p>
-                                        <button th:onclick="window.location.href='/crearPartidaPersonal'" 
+                                        <button th:onclick="window.location.href='/playhitsgame/crearPartidaPersonal'" 
                                                 class="btn btn-primary" 
                                                 role="button" 
                                                 th:text="#{general.crearpartidapersonal}">
@@ -174,7 +174,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                         <button class="btn btn-primary" 
                                                 th:text="#{general.crearpartidagrupo}"
                                                 role="button"                                                     
-                                                th:onclick="handleCrearPartida(event, [[${usuariosGrupo}]])">
+                                                th:onclick="handleCrearPartida(event, [[${usuariosGrupo}]], '/playhitsgame/crearPartida')">
                                         </button>
                                     </p>                                                                    
                                 </div>
@@ -249,7 +249,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                         <p th:text="${batalla.usuariosInscritosTxT}"/>                                                        
                                                     </td>
                                                     <td>
-                                                        <a th:href="'/unirseABatalla/' + ${batalla.id}" class="button"> 
+                                                        <a th:href="'/playhitsgame/unirseABatalla/' + ${batalla.id}" class="button"> 
                                                             <p th:text="#{general.unirme}"/>
                                                         </a>
                                                     </td>
@@ -329,7 +329,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                         <p th:text="${batalla.usuariosInscritosTxT}"/>                                                        
                                                     </td> 
                                                     <td>
-                                                        <a th:href="'/salirDeBatalla/' + ${batalla.id}" class="button"> 
+                                                        <a th:href="'/playhitsgame/salirDeBatalla/' + ${batalla.id}" class="button"> 
                                                             <p th:text="#{general.noparticipar}"/>
                                                         </a>
                                                     </td>
@@ -370,22 +370,22 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                 <tbody>
                                                     <tr th:each="unabatalla : *{batallasTerminadas()}">
                                                         <td>
-                                                            <a th:href="'/batallaResultados/' + ${unabatalla.id}" class="button"> 
+                                                            <a th:href="'/playhitsgame/batallaResultados/' + ${unabatalla.id}" class="button"> 
                                                                 <p th:text="${unabatalla.fechaFormateada}"/>
                                                             </a>
                                                         </td>
                                                         <td>
-                                                            <a th:href="'/batallaResultados/' + ${unabatalla.id}" class="button"> 
+                                                            <a th:href="'/playhitsgame/batallaResultados/' + ${unabatalla.id}" class="button"> 
                                                                 <p th:each="txt : ${unabatalla.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
                                                             </a>
                                                         </td>
                                                         <td>
-                                                            <a th:href="'/batallaResultados/' + ${unabatalla.id}" class="button"> 
+                                                            <a th:href="'/playhitsgame/batallaResultados/' + ${unabatalla.id}" class="button"> 
                                                                 <p th:text="${unabatalla.usuariosTxT}"/>
                                                             </a>
                                                         </td>
                                                         <td>
-                                                            <a th:href="'/batallaResultados/' + ${unabatalla.id}" class="button"> 
+                                                            <a th:href="'/playhitsgame/batallaResultados/' + ${unabatalla.id}" class="button"> 
                                                                 <p th:if="${unabatalla.ganador != null}" th:text="${unabatalla.ganador.nombre}"/> 
                                                             </a>
                                                         </td>
@@ -424,17 +424,17 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                 <tbody>
                                                     <tr th:each="unapartida : *{partidasTerminadasPersonales()}">
                                                         <td>
-                                                            <a th:href="'/partidaConsultaPersonales/' + ${unapartida.id}" class="button"> 
+                                                            <a th:href="'/playhitsgame/partidaConsultaPersonales/' + ${unapartida.id}" class="button"> 
                                                                 <p th:text="${unapartida.fechaFormateada}"/>
                                                             </a>
                                                         </td>
                                                         <td>
-                                                            <a th:href="'/partidaConsultaPersonal/' + ${unapartida.id}" class="button"> 
+                                                            <a th:href="'/playhitsgame/partidaConsultaPersonal/' + ${unapartida.id}" class="button"> 
                                                                 <p th:each="txt : ${unapartida.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
                                                             </a>
                                                         </td>
                                                         <td>
-                                                            <a th:href="'/partidaConsultaPersonal/' + ${unapartida.id}" class="button"> 
+                                                            <a th:href="'/playhitsgame/partidaConsultaPersonal/' + ${unapartida.id}" class="button"> 
                                                                 <p th:text="${unapartida.ptsUsuarioPartidaPersonal}"/>
                                                             </a>
                                                         </td>
@@ -476,22 +476,22 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                                                 <tbody>
                                                     <tr th:each="unapartida : *{partidasTerminadasGrupo()}">
                                                         <td>
-                                                            <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
+                                                            <a th:href="'/playhitsgame/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
                                                                 <p th:text="${unapartida.fechaFormateada}"/>
                                                             </a>
                                                         </td>
                                                         <td>
-                                                            <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
+                                                            <a th:href="'/playhitsgame/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
                                                                 <p th:each="txt : ${unapartida.descripcion}" th:text="#{${txt.etiqueta}} + ' : ' + ${txt.valor}" />
                                                             </a>
                                                         </td>
                                                         <td>
-                                                            <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
+                                                            <a th:href="'/playhitsgame/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
                                                                 <p th:text="${unapartida.usuariosTxT}"/>
                                                             </a>
                                                         </td>
                                                         <td>
-                                                            <a th:href="'/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
+                                                            <a th:href="'/playhitsgame/partidaConsultaGrupo/' + ${unapartida.id}" class="button"> 
                                                                 <p th:text="${unapartida.ganador}"/>
                                                             </a>
                                                         </td>
@@ -504,12 +504,12 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             </div> 
                             <div  class="text-center my-2">
                                 <p>
-                                    <button th:onclick="window.location.href='/records'" class="btn btn-primary" role="button" th:text="#{general.records}"/>
+                                    <button th:onclick="window.location.href='/playhitsgame/records'" class="btn btn-primary" role="button" th:text="#{general.records}"/>
                                 </p>  
                             </div>
                             <div class="card-footer py-3 border-0">
                                 <div class="text-center">                       
-                                    <a href="/logout" class="text-dark">
+                                    <a th:href="@{/logout}" class="text-dark">
                                         <p th:text="#{general.salir}"/>  
                                     </a>
                                 </div>

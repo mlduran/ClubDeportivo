@@ -4,7 +4,6 @@
  */
 package mld.playhitsgame.utilidades;
 
-import jakarta.mail.MessagingException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -18,16 +17,11 @@ import java.net.UnknownHostException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import mld.playhitsgame.correo.EmailServicioMetodos;
-import mld.playhitsgame.correo.Mail;
 import mld.playhitsgame.exemplars.Batalla;
 import mld.playhitsgame.exemplars.Cancion;
 import mld.playhitsgame.exemplars.CancionTmp;
@@ -41,19 +35,18 @@ import mld.playhitsgame.exemplars.Respuesta;
 import mld.playhitsgame.exemplars.Ronda;
 import mld.playhitsgame.exemplars.Tema;
 import mld.playhitsgame.exemplars.Usuario;
-import mld.playhitsgame.web.ControladorVista;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.mail.MailSendException;
 
 /**
  *
  * @author miguel
  */
 public class Utilidades {
-
+    
     private static final int NUMERO_OPCIONES = 5;
     private static final double UMBRAL_SIMILITUD = 0.90;
 
@@ -796,7 +789,7 @@ public class Utilidades {
                 for (Usuario usu : partidaFase.usuariosPartida()) {
                     PtsUsuario resultUsu = new PtsUsuario();
                     resultUsu.setUsuario(usu);
-                    resultUsu.setLink("/batallaConsulta/" + String.valueOf(partidaFase.getId())
+                    resultUsu.setLink("/playhitsgame/batallaConsulta/" + String.valueOf(partidaFase.getId())
                             + "/" + String.valueOf(usu.getId()));
                     resultUsu.setPts(0);
                     resultadosPartida.add(resultUsu);

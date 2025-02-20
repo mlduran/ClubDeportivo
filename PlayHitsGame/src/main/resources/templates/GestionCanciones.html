@@ -13,7 +13,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
     <body>
         <header th:insert="~{plantillas/playhitsgame :: encabezado}"></header>        
 
-        <a href="/panel" class="button" id="volver">VOLVER</a>
+        <a th:href="@{/panel}" class="button" id="volver">VOLVER</a>
         <audio controls id="reproductor" style="display: none;">
             <source src="" type="audio/mpeg" />                                                            
         </audio>
@@ -168,7 +168,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         </div>
 
         <div class="text-center">
-            <a href="/panel" class="text-dark">
+            <a th:href="@{/panel}" class="text-dark">
                 <p th:text="#{general.volver}" />
             </a>
         </div>

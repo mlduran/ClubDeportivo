@@ -142,7 +142,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>ROOT</finalName>
+        <finalName>playhitsgame</finalName>
     </build>
     <packaging>war</packaging>
 </project>

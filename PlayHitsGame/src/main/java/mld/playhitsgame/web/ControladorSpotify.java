@@ -37,7 +37,10 @@ public class ControladorSpotify {
     TemaServicioMetodos servTema;
 
     @Value("${custom.server.ip}")
-    private String customIp;
+    private String customIp;    
+    
+    @Value("${spring.application.name}")
+    private String contextPath;
 
     @GetMapping("/spotifyServicios")
     public String spotifyServicios(Model modelo) {
@@ -54,7 +57,7 @@ public class ControladorSpotify {
         String info;
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(customIp + "/api/spotify/datosPlayList?idPlayList="
+                .uri(URI.create(customIp + "/" + contextPath + "/api/spotify/datosPlayList?idPlayList="
                         + idplaylist))
                 .method("GET", HttpRequest.BodyPublishers.noBody())
                 .build();
@@ -82,7 +85,7 @@ public class ControladorSpotify {
         String info;
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(customIp + "/api/spotify/playList?idPlayList="
+                .uri(URI.create(customIp + "/" + contextPath + "/api/spotify/playList?idPlayList="
                         + idplaylist + "&anyoPlayList=" + anyoplaylist))
                 .method("GET", HttpRequest.BodyPublishers.noBody())
                 .build();
@@ -110,7 +113,7 @@ public class ControladorSpotify {
         String info;
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(customIp + "/api/spotify/playListTema?idPlayList="
+                .uri(URI.create(customIp + "/" + contextPath +"/api/spotify/playListTema?idPlayList="
                         + idplaylist + "&temaPlayList=" + temaplaylist))
                 .method("GET", HttpRequest.BodyPublishers.noBody())
                 .build();
@@ -149,7 +152,7 @@ public class ControladorSpotify {
             for (String lista : playList.split(",")) {
 
                 HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(customIp + "/api/spotify/playListTema?idPlayList="
+                        .uri(URI.create(customIp + "/" + contextPath + "/api/spotify/playListTema?idPlayList="
                                 + lista + "&temaPlayList=" + tema.get().getTema()))
                         .method("GET", HttpRequest.BodyPublishers.noBody())
                         .build();
@@ -182,7 +185,7 @@ public class ControladorSpotify {
         String info;
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(customIp + "/api/spotify/playListBD"))
+                .uri(URI.create(customIp + "/" + contextPath +"/api/spotify/playListBD"))
                 .method("GET", HttpRequest.BodyPublishers.noBody())
                 .build();
 

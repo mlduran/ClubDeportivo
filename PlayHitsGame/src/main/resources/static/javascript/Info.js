@@ -20,13 +20,13 @@ function loadHTML() {
 // Llama a la función para cargar el contenido al cargar la página
 window.onload = loadHTML;
 
-function handleCrearPartida(event, usuariosGrupo) {
+function handleCrearPartida(event, usuariosGrupo, href) {
     if (usuariosGrupo === false) {
         // Mostrar una alerta con el mensaje
         alert(document.getElementById('txtSinUsuarios').value);
         event.preventDefault(); // Evitar la navegación al enlace
     } else {
         // Si no hay error, proceder con la navegación
-        window.location.href = '/crearPartida';
+        window.location.href = href;
     }
 }
