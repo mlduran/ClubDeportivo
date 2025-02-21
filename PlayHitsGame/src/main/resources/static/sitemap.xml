@@ -13,17 +13,22 @@
   <priority>1.00</priority>
 </url>
 <url>
-  <loc>https://playhitsgame.es/altaUsuario</loc>
+  <loc>https://playhitsgame.es/playhitsgame</loc>
+  <lastmod>2024-11-04T13:05:22+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://playhitsgame.es/playhitsgame/altaUsuario</loc>
   <lastmod>2024-11-04T13:05:22+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://playhitsgame.es/accesoInvitado</loc>
+  <loc>https://playhitsgame.es/playhitsgame/accesoInvitado</loc>
   <lastmod>2024-11-04T13:05:22+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://playhitsgame.es/crearPartidaPersonalInvitado</loc>
+  <loc>https://playhitsgame.es/playhitsgame/crearPartidaPersonalInvitado</loc>
   <lastmod>2024-11-04T13:05:22+00:00</lastmod>
   <priority>0.64</priority>
 </url>
