@@ -6,6 +6,7 @@ package mld.playhitsgame.web;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -124,7 +125,7 @@ public class ControladorVista {
 
     @Value("${custom.mailadmin}")
     private String mailAdmin;
-    
+
     @Value("${spring.application.name}")
     private String contextPath;
 
@@ -341,17 +342,23 @@ public class ControladorVista {
 
     @GetMapping("/")
     public String inicio(Model modelo, HttpServletRequest request, Locale locale) {
-        servRegistro.registrar(TipoRegistro.Visita, ipCliente(request));
+
+        HttpSession session = request.getSession();
+        if (session.getAttribute("visitaRegistrada") == null) {
+            servRegistro.registrar(TipoRegistro.Visita, ipCliente(request));
+            session.setAttribute("visitaRegistrada", true);
+        }
+
         modelo.addAttribute("invitadosON", invitadosON);
         modelo.addAttribute("locale", locale);
         if ("es".equals(locale.getLanguage())) {
             modelo.addAttribute("videoyoutube", videoyoutube_es);
         } else {
             modelo.addAttribute("videoyoutube", videoyoutube_en);
-        }        
-        
+        }
+
         modelo.addAttribute("contextPath", contextPath);
-        
+
         try {
             Config config = servConfig.getSettings();
 
@@ -662,7 +669,7 @@ public class ControladorVista {
         boolean todoFallo = false;
         if (modelo.getAttribute("todoFallo") != null) {
             todoFallo = (boolean) modelo.getAttribute("todoFallo");
-        }        
+        }
 
         if ((partida.ultimaRonda() == null || partida.ultimaRonda().isCompletada())
                 && !partida.isTerminada() && todoFallo == false) {
@@ -929,8 +936,8 @@ public class ControladorVista {
     private void enviarCorreoActivacion(Usuario usuario, Model modelo) {
 
         String token = passwordEncoder.encode(usuario.getUsuario());
-        String enlace = customIp + "/validarUsuario?id=" + String.valueOf(usuario.getId())
-                + "&token=" + token;
+        String enlace = customIp + "/" + contextPath + "/validarUsuario?id="
+                + String.valueOf(usuario.getId()) + "&token=" + token;
         Mail mail = new Mail();
         mail.setAsunto(mensaje(modelo, "general.altaplay"));
         mail.setDestinatario(usuario.getUsuario());
@@ -964,7 +971,7 @@ public class ControladorVista {
 
         if (passwOK) {
             Optional<Usuario> usuLogin = servUsuario.findByUsuario(usuario.getUsuario());
-            if (!usuLogin.isEmpty()) {                
+            if (!usuLogin.isEmpty()) {
                 usuOK = false;
                 err = mensaje(modelo, "general.elusu") + usuario.getUsuario() + " " + mensaje(modelo, "general.yaexiste");
             }
