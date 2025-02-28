@@ -1,0 +1,80 @@
+<%-- any content can be specified here e.g.: --%>
+<%@ page pageEncoding="UTF-8" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml"%>
+<%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<c:set var="root" value="${pageContext.servletContext.contextPath}"/>
+<c:set var="idclub" value="${sessionScope.idClub}"/>
+<c:set var="deporte" value="${sessionScope.deporte}"/>
+<c:set var="idequipo" value="${sessionScope.idEquipo}"/>
+<c:set var="error" value="${requestScope.error}"/>
+
+<script type="text/javascript">
+function enviarFormulario(tac){ 
+    document.getElementById('tacsel').value = tac;
+    document.prepararPartido.submit() 
+} 
+</script> 
+
+ <table class="tabla">
+     <tr>
+         <c:forEach var="tac" items="${equipo.entrenador.tacticas}">
+             <td>
+                 <c:if test="${tacSeleccionada.numero == tac.numero}">
+                     <img src="${root}/images/tacticas/tacticam${tac.numero}.jpg" border="2" title="Tactica ${tac.numero}" alt="Tactica" onclick="enviarFormulario(${tac.numero})"/>
+                 </c:if>
+                 <c:if test="${tacSeleccionada.numero != tac.numero}">
+                     <img src="${root}/images/tacticas/tacticam${tac.numero}.jpg" title="Tactica ${tac.numero}" alt="Tactica" onclick="enviarFormulario(${tac.numero})"/>
+                 </c:if>
+             </td>
+         </c:forEach>
+     </tr>     
+ </table>
+ <input type="hidden" id="tacsel" name="tacsel" value="${tacSeleccionada.numero}"/>
+<div class="campo">
+    <p></p>
+        <c:forEach var="pos" items="${tacSeleccionada.cuadranteDelantera}">
+                <c:if test="${pos.activa}">
+                    <div class="celdaJugador" id="${pos.posicion}">
+                        <input type="text" class ="labelJugador" value="" size ="15" disabled/><br/>
+                    </div>
+                </c:if>
+                <c:if test="${!pos.activa}">
+                    <div class="celdaVacia"></div>
+                </c:if>
+        </c:forEach>
+    <p>
+        <c:forEach var="pos" items="${tacSeleccionada.cuadranteCentrocampo}">
+                <c:if test="${pos.activa}">
+                    <div class="celdaJugador" id="${pos.posicion}">
+                        <input type="text" class ="labelJugador" value="" size ="15" disabled/><br/>
+                    </div>
+                </c:if>
+                <c:if test="${!pos.activa}">
+                    <div class="celdaVacia"></div>
+                </c:if>
+        </c:forEach>
+    </p>
+        <c:forEach var="pos" items="${tacSeleccionada.cuadranteDefensa}">
+                <c:if test="${pos.activa}">
+                    <div class="celdaJugador" id="${pos.posicion}">
+                        <input type="text" class ="labelJugador" value="" size ="15" disabled/><br/>
+                    </div>
+                </c:if>
+                <c:if test="${!pos.activa}">
+                    <div class="celdaVacia"></div>
+                </c:if>
+        </c:forEach>
+     <p>
+         <div class="celdaPortero" id="P0">
+             <input type="text" class ="labelJugador" value="" size ="15" disabled/><br/>
+         </div>
+     </p>
+</div>
+
+ 
+
+

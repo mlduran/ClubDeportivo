@@ -1,0 +1,95 @@
+<%-- any content can be specified here e.g.: --%>
+<%@ page pageEncoding="UTF-8" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml"%>
+<%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<c:set var="root" value="${pageContext.servletContext.contextPath}"/>
+<c:set var="idclub" value="${sessionScope.idClub}"/>
+<c:set var="deporte" value="${sessionScope.deporte}"/>
+<c:set var="idequipo" value="${sessionScope.idEquipo}"/>
+<c:set var="error" value="${requestScope.error}"/>
+
+<script src='${root}/JavaScript/Lib/jquery/1.7.2/jquery.min.js'></script> 
+<script src='${root}/JavaScript/Lib/Highcharts-2.3.3/js/highcharts.js'></script> 
+<script type="text/javascript" src="${root}/JavaScript/Graficos.js"></script>
+<script type="text/javascript" src="${root}/JavaScript/DomDrag.js"></script>
+
+<form action="${root}/panelControl/Quiniela/jornadasDisputadas" method="post">
+
+     <SELECT NAME="competicion" onchange="this.form.submit()">
+        <c:forEach var="comp" items="${requestScope.competiciones}" step="1">
+            <c:if test="${comp.id != competicion}">
+                <OPTION VALUE="${comp.id}"> ${comp.nombre}
+            </c:if>  
+            <c:if test="${comp.id == competicion}">
+                <OPTION SELECTED VALUE="${comp.id}"> ${comp.nombre}
+            </c:if>  
+        </c:forEach>
+    </SELECT>
+
+    <SELECT NAME="jornada" onchange="this.form.submit()">
+        <c:forEach var="jor" items="${requestScope.jornadas}" step="1">
+            <c:if test="${jornada == jor.id}">
+                <OPTION SELECTED VALUE="${jor.id}"> ${jor.descripcion}
+            </c:if>
+            <c:if test="${jornada != jor.id}">
+                <OPTION VALUE="${jor.id}"> ${jor.descripcion}
+            </c:if>
+        </c:forEach>
+    </SELECT>
+
+    <SELECT NAME="equipo" onchange="this.form.submit()">
+        <c:forEach var="equip" items="${requestScope.equipos}" step="1">
+            <OPTION VALUE="${equip.id}"> ${equip.nombre}
+        </c:forEach>
+    </SELECT>
+    
+    
+    <br/>
+
+    <c:if test="${apuestas != null}">
+    <c:import url="/WEB-INF/jspf/Quiniela/tablaConsulta.jspf"/>
+    Puntos ${estadistica.puntos} (${estadistica.aciertos} Aciertos)
+
+    <br/>
+    <br/>
+    GRAFICO DE POSIONES REALIZADAS EN COMPETICION
+    <br/>
+    <img src="${root}/images/grafico.png" onclick="abrirGrafico('${root}', 'graficoPosicionesQuiniela', ${equipo}, ${competicion})">
+    
+    <div id="graficoPosicionesQuiniela" class="grafico" style=display:none> 
+        <table width="100%">
+            <tr>
+                <td align="right">                     
+                    <img src="${root}/images/cerrar.png" onclick="cerrarGrafico('graficoPosicionesQuiniela')"/>
+                </td>                
+            </tr>
+            <tr>
+                <td>
+                    <div id="posiciones"/>
+                </td>            
+            </tr>            
+        </table>
+    </div>
+    
+    </c:if>
+                    
+    <c:if test="${apuestas == null}">
+        <br/>
+        NO HAY NINGUNA APUESTA CON ESTA SELECCIÓN
+    </c:if>
+
+<c:if test="${error != null}">
+    ${error}
+</c:if>
+
+
+</form>
+                
+<script type="text/javascript">
+    mover.init(document.getElementById('graficoPosicionesQuiniela'));
+</script>
+
