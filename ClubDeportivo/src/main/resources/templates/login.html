@@ -5,18 +5,18 @@
         <meta charset="UTF-8">
         <title th:text="${@environment.getProperty('initParam.tituloapp')}"></title>
         
-        <link rel="stylesheet" type="text/css" th:href="@{/css/estiloPanelControl.css}"/>
-        <link rel="stylesheet" type="text/css" th:href="@{/css/general.css}"/>
-        <script type="text/javascript" th:src="@{/JavaScript/JuegoPenalties.js}"></script>
+        <link rel="stylesheet" type="text/css" th:href="@{css/estiloPanelControl.css}"/>
+        <link rel="stylesheet" type="text/css" th:href="@{css/general.css}"/>
+        <script type="text/javascript" th:src="@{JavaScript/JuegoPenalties.js}"></script>
     </head>
     <body>
         <div id="contenedor">
-            <div id="cabecera_login" th:insert="fragments/cabecera :: cabecera"></div>
+            <th:block th:insert="fragments/cabecera :: cabecera"></th:block>
             
             <div id="grupo">
                 <div id="columna_izquierda_login">
                     <br/>
-                    <img src="/images/deportes1.png" title="Deportes" alt="Deportes"/>
+                    <img th:src="@{images/deportes1.png}" title="Deportes" alt="Deportes"/>
                 </div>
                 
                 <div id="columna_central_login">
@@ -60,25 +60,7 @@
                     <br/>
                     <input class="error" size="10" type="text" id="reloj" disabled/>
                     <input type="hidden" id="fechaServer" th:value="${fechaServer}"/>
-                    <br/>
-                    
-                    <th:block th:if="${txtBannerEntrada != ''}">
-                        <br/>
-                        <table align="center" width="60%">
-                            <tr>
-                                <td class="banner">
-                                    <marquee th:text="${txtBannerEntrada}"></marquee>
-                                </td>
-                            </tr>
-                        </table>
-                        <br/>
-                    </th:block>
-                    
-                    <th:block th:if="${juego != null and juego != ''}">
-                        <br/>
-                        <div id="juego"></div>
-                        <br/>
-                    </th:block>
+                    <br/>                 
                     
                     <hr/>
                     <br/>
@@ -94,7 +76,7 @@
                                 <p class="presentacion">ClubDeportivo es el juego online y gratuito que te permite convertirte en el manager general de un Club con diferentes secciones y competir diariamente con otros amigos.</p>
                             </td>
                             <td width="40%">
-                                <img alt="Presentacion" id="imagenPresentacion" src="/images/presentacion/visualizarPartidoFutbol8.png"/>
+                                <img alt="Presentacion" id="imagenPresentacion" th:src="@{images/presentacion/visualizarPartidoFutbol8.png}"/>
                             </td>
                             <td width="30%" class="presentacion" bgcolor="black">
                                 <p class="presentacion" id="textoPresentacion">Futbol8 te permite competir diariamente con otros amigos en liga y copa.</p>
@@ -106,12 +88,12 @@
                 
                 <div id="columna_derecha_login">
                     <br/>
-                    <img src="/images/deportes2.png" title="Deportes" alt="Deportes"/>
+                    <img th:src="@{images/deportes2.png}" title="Deportes" alt="Deportes"/>
                 </div>
             </div>
         </div>
         <input type="hidden" id="juegoElegido" th:value="${juego}"/>
     </body>
-    <script type="text/javascript" th:src="@{/JavaScript/relojServidor.js}"></script>
+    <script type="text/javascript" th:src="@{JavaScript/relojServidor.js}"></script>
 </html>
 

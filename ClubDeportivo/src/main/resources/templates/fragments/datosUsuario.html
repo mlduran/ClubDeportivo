@@ -1,0 +1,126 @@
+
+<th:block th:fragment="datosUsuario">
+<div id="columna_central">
+
+    <script th:src="@{/JavaScript/Lib/jquery/1.7.2/jquery.min.js}"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#Futbol8").click(function(){ confirmarBaja("Futbol8"); });
+            $("#Quiniela").click(function(){ confirmarBaja("Quiniela"); });
+            $("#Basket").click(function(){ confirmarBaja("Basket"); });
+
+            $("#passwordOld, #passwordNew1, #passwordNew2").keydown(function(e){
+                if (e.which == 13) $("#cambioPasword").focus();
+            });
+
+            $("#mail").keydown(function(e){
+                if (e.which == 13) $("#cambioMail").focus();
+            });
+        });
+
+        function confirmarBaja(seccion){
+            if (confirm("Se va ha proceder eliminar la seccion " + seccion + ", si hay alguna competición activa, tu equipo va a pasar a modo Automatico y se eliminará al finalizar la misma")){
+                $("#operacionBaja").val("baja");
+                $("#seccion").val(seccion);
+                document.datosUsuario.submit();
+            }
+        }
+    </script>
+
+    <h3>DATOS USUARIO</h3>
+
+    <form method="POST" name="datosUsuario" th:action="@{/panelControl/datosUsuario}">
+        <table class="tabladatos">
+            <tr>
+                <td>GRUPO ACTUAL</td>
+                <td th:text="${club.grupo.nombre}"></td>
+            </tr>
+            <tr>
+                <td>TIPO GRUPO</td>
+                <td th:text="${club.grupo.privado} ? 'Privado' : 'Publico'"></td>
+            </tr>
+            <tr th:if="${club.grupo.privado}">
+                <td title="Este codigo es el que has de facilitar a otros usuarios para que se registren en tu grupo">CODIGO GRUPO</td>
+                <td th:text="${club.grupo.codigo}" title="Este codigo es el que has de facilitar a otros usuarios para que se registren en tu grupo"></td>
+            </tr>
+            <tr>
+                <td>Contraseña actual:</td>
+                <td><input type="password" name="passwordact" id="passwordOld" title="Introduce tu contraseña actual" maxlength="20" style="width: 80px"/></td>
+            </tr>
+            <tr>
+                <td>Nueva contraseña:</td>
+                <td><input type="password" name="password" id="passwordNew1" title="Introduce nueva contraseña" maxlength="20" style="width: 80px"/></td>
+            </tr>
+            <tr>
+                <td>Repetir contraseña:</td>
+                <td><input type="password" name="password2" id="passwordNew2" title="Repite contraseña" maxlength="20" style="width: 80px"/></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="submit" id="cambioPasword" name="operacion" value="Cambiar password" accesskey="E"/>
+                </td>
+            </tr>
+        </table>
+
+        <br/>
+
+        <table class="tabladatos">
+            <tr>
+                <td><label for="mail" accesskey="i">Mail:</label></td>
+                <td>
+                    <input type="text" name="mail" id="mail" title="Introduce una dirección de correo" maxlength="255" style="width: 200px" th:value="${club.mail}"/>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="submit" id="cambioMail" name="operacion" value="Cambiar correo" accesskey="E"/>
+                </td>
+            </tr>
+        </table>
+
+        <br/><br/>
+
+        <div th:if="${ok}">
+            Se han grabado los datos correctamente
+        </div>
+
+        <p th:if="${error != null}" class="error">Se ha producido un error: <span th:text="${error}"></span></p>
+
+        <p class="titulo1">SECCIONES ACTIVAS</p>
+
+        <table class="tabla">
+            <tr>
+                <th>QUIERO DAR DE BAJA ESTA SECCIÓN (Haz un click sobre la que desees)</th>
+            </tr>
+            <tr>
+                <td>
+                    <span th:if="${club.futbol8 and Futbol8 != null}">
+                        <img th:src="@{/images/pelotaFutbol.png}" id="Futbol8" title="Futbol 8" alt="Futbol 8"/>
+                    </span>
+                    <span th:if="${club.basket and Basket != null}">
+                        <img th:src="@{/images/pelotaBasket.png}" id="Basket" title="Basket" alt="Basket"/>
+                    </span>
+                    <span th:if="${club.quiniela and Quiniela != null}">
+                        <img th:src="@{/images/quiniela.jpg}" id="Quiniela" title="Quinielas" alt="Quinielas"/>
+                    </span>
+                    <p th:if="${!(club.futbol8 and Futbol8 != null) and !(club.basket and Basket != null) and !(club.quiniela and Quiniela != null)}">
+                        Actualmente no tienes ninguna sección activa
+                    </p>
+                </td>
+            </tr>
+            <input type="hidden" id="operacionBaja" name="operacion" value=""/>
+            <input type="hidden" id="seccion" name="seccion" value=""/>
+        </table>
+    </form>
+
+</div>
+
+</th:block>
+
+
+
+
+
+
+
+

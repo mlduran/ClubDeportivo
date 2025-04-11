@@ -33,11 +33,16 @@ import static mld.clubdeportivo.controladores.UtilesHttpServlet.isDeporteActivo;
 import static mld.clubdeportivo.utilidades.Correo.getCorreo;
 import static mld.clubdeportivo.utilidades.UtilGenericas.isDomingo;
 import static mld.clubdeportivo.utilidades.UtilGenericas.pilaError;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
 
-
+@Controller
 public class LanzarJornadaHttpServlet extends HttpServlet{
 
     private static Logger logger = getLogger(LanzarJornadaHttpServlet.class.getName());
+    
+    @Value("${custom.deportesactivos}")
+    private String deportesactivos;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -76,12 +81,12 @@ public class LanzarJornadaHttpServlet extends HttpServlet{
                 
                 //UtilesHttpServlet.ejecutaBackup(appManager, "Backup"); 
                 
-                if (isDeporteActivo(appManager, Futbol8)){
+                if (isDeporteActivo(deportesactivos, Futbol8)){
                     var lanzarf8 = new LanzarJornadaFutbol8();            
                     lanzarf8.lanzarJornadaFutbol8(req, resp, appManager);  
                 }
                 
-                if (isDeporteActivo(appManager, Quiniela)){
+                if (isDeporteActivo(deportesactivos, Quiniela)){
                     var lanzarq = new LanzarJornadaQuiniela();
                     lanzarq.lanzarJornadaQuiniela(req, resp, appManager);
                 }

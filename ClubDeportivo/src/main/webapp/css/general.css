@@ -365,6 +365,7 @@
 	font-family : Tahoma,Verdana,Arial;
 	font-weight: bold;
 	font-style: italic;
+        text-align: center; 
 }
 
 .titulo1 {
@@ -623,7 +624,7 @@
      font-family : Tahoma,Verdana,Arial;
      font-style: italic;    
      text-align: center;    
-     overflow: no-display;
+     /*overflow: no-display;*/
      
  }
  

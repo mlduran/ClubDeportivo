@@ -2,9 +2,7 @@
 package mld.clubdeportivo.base;
 
 import static java.lang.Integer.valueOf;
-import static java.lang.Integer.valueOf;
 import static java.lang.String.format;
-import java.text.DateFormat;
 import static java.text.DateFormat.SHORT;
 import static java.text.DateFormat.getDateInstance;
 import java.util.ArrayList;
@@ -14,15 +12,11 @@ import java.util.GregorianCalendar;
 import static mld.clubdeportivo.base.Deporte.Basket;
 import static mld.clubdeportivo.base.Deporte.Futbol8;
 import static mld.clubdeportivo.base.Deporte.Quiniela;
-import mld.clubdeportivo.utilidades.CalendarFunctions;
 import static mld.clubdeportivo.utilidades.CalendarFunctions.restarFechas;
-import mld.clubdeportivo.utilidades.Seguridad;
 import static mld.clubdeportivo.utilidades.Seguridad.SHA1Digest;
 import static mld.clubdeportivo.utilidades.Seguridad.isSHA1Digest;
-import mld.clubdeportivo.utilidades.StringUtil;
 import static mld.clubdeportivo.utilidades.StringUtil.isNullOrEmpty;
 import static mld.clubdeportivo.utilidades.StringUtil.removeCharsEspeciales;
-import mld.clubdeportivo.utilidades.UtilGenericas;
 import static mld.clubdeportivo.utilidades.UtilGenericas.isClub;
 import static mld.clubdeportivo.utilidades.UtilGenericas.isMail;
 import static mld.clubdeportivo.utilidades.UtilGenericas.isPassword;

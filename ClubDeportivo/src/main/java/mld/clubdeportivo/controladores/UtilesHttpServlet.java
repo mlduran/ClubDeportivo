@@ -32,7 +32,7 @@ import static mld.clubdeportivo.utilidades.Correo.getCorreo;
 public class UtilesHttpServlet extends HttpServlet {
 
     private static Logger logger = getLogger(LoginHttpServlet.class.getName());
-    
+     
    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -102,20 +102,20 @@ public class UtilesHttpServlet extends HttpServlet {
 
     }
     
-     protected static ArrayList<String> deportesActivos(ServletContext appManager){
+     protected static ArrayList<String> deportesActivos(String deportesactivos){
 
         var lista = new ArrayList<String>();
-        var confDeportes = appManager.getInitParameter("deportesactivos");
+        var confDeportes = deportesactivos;
         lista.addAll(asList(confDeportes.split(",")));
         
         return lista;
 
     }
      
-     protected static boolean isDeporteActivo(ServletContext appManager, Deporte deporte){
+     protected static boolean isDeporteActivo(String deportesactivos, Deporte deporte){
 
          var isActivo = false;
-         var lista = deportesActivos(appManager);
+         var lista = deportesActivos(deportesactivos);
          for (var dep : lista) {
              if (deporte.name().equals(dep)){
                  isActivo = true;
