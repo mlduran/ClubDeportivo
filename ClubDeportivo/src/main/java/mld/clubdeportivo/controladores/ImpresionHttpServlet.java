@@ -2,7 +2,6 @@
 package mld.clubdeportivo.controladores;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -15,32 +14,32 @@ import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.obtenerApuestas;
 import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.obtenerJornada;
 import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.obtenerSimpleEquipoQuiniela;
 import static mld.clubdeportivo.controladores.UtilesHttpServlet.comprobarEstado;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 
 /**
  *
  * @author Miguel
  */
-public class ImpresionHttpServlet extends HttpServlet {
+@Controller
+public class ImpresionHttpServlet{
 
    
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+    @GetMapping("/imprimir")
+    public String doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        processRequest(req, resp);
-    }
+        return processRequest(req, resp);
+    }    
+  
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-
-        processRequest(req, resp);
-    }
-
-    private void processRequest(HttpServletRequest req, HttpServletResponse resp)
+    private String processRequest(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         
-        if (!comprobarEstado(req, resp)) return;
+        String estado = comprobarEstado(req, resp);
+        if (!"".equals(estado)) {
+            return estado;
+        }
 
         var op = req.getParameter("operacion");
         var texto = "";
@@ -62,10 +61,8 @@ public class ImpresionHttpServlet extends HttpServlet {
         }
 
 
-        var view = req.getRequestDispatcher("/Utiles/imprimir.jsp");
-        view.forward(req, resp);
-       
-       
+        return "Utiles/imprimir";
+      
     }
 
     private void imprimirQuiniela(HttpServletRequest req,
@@ -124,7 +121,7 @@ public class ImpresionHttpServlet extends HttpServlet {
             numeq = numeq + 2;
         }
 
-        txt.append("<table class='gidView' border='1'>");
+        txt.append("<table class='gidView' border='1' style=\"background-color: white;\">");
         txt.append("<tr>");
         txt.append("<th>PARTIDO</th>");
         for (var eq : lista){

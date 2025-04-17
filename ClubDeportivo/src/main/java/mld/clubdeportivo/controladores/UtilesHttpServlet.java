@@ -55,7 +55,7 @@ public class UtilesHttpServlet extends HttpServlet {
        
     }
 
-    protected static boolean comprobarEstado(HttpServletRequest req, HttpServletResponse resp)
+    protected static String comprobarEstado(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException{
         
          
@@ -65,24 +65,17 @@ public class UtilesHttpServlet extends HttpServlet {
         
         if (appManager.getAttribute("simulando") != null && 
                 appManager.getAttribute("simulando").equals("true")){
-            var view =
-                            req.getRequestDispatcher("/Utiles/simulando.jsp");
-            view.forward(req, resp);
-            ok = false;
+            return "/Utiles/simulando";
         }
         else if (appManager.getAttribute("mantenimiento") != null && 
                 appManager.getAttribute("mantenimiento").equals("true")){
-            var view =
-                            req.getRequestDispatcher("/Utiles/mantenimiento.jsp");
-            view.forward(req, resp);
-            ok = false;
+            return "/Utiles/mantenimiento";           
         }
         else if (sesion.getAttribute("idClub") == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            ok = false;
+            return "/login";
         }
 
-        return ok;
+        return "";
 
     }
     

@@ -46,18 +46,25 @@ public class LoginHttpServlet {
             req.setAttribute("idClub", null);
             req.setAttribute("fechaServer", fechaServidor());
             UtilesHttpServlet.registrarEntrada(req);
-            obtenerDatos(req);            
+            obtenerDatos(req);
         } catch (DAOException ex) {
             logger.log(SEVERE, ex.getMessage());
         }
         return "login";
     }
-
-    @PostMapping("/login")
-    public void doPost(HttpServletRequest req, HttpServletResponse resp)
+    
+    @GetMapping("/login")
+    public String recuperarContrasenya(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        processRequest(req, resp);
+        return processRequest(req, resp);
+    }
+
+    @PostMapping("/login")
+    public String doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        return processRequest(req, resp);
     }
 
     private void obtenerDatos(HttpServletRequest req) throws DAOException {
@@ -67,7 +74,7 @@ public class LoginHttpServlet {
 
     }
 
-    private void processRequest(HttpServletRequest req, HttpServletResponse resp)
+    private String processRequest(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
         var sesion = req.getSession();
@@ -78,10 +85,7 @@ public class LoginHttpServlet {
             var envioClave = req.getParameter("bSubmit");
 
             if (accion != null && accion.equals("envioPassword")) {
-                var view
-                        = req.getRequestDispatcher("/Login/envioPassword.jsp");
-                view.forward(req, resp);
-                return;
+                return "envioPassword";
             } else if (envioClave != null && envioClave.equals("Enviar Nuevo Password")) {
                 var usuarioEnvio = req.getParameter("usuarioEnvio");
                 var mailEnvio = req.getParameter("mailEnvio");
@@ -98,11 +102,7 @@ public class LoginHttpServlet {
                         req.setAttribute("resultado", "No se ha encontrado ningun usuario y mail coincidente, no se realiza ninguna acción");
                     }
                 }
-                var view
-                        = req.getRequestDispatcher("/Login/envioPassword.jsp");
-                view.forward(req, resp);
-                return;
-
+                return "envioPassword";
             }
 
             var usuario = req.getParameter("usuario");
@@ -121,11 +121,13 @@ public class LoginHttpServlet {
                     grabarClub(club);
                     registrarLogin(req, club.getNombre());
                     resp.sendRedirect(req.getContextPath() + "/panelControl/presentacion");
-                } else {                    
+                } else {
                     if (usuario != null || password != null) {
                         req.setAttribute("noValidado", true);
                     }
-                    resp.sendRedirect(req.getContextPath() + "/");
+                    req.setAttribute("fechaServer", fechaServidor());
+                    obtenerDatos(req);
+                    return "login";
                 }
             }
 
@@ -133,6 +135,8 @@ public class LoginHttpServlet {
             logger.log(SEVERE, "Error acceso a BD: ".concat(ex.getMessage()));
             req.setAttribute("error", ex.getMessage());
         }
+
+        return "login";
 
     }
 

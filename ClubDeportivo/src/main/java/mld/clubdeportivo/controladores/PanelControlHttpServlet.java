@@ -63,14 +63,15 @@ public class PanelControlHttpServlet {
     @Value("${custom.deportesactivos}")
     private String deportesactivos;
 
-    @GetMapping("/panelControl/presentacion")
+    @GetMapping({"/panelControl/presentacion", "/panelControl/datosUsuario", 
+        "/panelControl/ranking", "/panelControl/fichaClub", "/panelControl/inicio"})
     public String doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
         return processRequest(req, resp);
     }
 
-    @PostMapping("/panelControl/presentacion")
+    @PostMapping({"/panelControl/presentacion", "/panelControl/datosUsuario"})
     public String doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
@@ -89,9 +90,9 @@ public class PanelControlHttpServlet {
             if (accion.equals("fichaClub")) {
                 fichaClub(req);
             } else {
-
-                if (!comprobarEstado(req, resp)) {
-                    return "redirect:/";
+                String estado = comprobarEstado(req, resp);
+                if (!"".equals(estado)) {
+                    return estado;
                 }
 
                 long id = (Long) req.getSession().getAttribute("idClub");

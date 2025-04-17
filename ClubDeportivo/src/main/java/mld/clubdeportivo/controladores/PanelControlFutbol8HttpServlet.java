@@ -115,34 +115,40 @@ import static mld.clubdeportivo.utilidades.StringUtil.isNumero;
 import static mld.clubdeportivo.utilidades.StringUtil.removeCharsEspeciales;
 import static mld.clubdeportivo.utilidades.StringUtil.truncate;
 import static mld.clubdeportivo.utilidades.UtilGenericas.pilaError;
+import org.springframework.stereotype.Controller;
 
 /**
  *
  * @author Miguel
  */
-public class PanelControlFutbol8HttpServlet extends HttpServlet {
+@Controller
+public class PanelControlFutbol8HttpServlet  {
 
     private static Logger logger = 
             getLogger(PanelControlFutbol8HttpServlet.class.getName());
    
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+    
+    public String doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
-        processRequest(req, resp);
+        return "";
+        //processRequest(req, resp);
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+    
+    public String doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        processRequest(req, resp);
+        return "";
+        //processRequest(req, resp);
     }
 
-    private void processRequest(HttpServletRequest req, HttpServletResponse resp)
+    private String processRequest(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        if (!comprobarEstado(req, resp)) return;
+        String estado = comprobarEstado(req, resp);
+                if (!"".equals(estado)) {
+                    return estado;
+                }
         
         req.setAttribute("path", "/panelControl/Futbol8/inicio");
         
@@ -247,6 +253,7 @@ public class PanelControlFutbol8HttpServlet extends HttpServlet {
              
         var view = req.getRequestDispatcher(dir);
         view.forward(req, resp);
+        return "";
        
     }
 

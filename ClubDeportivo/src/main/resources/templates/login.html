@@ -1,12 +1,10 @@
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="UTF-8">
-        <title th:text="${@environment.getProperty('initParam.tituloapp')}"></title>
-        
-        <link rel="stylesheet" type="text/css" th:href="@{css/estiloPanelControl.css}"/>
-        <link rel="stylesheet" type="text/css" th:href="@{css/general.css}"/>
+        <title th:text="${@environment.getProperty('initParam.tituloapp')}"></title>        
+        <link rel="stylesheet" type="text/css" th:href="@{/css/estiloPanelControl.css}"/>
+        <link rel="stylesheet" type="text/css" th:href="@{/css/general.css}"/>
         <script type="text/javascript" th:src="@{JavaScript/JuegoPenalties.js}"></script>
     </head>
     <body>

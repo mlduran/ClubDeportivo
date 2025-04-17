@@ -1,0 +1,66 @@
+<th:block th:fragment="jornada">
+
+    <div th:if="${comp == null}">
+        <br/>
+        <b>NO HAY NINGUNA COMPETICIÓN ACTIVA EN ESTE MOMENTO</b>
+        <br/><br/>
+    </div>
+
+    <!-- Si existe una jornada -->
+    <div th:if="${jornada != null}">
+        <form th:action="@{/panelControl/Quiniela/jornada}" method="post">
+
+            <!-- Selector de equipo -->
+            <select name="equipo" onchange="this.form.submit()">
+                <option th:each="equip : ${equipos}"
+                        th:value="${equip.id}"
+                        th:text="${equip.nombre}">
+                </option>
+            </select>
+
+            <!-- Info jornada -->
+            <br/>
+            Jornada número <span th:text="${jornada.numero}"></span> 
+            (Pts ganador jornada: <span th:text="${jornada.puntos}"></span>)
+
+            <!-- Fragmento de tabla según tipo de apuesta -->
+            <div th:if="${apuestaelegida == 'Sencilla'}"
+                 th:insert="~{/fragments/Quiniela/tablaConsulta :: tablaConsulta}"></div>
+
+            <div th:if="${apuestaelegida != 'Sencilla'}"
+                 th:insert="~{/fragments/Quiniela/tablaMix :: tablaMix}"></div>
+
+            <!-- Fecha de actualización -->
+            <div th:if="${actualizada != null}">
+                Actualizadas el 
+                <span th:text="${#dates.format(actualizada, 'dd/MM/yyyy HH:mm')}"></span>
+            </div>
+
+            <!-- Resultados temporales -->
+            <div th:if="${resultadosTemp != null}">
+                <table class="tabla">
+                    <thead>
+                        <tr>
+                            <th colspan="2">Resultados Provisionales</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="eqQ : ${resultadosTemp}">
+                            <td th:text="${eqQ.nombre}">Equipo</td>
+                            <td th:text="${eqQ.resultadoProvisional}">Resultado</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>Estos resultados incluyen posibles puntos extras</p>
+            </div>
+
+            <br/>
+            <a th:href="@{/imprimir(operacion='quiniela', jornada=${jornada.id})}" target="_blank">Imprimir</a>
+            <br/>
+        </form>
+    </div>
+
+    <!-- Mostrar error si existe -->
+    <div th:if="${error != null}" th:text="${error}"></div>
+
+</th:block>

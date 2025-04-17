@@ -1,0 +1,60 @@
+<th:block th:fragment="faqPuntuacion">
+
+    <table class="tabladatos">
+        <tr>
+            <th>
+                TABLA DE PUNTUACIONES
+            </th>
+        </tr>
+        <tr>
+            <td>
+                Cada Jugador obtiene los puntos de la columna con mayor número de aciertos.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Si un jugador es el único en acertar un resultado en alguna de sus columnas, tendrá un punto extra en ese resultado.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Además obtendrá un extra según el número de aciertos (pueden haber aciertos dobles si es el único acertante del resultado):<br/>
+                Por 10 aciertos: 5 puntos<br/>
+                Por 11 aciertos: 10 puntos<br/>
+                Por 12 aciertos: 25 puntos<br/>
+                Por 13 aciertos: 50 puntos<br/>
+                Por 14 aciertos: 200 puntos<br/>
+                Por 15 o más aciertos: 500 puntos<br/>
+                Por 0 aciertos: 100 puntos<br/>
+                <small>
+                    (En este caso, NO se ha de acertar ningún resultado de los partidos para 1 de las columnas cumplimentadas, y todos los pronósticos deben estar cumplimentados.)
+                </small><br/>
+                Por 1 acierto: 50 puntos<br/>
+                <small>
+                    (En este caso, se ha de acertar 1 resultado de los partidos para 1 de las columnas cumplimentadas, y todos los pronósticos deben estar cumplimentados.)
+                </small><br/>
+                Por 00 aciertos: 500 puntos<br/>
+                <small>
+                    (En este caso, NO se ha de acertar ningún resultado de los partidos para las 2 columnas cumplimentadas, y todos los pronósticos deben estar cumplimentados.)
+                </small><br/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                A la puntuación anterior hay que sumar los siguientes puntos, si queda entre los 4 primeros:<br/>
+                Puntos para el puesto 1: Se informará en la creación de la jornada<br/>
+                Puntos para el puesto 2: La mitad del primero<br/>
+                Puntos para el puesto 3: La mitad del segundo<br/>
+                Puntos para el puesto 4: La mitad del tercero<br/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Nota: Para determinar el puesto, si hay empate en los resultados de la 
+                primera columna, se desempatará con la otra columna. En el caso de persistir 
+                el empate entre uno o varios jugadores se asignará el número
+                de puntos de esa posición para todos ellos.
+            </td>
+        </tr>
+    </table>
+</th:block>

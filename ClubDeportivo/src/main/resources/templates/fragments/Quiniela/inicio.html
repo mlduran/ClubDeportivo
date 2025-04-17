@@ -1,0 +1,51 @@
+<th:block th:fragment="inicio">
+
+    <div th:if="${comp == null}">
+        <br/>
+        <b>NO HAY NINGUNA COMPETICION ACTIVA EN ESTE MOMENTO</b>
+        <br/><br/>
+    </div>
+
+    <!-- Si hay elementos en la lista de clasificacion -->
+    <div th:if="${not #lists.isEmpty(clasificacion)}">
+        <table class="tabla">
+            <tr>
+                <th>Posición</th>
+                <th>Equipo</th>
+                <th>Puntos</th>
+                <th>Victorias</th>
+            </tr>
+
+            <tr th:each="obj, cuenta : ${clasificacion}">
+                <td align="center" th:text="${cuenta.count}">1</td>
+                <td th:text="${obj.nombreEquipo}">Equipo</td>
+                <td align="right" th:text="${obj.puntosGeneral}">0</td>
+                <td align="right" th:text="${obj.victoriasGeneral}">0</td>
+            </tr>
+        </table>
+
+        <!-- Si hay jornada para mostrar -->
+        <div th:if="${ultimaJornada != null}">
+            <br/>
+            <span th:text="${ultimaJornada.descripcion}">Descripción jornada</span><br/>
+            <table class="tabla">
+                <tr>
+                    <th width="50%">Equipo</th>
+                    <th width="30%">Aciertos</th>
+                    <th width="20%">PTS</th>
+                </tr>
+
+                <tr th:each="est : ${ultimaJornada.estadisticas}">
+                    <td th:text="${est.equipo}">Equipo</td>
+                    <td align="center" th:text="${est.aciertos}">0</td>
+                    <td align="right" th:text="${est.puntos}">0</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <th:block th:insert="/fragments/comentarios :: comentarios"></th:block>
+
+</th:block>
+
+
