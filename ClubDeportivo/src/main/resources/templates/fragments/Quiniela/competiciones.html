@@ -36,28 +36,7 @@
                             </tbody>
                         </table>
                     </div>
-                </td>
-                <td>
-                    <div th:each="jornada : ${jornadasCol2}">
-                        <span th:text="${jornada.descripcionPuntos}"></span><br/>
-                        <table class="tabla">
-                            <thead>
-                                <tr>
-                                    <th width="50%">Equipo</th>
-                                    <th width="30%">Aciertos</th>
-                                    <th width="20%">PTS</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="est : ${jornada.estadisticas}">
-                                    <td th:text="${est.equipo}"></td>
-                                    <td align="center" th:text="${est.aciertos}"></td>
-                                    <td align="right" th:text="${est.puntos}"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </td>
+                </td>               
                 <td>
                     <div th:each="jornada : ${jornadasCol2}">
                         <span th:text="${jornada.descripcionPuntos}"></span><br/>

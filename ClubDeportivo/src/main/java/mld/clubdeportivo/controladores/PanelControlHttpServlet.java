@@ -63,7 +63,7 @@ public class PanelControlHttpServlet {
     @Value("${custom.deportesactivos}")
     private String deportesactivos;
 
-    @GetMapping({"/panelControl/presentacion", "/panelControl/datosUsuario", 
+    @GetMapping({"/panelControl/presentacion", "/panelControl/datosUsuario", "/panelControl/faqs",
         "/panelControl/ranking", "/panelControl/fichaClub", "/panelControl/inicio"})
     public String doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -71,7 +71,7 @@ public class PanelControlHttpServlet {
         return processRequest(req, resp);
     }
 
-    @PostMapping({"/panelControl/presentacion", "/panelControl/datosUsuario"})
+    @PostMapping({"/panelControl/presentacion", "/panelControl/datosUsuario", "/panelControl/faqs"})
     public String doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
@@ -80,6 +80,11 @@ public class PanelControlHttpServlet {
 
     private String processRequest(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        
+        String estado = comprobarEstado(req, resp);
+        if (!"".equals(estado)) {
+            return "redirect:/";
+        }
 
         var path = req.getRequestURI();
         String accion = path.substring(path.lastIndexOf("/") + 1);
@@ -89,11 +94,7 @@ public class PanelControlHttpServlet {
         try {
             if (accion.equals("fichaClub")) {
                 fichaClub(req);
-            } else {
-                String estado = comprobarEstado(req, resp);
-                if (!"".equals(estado)) {
-                    return estado;
-                }
+            } else {               
 
                 long id = (Long) req.getSession().getAttribute("idClub");
 

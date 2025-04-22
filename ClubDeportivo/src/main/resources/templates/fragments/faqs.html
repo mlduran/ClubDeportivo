@@ -1,42 +1,47 @@
 
 <th:block th:fragment="faqs">
-    
-<p class="titulo1">PREGUNTAS Y SUGERENCIAS</p>
 
-<p>
-    Este es un juego nuevo, así que si tienes alguna pregunta, sugerencia o propuesta que realizar, 
-    estaremos encantados de contestarlas y tenerlas en cuenta.
-</p>
+    <p class="titulo1">PREGUNTAS Y SUGERENCIAS</p>
 
-<form method="POST" th:action="@{/panelControl/faqs}">
-    <table class="tablaTitulo" cellpadding="3">
-        <tr align="left">        
-            <td>
-                <label for="pregunta">Pregunta / Sugerencia</label>
-                <textarea name="pregunta" id="pregunta" rows="2" cols="90"
-                          title="Introduce tu pregunta o sugerencia (max 255 caracteres)"></textarea>
-            </td>
+    <p>
+        Este es un juego nuevo, así que si tienes alguna pregunta, sugerencia o propuesta que realizar, 
+        estaremos encantados de contestarlas y tenerlas en cuenta.
+    </p>
+
+    <form method="POST" th:action="@{/panelControl/faqs}">
+        <table class="tablaTitulo" cellpadding="3">
+            <tr align="left">        
+                <td>
+                    <label for="pregunta">Pregunta / Sugerencia</label>
+                    <textarea name="pregunta" id="pregunta" rows="2" cols="90"
+                              title="Introduce tu pregunta o sugerencia (max 255 caracteres)"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" align="center">
+                    <input type="submit" id="operacion" name="operacion" value="Enviar" accesskey="E"/>
+                    <br/>
+                    <span th:if="${enviado}">Gracias, se ha enviado la notificación, en breve recibirás respuesta</span>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <table class="tabla" width="100%">
+        <tr th:if="${faqs == null or #lists.isEmpty(faqs)}">
+            <td colspan="2" align="center">No hay preguntas frecuentes disponibles</td>
         </tr>
-        <tr>
-            <td colspan="2" align="center">
-                <input type="submit" id="operacion" name="operacion" value="Enviar" accesskey="E"/>
-                <br/>
-                <span th:if="${enviado}">Gracias, se ha enviado la notificación, en breve recibirás respuesta</span>
+
+        <tr th:each="fq : ${faqs}">
+            <td align="left" width="10%">
+                <span th:text="${#dates.format(fq.fecha, 'dd/MM/yyyy')}"></span>
             </td>
+            <td align="left" width="90%" th:text="${fq.pregunta}"></td>
+        </tr>
+        <tr th:each="fq : ${faqs}">
+            <td></td>
+            <td align="left" bgcolor="orange" th:text="${fq.respuesta}"></td>
         </tr>
     </table>
-</form>
 
-<table class="tabla" width="100%">
-    <tr th:each="fq : ${faqs}">
-        <td align="left" width="10%">
-            <span th:text="${#dates.format(fq.fecha, 'dd/MM/yyyy')}"></span>
-        </td>
-        <td align="left" width="90%" th:text="${fq.pregunta}"></td>
-    </tr>
-    <tr>
-        <td></td>
-        <td align="left" bgcolor="orange" th:text="${fq.respuesta}"></td>
-    </tr>
-</table>
 </th:block>

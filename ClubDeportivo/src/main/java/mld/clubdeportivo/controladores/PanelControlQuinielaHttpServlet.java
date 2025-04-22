@@ -94,7 +94,7 @@ public class PanelControlQuinielaHttpServlet {
 
         String estado = comprobarEstado(req, resp);
         if (!"".equals(estado)) {
-            return estado;
+            return "redirect:/";
         }
 
         req.setAttribute("path", "/panelControl/Quiniela/inicio");
