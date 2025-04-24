@@ -31,28 +31,27 @@ import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.obtenerCompeticionP
 import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.obtenerEstadistica;
 import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.obtenerJornadasValidadas;
 import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.obtenerSimpleEquipoQuiniela;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 
 
 /**
  *
  * @author Miguel
  */
-public class JsonServlet extends HttpServlet {
+
+
+@Controller
+public class JsonServlet  {
 
    
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+    @GetMapping("/json/posicionesQuiniela")
+    public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        processRequest(req, resp);
+         processRequest(req, resp);
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-
-        processRequest(req, resp);
-    }
     
     private String formatJsonpresupuesto(String tipo, int valor){
         // Ejemplo {"Ingresos Campo": 100}
@@ -75,30 +74,31 @@ public class JsonServlet extends HttpServlet {
             throws ServletException, IOException {
        
         var txt = "";
-        var accion = req.getPathInfo();           
+        var path = req.getRequestURI();
+        String accion = path.substring(path.lastIndexOf("/") + 1);        
         
         try {
             if (null == accion) {}
             else switch (accion) {
-                case "/bolsa":
+                case "bolsa":
                     txt = datosBolsa(req);
                     break;
-                case "/presupuesto":
+                case "presupuesto":
                     txt = datosPresupuestoFutbol8(req);
                     break;
-                case "/movimientos":
+                case "movimientos":
                     txt = datosMovimientos(req);
                     break;
-                case "/auditoria":
+                case "auditoria":
                     txt = datosAuditoria(req);
                     break;
-                case "/posicionesQuiniela":
+                case "posicionesQuiniela":
                     txt = datosPosicionesQuiniela(req);
                     break;
-                case "/jugadoresFutbol8":
+                case "jugadoresFutbol8":
                     txt = datosJugadoresFutbol8(req);
                     break;
-                case "/cronicaFutbol8":
+                case "cronicaFutbol8":
                     txt = datosCronicaFutbol8(req);
                     break;
                 default:

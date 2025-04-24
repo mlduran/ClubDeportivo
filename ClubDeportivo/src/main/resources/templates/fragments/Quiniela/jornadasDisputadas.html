@@ -3,6 +3,7 @@
     <script th:src="@{/JavaScript/Lib/jquery/1.7.2/jquery.min.js}"></script>
     <script th:src="@{/JavaScript/Lib/Highcharts-2.3.3/js/highcharts.js}"></script>
     <script th:src="@{/JavaScript/Graficos.js}"></script>
+    <script th:src="@{/JavaScript/DomDrag.js}"></script>
 
 
     <form th:action="@{/panelControl/Quiniela/jornadasDisputadas}" method="post">
@@ -46,7 +47,12 @@
             <br/><br/>
             <p>GRAFICO DE POSICIONES REALIZADAS EN COMPETICIÓN</p>
             <img th:src="@{/images/grafico.png}"
-                 th:onclick="'abrirGrafico(\'' + @{/} + '\', \'graficoPosicionesQuiniela\', ' + ${equipo} + ', ' + ${competicion} + ')'"/>
+                 th:onclick="'abrirGrafico(\'/ClubDeportivo\', \'graficoPosicionesQuiniela\', ' 
+                 + ${equipo} + ', ' 
+                 + ${competicion} + ')'" />
+
+
+
 
             <div id="graficoPosicionesQuiniela" class="grafico" style="display:none">
                 <table style="width:100%">

@@ -35,37 +35,39 @@ import static mld.clubdeportivo.utilidades.UtilGenericas.isDomingo;
 import static mld.clubdeportivo.utilidades.UtilGenericas.pilaError;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class LanzarJornadaHttpServlet extends HttpServlet{
+public class LanzarJornadaHttpServlet {
 
     private static Logger logger = getLogger(LanzarJornadaHttpServlet.class.getName());
     
     @Value("${custom.deportesactivos}")
     private String deportesactivos;
+    @Value("${custom.entornoapp}")
+    private String entornoapp;
+    @Value("${custom.mailcontacto}")
+    private String mailcontacto;
+    @Value("${custom.codigoLanzamiento}")
+    private String codigoLanzamiento;
+    
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+    @GetMapping("/lanzarJornada")
+    public String doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException {
 
-        processRequest(req, resp);
+        return processRequest(req, resp);
     }
+    
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException {
-
-        processRequest(req, resp);
-    }
-
-    private void processRequest(HttpServletRequest req, HttpServletResponse resp)
+    private String processRequest(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException {
         
         var ok = false;
         var appManager = req.getServletContext();
-        var entorno = appManager.getInitParameter("entornoapp");
-        var dirCorreo = appManager.getInitParameter("mailcontacto");
-        var dir = "/Utiles/lanzarJornada.jsp";
+        var entorno = entornoapp;
+        var dirCorreo = mailcontacto;
+        var dir = "/Utiles/lanzarJornada";
         var txtMail = "";
 
         try {
@@ -73,7 +75,7 @@ public class LanzarJornadaHttpServlet extends HttpServlet{
             if ((entorno == null || (entorno != null && !entorno.equals("desarrollo"))) && !comprobarLanzamiento(req, resp)){
                 logger.log(SEVERE, "Error al lanzar Jornada: La configuracion del lanzamiento no es correcta");
                 req.setAttribute("error", "La configuracion del lanzamiento no es correcta");
-                dir = "/Utiles/error.jsp";
+                dir = "/Utiles/error";
             }
             else{           
                 // cerramos acceso a los usuarios
@@ -119,7 +121,7 @@ public class LanzarJornadaHttpServlet extends HttpServlet{
             logger.log(SEVERE, pilaError(ex));
             req.setAttribute("error", ex.getMessage());
             req.setAttribute("errorDes", pilaError(ex));
-            dir = "/Utiles/error.jsp";
+            dir = "/Utiles/error";
             txtMail = ex.getMessage()  + "<br/>" + pilaError(ex);
         }        
         
@@ -138,13 +140,7 @@ public class LanzarJornadaHttpServlet extends HttpServlet{
                 "No ha habido problemas", true, dirCorreo);         
         }
 
-        var view =
-                    req.getRequestDispatcher(dir);
-        try {
-            view.forward(req, resp);
-        } catch (IOException ex) {
-            logger.log(SEVERE, ex.getMessage());
-        }
+        return dir;
 
     }
     
@@ -155,7 +151,7 @@ public class LanzarJornadaHttpServlet extends HttpServlet{
         var ok = false;
         var appManager = req.getServletContext();
         var codigo = (String) req.getParameter("codigo");
-        var codigoConf = this.getInitParameter("codigoLanzamiento");
+        var codigoConf = codigoLanzamiento;
         var fechaUltimoLanzamiento = 
                 (String) appManager.getAttribute("fechUltimoLanzamiento");
         if (fechaUltimoLanzamiento == null)

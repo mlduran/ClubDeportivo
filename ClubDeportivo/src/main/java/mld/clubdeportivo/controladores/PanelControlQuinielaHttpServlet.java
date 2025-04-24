@@ -1,7 +1,6 @@
 package mld.clubdeportivo.controladores;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -9,7 +8,6 @@ import static java.lang.Integer.parseInt;
 import static java.lang.Long.parseLong;
 import static java.lang.String.valueOf;
 import java.util.*;
-import static java.util.Arrays.asList;
 import static java.util.Calendar.DAY_OF_WEEK;
 import static java.util.Calendar.getInstance;
 import mld.clubdeportivo.base.Grupo;

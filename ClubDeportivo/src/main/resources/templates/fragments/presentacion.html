@@ -61,7 +61,7 @@
 
     <table class="tablaDeportes" border="solid">
         <tbody>
-            <tr th:if="${club.futbol8 == true and Futbol8 == true}">
+            <tr th:if="${club.futbol8 != true and Futbol8 == true}">
                 <td>
                     <img th:src="@{/images/pelotaFutbol.png}" title="Futbol 8" alt="Futbol 8"/>
                 </td>
@@ -75,7 +75,7 @@
                 </td>
             </tr>
 
-            <tr th:if="${club.quiniela == true and Quiniela == true}">
+            <tr th:if="${club.quiniela != true and Quiniela == true}">
                 <td>
                     <img th:src="@{/images/quiniela.jpg}" title="Quinielas" alt="Quinielas"/>
                 </td>
