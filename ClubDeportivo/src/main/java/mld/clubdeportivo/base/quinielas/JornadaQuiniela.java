@@ -1,7 +1,6 @@
 
 package mld.clubdeportivo.base.quinielas;
 
-import static java.lang.String.valueOf;
 import java.util.ArrayList;
 import mld.clubdeportivo.base.Jornada;
 
@@ -73,8 +72,9 @@ public class JornadaQuiniela extends Jornada{
 
     public boolean resultadosCompletos(){
         
-        var completo = true;
-        for (var result : this.getResultado()) {
+        boolean completo = true;
+        
+        for (String result : this.getResultado()) {
             if (result == null || (!result.equals("1") && !result.equals("X") && !result.equals("2"))) {
                 completo = false;
                 break;
@@ -86,9 +86,9 @@ public class JornadaQuiniela extends Jornada{
     
     public String getDescripcionPuntos(){
         
-        var pts = "";
+        String pts = "";
         if (this.getPuntos() > 0)
-            pts = " (Puntos " + valueOf(this.getPuntos()) + ")"; 
+            pts = " (Puntos " + String.valueOf(this.getPuntos()) + ")"; 
         return this.getDescripcion() + pts;
     }
 

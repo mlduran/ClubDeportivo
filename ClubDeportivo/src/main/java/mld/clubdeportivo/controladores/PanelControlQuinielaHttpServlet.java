@@ -73,13 +73,13 @@ public class PanelControlQuinielaHttpServlet {
 
     @PostMapping(
             {
-            "/panelControl/Quiniela/inicio",
+                "/panelControl/Quiniela/inicio",
                 "/panelControl/Quiniela/competiciones",
                 "/panelControl/Quiniela/cumplimentar",
                 "/panelControl/Quiniela/jornadaAdmin",
                 "/panelControl/Quiniela/historico",
                 "/panelControl/Quiniela/jornada",
-                "/panelControl/Quiniela/jornadasDisputadas"                
+                "/panelControl/Quiniela/jornadasDisputadas"
             })
     public String doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -181,10 +181,10 @@ public class PanelControlQuinielaHttpServlet {
 
     }
 
-    private void obtenerDatosApuestas(HttpServletRequest req, JornadaQuiniela jornada, EquipoQuiniela eq
-    ) throws DAOException {
+    private void obtenerDatosApuestas(HttpServletRequest req, JornadaQuiniela jornada, EquipoQuiniela eq) throws DAOException {
 
-        ArrayList<ApuestaQ> datosApuestas = new ArrayList();
+        ArrayList<ApuestaQ> datosApuestas = new ArrayList<>();
+        ArrayList<ResultadosApuestas> resultadosApuestas = new ArrayList<>();
 
         var equipos = listaEquiposQuiniela();
         var equiposGrupo = new ArrayList<EquipoQuiniela>();
@@ -193,10 +193,12 @@ public class PanelControlQuinielaHttpServlet {
                 equiposGrupo.add(e);
             }
         }
+
         var aciertosTotales = new Integer[15];
         for (var i = 0; i < 15; i++) {
             aciertosTotales[i] = 0;
         }
+
         Date actualizada = null;
 
         for (var eqg : equiposGrupo) {
@@ -204,8 +206,12 @@ public class PanelControlQuinielaHttpServlet {
             var ap1 = obtenerApuestas.get(0);
             var ap2 = obtenerApuestas.get(1);
 
-            for (var i = 0; i < 15; i++) {
+            int aciertosCol1 = 0;
+            int aciertosCol2 = 0;
+            int ptsCol1 = 0;
+            int ptsCol2 = 0;
 
+            for (var i = 0; i < 15; i++) {
                 var ap = new ApuestaQ();
 
                 ap.setNumero(valueOf(i + 1));
@@ -217,9 +223,11 @@ public class PanelControlQuinielaHttpServlet {
 
                 if (ap1.getResultado()[i] != null && ap1.getResultado()[i].equals(ap.getResultado())) {
                     aciertosTotales[i]++;
+                    aciertosCol1++;
                 }
                 if (ap2.getResultado()[i] != null && ap2.getResultado()[i].equals(ap.getResultado())) {
                     aciertosTotales[i]++;
+                    aciertosCol2++;
                 }
 
                 if (eq.equals(eqg)) {
@@ -228,12 +236,33 @@ public class PanelControlQuinielaHttpServlet {
                         actualizada = ap1.getActualizada();
                     }
                 }
-
             }
+
+            // Calcular puntos sumando el total de puntos por columna
+            var ptsPartido = jornada.getPuntos();
+            for (var i = 0; i < 15; i++) {
+                if (ap1.getResultado()[i] != null && ap1.getResultado()[i].equals(jornada.getResultado()[i])) {
+                    ptsCol1 += (aciertosTotales[i] != 0) ? (ptsPartido / aciertosTotales[i]) : 0;
+                }
+                if (ap2.getResultado()[i] != null && ap2.getResultado()[i].equals(jornada.getResultado()[i])) {
+                    ptsCol2 += (aciertosTotales[i] != 0) ? (ptsPartido / aciertosTotales[i]) : 0;
+                }
+            }
+
+            // Crear y agregar el objeto ResultadosApuestas
+            ResultadosApuestas res = new ResultadosApuestas();
+            res.setEquipo(eqg);
+            res.setAciertosCol1(String.valueOf(aciertosCol1));
+            res.setAciertosCol2(String.valueOf(aciertosCol2));
+            res.setPtsCol1(ptsCol1);
+            res.setPtsCol2(ptsCol2);
+
+            resultadosApuestas.add(res);
         }
+
+        // Asignar puntos a datosApuestas
         var ptsPartido = jornada.getPuntos();
         for (var i = 0; i < 15; i++) {
-
             var ap = datosApuestas.get(i);
 
             if (ap.getColumna1() != null && ap.getColumna1().equals(ap.getResultado())) {
@@ -242,12 +271,11 @@ public class PanelControlQuinielaHttpServlet {
             if (ap.getColumna2() != null && ap.getColumna2().equals(ap.getResultado())) {
                 ap.setPtsCol2(ptsPartido / aciertosTotales[i]);
             }
-
         }
 
         req.setAttribute("apuestas", datosApuestas);
+        req.setAttribute("resultadosApuestas", resultadosApuestas);
         req.setAttribute("actualizada", actualizada);
-
     }
 
     private void obtenerApuestas(HttpServletRequest req, JornadaQuiniela jornada,
@@ -257,7 +285,7 @@ public class PanelControlQuinielaHttpServlet {
         ArrayList<String> apuestas = null;
 
         if (isTemporal) {
-            apuestas = obtenerApuestasTemporalGrupo(req, jornada, apuesta1.getEquipo());
+            apuestas = obtenerApuestasTemporalGrupo_obsoleto(req, jornada, apuesta1.getEquipo());
         }
 
         var col1 = 0;
@@ -293,7 +321,7 @@ public class PanelControlQuinielaHttpServlet {
 
     }
 
-    private ArrayList<String> obtenerApuestasTemporalGrupo(HttpServletRequest req,
+    private ArrayList<String> obtenerApuestasTemporalGrupo_obsoleto(HttpServletRequest req,
             JornadaQuiniela jornada, EquipoQuiniela eq) throws DAOException {
 
         ArrayList<String> apuestas = null;

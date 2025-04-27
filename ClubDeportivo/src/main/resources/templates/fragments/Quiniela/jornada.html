@@ -37,21 +37,27 @@
             </div>
 
             <!-- Resultados temporales -->
-            <div th:if="${resultadosTemp != null}">
+            <div th:if="${resultadosApuestas != null}">
                 <table class="tabla">
                     <thead>
                         <tr>
-                            <th colspan="2">Resultados Provisionales</th>
+                            <th>Equipo</th>
+                            <th>Aciertos Col1</th>
+                            <th>Aciertos Col2</th>
+                            <th>Puntos Col1</th>
+                            <th>Puntos Col2</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="eqQ : ${resultadosTemp}">
-                            <td th:text="${eqQ.nombre}">Equipo</td>
-                            <td th:text="${eqQ.resultadoProvisional}">Resultado</td>
+                        <tr th:each="result : ${resultadosApuestas}">
+                            <td th:text="${result.equipo.nombre}">Equipo</td>
+                            <td th:text="${result.aciertosCol1}">Aciertos Col1</td>
+                            <td th:text="${result.aciertosCol2}">Aciertos Col2</td>
+                            <td th:text="${result.ptsCol1}">Pts Col1</td>
+                            <td th:text="${result.ptsCol2}">Pts Col2</td>
                         </tr>
                     </tbody>
                 </table>
-                <p>Estos resultados incluyen posibles puntos extras</p>
             </div>
 
             <br/>

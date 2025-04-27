@@ -292,7 +292,8 @@ public class UtilesQuiniela {
         }
         
         var numJor = parseInt(numJornada.trim());
-        var ptsJor = parseInt(ptsJornada.trim());
+        //var ptsJor = parseInt(ptsJornada.trim());
+        int ptsJor = eqs.size() * 150; // MLD puntuacion
         var jorQuini = obtenerJornadaPorNumero(comp, numJor);
         
         if (jorQuini != null)
