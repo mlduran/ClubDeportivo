@@ -104,7 +104,7 @@ public class PanelControlQuinielaHttpServlet {
 
             req.setAttribute("esAdmin", eq.isAdmin());
 
-            obtenerListaEquipos(req, eq.getClub().getGrupo());
+            int numEquipos = obtenerListaEquipos(req, eq.getClub().getGrupo()).size();
 
             var path = req.getRequestURI();
             String accion = path.substring(path.lastIndexOf("/") + 1);
@@ -126,7 +126,7 @@ public class PanelControlQuinielaHttpServlet {
             } else if (accion.equals("historico")) {
                 verHistorico(req);
             } else if (accion.equals("jornadaAdmin") && eq.isAdmin()) {
-                cumplimentarAdmin(req, eq);
+                cumplimentarAdmin(req, eq, numEquipos);
             }
 
         } catch (Exception ex) {
@@ -166,7 +166,7 @@ public class PanelControlQuinielaHttpServlet {
 
     }
 
-    private void obtenerListaEquipos(HttpServletRequest req, Grupo grp)
+    private List obtenerListaEquipos(HttpServletRequest req, Grupo grp)
             throws DAOException {
 
         var equipos = listaEquiposQuiniela();
@@ -178,6 +178,8 @@ public class PanelControlQuinielaHttpServlet {
         }
 
         req.setAttribute("equiposGrupo", equiposGrupo);
+        
+        return equiposGrupo;
 
     }
 
@@ -673,7 +675,7 @@ public class PanelControlQuinielaHttpServlet {
 
     }
 
-    private void cumplimentarAdmin(HttpServletRequest req, EquipoQuiniela eq)
+    private void cumplimentarAdmin(HttpServletRequest req, EquipoQuiniela eq, int numEquipos)
             throws DAOException, IllegalArgumentException {
 
         req.setAttribute("op", "cumplimentarAdmin");
@@ -788,6 +790,10 @@ public class PanelControlQuinielaHttpServlet {
         req.setAttribute("numJornada", numJornada);
         req.setAttribute("jornadaActiva", jornada != null);
         req.setAttribute("resultadosCompletos", resultadosCompletos);
+        if (jornada != null)
+            req.setAttribute("puntosJornada", jornada.getPuntos());
+        else
+            req.setAttribute("puntosJornada", numEquipos * 15 * 10);
 
     }
 
@@ -811,6 +817,10 @@ public class PanelControlQuinielaHttpServlet {
         }
 
         var jornada = obtenerProximaJornada(comp);
+        if (jornada == null) {
+            return;
+        }
+        
 
         if (jornada.isValidada()) {
             throw new UnsupportedOperationException("No hay ninguna jornada pendiente");

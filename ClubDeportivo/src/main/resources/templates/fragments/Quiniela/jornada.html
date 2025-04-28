@@ -6,6 +6,11 @@
         <br/><br/>
     </div>
 
+    <div th:if="${jornada == null}">
+        <br/>
+        <b>NO HAY NINGUNA JORNADA ACTIVA EN ESTE MOMENTO</b>
+        <br/><br/>
+    </div>
     <!-- Si existe una jornada -->
     <div th:if="${jornada != null}">
         <form th:action="@{/panelControl/Quiniela/jornada}" method="post">

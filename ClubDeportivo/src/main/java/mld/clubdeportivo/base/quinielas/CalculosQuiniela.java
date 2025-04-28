@@ -136,10 +136,10 @@ public class CalculosQuiniela {
 
             var puntosNuevos = 0;
             switch (posReal) {
-                case 1 -> puntosNuevos = ptsPorPartido * 4;
-                case 2 -> puntosNuevos = ptsPorPartido * 2;
-                case 3 -> puntosNuevos = ptsPorPartido * 1;
-                case 4 -> puntosNuevos = (int) (ptsPorPartido * 0.5);
+                case 1 -> puntosNuevos = ptsPorPartido;
+                case 2 -> puntosNuevos = (int) ptsPorPartido / 2;
+                case 3 -> puntosNuevos = (int) ptsPorPartido / 4;
+                case 4 -> puntosNuevos = (int) ptsPorPartido / 8;
                 default -> {
                 }
             }
@@ -159,8 +159,8 @@ public class CalculosQuiniela {
                     eq.getPuntuaciones().get(0).setVictorias(victoriasActuales + 1);
                 
                 eq.getEstadisiticas().get(0).setPuntos(puntosNuevos);
-                eq.getEstadisiticas().get(0).setAciertos(valueOf(puntCol) +
-                        " - " + valueOf(puntCol2));
+                eq.getEstadisiticas().get(0).setAciertos(aciertos1.get(eq) +
+                        " - " + valueOf(aciertos2.get(eq)));
                 eq.getEstadisiticas().get(0).setPosicion(posReal);
             }
             else{

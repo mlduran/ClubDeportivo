@@ -6,12 +6,7 @@
 package mld.clubdeportivo.base.quinielas;
 
 import static java.lang.Integer.parseInt;
-import static java.lang.Integer.parseInt;
-import static java.lang.Integer.parseInt;
-import static java.lang.Integer.parseInt;
 import java.util.ArrayList;
-import java.util.Collections;
-import static java.util.Collections.sort;
 import static java.util.Collections.sort;
 import java.util.Comparator;
 import mld.clubdeportivo.base.Estadistica;

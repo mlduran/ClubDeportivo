@@ -10,8 +10,6 @@ import mld.clubdeportivo.base.Jornada;
  */
 public class JornadaQuiniela extends Jornada{
 
- 
-
     private String[] partido;
     private String[] resultado; // 1 X 2
     private int puntos;

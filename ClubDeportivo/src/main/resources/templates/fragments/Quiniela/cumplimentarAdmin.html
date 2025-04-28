@@ -36,9 +36,12 @@
                 </tr>
                 <tr align="center">
                     <td>PUNTOS GANADOR</td>
-                    <td>
+                    <td th:if="${jornadaActiva}">
                         <input type="text" th:value="${puntosJornada}" size="2" disabled />
                     </td>
+                    <td th:if="${not jornadaActiva}">
+                        <input type="text" th:name="puntosJornada" th:value="${puntosJornada}" size="2"/>
+                    </td>                    
                 </tr>
             </table>
 
