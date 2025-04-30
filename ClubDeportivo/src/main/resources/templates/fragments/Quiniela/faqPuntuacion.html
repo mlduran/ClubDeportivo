@@ -8,32 +8,31 @@
         </tr>
         <tr>
             <td>
-                Cada Jugador obtiene los puntos de la columna con mayor número de aciertos.
+                Cada jugador obtiene los puntos de la columna con mayor número de aciertos. Puede darse el caso de que la columna con más aciertos 
+                tenga menos puntos que otra con menor número de aciertos.
             </td>
         </tr>
         <tr>
             <td>
-                Los puntos para cada partido se obtienen de la formula Numero_Equipos * 2 * 10. Los puntos se reparten entre todos los acertantes.
-            </td>
-        </tr>
-        
-        <tr>
-            <td>
-                A la puntuación anterior hay que sumar los puntos para la jornada y que se informarán en la creacion de la jornada. 
-                Por defecto, los que se obtienen de la formula Numero_Equipos * 150 y que se informaran en la creacion de la jornada, 
-                pero pueden variar si el administrador lo decide<br/>
-                Puntos para el puesto 1: Los puntos informados en la creación de la jornada<br/>
-                Puntos para el puesto 2: La mitad del primero<br/>
-                Puntos para el puesto 3: La mitad del segundo<br/>
-                Puntos para el puesto 4: La mitad del tercero<br/>
+                Los puntos para cada partido se obtienen con la fórmula: Número_Equipos * 2 * 10. Estos puntos se reparten entre todos los acertantes.
             </td>
         </tr>
         <tr>
             <td>
-                Nota: Para determinar el puesto, si hay empate en los aciertos de la 
-                primera columna, se desempatará con la otra columna. En el caso de persistir 
-                el empate entre uno o varios jugadores se asignará el número
-                de puntos de esa posición para todos ellos.
+                A la puntuación anterior hay que sumar los puntos correspondientes a la jornada, los cuales se indicarán al momento de crearla. 
+                Por defecto, estos puntos se calculan con la fórmula: Número_Equipos * 150. Sin embargo, pueden variar si el administrador así lo decide.<br/>
+                <strong>Puntos por puesto:</strong><br/>
+                Puesto 1: los puntos indicados en la creación de la jornada<br/>
+                Puesto 2: la mitad del primero<br/>
+                Puesto 3: la mitad del segundo<br/>
+                Puesto 4: la mitad del tercero
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong>Nota:</strong> Para determinar el puesto, se consideran los aciertos (no los puntos). Si hay empate en los aciertos de la primera columna, 
+                se desempatará usando la segunda columna. Si el empate persiste entre uno o varios jugadores, se asignará a todos ellos 
+                la puntuación correspondiente a esa posición.
             </td>
         </tr>
     </table>

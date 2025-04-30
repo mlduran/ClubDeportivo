@@ -101,6 +101,8 @@ public class PanelControlQuinielaHttpServlet {
 
             long id = (Long) req.getSession().getAttribute("idEquipo");
             var eq = obtenerSimpleEquipoQuiniela(id);
+            
+            req.setAttribute("nombreGrupo", eq.getClub().getGrupo().getNombre());
 
             req.setAttribute("esAdmin", eq.isAdmin());
 
@@ -178,7 +180,7 @@ public class PanelControlQuinielaHttpServlet {
         }
 
         req.setAttribute("equiposGrupo", equiposGrupo);
-        
+
         return equiposGrupo;
 
     }
@@ -200,6 +202,21 @@ public class PanelControlQuinielaHttpServlet {
         for (var i = 0; i < 15; i++) {
             aciertosTotales[i] = 0;
         }
+        
+        // primero obtenemos losaciertos totales para cada partido
+        for (var eqg : equiposGrupo) {
+            var obtenerApuestas = JDBCDAOQuiniela.obtenerApuestas(eqg, jornada);
+            var ap1 = obtenerApuestas.get(0);
+            var ap2 = obtenerApuestas.get(1);          
+            for (var i = 0; i < 15; i++) {
+                if (ap1.getResultado()[i] != null && ap1.getResultado()[i].equals(jornada.getResultado()[i])) {
+                    aciertosTotales[i]++;
+                }
+                if (ap2.getResultado()[i] != null && ap2.getResultado()[i].equals(jornada.getResultado()[i])) {
+                    aciertosTotales[i]++;
+                }
+            }
+        }
 
         Date actualizada = null;
 
@@ -213,6 +230,7 @@ public class PanelControlQuinielaHttpServlet {
             int ptsCol1 = 0;
             int ptsCol2 = 0;
 
+            var ptsPartido = equiposGrupo.size() * 2 * 10;
             for (var i = 0; i < 15; i++) {
                 var ap = new ApuestaQ();
 
@@ -224,11 +242,9 @@ public class PanelControlQuinielaHttpServlet {
                 ap.setResultado(jornada.getResultado()[i]);
 
                 if (ap1.getResultado()[i] != null && ap1.getResultado()[i].equals(ap.getResultado())) {
-                    aciertosTotales[i]++;
                     aciertosCol1++;
                 }
                 if (ap2.getResultado()[i] != null && ap2.getResultado()[i].equals(ap.getResultado())) {
-                    aciertosTotales[i]++;
                     aciertosCol2++;
                 }
 
@@ -238,20 +254,18 @@ public class PanelControlQuinielaHttpServlet {
                         actualizada = ap1.getActualizada();
                     }
                 }
-            }
 
-            // Calcular puntos sumando el total de puntos por columna
-            var ptsPartido = jornada.getPuntos();
-            for (var i = 0; i < 15; i++) {
-                if (ap1.getResultado()[i] != null && ap1.getResultado()[i].equals(jornada.getResultado()[i])) {
-                    ptsCol1 += (aciertosTotales[i] != 0) ? (ptsPartido / aciertosTotales[i]) : 0;
+                if (ap.getColumna1() != null && ap.getColumna1().equals(ap.getResultado())) {
+                    ptsCol1 = ptsCol1 + (ptsPartido / aciertosTotales[i]);
+                    ap.setPtsCol1(ptsPartido / aciertosTotales[i]);
                 }
-                if (ap2.getResultado()[i] != null && ap2.getResultado()[i].equals(jornada.getResultado()[i])) {
-                    ptsCol2 += (aciertosTotales[i] != 0) ? (ptsPartido / aciertosTotales[i]) : 0;
+                if (ap.getColumna2() != null && ap.getColumna2().equals(ap.getResultado())) {
+                    ap.setPtsCol2(ptsPartido / aciertosTotales[i]);
+                    ptsCol2 = ptsCol2 + (ptsPartido / aciertosTotales[i]);
                 }
-            }
+            }        
 
-            // Crear y agregar el objeto ResultadosApuestas
+            // Crear y agregar el objeto ResultadosApuestas            
             ResultadosApuestas res = new ResultadosApuestas();
             res.setEquipo(eqg);
             res.setAciertosCol1(String.valueOf(aciertosCol1));
@@ -260,19 +274,7 @@ public class PanelControlQuinielaHttpServlet {
             res.setPtsCol2(ptsCol2);
 
             resultadosApuestas.add(res);
-        }
 
-        // Asignar puntos a datosApuestas
-        var ptsPartido = jornada.getPuntos();
-        for (var i = 0; i < 15; i++) {
-            var ap = datosApuestas.get(i);
-
-            if (ap.getColumna1() != null && ap.getColumna1().equals(ap.getResultado())) {
-                ap.setPtsCol1(ptsPartido / aciertosTotales[i]);
-            }
-            if (ap.getColumna2() != null && ap.getColumna2().equals(ap.getResultado())) {
-                ap.setPtsCol2(ptsPartido / aciertosTotales[i]);
-            }
         }
 
         req.setAttribute("apuestas", datosApuestas);
@@ -790,10 +792,11 @@ public class PanelControlQuinielaHttpServlet {
         req.setAttribute("numJornada", numJornada);
         req.setAttribute("jornadaActiva", jornada != null);
         req.setAttribute("resultadosCompletos", resultadosCompletos);
-        if (jornada != null)
+        if (jornada != null) {
             req.setAttribute("puntosJornada", jornada.getPuntos());
-        else
+        } else {
             req.setAttribute("puntosJornada", numEquipos * 15 * 10);
+        }
 
     }
 
@@ -820,7 +823,6 @@ public class PanelControlQuinielaHttpServlet {
         if (jornada == null) {
             return;
         }
-        
 
         if (jornada.isValidada()) {
             throw new UnsupportedOperationException("No hay ninguna jornada pendiente");
