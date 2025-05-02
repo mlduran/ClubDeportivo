@@ -203,7 +203,7 @@ public class PanelControlQuinielaHttpServlet {
             aciertosTotales[i] = 0;
         }
         
-        // primero obtenemos losaciertos totales para cada partido
+        // primero obtenemos los aciertos totales para cada partido
         for (var eqg : equiposGrupo) {
             var obtenerApuestas = JDBCDAOQuiniela.obtenerApuestas(eqg, jornada);
             var ap1 = obtenerApuestas.get(0);
@@ -246,14 +246,7 @@ public class PanelControlQuinielaHttpServlet {
                 }
                 if (ap2.getResultado()[i] != null && ap2.getResultado()[i].equals(ap.getResultado())) {
                     aciertosCol2++;
-                }
-
-                if (eq.equals(eqg)) {
-                    datosApuestas.add(ap);
-                    if (actualizada == null) {
-                        actualizada = ap1.getActualizada();
-                    }
-                }
+                }                
 
                 if (ap.getColumna1() != null && ap.getColumna1().equals(ap.getResultado())) {
                     ptsCol1 = ptsCol1 + (ptsPartido / aciertosTotales[i]);
@@ -262,6 +255,13 @@ public class PanelControlQuinielaHttpServlet {
                 if (ap.getColumna2() != null && ap.getColumna2().equals(ap.getResultado())) {
                     ap.setPtsCol2(ptsPartido / aciertosTotales[i]);
                     ptsCol2 = ptsCol2 + (ptsPartido / aciertosTotales[i]);
+                }
+                
+                if (eq.equals(eqg)) {
+                    datosApuestas.add(ap);
+                    if (actualizada == null) {
+                        actualizada = ap1.getActualizada();
+                    }
                 }
             }        
 
@@ -303,6 +303,8 @@ public class PanelControlQuinielaHttpServlet {
             ap.setPartido(jornada.getPartido()[i]);
             ap.setColumna1(apuesta1.getResultado()[i]);
             ap.setColumna2(apuesta2.getResultado()[i]);
+            ap.setPtsCol1(apuesta1.getPuntos()[i]);
+            ap.setPtsCol2(apuesta2.getPuntos()[i]);
             if (!isTemporal) {
                 ap.setResultado(jornada.getResultado()[i]);
             } else {

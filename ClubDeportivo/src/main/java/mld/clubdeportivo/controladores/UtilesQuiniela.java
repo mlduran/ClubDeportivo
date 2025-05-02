@@ -214,6 +214,7 @@ public class UtilesQuiniela {
             eq.setApuestas(apuestas);
             for (var apuesta : apuestas) {
                 apuesta.setEquipo(eq);
+                apuesta.setJornada(jornada);
             }
             
             ArrayList<PuntuacionQuiniela> puntos = new ArrayList();
@@ -500,6 +501,7 @@ public class UtilesQuiniela {
         
         var daopunt = new PuntuacionQuinielaDAO();
         var daoest= new EstadisticaQuinielaDAO();
+        var daoap= new ApuestaQuinielaDAO();
         var daocomp = new CompeticionQuinielaDAO();
         var comp = competicionActiva();
         if (comp == null)
@@ -531,6 +533,9 @@ public class UtilesQuiniela {
         for (var eq : eqs) {
             daopunt.save(eq.getPuntuaciones().get(0));
             daoest.save(eq.getEstadisiticas().get(0));
+            daoap.save(eq.getApuestas().get(0));
+            daoap.save(eq.getApuestas().get(1));
+            
             grabarClub(eq.getClub());
         }
         

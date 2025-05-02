@@ -13,6 +13,7 @@ public class ApuestaQuiniela extends Objeto {
     private EquipoQuiniela equipo;
     private JornadaQuiniela jornada;
     private String[] resultado; // 1 X 2
+    private int[] puntos;
     private Date actualizada;
 
     public JornadaQuiniela getJornada() {
@@ -52,7 +53,22 @@ public class ApuestaQuiniela extends Objeto {
     public void setActualizada(Date actualizada) {
         this.actualizada = actualizada;
     }
+    
+    /**
+     * @return the puntoscol1
+     */
+    public int[] getPuntos() {
+        return puntos;
+    }
 
+    /**
+     * @param puntos the puntos to set
+     */
+    public void setPuntos(int[] puntos) {
+        this.puntos = puntos;
+    }
+
+ 
     public boolean isCumplentadaOK(){
         
         var ok = true;

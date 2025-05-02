@@ -47,7 +47,22 @@ public class ApuestaQuinielaDAO extends ObjetoDAO{
             "resultado13",
             "resultado14",
             "resultado15",
-            "actualizada"
+            "puntos1",
+            "puntos2",
+            "puntos3",
+            "puntos4",
+            "puntos5",
+            "puntos6",
+            "puntos7",
+            "puntos8",
+            "puntos9",
+            "puntos10",
+            "puntos11",
+            "puntos12",
+            "puntos13",
+            "puntos14",
+            "puntos15",           
+            "actualizada",
         };
         return campos;
         }
@@ -95,15 +110,21 @@ public class ApuestaQuinielaDAO extends ObjetoDAO{
             else
                 sql.setString(i, null);
         }
-
+        for (var i = 18; i < 33; i++){
+            if (objap.getPuntos()!= null)
+                sql.setInt(i, objap.getPuntos()[i-18]);
+            else
+                sql.setInt(i, 0);
+        }
+        
         if (objap.getActualizada() == null)
-            sql.setTimestamp(18, null);
+            sql.setTimestamp(33, null);
         else
-            sql.setTimestamp(18,
+            sql.setTimestamp(33,
                     new Timestamp(objap.getActualizada().getTime()));
-
+        
         // Si es un update asignamos el parametro del id
-        if (tipo == update) sql.setLong(19, objap.getId());
+        if (tipo == update) sql.setLong(34, objap.getId());
 
         return sql;
     }
@@ -119,13 +140,17 @@ public class ApuestaQuinielaDAO extends ObjetoDAO{
         obj.setId(retorno.getLong("id"));
         
         var resultado = new String[15];
-
         for (var i = 0; i < 15; i++){
             resultado[i] = retorno.getString("resultado" + (i + 1));
         }
-
         obj.setResultado(resultado);
-
+        
+        var puntos = new int[15];
+        for (var i = 0; i < 15; i++){
+            puntos[i] = retorno.getInt("puntos" + (i + 1));
+        }
+        obj.setPuntos(puntos);        
+     
         obj.setActualizada(retorno.getTimestamp("actualizada"));
 
         return obj;
