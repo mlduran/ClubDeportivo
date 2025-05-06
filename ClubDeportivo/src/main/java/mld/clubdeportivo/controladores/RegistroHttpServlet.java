@@ -2,37 +2,40 @@
 package mld.clubdeportivo.controladores;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import static java.lang.Integer.parseInt;
 import mld.clubdeportivo.bd.*;
 import static mld.clubdeportivo.bd.JDBCDAORegistro.obtenerRegistros;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 
 /**
  *
  * @author Miguel
  */
-public class RegistroHttpServlet extends HttpServlet {
+@Controller
+public class RegistroHttpServlet {
 
    
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+    @GetMapping("/registro")
+    public String doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        processRequest(req, resp);
+        return processRequest(req, resp);
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+    @PostMapping("/registro")
+    public String doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        processRequest(req, resp);
+        return processRequest(req, resp);
     }
 
-    private void processRequest(HttpServletRequest req, HttpServletResponse resp)
+    private String processRequest(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
         try {
@@ -48,8 +51,7 @@ public class RegistroHttpServlet extends HttpServlet {
              req.setAttribute("error", ex.getMessage());
         }
 
-        var view = req.getRequestDispatcher("/Utiles/registro.jsp");
-        view.forward(req, resp);
+        return "registro";
        
        
     }
