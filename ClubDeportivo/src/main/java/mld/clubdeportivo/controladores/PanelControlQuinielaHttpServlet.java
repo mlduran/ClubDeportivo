@@ -150,7 +150,7 @@ public class PanelControlQuinielaHttpServlet {
 
         var comp = competicionActiva();
         var pts
-                = clasificacionQuiniela(comp, true);
+                = clasificacionQuiniela(comp, false);
         var jornadas = jornadasDisputadas(comp);
 
         JornadaQuiniela ultimaJornada = null;

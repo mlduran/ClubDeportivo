@@ -4,13 +4,13 @@
  */
 package mld.clubdeportivo.base.quinielas;
 
-import static java.lang.String.valueOf;
+
 import static java.lang.String.valueOf;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class CalculosQuiniela {
 
     public static void calculoResultadosQuiniela(
-            ArrayList<EquipoQuiniela> eqs, String[] resultados, boolean isGeneral, int ptsJornada) {
+            ArrayList<EquipoQuiniela> eqs, String[] resultados, int ptsJornada) {
 
         var aciertosTotales = new Integer[15];
         for (var i = 0; i < 15; i++) {
@@ -64,7 +64,7 @@ public class CalculosQuiniela {
                     puntoscol1[i] = ptsPartido / aciertosTotales[i];
                 }
                 if (ap2.getResultado()[i] != null && ap2.getResultado()[i].equals(resultados[i])) {
-                    aciertosCol2++;                     
+                    aciertosCol2++;
                     ptsCol2 = ptsCol2 + (ptsPartido / aciertosTotales[i]);
                     puntoscol2[i] = ptsPartido / aciertosTotales[i];
                 }
@@ -113,11 +113,15 @@ public class CalculosQuiniela {
             ResultadosApuestas base = resulOrdenado.get(indice);
             int ac1 = base.getAciertos1();
             int ac2 = base.getAciertos2();
-            Set<Integer> baseSet = Set.of(ac1, ac2);
+            List<Integer> baseList = Stream.of(ac1, ac2).sorted().collect(Collectors.toList());
 
-            // Encontrar todos los que tienen la misma combinación de aciertos (sin importar el orden)
             List<ResultadosApuestas> mismos = resulOrdenado.stream()
-                    .filter(r -> Set.of(r.getAciertos1(), r.getAciertos2()).equals(baseSet))
+                    .filter(r -> {
+                        List<Integer> otros = Stream.of(r.getAciertos1(), r.getAciertos2())
+                                .sorted()
+                                .collect(Collectors.toList());
+                        return otros.equals(baseList);
+                    })
                     .collect(Collectors.toList());
 
             for (ResultadosApuestas r : mismos) {
@@ -145,7 +149,7 @@ public class CalculosQuiniela {
             }
             puntosNuevos = puntosNuevos + ResultadosApuestas.getPtsJornada();
 
-            eq.getPuntuaciones().get(0).setPuntos(puntosActuales + puntosNuevos);            
+            eq.getPuntuaciones().get(0).setPuntos(puntosActuales + puntosNuevos);
 
             var victoriasActuales
                     = eq.getPuntuaciones().get(0).getVictorias();
@@ -156,7 +160,7 @@ public class CalculosQuiniela {
             eq.getEstadisiticas().get(0).setAciertos(ResultadosApuestas.getAciertosCol1()
                     + " - " + ResultadosApuestas.getAciertosCol2());
             eq.getEstadisiticas().get(0).setPosicion(ResultadosApuestas.getPosicionReal());
-            
+
         }
 
     }

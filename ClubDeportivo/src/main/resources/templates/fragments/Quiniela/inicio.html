@@ -19,8 +19,8 @@
             <tr th:each="obj, cuenta : ${clasificacion}">
                 <td align="center" th:text="${cuenta.count}">1</td>
                 <td th:text="${obj.nombreEquipo}">Equipo</td>
-                <td align="right" th:text="${obj.puntosGeneral}">0</td>
-                <td align="right" th:text="${obj.victoriasGeneral}">0</td>
+                <td align="right" th:text="${obj.puntos}">0</td>
+                <td align="right" th:text="${obj.victorias}">0</td>
             </tr>
         </table>
 

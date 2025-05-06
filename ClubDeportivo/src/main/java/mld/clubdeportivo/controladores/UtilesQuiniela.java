@@ -522,13 +522,9 @@ public class UtilesQuiniela {
             if (listaEqs.get(grp) == null )
                 listaEqs.put(grp, new ArrayList<>());
             listaEqs.get(grp).add(eq);
-        }
-        for (Map.Entry e : listaEqs.entrySet()) {
-            var eqsGrp = (ArrayList<EquipoQuiniela>) e.getValue();
-            calculoResultadosQuiniela(eqsGrp, resultados, false, jornada.getPuntos());
-        }
+        }       
         
-        calculoResultadosQuiniela(eqs, resultados, true, jornada.getPuntos());
+        calculoResultadosQuiniela(eqs, resultados, jornada.getPuntos());
         
         for (var eq : eqs) {
             daopunt.save(eq.getPuntuaciones().get(0));
@@ -583,10 +579,10 @@ public class UtilesQuiniela {
         }
         for (Map.Entry e : listaEqs.entrySet()) {
             var eqsGrp = (ArrayList<EquipoQuiniela>) e.getValue();
-            calculoResultadosQuiniela(eqsGrp, resultados, false, jornada.getPuntos());
+            //calculoResultadosQuiniela(eqsGrp, resultados, false, jornada.getPuntos());
         }
         
-        calculoResultadosQuiniela(eqs, resultados, true, jornada.getPuntos());
+        //calculoResultadosQuiniela(eqs, resultados, true, jornada.getPuntos());
         
         for (var eq : eqs) {
             daopunt.save(eq.getPuntuaciones().get(0));
