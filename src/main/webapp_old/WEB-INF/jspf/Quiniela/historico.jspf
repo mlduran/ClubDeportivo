@@ -1,0 +1,33 @@
+<%@ page pageEncoding="UTF-8" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml"%>
+<%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+    
+<c:set var="root" value="${pageContext.servletContext.contextPath}"/>
+    
+    
+<form action="${root}/panelControl/Quiniela/historico" method="post">
+    
+    <table class="tabla" width="100%">
+        <tr>
+            <th width="40%">Nombre</th>
+            <th width="30%">Campeon</th>
+            <th width="30%">Subcampeon</th>
+        </tr>                        
+            
+        <c:forEach var="comp" items="${competiciones}">
+            <tr>
+                <td>${comp.nombre}</td>
+                <td align="center">${comp.campeon}</td>
+                <td align="center">${comp.subcampeon}</td>
+            </tr>
+                
+        </c:forEach>                            
+    </table>
+   
+    
+    
+    
+</form>

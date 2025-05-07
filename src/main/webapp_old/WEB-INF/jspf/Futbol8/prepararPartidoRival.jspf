@@ -1,0 +1,77 @@
+<%-- any content can be specified here e.g.: --%>
+<%@ page pageEncoding="UTF-8" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml"%>
+<%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<c:set var="root" value="${pageContext.servletContext.contextPath}"/>
+<c:set var="idclub" value="${sessionScope.idClub}"/>
+<c:set var="deporte" value="${sessionScope.deporte}"/>
+<c:set var="idequipo" value="${sessionScope.idEquipo}"/>
+
+<form action="${root}/panelControl/Futbol8/prepararPartido?panel=eqRival" name="prepararPartido"  method="post">
+     
+    <c:if test="${equipoSimul != null}">
+    
+    <table class="tabladatos" id="eqsimulado">
+
+        <tr>
+            <th class="titulo2" colspan="3">${equipoSimul.nombre}</th>
+        </tr>
+
+        <tr>
+            <td>
+                ESFUERZO: 
+                <c:forEach var="tipo" items="${equipoSimul.tiposEsfuerzo}">
+                    <c:if test="${esfuerzoSimul == tipo}">
+                        <input type="radio" name="esfuerzoSimul" value="${tipo}" checked>${tipo}
+                    </c:if>
+                    <c:if test="${esfuerzoSimul != tipo}">
+                        <input type="radio" name="esfuerzoSimul" value="${tipo}">${tipo}
+                    </c:if>
+                </c:forEach>
+            </td>
+            <td>
+                ESTRATEGIA:
+                <select class="txtNum" name="estrategiaSimul" size="1">
+                     <c:forEach var="tipo" items="${equipoSimul.tiposEstrategia}">
+                         <c:if test="${estrategiaSimul == tipo}">
+                             <option selected>${tipo}</option>
+                         </c:if>
+                         <c:if test="${estrategiaSimul != tipo}">
+                             <option>${tipo}</option>
+                         </c:if>
+                </c:forEach>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>PRIMAS: ${primasSimul}</td>
+            <td>DAR PRIMA:<INPUT class="txtNum" type="text" name="primasSimul" maxlength="10" size="10" value="0"></td>
+        </tr>
+        
+        <tr>
+            <td>Moral: ${equipoSimul.moral}</td>
+            <td>
+                <input type="submit" value="Grabar Simulacion" id ="operacionGrabar1" name="operacion" onclick="obtenerAlineacion(true)"/>
+                <a href="${root}/ayuda?grupo=Futbol8&codigo=alineacionrival" target="_blank"><img src="${root}/images/ayuda.gif"></a> 
+            </td>
+        </tr>
+
+        <tr>
+            <c:import url="/WEB-INF/jspf/Futbol8/posicionar.jspf"/>
+        </tr>
+        <tr>
+             <c:import url="/WEB-INF/jspf/Futbol8/alineacion.jspf"/>
+        </tr>
+    </table>
+    <input type="submit" value="Grabar Simulacion" id ="operacionGrabar2" name="operacion" onclick="obtenerAlineacion(true)"/>
+    </c:if>
+
+    <input type="hidden" id ="alineacion" name="alineacion" value="${alineacionTxt}" />    
+
+</form>
+
+

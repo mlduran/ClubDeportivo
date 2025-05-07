@@ -1,0 +1,56 @@
+<%-- any content can be specified here e.g.: --%>
+<%@ page pageEncoding="UTF-8" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml"%>
+<%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<c:set var="root" value="${pageContext.servletContext.contextPath}"/>
+<c:set var="club" value="${requestScope.club}"/>
+
+
+<table class="tabladatos" width="100%">
+    
+    <c:if test="${numero != null}">
+        <tr>
+            <th></th>
+            <th></th>
+            <td>
+                <form action="${root}/panelControl/Futbol8/comentarios" method="post">
+                    NUMERO DE COMENTARIOS                    
+                    <input class="txtNum" type="text" name="numero" value="${numero}" size="3"/>
+                    <input type="submit" value="Ejecutar"  />
+                </form>
+            </td>                
+        <tr>
+    </c:if>
+
+    <c:forEach var="coment" items="${comentarios}">
+        <tr>
+            <td align="left" width="15%"><fmt:formatDate value="${coment.fecha}"
+                            type="both" timeStyle="short" dateStyle="short" /></td>
+            <td align="left" width="25%">${coment.club}</td>
+            <td align="left" width="60%">${coment.comentario}</td>
+        </tr>
+    </c:forEach>
+
+</table>
+
+<form method="POST" action="${root}${path}">
+    <table class="tablaTitulo" cellpadding="3">
+        <tr align="left">
+            <td><label for="coment" accesskey="i">Comentar:</label></td>
+            <td>
+                <input type="text" name="comentario" id="comentario" title="Introduce tu comentario (max 255 caracteres)" maxlength="255" style="width: 500px"/>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <input type="submit" id="bSubmit" name="bSubmit" value="Enviar" accesskey="E"/>
+            </td>
+        </tr>
+    </table>
+
+
+</form>

@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title th:text="${@environment.getProperty('tituloapp')}">Título</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/general.css}">
+</head>
+
+<body>
+
+<table class="tabla">
+    <tr>
+        <th>HA OCURRIDO UN ERROR EN LA APLICACION</th>
+    </tr>
+    <tr>
+        <td>
+            Error: <br/> <span th:text="${error}">Mensaje de error</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Pila: <br/> <pre th:text="${errorDes}">Detalle de la pila</pre>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>
+

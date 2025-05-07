@@ -1,0 +1,40 @@
+<th:block th:fragment="tablaQuinielaAdmin">
+    <table class="tabla">
+        <thead>
+            <tr>
+                <th>Num</th>
+                <th>Partido</th>
+                <th align="center" colspan="1">
+                    <img alt="" th:src="@{/images/1.jpg}" />
+                    <img alt="" th:src="@{/images/X.jpg}" />
+                    <img alt="" th:src="@{/images/2.jpg}" />
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="apuesta, cuenta : ${datos}">
+                <td th:text="${apuesta.numero}"></td>
+                <td>
+                    <input type="text"
+                           th:name="'partido' + ${apuesta.numero}"
+                           th:value="${apuesta.partido}"
+                           size="40" />
+                </td>
+                <td align="center" colspan="1">
+                    <input type="radio"
+                           th:name="'resultado' + ${cuenta.count}"
+                           value="1"
+                           th:checked="${apuesta.col1}" />
+                    <input type="radio"
+                           th:name="'resultado' + ${cuenta.count}"
+                           value="X"
+                           th:checked="${apuesta.colX}" />
+                    <input type="radio"
+                           th:name="'resultado' + ${cuenta.count}"
+                           value="2"
+                           th:checked="${apuesta.col2}" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</th:block>

@@ -1,0 +1,376 @@
+﻿+%presentacion%FUTBOL8
+
+Futbol8 es un manager de Futbol en el que podrás gestionar un equipo desde la parte económica hasta la gestión de la plantilla y entrenador.
+Al realizar el alta del equipo, se te entrega una plantilla de 12 jugadores con un entrenador, un presupuesto de 20.000 Euros para iniciar tu gestión y un estadio para 100 personas, que podrás ir ampliando poco a poco. Las principales características de este juego son:
+
+Las ligas tienen un mínimo de 4 equipos y un máximo de 16.
+
+Los partidos de liga se disputan de lunes a sábado, siempre y cuando no haya competición de copa, en cuyo caso los miércoles y el sábado se destinarán a esa competición.
+
+Al final de la primera vuelta de la liga se crea la copa con los primeros clasificados, dependiendo del número de equipos que componen la competición.
+
+Los partidos de copa se disputan los miércoles y sábados, en la clasificación de las eliminatorias para llegar a la final, se suman los goles de ambos partidos, en caso de empate los goles fuera de casa valen doble y si persiste el empate, se disputa una tanda de penalties.
+
+Los partidos se disputan con alineaciones de 7 jugadores más el portero, por cada equipo.
+
+Tienes un simulador para preparar tu equipo en cada partido a disputar.
+
+Puedes cambiar el nombre de tus jugadores.
+
+
+
+*** 
+
+
++%entrenamiento%ENTRENAMIENTO
+
+Los jugadores de tu equipo aproximadamente van a bajar su valoración un media de 0.5 cada jornada (puede variar en función de su valoración, contra más alta más posibilidad de bajar), por ello, es importante que los entrenes, para mantener su nivel o bien incrementarlo. Solo se puede realizar un entrenamiento cada jornada y tienes la posibilidad de entrenar una posición en concreto o todas. Si se elige una posición, el número máximo de jugadores entrenables es de 6, si se supera esta cifra, se elegirán 6 jugadores aleatoriamente de esa posición.
+Para cada entreno, el cálculo de subida se realiza con la siguiente formula:
+
+((1100 – Valoración Actual) / 100) * Numero Técnicos
+ 
+Hay que decir que la valoración real de los jugadores va de 100 a 1000, aunque solo se muestran las 2 primeras cifras.
+La subida se aplicará a cada jugador, si se elige una posición, si se elige todas, la posibilidad de que cada jugador entrene es de 1 a 4.
+Hay que decir que cuando la valoración de un jugador sube por su entreno, baja en igual medida su estado físico, aun cuando este haya alcanzado su máximo de 100, es decir, entrenar jugadores que están a 100 o cerca de él, puede representar perder más puntos en estado físico que los ganados en su valoración.
+El resultado final del entreno viene reflejado en la tabla superior, en que las 2 primeras columnas son el estado antes de entrenar y las 2 últimas el estado final.
+Por supuesto los jugadores lesionados no pueden entrenar.
+
+
+***
+
++%plantilla%PLANTILLA
+
+En esta pantalla tienes la información de todos los jugadores de tu plantilla, y las operaciones que puedes hacer con ellos. Inicialmente, cuando creas el equipo se te asignan 12 jugadores: 2 porteros, 4 defensas, 4 centrocampistas y 2 delanteros con una valoración media por línea de 50. La plantilla puede tener un máximo de 16 jugadores. Para realizar cualquier operación, debes marcar la casilla de SEL (selección) del jugador o jugadores a los cuales aplicar y pulsar la operación.
+
+
+DESPEDIR
+
+Cuando un jugador ya no es útil en tu plantilla o bien tienes que dejar hueco para otro jugador, puedes despedirlo. Pero, cuidado esto no es gratis, para despedir un jugador tendrás que pagar un número aleatorio de las jornadas que le resten de contrato por su ficha.
+
+BLINDAR
+
+Cuando quieras que un jugador no pueda ser fichado por cualquier equipo, puedes blindarlo, el blindaje dura hasta la finalización del contrato, y el coste es del 4% del valor de la cláusula por el número de jornadas que resten de contrato. Para poder blindar necesitas tener la cantidad de presupuesto suficiente para pagar el coste.
+
+MEJORAR CONTRATO
+
+Cuando quieres retener a un jugador pero, no quieres pagar un blindaje, tienes la opción de mejorar el contrato del mismo para intentar evitar que el resto de equipos puedan comprártelo. Cada vez que mejores el contrato de un jugador, subirá un 10% su ficha y un 20% su cláusula. 
+
+RENOVAR
+
+Los jugadores tienen un contrato inicial de 40 jornadas, y cada jornada disputada su contrato disminuye en una jornada, antes de que llegue a 0, si no quieres perder tu jugador, tendrás que renovarlo. El coste de la renovación supondrá el 25% de la cláusula que el jugador tenga en ese momento. Tras la renovación, el jugador, subirá su ficha un número aleatorio entre 0 y la valoración que tenga y la cláusula subirá ese mismo número por 40. 
+Hay que tener en cuenta que si el jugador estaba blindado, en subasta o transferible, todo esto queda sin efecto al realizar la renovación.
+
+PONER TRANSFERIBLE
+
+Es la primera forma de vender un jugador, poniéndolo transferible, haces que el equipo que quiera comprar tu jugador, no page ninguna cantidad en concepto de intermediarios, por lo que el precio se limita únicamente a la cláusula, que será la cantidad que percibas por la venta. En caso de tener blindado el jugador, el blindaje se elimina. 
+Ten en cuenta que la única manera de deshacer la operación de poner transferible al jugador es blindarlo.
+
+
+SUBASTAR
+
+Es la segunda forma de vender un jugador, al poner el jugador en subasta, el resto de quipos pueden pujar por él y el que ofrezca mayor cantidad de dinero, conseguirá hacerse con sus servicios y tú recibirás esa cantidad por la venta. En caso de tener blindado el jugador, el blindaje se elimina. En la jornada del lunes, se finalizan las pujas de los jugadores y el equipo que ha realizado la puja más alta se queda con el jugador. 
+Si ningún equipo del grupo puja por el jugador, hay la posibilidad de que un equipo internacional se lo lleve, eso sí, por la mitad del precio de la cláusula y un máximo de 10.000, teniendo en cuenta que contra mas alta es la cláusula menos probabilidad hay de que el jugador se vaya, si esto tampoco sucede, el precio de la cláusula baja un 10% automáticamente para la próxima jornada.
+
+Antes de poner en subasta un jugador, piénsalo, ya que no es posible deshacer la operación, tampoco podrás blindar, poner transferible o mejorar el contrato.
+
+JUGADORES OJEADOS
+
+Si tienes ojeadores en tu equipo y estos logran ojear algún jugador, se activará una opción en esta pantalla para que puedas incorporarlos a tu equipo, situándote encima del botón, aparecerán el número de jugadores ojeados. Solamente puedes incorporar jugadores si tu plantilla tiene menos de 16.
+En el caso de que decidas incorporar un jugador ojeado, no sabrás hasta su incorporación que posición ocupará, ni que valoración tendrá, que será un número aleatorio entre 10 y 100.
+
+
+***
+
+
++%jugador%JUGADOR
+
+Los jugadores son la pieza clave de tu equipo, y en definitiva son los que van a hacer que tu equipo consiga más o menos triunfos. Estas son las características que definen a tus jugadores:
+
+NOMBRE
+
+Inicialmente, cuando te asignan los jugadores para tu plantilla, estos tienen un nombre, este nombre lo puedes cambiar siempre que quieras, por otro que no exista en el grupo en el que participes. El nombre no puede tener más de 40 caracteres, ni tener caracteres especiales. Si realizas el cambio de nombre una vez se han disputado partidos, has de tener en cuenta que el cambio no se realizará en los informes estadísticos de cada partido hasta ese momento y solo se verá reflejado para los nuevos partidos que se disputarán.
+
+POSICIÓN
+
+Es el área del campo donde tu jugador va a desempeñar mejor su función. Excepto los porteros, puedes colocar cualquier jugador en cualquier posición, pero si colocas un delantero de defensa su rendimiento bajara considerablemente.
+
+VALORACIÓN
+
+Junto al Estado Físico, determina el valor real que va a tener tu jugador frente a los demás para competir. La valoración puede ir de 10 a 100. La valoración puede bajar un solo punto por jornada y la posibilidad que baje depende del valor de la misma, y será ese porcentaje, para valoración 30 un 30%, para 50 un 50% y así sucesivamente. Para subir la valoración solo se puede hacer con los entrenamientos y aleatoriamente en función del equipo técnico contratado.
+
+ESTADO FISICO
+
+Es el complemento a la valoración, si un jugador está a tope de estado físico (100), su valoración será la que tenga asignada, en cambio, un estado físico malo, hará que esa valoración baje. En cada partido el estado físico de cada jugador baja en función de su intervención en el partido y del nivel de esfuerzo exigido a tu equipo, además también baja en los entrenamientos de forma inversamente proporcional a los que suba su valoración. La única manera de que el Estado Físico suba es dejar al jugador que descanse en un partido, por cada partido que descansa su EF sube 5 + (100 – EF actual) / 5. El estado físico puede ir de 10 a 100.
+
+JORNADAS LESIONADO
+
+En cada partido que juega, tu jugador puede lesionarse, el número de jornadas puede ir de 1 a 5. Mientras el jugador está lesionado no puede entrenar y por supuesto no puede jugar. Cada jornada disputada, juegue o no tu equipo, disminuirá el número de jornadas hasta llegar a 0.
+
+FICHA
+
+Es la cantidad que tendrás que pagar a tu jugador por cada partido disputado.
+
+CLAUSULA
+
+Es la cantidad que recibirás, si el jugador no está blindado y un equipo decide ficharlo.
+
+BLINDADO
+
+Si el jugador está blindado, ningún otro equipo puede comprártelo.
+
+TRANSFERIBLE
+
+Permite que el equipo que quiera comprarte un jugador no pague nada en concepto de intermediarios.
+
+EN SUBASTA
+
+Indica si has puesto a tu jugador en subasta, para que pueda salir de tu equipo.
+
+JORNADAS DE CONTRATO
+
+Indica el número de jornadas que le restan de contrato a tu jugador, inicialmente un jugador se contrata, por 40 jornadas. A falta de 5 jornadas, la celda aparecerá en color rojo, y a falta de 1 se envía un correo indicando la situación. Si el jugador no es renovado, a la siguiente jornada, automáticamente deja de pertenecer a tu plantilla.
+
+
+***
+
++%entrenador%ENTRENADOR
+
+Al crear el equipo además de asignarte una serie de jugadores, se te asignará un entrenador. Has de tener en cuenta que siempre has de tener un entrenador, es decir, la única forma de destituir a tu entrenador actual es contratar a uno nuevo. Los contratos se renovaran automáticamente cada 40 jornadas. Si tu equipo tiene la moral baja tras varias derrotas o empates en casa, puedes hacer un cambio de entrenador para resetear la moral.
+
+TACTICAS ASIGNADAS
+Es la principal característica del entrenador, contra mas tácticas más versatilidad tendrás para jugar tus partidos y tendrás más facilidad para posicionar a tus jugadores.
+
+FICHA
+Es la cantidad que deberás pagar cada jornada por tu entrenador, e irá aumentando a cada renovación.
+
+CONTRATO
+Son las jornadas de contrato que le restan a tu entrenador, hasta la próxima renovación, que en caso de no contratar a un nuevo entrenador, se realiza automáticamente, en cada renovación de tu entrenador, incorporará una nueva táctica aleatoriamente y su ficha subirá un 5 * el número de tácticas que posea.
+
+
+PLUS TACTICA
+Cada vez que repites táctica, tienes un plus para el próximo partido, este plus hará que tus jugadores rindan más en el partido. El plus se aplica según esta escala 0, 1, 2, 3, 6, 10. Es decir, si repites una táctica 4 veces, al próximo partido tendrás un plus de 6 puntos. Cuando cambias de táctica, no vuelves a 0 sino que bajas un lugar en la escala, es decir, si estas en el 6 al próximo partido tendrás un plus de 3.
+
+CURSO ENTRENADOR
+Cuando creas que hay una determinada táctica que sería muy interesante para tu equipo y tu entrenador no la tiene, puedes hacer que realice un curso para incorporarla a la lista de sus tácticas. El coste de cada curso será de 4000 y su ficha aumentará un 5 * el número de tácticas que posea.
+
+CAMBIAR DE ENTRENADOR
+Si tienes algún entrenador en la lista y deseas contratarlo, simplemente tienes que selecciónalo y utilizar la opción de contratar, el único coste será indemnizar al entrenador actual con la cantidad resultante de multiplicar las jornadas de contrato que le resten por su ficha. Automáticamente cuando tengas al nuevo entrenador, tu moral se researá al estado inicial. 
+
+***
+
++%subastaJugador%SUBASTA DE JUGADORES
+
+Aquí puedes pujar por los jugadores que aparecerán en subasta y no podrás acceder si tu presupuesto es negativo. Para pujar, únicamente tienes que marcar la casilla de selección del jugador o jugadores por lo que deseas pujar, poner la cantidad de puja y pulsar el botón de Pujar. Cada jornada de lunes aparecerá un nuevo jugador, de una valoración que oscilará entre 10 y 70, además de los jugadores que los equipos hayan puesto en subasta. Hasta la siguiente jornada de lunes puedes realizar todas las pujas que quieras por uno o varios jugadores, estas pujas son secretas y tú no vas a ver lo que han pujado los demás equipos ni ellos lo que has pujado tú. La puja mínima ha de ser el valor que indica la cláusula. No debes pujar si tienes tu plantilla completa, es decir con 16 jugadores. Al finalizar la jornada del lunes el equipo que más haya pujado por cada jugador se lo llevará, excepto si ya tiene 16 jugadores, en ese caso, el equipo pagará un 25% de lo pujado y el jugador seguirá en la subasta otra semana.
+El equipo que gana la puja y se lleva al jugador únicamente paga el precio de la puja y si el jugador ya pertenece a otro equipo, este equipo recibe ese dinero. El jugador que se incorpora por la subasta, lo hace modificando su cláusula, esta pasará a ser un 40% mayor que la puja realizada. Los jugadores que consigas por la subasta, tendrán un contrato con una duración de 40 jornadas.
+Para los jugadores a los que no se les ha realizado ninguna puja, su cláusula o precio de partida de la puja baja un 10%, y en el caso de los jugadores sin equipo también baja su ficha un 10%. 
+Para los jugadores con equipo si no han recibido ninguna oferta, también hay la posibilidad de que un equipo externo se lleve al jugador por la mitad del precio de la cláusula.
+
+
+***
+
++%compraJugador%COMPRA DE JUGADORES
+
+Si necesitas un jugador ya y no deseas pasar por el proceso de subasta puedes comprarlo, al igual que en la subasta no podrás acceder si tu presupuesto está en negativo. Para comprar, únicamente tienes que marcar la casilla de selección del jugador o jugadores que quieras comprar y pulsar el botón de Comprar. En la lista de jugadores para compra, aparecerán todos los jugadores del resto de equipos, que no estén blindados. El precio de compra, será la cláusula del jugador y será la cantidad que recibirá el equipo el equipo propietario. Has de tener en cuenta que si el jugador no ha sido declarado transferible, además de pagar la cláusula, tendrás que pagar una cantidad aleatoria en concepto de intermediarios que oscilará entre un 25% y un 75% de la cláusula.
+Al comprar un jugador la ficha, sube un número aleatorio entre el 25% y 75% de la valoración del jugador, al igual que la cláusula, que sube ese mismo número multiplicado por 40.
+Los jugadores que consigas por compra, tendrán un contrato con una duración de 40 jornadas.
+
+
+***
+
++%alineacion%PREPARAR ALINEACION PARA PARTIDO
+
+En esta pantalla podrás preparar todos los elementos para el próximo partido a disputar, esto incluye: La táctica y alineación a emplear, el esfuerzo a emplear, la estrategia y si lo deseas las primas a repartir a tus jugadores. Para cambiar los valor, de cualquiera de las anteriores opciones y que queden registradas para el partido, recuerda que has de pulsar el botón de Grabar. Cualquier opción se puede cambiar o deshacer excepto si introduces primas, las cantidades que grabes no se pueden deshacer y quedarán grabadas para el partido a disputar.
+Si no preparas el partido, el sistema elegirá una táctica aleatoria y alineará los jugadores de que dispongas, también aleatoriamente, es esfuerzo y la estrategia serán Normales. 
+ESFUERZO
+Normal: es el modo por defecto.
+Máximo: sube un 10% la valoración del jugador para el partido, pero se cansaran el doble durante el partido que en modo normal.
+Relajado: baja un 10% la valoración del jugador para el partido, pero se cansaran 2/5 partes que en modo normal.
+
+ESTRATEGIA
+La estrategia es una orden concreta que el entrenador da al conjunto del equipo para ese partido y que hace que algunas características o cálculos puedan variar en la simulación. Las estrategias que actualmente se pueden emplear son:
+
+Presionar: Hace que los jugadores lleguen a defender al jugador contrario, aunque no estén cerca, pero se cansaran mas.
+
+Agresivos: sube la característica Robo de los jugadores un 25%, pero también sube la posibilidad de cometer faltas, penaltis y de recibir tarjetas.
+
+Ralentizar: Ralentiza el juego y el tiempo que destinas a cada acción se incrementará un 50%.
+
+Tirar: Tus jugadores, intentaran tirar en cuanto se encuentren sin ningún jugador cubriéndoles y en el caso del delantero lo hará siempre que le llegue la pelota.
+
+Contraataque: Realizaras un juego más directo sin hacer demasiados pases y buscando más el 1 contra 1.
+
+Estáticos: suben las características de Robo y Pase de los jugadores un 25%, pero tus jugadores solo defenderán si su oponente esta delante de él.
+
+Control: Sube la característica de pase un 25% y baja el mismo porcentaje la de robo.
+
+PRIMAS
+Subes la moral de tus jugadores de número aleatorio entre 0 y la cantidad que tengas como prima dividido por 100.
+
+TACTICA
+Aparecen las tácticas asignadas a tu entrenador. Elige la táctica que quieras utilizar para el partido, en función de los jugadores disponibles que tengas, para ello pulsa el número de táctica que hay en su parte inferior, cuando cambies de táctica, los valores de las opciones que no hayas guardado se pierden, también se pierde la alineación de jugadores que tuvieses, aunque esta ya se hubiese guardado.
+
+PIZARRA TACTICA
+Es el rectángulo verde donde podrás colocar a tus jugadores según la táctica elegida. La posición dentro de la pizarra, va en este orden de arriba a abajo:
+Delanteros
+Medios
+Defensas
+Portero
+
+LISTA JUGADORES
+Aparecerán, todos los jugadores de tu equipo susceptibles de alinear. A modo informativo también aparecerán los jugadores sancionados y lesionados, pero estos no los podrás alinear. Además de la columna de selección, el nombre y la posición, tenemos estas características:
+
+VM: Es la valoración con la que el jugador va a partir para disputar el partido, esta valoración se calcula en base a la valoración real del jugador y su estado físico según la fórmula: VP = VJ*EF/100.
+VJ: Es la valoración real del jugador.
+EF: Es el Estado Físico del jugador.
+TA: Indica si el jugador ya tiene una tarjeta amarilla. Si recibe otra tarjeta, tendrá una tarjeta roja y deberá cumplir un partido de sanción.
+
+ALINEACION
+Una vez elegida la táctica, puedes colocar manualmente los jugadores que van a jugar, para ello, selecciona en la lista de jugadores, la figura del jugador que desees, y arrástrala hasta la posición que desees que ocupe, también puedes hacer un click sobre el jugador (se pondrá de color rojo) y a continuación un click en la posición que desees. Si deseas sacar un jugador de la alineación, simplemente arrastrar y soltar o clickar el jugador y volverá a la lista. Excepto el portero, el resto de jugadores puedes posicionarlos donde quieras, pero has de tener en cuenta que si los colocas en una posición que no es la suya, sus características a lo mejor no son las mas eficaces para esa posición y además alguna característica como el pase puede verse disminuida. Si lo deseas puedes utilizar la opción de Alineación Automática, para que el sistema te coloque aleatoriamente, tus los jugadores disponibles según su posición, después de ello también puedes acabar de confeccionar la alineación modificando las posiciones que creas oportunas.
+
+
+
+*** 
+
++%alineacionrival%PREPARAR ALINEACION PARA EQUIPO RIVAL
+En esta pantalla puedes modificar los elementos del equipo rival de cara a realizar la simulación. La alineación, táctica y demás elementos que aparecen por defecto, pueden cambiarse y grabarse para realizar la simulación, en ningún caso estos datos se graban realmente en el equipo contrario, solo sirven para realizar tus simulaciones. La forma de operar es la misma que en la preparación de tu equipo, ves a la pestaña de Mi Equipo para mas información.
+
+
+*** 
+
+
++%simulacion%SIMULACION
+
+Esta es la funcionalidad más importante del juego, ya que te permitirá, realizar las pruebas necesarias para conocer más en profundidad como se calcula el resultado de un partido y te permitirá saber qué posibilidades tienes de ganar un encuentro según la estrategia, táctica, esfuerzo y alineación elegidas, tanto para tu equipo como el equipo rival. En las pestañas Mi Equipo y Equipo Rival encontraras información al respecto.
+
+Hay 3 opciones: Jugar un partido, Calcular resultados y Simular Tiros. 
+
+
+JUGAR UN PARTIDO
+
+Cuando pulses esta opción, el simulador cogerá los datos introducidos de tu equipo y del equipo simulado y calculará un resultado de la misma manera que se hará en el partido que se dispute en la jornada. Has de tener muy en cuenta que es una simulación y por lo tanto el resultado ira variando dependiendo de todos los factores que se expondrán más adelante, además, a la hora de valorar los resultados, ten en cuenta que el equipo contrario, en el partido, no tiene por qué poner la misma táctica, alineación etc. que tu hayas elegido para la simulación.
+
+CALCULO DEL RESULTADO DEL PARTIDO
+
+Inicialmente de calcula la asistencia el público (para más detalles del cálculo, ver ayuda de Gestión-Espectadores), que nos dará el número de espectadores que vienen a ver el partido. Este cálculo se realiza con los datos actuales del equipo que juegue en casa, ya sea tu equipo o el simulado.
+
+A continuación se calcula el nuevo plus por táctica del entrenador (para más detalles ver ayuda entrenador).
+
+Una vez realizados los 2 cálculos anteriores se procede a calcular la valoración de todos los jugadores que jugaran el partido, el cálculo de la valoración final para el partido, de cada jugador se hace de la siguiente manera:
+
+Moral = Moral Equipo + Valor Aleatorio (Primas / 100)
+Campo = mínimo ((10 + (numero espectadores / 100)), 30)
+Esfuerzo = +10 (Máximo) –10 (Relajado) 
+
+Valoración base = (Valoración Media * Moral / 100) 
+Valoración Extra = Campo + Plus Táctica + Esfuerzo
+Valoración Partido = Valoración base + (Valoración base * Valoración Extra / 100)
+
+Una vez conocemos la valoración para el partido de cada jugador, se calcula la valoración del mismo en las diferentes acciones del juego, que serán las que se aplicaran en última instancia (excepto al portero), la valoración de la acción será un porcentaje de la valoración de partido que se expresa entre paréntesis:
+
+Pase:   Defensa (60%) Medio (100%) Delantero (60%)
+Regate: Defensa (40%) Medio (80%) Delantero (80%)
+Tiro/Remate: Defensa (40%) Medio (60%) Delantero (100%)
+Robo:   Defensa (100%) Medio (50%) Delantero (30%)
+Parar: Portero (100%)
+
+Si el jugador esta fuera de su posición, la característica de pase se disminuye un 25%.
+
+Si la estrategia utilizada es Control, la acción Pase sube un 25% más y la de robo baja un 25%.
+Si la estrategia utilizada es Agresivos o Estáticos, la acción Robo sube un 25% más.
+
+
+Esta valoración de partido será la utilizada a partir de ahora para el cálculo de los diferentes apartados del partido, en cuanto al portero, su valoración de partido es directamente la valoración que se utiliza para su acción de Parar.
+
+A partir de aquí, hay muchos cálculos en los que veras la palabra enfrentar y entre paréntesis 2 valores, por ejemplo:
+
+Gol penalti = enfrentar (Tiro Atacante * 10,  Parar Portero)
+
+Este tipo de cálculos se realiza de la siguiente forma: se calcula un numero aleatorio del primer valor (Tiro Atacante * 10) y otro valor aleatorio del segundo valor (Parar Portero), si el valor aleatorio obtenido del primer valor supera al segundo se determina que ha sido gol, en caso contrario no. Por lo tanto contra mayor valoración tenga el tiro del atacante y menor sea la valoración del portero más posibilidades habrá de que sea gol en este caso o en otros cálculos, que el pase sea correcto, que la ocasión de gol prospere, etc. 
+
+Otro concepto que aparecerá es el del jugador contrario, jugador contrario cercano y jugador contrario próximo. Los jugadores están situados en cuadrantes, que para cada línea (Defensa, Centrocampo y Delantera) son: A, B, C, D, E, F, G, y F. Los defensas, tienen como jugadores contrarios los delanteros del otro equipo y viceversa, los centrocampistas de ambos equipos son jugadores contrarios entre sí.
+
+El jugador contrario se considera el que está en el mismo cuadrante.
+
+El jugador contrario cercano se considera el que está en uno de los cuadrantes contiguos, por ejemplo, si un jugador está en el cuadrante B, los jugadores contrarios cercanos pueden estar en el A o el C, en caso de estar ambos ocupados, el sistema coge uno de ellos aleatoriamente.
+
+El jugador contrario próximo se considera el que está en uno de los cuadrantes contiguos al cercano, por ejemplo, si un jugador está en el cuadrante C, los jugadores contrarios cercanos pueden estar en el A o el E, en caso de estar ambos ocupados, el sistema coge uno de ellos aleatoriamente.
+
+
+POSESION
+
+El partido dura 60 minutos, durante los cuales se desarrollan acciones, que tienen una duración estimada de tiempo, el tanto por ciento de posesión es el resultado de la suma de tiempo en que cada jugador realiza sus acciones.
+
+NUMERO JUGADAS
+
+Se considera jugada desde que un equipo tiene la posesión de la pelota hasta que la pierde. Por lo que el numero de jugadas debe ser similar para ambos equipos.
+
+
+CORNER
+
+Se elige al azar un jugador del equipo atacante y otro del equipo defensor y se enfrenta el regate del atacante contra el robo del defensa, si el resultado es favorable al atacante se realiza el tiro.
+
+FALTA DIRECTA
+
+Se elige un jugador Medio o delantero del equipo atacante, se calcula una posibilidad entre 3 de que el balón no vaya a portería o se estrelle en la barrera, si va a portería, se calcula un tiro.
+
+
+TIROS
+
+Esta acción junto con la del penalti, son las que pueden hacer que un gol suba a los marcadores. La acción de tiro se compone de lo siguiente: el jugador que tira o remata, el portero del equipo contrario y el grado de dificultad del mismo. El grado de dificultad puede ir de 0 a 100 (0 mínima dificultad y 100 máxima dificultad). Según la acción de tiro tenemos estos grados de dificultad:
+
+Tiro Lejano: 80
+Tiro Lejano solo: 45
+Remate Cabeza: 25
+Falta Directa: 30
+Tiro Dentro Area: 40
+Tiro Solo: 10
+Penalti: 1
+
+
+CALCULAR RESULTADOS
+
+En esta opción se disputan 100 partidos y se muestran los resultados obtenidos en numero de victorias, empates y derrotas. Esto te puede dar una orientación de como puede ir el partidos con la alineación y opciones puestas para tu equipo y el equipo rival. No obstante esto son probabilidades, puede darse el caso de que en 100 partidos tengas 100 victorias, pero puede darse el caso de que el 101 fuese un empate o una derrota. De hecho si vas realizando varios cálculos, los resultados pueden diferir, pero mas o menos tendrás una orientación de que puede llegar a pasar.
+
+
+SIMULAR TIROS
+
+Puedes utilizar la opción de Simular Tiros, para tener una orientación de que porcentajes de acierto tendría cada jugador en cada tipo de tiro. También puedes ver el porcentaje de paradas realizadas por los porteros.
+
+
+*** 
+
++%goleadores%GOLEADORES
+El pichichi de la temporada, es decir, el jugador que al finalizar la liga consiga mas goles entre liga y copa, consigue una subida en su valoración de 5 puntos, en caso de empate a goles, la subida será para todos.
+
+
+*** 
+
++%porteros%PORTEROS
+El mejor portero de la temporada, recibirá al finalizar la temporada 5 puntos de valoración extra. La clasificación va en función del ratio goles / partidos de cada portero, teniendo en cuenta de que se fija un número de partidos mínimos para jugar, por cada partido no jugado, se penaliza medio punto.
+
+*** 
+
+
++%estadistica%ESTADISTICA
+
+En las estadísticas puedes contrastar tus resultados reales con los porcentajes calculados según cada partido. Por un lado tienes el porcentaje de victorias, empates y derrotas para cada partido y una fila final con la media, por otro lado tienes los resultados reales para cada partido y la media final, a mas partidos, las diferencias entre la media calculada y la real, te dirá si has tenido buena o mala suerte. Para ver las estadísticas de otro equipo selecciónalo en el desplegable y pulsa el icono situado a la derecha para actualizar los datos.
+
+*** 
+
++%vacaciones%MODO VACACIONES
+Si crees que no vas a poder atender a tu equipo en unos días y quieres establecer algunos parámetros por defecto puedes hacerlo en la opción de Modo Vacaciones de la Gestión de Equipo, para ello solo has de pulsar la opción de Activar y te aparecerán los parámetros a controlar, si pulsar la opción Desactivar desactivaras todas las opciones del Modo Vacaciones. 
+
+Todas las opciones elegidas se aplican automáticamente a la finalización de cada jornada que dispute tu equipo. 
+
+Los parámetros que puedes controlar son los siguientes:
+
+Renovación: si activas el check los jugadores a los que les reste 1 jornada de contrato, serán renovados automáticamente.
+
+Fijar Táctica: si activas esta opción, todos los partidos que disputes, los disputarás con la táctica que tengas seleccionada.
+
+Entreno Automático: si lo activas, tus jugadores entrenarán automáticamente al finalizar cada jornada, según la posición que hallas elegido, si elijes la posición Cualquiera, el entreno se realizará como si se hubiese elegido la posición Todos.
+
+
+
+*** 
+

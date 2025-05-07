@@ -1,0 +1,95 @@
+<%@ page pageEncoding="UTF-8" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml"%>
+<%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<c:set var="root" value="${pageContext.servletContext.contextPath}"/>
+<script src='${root}/JavaScript/Lib/jquery/1.7.2/jquery.min.js'></script> 
+<script src='${root}/JavaScript/Lib/Highcharts-2.3.3/js/highcharts.js'></script> 
+<script type="text/javascript" src="${root}/JavaScript/Graficos.js"></script>
+<script type="text/javascript" src="${root}/JavaScript/DomDrag.js"></script>
+
+<script type="text/javascript">
+    document.getElementById('columna_central').style.height = "1000px";
+</script>
+
+<form action="${root}/panelControl/Futbol8/movimientos" method="post">
+    <table class="tabla" width="75%"> 
+        <tr>
+            <td>
+                <c:if test="${!todo}">
+                    <input type="submit" value="Ver Todos" id ="operacion" name="operacion" />
+                </c:if>
+                    <c:if test="${todo}">
+                    <input type="submit" value="Ver ultimos 30 dias" id ="operacion" name="operacion" />
+                </c:if>
+            <td>
+                <img src="${root}/images/grafico.png" onclick="abrirGrafico('${root}', 'graficoMovimientos', ${idEquipo}, '${todo}')">
+            </td>
+            <td>
+                <a href="${root}/ayuda?grupo=General&codigo=movimientos" target="_blank"><img src="${root}/images/ayuda.gif"></a> 
+            </td>
+        </tr>
+    </table>
+</form>
+
+<table class="tabla" width="75%">    
+    <tr>
+        <th>Fecha</th>
+        <th>Descripción</th>
+        <th>Valor</th>
+        <th>Saldo</th>
+    </tr>
+    <c:forEach var="mov" items="${movimientos}">
+        <tr>
+            <td align="left"><fmt:formatDate value="${mov.fecha}"
+                            dateStyle="short" /></td>
+            <td align="left">${mov.claseTxt}</td>
+            <c:if test="${mov.valor >= 0}">
+                <td class="txtNum"><fmt:formatNumber value="${mov.valor}"/></td>
+            </c:if>
+            <c:if test="${mov.valor < 0}">
+                <td class="txtNumRojo"><fmt:formatNumber value="${mov.valor}"/></td>
+            </c:if>  
+            <c:if test="${mov.saldo >= 0}">
+                <td class="txtNum"><fmt:formatNumber value="${mov.saldo}"/></td>
+            </c:if>
+            <c:if test="${mov.saldo < 0}">
+                <td class="txtNumRojo"><fmt:formatNumber value="${mov.saldo}"/></td>
+            </c:if>   
+        </tr>
+    </c:forEach>
+
+</table>
+            
+     <div id="graficoMovimientos" class="grafico3" style=display:none > 
+        <table width="100%" >
+            <tr>
+                <td align="right">                    
+                    <img src="${root}/images/cerrar.png" onclick="cerrarGrafico('graficoMovimientos')"/>
+                </td>                
+            </tr>
+            <tr>
+                <td>
+                    <div id="ingresos"/>
+                </td>   
+            </tr> 
+            <tr>
+                <td>
+                    <div id="gastos"/>
+                </td> 
+           </tr> 
+            <tr>
+                <td>
+                    <div id="balance"/>
+                </td> 
+            </tr>              
+        </table>
+    </div>
+
+
+<script type="text/javascript">
+    mover.init(document.getElementById('graficoMovimientos'));
+</script>

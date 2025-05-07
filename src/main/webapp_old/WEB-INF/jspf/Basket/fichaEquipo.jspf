@@ -1,0 +1,154 @@
+<%-- any content can be specified here e.g.: --%>
+<%@ page pageEncoding="UTF-8" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml"%>
+<%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<c:set var="root" value="${pageContext.servletContext.contextPath}"/>
+<c:set var="deporte" value="${sessionScope.deporte}"/>
+<c:set var="eqFicha" value="${requestScope.equipoFicha}"/>
+<c:set var="jugadores" value="${requestScope.jugadoresFicha}"/>
+
+<p class="titulo1">
+    ${equipoFicha.nombre}
+    <c:if test="${equipoFicha.automatico}">
+        (Automático)
+    </c:if>
+</p>
+
+<table class="tabla">
+    <tr><td>Equipación</td><td><img alt="Equipacion"  src="${root}/images/jugadores/jugador${eqFicha.equipacion}ico.png"/></td></tr>
+    <tr><td>Espectativa</td><td>${eqFicha.espectativa}</td></tr>
+    <tr><td>Presupuesto Actual</td><td><fmt:formatNumber value="${eqFicha.presupuesto}"/> Euros</td></tr>
+    <tr><td>Inversión en Bolsa</td><td><fmt:formatNumber value="${eqFicha.bolsa}"/> Euros</td></tr>
+    <tr><td>Credito Actual</td><td><fmt:formatNumber value="${eqFicha.credito}"/> Euros</td></tr>
+    <tr><td>Estadio/Pabellón<br/>${eqFicha.nombreCampo}</td><td><fmt:formatNumber value="${eqFicha.campo}"/> Espectadores</td></tr>
+    <tr><td>Contratos Publicitarios</td><td>${eqFicha.publicidad} Contratos</td></tr>
+    <tr><td>Equipo Tecnico</td><td>${eqFicha.eqTecnico} Personas</td></tr>
+    <tr><td>Ojeadores</td><td>${eqFicha.ojeadores} Personas</td></tr>
+</table>
+<br/>
+
+<table class="tabla">
+    <tr><th colspan="3">Entrenador</th></tr>
+    <tr>
+        <th>Nombre</th>        
+        <th>Ficha</th>
+        <th>Tacticas</th>
+    </tr>
+    <tr>
+        <td>${entrenadorFicha.nombre}</td>
+        <td align="right">${entrenadorFicha.ficha}</td>
+         <td colspan="2">
+            <c:forEach var="tac" items="${entrenadorFicha.tacticas}">
+                <img src="${root}/images/tacticas/tacticam${tac.numero}.jpg" title="Tactica ${tac.numero}" alt="Tactica"/>
+            </c:forEach>
+        </td>
+    </tr>
+</table>
+<br/>
+<c:if test="${jugadores != null}">
+
+<table class="tablaJugadores">
+
+    <tr><th colspan="11">JUGADORES</th></tr>
+    <tr>
+        <th>Nombre</th>
+        <th>Posicion</th>
+        <th title="Valoración">VA</th>
+        <th title="Estado Fisico">EF</th>
+        <th title="Lesionado">LS</th>
+        <th>Ficha</th>
+        <th>Clausula</th>
+        <th title="Blindado">Bl</th>
+        <th title="Transferible">Tr</th>
+        <th title="En Subasta">SB</th>
+        <th title="Contrato">CT</th>
+    </tr>
+
+    <c:forEach var="obj" items="${jugadores}">
+        <tr>
+            <td align="left">${obj.nombre}</td>
+            <td align="left">${obj.posicion}</td>
+            <td bgcolor="${obj.colorValoracion}" width="25px" align="center">${obj.valoracionReal}</td>
+            <td bgcolor="${obj.colorEstadoFisico}" width="25px" align="center">${obj.estadoFisico}</td>  
+            <td>
+                <c:if test="${obj.jornadasLesion > 0}">
+                    <img alt="${obj.jornadasLesion} Jornada/s" title="${obj.jornadasLesion} Jornada/s" src="${root}/images/lesion.gif"/>                    
+                </c:if>
+            </td>
+         
+            <td align="right"><fmt:formatNumber value="${obj.ficha}"/></td>
+            <td align="right"><fmt:formatNumber value="${obj.clausula}"/></td>
+            <td align="center">
+                <c:if test="${obj.blindado}">
+                    <img alt="Si"  src="${root}/images/activo.gif"/>
+                </c:if>
+                <c:if test="${!obj.blindado}">
+                    <img alt="No"  src="${root}/images/noActivo.gif"/>
+                </c:if>
+            </td>
+            <td align="center">
+                <c:if test="${obj.transferible}">
+                    <img alt="Si"  src="${root}/images/activo.gif"/>
+                </c:if>
+                <c:if test="${!obj.transferible}">
+                    <img alt="No"  src="${root}/images/noActivo.gif"/>
+                </c:if>
+            </td>
+            <td align="center">
+                <c:if test="${obj.enSubasta}">
+                    <img alt="Si"  src="${root}/images/activo.gif"/>
+                </c:if>
+                <c:if test="${!obj.enSubasta}">
+                    <img alt="No"  src="${root}/images/noActivo.gif"/>
+                </c:if>
+            </td>
+            <td bgcolor="${obj.colorContrato}" width="25px" align="center">${obj.contrato}</td>
+                        
+        </tr>
+    </c:forEach>
+         <tr>
+            <td></td>
+            <td align="left"><p class="pie" align="left">Media</p></td>
+            <td align="center"><p class="pie">${eqFicha.valoracionMediaJugadores}</p></td>
+            <td colspan="2"></td>
+            <td align="right"><p><b>${eqFicha.costeJugadores}</b></p></td>
+        </tr>
+        <c:if test="${juvenil != null}">
+            <tr>
+                <th>Nombre</th>
+                <th>Posicion</th>
+                <th title="Valoración">VA</th>
+                <th title="Jornadas en Club">JR</th>
+                <th title="Se puede incorporar a Equipo">IN</th>
+                <th colspan="6"></th>       
+            </tr>
+            <tr>
+                <td align="left">${juvenil.nombre}</td>
+                <td align="left">${juvenil.posicion}</td>
+            <td bgcolor="${juvenil.colorValoracion}" width="25px" align="center">${juvenil.valoracionReal}</td>
+            <td width="25px" align="center">${juvenil.jornadas}</td>  
+            <td align="center">
+                <c:if test="${juvenil.incorporacion}">
+                    <img alt="Si"  src="${root}/images/activo.gif"/>
+                </c:if>
+                <c:if test="${!juvenil.incorporacion}">
+                    <img alt="No"  src="${root}/images/noActivo.gif"/>
+                </c:if>
+            </td>              
+            <td colspan="5"></td>
+            </tr>
+        </c:if>       
+</table>
+ 
+</c:if>
+
+
+
+
+
+
+

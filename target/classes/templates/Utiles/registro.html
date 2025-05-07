@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title th:text="${@environment.getProperty('tituloapp')}">Título</title>
+        <link rel="stylesheet" type="text/css" th:href="@{/css/general.css}">
+    </head>
+
+    <body>
+
+        <table style="width: 800px" class="tabla">
+            <tr>
+                <td colspan="4">ENTRADAS AL SISTEMA</td>
+                <td>
+                    <form th:action="@{/registro}" method="post">
+                        <input type="submit" value="Ejecutar"/>
+                        <input class="txtNum" type="text" name="numero" th:value="${numero}" size="3"/> Registros
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <th>Id</th>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Usuario</th>
+                <th>IP</th>
+            </tr>
+            <tr th:each="reg : ${regs}">
+                <td align="center" th:text="${reg.id}">ID</td>
+                <td th:text="${#dates.format(reg.fecha, 'dd/MM/yyyy HH:mm')}">Fecha</td>
+                <td th:text="${reg.tipo}">Tipo</td>
+                <td th:text="${reg.usuario}">Usuario</td>
+                <td th:text="${reg.ip}">IP</td>
+            </tr>
+        </table>
+
+        <br>
+
+        <div th:if="${error != null}" th:text="${error}"></div>
+
+    </body>
+</html>
