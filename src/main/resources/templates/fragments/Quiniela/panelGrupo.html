@@ -1,0 +1,19 @@
+<th:block th:fragment="panelGrupo">
+    <div th:if="${equiposGrupo != null and #lists.size(equiposGrupo) > 0}">
+
+        <table class="tablaClubs">
+            <thead>
+                <tr>
+                    <th th:text="'GRUPO ' + ${nombreGrupo}"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="obj : ${equiposGrupo}">
+                    <td style="text-align: center;" th:text="${obj.nombre}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+</th:block>

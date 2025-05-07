@@ -1,0 +1,83 @@
+<%-- any content can be specified here e.g.: --%>
+<%@ page pageEncoding="UTF-8" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml"%>
+<%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<c:set var="root" value="${pageContext.servletContext.contextPath}"/>
+<c:set var="deporte" value="${sessionScope.deporte}"/>
+
+<table class="tablaAcciones">
+    <th>Acciones</th>
+
+    <tr align="center">
+        <td>
+            <a  href="${root}/panelControl/presentacion">Deportes</a>
+        </td>
+    </tr>
+
+    <c:if test="${deporte != null}">
+
+    
+        <tr align="center">
+            <td>
+                <a  href="${root}/panelControl/Quiniela/inicio?deporte=${deporte}">Inicio</a>
+            </td>
+            
+        </tr>
+        <tr align="center">
+            <td>
+               <a  href="${root}/panelControl/Quiniela/cumplimentar">Cumplimentar</a>
+            </td>
+            
+        </tr>
+        <tr align="center">
+            <td>
+                <a  href="${root}/panelControl/Quiniela/jornada">Consultar Jornada</a>
+            </td>
+            
+        </tr>
+        
+        <tr align="center">
+            <td>
+                <a  href="${root}/panelControl/Quiniela/clasificacion">Clasificación</a>
+            </td>
+            
+        </tr>
+        
+        <tr align="center">
+            <td>
+                <a  href="${root}/panelControl/Quiniela/jornadasDisputadas">Jornadas Disputadas</a>
+            </td>
+
+        </tr>      
+
+        <tr align="center">
+            <td>
+                <a  href="${root}/panelControl/Quiniela/competiciones">Competiciones</a>
+            </td>
+
+        </tr>  
+        
+         <tr align="center">
+            <td>
+                <a  href="${root}/panelControl/Quiniela/historico">Historico</a>
+            </td>
+
+        </tr>  
+
+        <c:if test="${esAdmin}">
+            <tr align="center">
+                <td>
+                    <a  href="${root}/panelControl/Quiniela/jornadaAdmin">Administrar Jornada</a>
+                </td>
+            </tr> 
+        </c:if>        
+
+    </c:if>
+
+</table>
+
+

@@ -1,0 +1,106 @@
+
+<!-- Asume que ya se pasan al modelo:
+     - club
+     - Futbol8
+     - Basket
+     - Quiniela
+     - posibles
+     - error
+-->
+
+<th:block th:fragment="presentacion">
+
+<p class="titulo1">SECCIONES ACTIVAS</p>
+<br/>
+
+<table class="tablaDeportes">
+    <tr>
+        <td>
+            <div th:if="${club.futbol8 and Futbol8}">
+                <a th:href="@{/panelControl/inicio(deporte='Futbol8')}">
+                    <img th:src="@{/images/pelotaFutbol.png}" title="Futbol 8" alt="Futbol 8"/>
+                </a>
+            </div>
+
+            <div th:if="${club.basket and Basket}">
+                <a th:href="@{/panelControl/inicio(deporte='Basket')}">
+                    <img th:src="@{/images/pelotaBasket.png}" title="Basket" alt="Basket"/>
+                </a>
+            </div>
+
+            <div th:if="${club.quiniela and Quiniela}">
+                <a th:href="@{/panelControl/inicio(deporte='Quiniela')}">
+                    <img th:src="@{/images/quiniela.jpg}" title="Quinielas" alt="Quinielas"/>
+                </a>
+            </div>
+
+            <div th:if="${!(club.futbol8 and Futbol8 != null)
+                       and !(club.basket and Basket != null)
+                       and !(club.quiniela and Quiniela != null)}">
+                <p>
+                    Actualmente no tienes ninguna sección activa, en la parte inferior
+                    aparecerán las SECCIONES DISPONIBLES en este momento, para darte de alta
+                    pulsa sobre el enlace.
+                </p>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<br/><br/>
+
+<!-- Aquí debes reemplazar el include con un fragmento thymeleaf -->
+<!-- Ejemplo: -->
+<div th:replace="fragments/comentarios :: comentarios"></div>
+
+<br/><br/>
+
+<div th:if="${posibles}">
+    <p class="titulo1">SECCIONES DISPONIBLES</p>
+    <br/>
+
+    <table class="tablaDeportes" border="solid">
+        <tbody>
+            <tr th:if="${club.futbol8 != true and Futbol8 == true}">
+                <td>
+                    <img th:src="@{/images/pelotaFutbol.png}" title="Futbol 8" alt="Futbol 8"/>
+                </td>
+                <td>
+                    <a th:href="@{/ayuda(grupo='Futbol8', codigo='presentacion')}" target="_blank">
+                        <img th:src="@{/images/ayuda.gif}"/>
+                    </a>
+                </td>
+                <td>
+                    <a th:href="@{/panelControl/altas(deporte='Futbol8')}">Alta Equipo Futbol8</a>
+                </td>
+            </tr>
+
+            <tr th:if="${club.quiniela != true and Quiniela == true}">
+                <td>
+                    <img th:src="@{/images/quiniela.jpg}" title="Quinielas" alt="Quinielas"/>
+                </td>
+                <td>
+                    <a th:href="@{/ayuda(grupo='Quiniela', codigo='presentacion')}" target="_blank">
+                        <img th:src="@{/images/ayuda.gif}"/>
+                    </a>
+                </td>
+                <td>
+                    <a th:href="@{/panelControl/altas(deporte='Quiniela')}">Alta Peña Quinielista</a>
+                </td>
+            </tr>
+
+            <tr th:if="${(Futbol8 == false or club.futbol8 == true) and (Quiniela == false or club.quiniela == true)}">
+                <td colspan="3">No hay en estos momentos</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <br/>
+
+    <div th:if="${error != null}">
+        <p class="error" th:text="${error}"></p>
+    </div>
+</div>
+
+</block>
+

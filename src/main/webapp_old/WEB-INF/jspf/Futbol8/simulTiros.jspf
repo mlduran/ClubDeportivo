@@ -1,0 +1,81 @@
+<%@ page pageEncoding="UTF-8" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml"%>
+<%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<c:set var="root" value="${pageContext.servletContext.contextPath}"/>
+
+<c:if test="${tirJugs != null}">
+        <table class="tablaJugadores">
+            <tr><th colspan="11">Porcentajes Lanzamientos</th></tr>
+            <tr>
+                <th width="15">Nombre</th>
+                <th width="15">Equipo</th>
+                <th width="10">Posicion</th>
+                <th width="5%" title=" Valorción Tiro">TI</th>
+                <th width="5%" title="Tiro Solo">TS</th>
+                <th width="5%" title="Tiro en Area">TA</th>
+                <th width="5%" title="Tiro Solo Lejano">TSL</th>
+                <th width="5%" title="Tiro Lejano">TL</th>
+                <th width="5%" title="Penalti">PE</th>
+                <th width="5%" title="Falta">FA</th>
+                <th width="5%" title="Remate de Cabeza">CA</th>
+            </tr>
+            
+            <c:forEach var="obj" items="${tirJugs}">
+                <tr>
+                    <td align="left">${obj.nombre}</td>
+                    <td align="left">${obj.nombreEquipo}</td>
+                    <td align="left">${obj.posicion}</td>
+                    <td bgcolor="${obj.colorTiro}" align="center">${obj.tiro}</td>  
+                    <td align="center">${obj.tiroSolo}</td>
+                    <td align="center">${obj.tiroArea}</td>
+                    <td align="center">${obj.tiroLejanoSolo}</td>
+                    <td align="center">${obj.tiroLejano}</td>
+                    <td align="center">${obj.penalti}</td>
+                    <td align="center">${obj.falta}</td>
+                    <td align="center">${obj.cabeza}</td>
+                </tr>
+            </c:forEach>
+                
+        </table>      
+</c:if>
+
+<c:if test="${parJugs != null}">
+        <table class="tablaJugadores">
+            <tr><th colspan="11">Porcentajes de Paradas</th></tr>
+            <tr>
+                <th width="15">Nombre</th>
+                <th width="15">Equipo</th>
+                <th width="10">Posicion</th>
+                <th width="5%" title=" Valoración">VA</th>
+                <th width="5%" title="Tiro Solo">TS</th>
+                <th width="5%" title="Tiro en Area">TA</th>
+                <th width="5%" title="Tiro Solo Lejano">TSL</th>
+                <th width="5%" title="Tiro Lejano">TL</th>
+                <th width="5%" title="Penalti">PE</th>
+                <th width="5%" title="Falta">FA</th>
+                <th width="5%" title="Remate de Cabeza">CA</th>
+            </tr>
+            
+            <c:forEach var="obj" items="${parJugs}">
+                <tr>
+                    <td align="left">${obj.nombre}</td>
+                    <td align="left">${obj.nombreEquipo}</td>
+                    <td align="left">${obj.posicion}</td>
+                    <td bgcolor="${obj.colorValoracionPartido}" align="center">${obj.valoracionPartido}</td>  
+                    <td align="center">${obj.paradasTiroSolo}</td>
+                    <td align="center">${obj.paradasTiroArea}</td>
+                    <td align="center">${obj.paradasTiroLejanoSolo}</td>
+                    <td align="center">${obj.paradasTiroLejano}</td>
+                    <td align="center">${obj.paradasPenalti}</td>
+                    <td align="center">${obj.paradasFalta}</td>
+                    <td align="center">${obj.paradasCabeza}</td>
+                </tr>
+            </c:forEach>
+                
+        </table>      
+</c:if>
+

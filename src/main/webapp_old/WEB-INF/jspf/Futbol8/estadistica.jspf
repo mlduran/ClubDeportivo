@@ -1,0 +1,72 @@
+<%@ page pageEncoding="UTF-8" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml"%>
+<%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<c:set var="root" value="${pageContext.servletContext.contextPath}"/>
+
+<form action="${root}/panelControl/Futbol8/estadistica" method="post">
+EQUIPO:
+<select name="equipoSeleccionado" size="1" >
+    <c:forEach var="equipo" items="${seleccionEquipos}">
+        <c:if test="${equipoSeleccionado eq equipo.id}">
+            <option selected value="${equipo.id}">${equipo.nombre}</option>
+        </c:if>
+        <c:if test="${equipoSeleccionado ne equipo.id}">
+            <option value="${equipo.id}">${equipo.nombre}</option>
+        </c:if>              
+    </c:forEach>
+</select>
+<input type="image" src="${root}/images/actualizar.png" >
+<input type="hidden" name="comp" value="${comp}" >
+</form>
+<table class="tabla">
+    <tr>
+        <th>Partido</th>
+        <th>% Victoria</th>
+        <th>% Empate</th>
+        <th>% Derrota</th>
+        <th>Victoria</th>  
+        <th>Empate</th> 
+        <th>Derrota</th> 
+    </tr>
+    <c:forEach var="partido" items="${partidos}"> 
+        <tr>
+            <td>${partido.partidoDes}</td>           
+            <td>${partido.posGanar}</td>
+            <td>${partido.posEmpatar}</td>
+            <td>${partido.posPerder}</td>            
+            <td>
+                <c:if test="${partido.ganado}">
+                    <img id="pelota" alt="*" src="${root}/images/pelotaFutbolMini.png"/>
+                </c:if>
+            </td>
+            <td>
+                <c:if test="${partido.empatado}">
+                    <img id="pelota" alt="*" src="${root}/images/pelotaFutbolMini.png"/>
+                </c:if>
+            </td>
+            <td>
+                <c:if test="${partido.perdido}">
+                    <img id="pelota" alt="*" src="${root}/images/pelotaFutbolMini.png"/>
+                </c:if>
+            </td>
+        </tr>
+    </c:forEach>
+    <tr>
+        <th>Media</th>
+        <th>${mediaOpcionesGanar}</th>
+        <th>${mediaOpcionesEmpatar}</th>
+        <th>${mediaOpcionesPerder}</th>
+        <th>${mediaGanados}</th>  
+        <th>${mediaEmpatados}</th> 
+        <th>${mediaPerdidos}</th>    
+    </tr>
+
+</table>
+    
+<a href="${root}/ayuda?grupo=Futbol8&codigo=estadistica" target="_blank"><img src="${root}/images/ayuda.gif"></a>        
+
+

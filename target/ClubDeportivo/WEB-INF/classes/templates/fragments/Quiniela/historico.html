@@ -1,0 +1,21 @@
+<th:block th:fragment="historico">
+
+    <form th:action="@{/panelControl/Quiniela/historico}" method="post">
+
+        <table class="tabla" width="100%">
+            <tr>
+                <th width="40%">Nombre</th>
+                <th width="30%">Campeón</th>
+                <th width="30%">Subcampeón</th>
+            </tr>                        
+
+            <tr th:each="comp : ${competiciones}">
+                <td th:text="${comp.nombre}">Nombre</td>
+                <td align="center" th:text="${comp.campeon}">Campeón</td>
+                <td align="center" th:text="${comp.subcampeon}">Subcampeón</td>
+            </tr>
+
+        </table>
+
+    </form>
+</th:block>

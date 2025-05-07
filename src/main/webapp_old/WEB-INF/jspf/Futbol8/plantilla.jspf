@@ -1,0 +1,180 @@
+<%-- any content can be specified here e.g.: --%>
+<%@ page pageEncoding="UTF-8" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml"%>
+<%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<script type="text/javascript">
+    
+    
+</script>
+
+<c:set var="root" value="${pageContext.servletContext.contextPath}"/>
+
+<form action="${root}/panelControl/Futbol8/plantilla" name="plantilla"  method="post">
+
+<c:if test="${jugadores != null}">
+
+<table class="tablaJugadores">
+    <tr>
+        <td colspan="2"><p class="pie">Moral</p></td>
+        <td colspan="2"><p class="pie">${equipo.moral}</p></td>
+        <td colspan="5"><p class="pie">Numero de Jugadores</p></td>
+        <td colspan="3"><p class="pie">${jugadores.size()}</p></td>
+        
+    </tr>
+    <tr>
+        <th title="Seleccionar">Sel</th>        
+        <th>Nombre</th>
+        <th>Posicion</th>
+        <th title="Valoración">VA</th>
+        <th title="Estado Fisico">EF</th>
+        <th title="Lesionado">LS</th>
+        <th>Ficha</th>
+        <th>Clausula</th>
+        <th title="Blindado">Bl</th>
+        <th title="Transferible">Tr</th>
+        <th title="En Subasta">SB</th>
+        <th title="Contrato">CT</th>
+    </tr>
+
+    <c:forEach var="obj" items="${jugadores}">
+        <tr>
+            <td align="center"><input class="checkSeleccion" type="checkbox" id="${obj.id}" name="${obj.id}"></td>            
+            <td align="left">
+                <a  href="${root}/panelControl/Futbol8/jugador?id=${obj.id}" id="nombre_${obj.id}">${obj.nombre}</a>
+            </td>
+            <td align="left">${obj.posicion}</td>
+            <td bgcolor="${obj.colorValoracion}" width="25px" align="center">${obj.valoracionReal}</td>
+            <td bgcolor="${obj.colorEstadoFisico}" width="25px" align="center">${obj.estadoFisico}</td>  
+            <td>
+                <c:if test="${obj.jornadasLesion > 0}">
+                    <img alt="${obj.jornadasLesion} Jornada/s" title="${obj.jornadasLesion} Jornada/s" src="${root}/images/lesion.gif"/>             
+                </c:if>
+            </td>
+         
+            <td align="right"><fmt:formatNumber value="${obj.ficha}"/></td>
+            <td align="right"><fmt:formatNumber value="${obj.clausula}"/></td>
+            <td align="center">
+                <c:if test="${obj.blindado}">
+                    <img alt="Si"  src="${root}/images/activo.gif"/>
+                </c:if>
+                <c:if test="${!obj.blindado}">
+                    <img alt="No"  src="${root}/images/noActivo.gif"/>
+                </c:if>
+            </td>
+            <td align="center">
+                <c:if test="${obj.transferible}">
+                    <img alt="Si"  src="${root}/images/activo.gif"/>
+                </c:if>
+                <c:if test="${!obj.transferible}">
+                    <img alt="No"  src="${root}/images/noActivo.gif"/>
+                </c:if>
+            </td>
+            <td align="center">
+                <c:if test="${obj.enSubasta}">
+                    <img alt="Si"  src="${root}/images/activo.gif"/>
+                </c:if>
+                <c:if test="${!obj.enSubasta}">
+                    <img alt="No"  src="${root}/images/noActivo.gif"/>
+                </c:if>
+            </td>
+            <td bgcolor="${obj.colorContrato}" width="25px" align="center" id="contrato_${obj.id}">${obj.contrato}</td>
+                        
+        </tr>
+    </c:forEach>
+        <tr>
+            <td colspan="2"></td>
+            <td><p class="pie">Media</p></td>
+            <td align="center"><p class="pie">${equipo.valoracionMediaJugadores}</p></td>
+            <td align="right" colspan="3"><p align="rigth"><b>Total ${equipo.costeJugadores}</b></p></td>
+        </tr>
+        <c:if test="${juvenil != null}">
+            <tr>
+                <th></th>        
+                <th>Nombre</th>
+                <th>Posicion</th>
+                <th title="Valoración">VA</th>
+                <th title="Jornadas en Club">JR</th>
+                <th title="Se puede incorporar a Equipo">IN</th>
+                <th colspan="6"></th>       
+            </tr>
+            <tr>
+                <td></td>
+                <td align="left">${juvenil.nombre}</td>
+                <td align="left">${juvenil.posicion}</td>
+            <td bgcolor="${juvenil.colorValoracion}" width="25px" align="center">${juvenil.valoracionReal}</td>
+            <td width="25px" align="center">${juvenil.jornadas}</td>  
+            <td align="center">
+                <c:if test="${juvenil.incorporacion}">
+                    <img alt="Si"  src="${root}/images/activo.gif"/>
+                </c:if>
+                <c:if test="${!juvenil.incorporacion}">
+                    <img alt="No"  src="${root}/images/noActivo.gif"/>
+                </c:if>
+            </td>              
+            <td colspan="6"></td>
+            </tr>
+        </c:if>       
+</table>
+    <input type="submit" value="Despedir" id ="operacion" name="operacion" onclick=""/>
+    <input type="submit" value="Blindar" id ="operacion" name="operacion" onclick=""/>
+    <input type="submit" value="Mejorar Contrato" id ="operacion" name="operacion" onclick=""/>
+    <input type="submit" value="Renovar" id ="operacion" name="operacion" onclick="avisoRenovacion()"/>
+    <input type="submit" value="Poner Transferible" id ="operacion" name="operacion" onclick=""/>
+    <input type="submit" value="Subastar" id ="operacion" name="operacion" onclick=""/>  
+    <c:if test="${equipo.jugadoresOjeados > 0}">
+        <input type="submit" value="Incorporar Ojeado" id ="operacion" name="operacion" title="Tienes ${equipo.jugadoresOjeados} jugadores ojeados" onclick=""/>  
+    </c:if>
+    <c:if test="${juvenil != null && juvenil.incorporacion == true}">
+        <input type="submit" value="Incorporar Juvenil" id ="operacion" name="operacion" title="Incorpora el juvenil en tu plantilla" onclick=""/>  
+    </c:if>
+        <br/>
+    <a href="${root}/ayuda?grupo=Futbol8&codigo=plantilla" target="_blank"><img src="${root}/images/ayuda.gif"></a> 
+</c:if>
+
+    <c:if test="${error != null}">
+        <p class="error">${error}</p>
+    </c:if>
+
+</form>
+
+ <script type="text/javascript">
+        
+      var avisoRenovacion = function(){
+          txtMensaje="";
+          checkboxes=document.getElementsByTagName('input'); //obtenemos todos los controles del tipo Input
+          for(i=0;i<checkboxes.length;i++) //recoremos todos los controles
+          {
+              if(checkboxes[i].type == "checkbox") //solo si es un checkbox entramos
+              {
+                  if(checkboxes[i].checked){ //Si esta marcado sacamos mensaje
+                      contrato = document.getElementById("contrato_" + checkboxes[i].id).innerHTML;                      
+                      if (parseInt(contrato) > 20){
+                          nombre = document.getElementById("nombre_" + checkboxes[i].id).innerHTML;
+                          txtMensaje = txtMensaje + "Al jugador " + nombre + " le queda mas de la mitad de contrato\n";
+                      }
+                  }                  
+              }
+          }
+          if (txtMensaje != ""){
+              txtMensaje = txtMensaje + "\n\n¿Seguro que deseas continuar?";
+              if(confirm(txtMensaje) == false){
+                  for(i=0;i<checkboxes.length;i++) //recoremos todos los controles
+                  {
+                      if(checkboxes[i].type == "checkbox"){ //solo si es un checkbox entramos
+                          checkboxes[i].checked = false;                
+                      }
+                  } 
+              }
+          } 
+              
+          
+      }
+     
+        
+    </script>
+
+

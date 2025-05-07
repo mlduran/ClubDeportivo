@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+    <head>
+        <meta charset="UTF-8">
+        <title th:text="${@environment.getProperty('initParam.tituloapp')}"></title>       
+
+        <link rel="stylesheet" type="text/css" th:href="@{/css/estiloPanelControl.css}"/>
+        <link rel="stylesheet" type="text/css" th:href="@{/css/general.css}"/>
+    </head>
+
+    <body>
+        <div id="contenedor">
+            <!-- Inserta la cabecera -->
+            <th:block th:insert="fragments/cabecera :: cabecera"></th:block>
+
+            <div id="grupo">
+                <div id="columna_izquierda_login">
+                    <br/>
+                    <img style="padding: 0;" th:src="@{/images/deportes1.png}" title="Deportes" alt="Deportes"/>
+                </div>
+
+                <div id="columna_central_login">
+                    <h3>REGISTRO</h3>
+
+                    <form method="POST" th:action="@{/alta/club}">
+                        <table class="tabla" cellpadding="3">
+                            <tr align="left">
+                                <td>
+                                    <label for="grupo" accesskey="i">Grupo:</label><br/>
+                                    <a th:href="@{/alta/grupo}" title="Alta Grupo">Crear Grupo</a>
+                                </td>
+                                <td>
+                                    <!-- Grupos públicos -->
+                                    <label>GRUPOS PÚBLICOS</label>
+                                    <select name="grupopublico">
+                                        <option value="" th:if="${newgrupo == null or newgrupo.privado}">Selecciona uno</option>
+                                        <option th:each="grupo : ${grupospublicos}"
+                                                th:value="${grupo.id}"
+                                                th:text="${grupo.nombre}">
+                                        </option>
+                                    </select>
+
+                                    <br/>
+
+                                    <!-- Grupos privados -->
+                                    <label>GRUPOS PRIVADOS</label>
+                                    <select name="grupoprivado">
+                                        <option value="" th:if="${newgrupo == null or !newgrupo.privado}">Selecciona uno</option>
+                                        <option th:each="grupo : ${gruposprivados}"
+                                                th:value="${grupo.id}"
+                                                th:text="${grupo.nombre}">
+                                        </option>
+                                    </select>
+
+                                    <!-- Código de grupo privado -->
+                                    <label for="codigo">Contraseña:</label>
+                                    <input type="text" name="codigo" id="codigo"
+                                           title="Si es un grupo privado introduce la contraseña"
+                                           maxlength="255" style="width: 60px"
+                                           th:value="${codigo}"/>
+
+                                    <!-- Error en código -->
+                                    <img th:if="${errors != null and errors.containsKey('codigo')}"
+                                         th:src="@{/images/iconError.gif}"
+                                         alt="Error" th:title="${errors['codigo']}"/>
+                                </td>
+                            </tr>
+
+                            <!-- Error general en grupo -->
+                            <tr th:if="${errors != null and errors.containsKey('grupo')}">
+                                <td colspan="2" th:text="${errors['grupo']}"></td>
+                            </tr>
+
+                            <!-- Campos restantes -->
+
+                            <tr align="left">
+                                <td><label for="nombre">Nombre Club:</label></td>
+                                <td>
+                                    <input type="text" name="nombre" id="nombre"
+                                           title="Introduce el nombre para tu Club"
+                                           maxlength="20" style="width: 200px"
+                                           th:value="${param.nombre}"/>
+                                    <img th:if="${errors != null and errors.containsKey('nombre')}"
+                                         th:src="@{/images/iconError.gif}"
+                                         alt="Error" th:title="${errors['nombre']}"/>
+                                </td>
+                            </tr>
+
+                            <tr align="left">
+                                <td><label for="usuario">Usuario:</label></td>
+                                <td>
+                                    <input type="text" name="usuario" id="usuario"
+                                           title="Introduce el usuario de acceso"
+                                           maxlength="20" style="width: 60px"
+                                           th:value="${param.usuario}"/>
+                                    <img th:if="${errors != null and errors.containsKey('usuario')}"
+                                         th:src="@{/images/iconError.gif}"
+                                         alt="Error" th:title="${errors['usuario']}"/>
+                                </td>
+                            </tr>
+
+                            <tr align="left">
+                                <td><label for="password">Contraseña:</label></td>
+                                <td>
+                                    <input type="password" name="password" id="password"
+                                           title="Introduce tu contraseña de acceso"
+                                           maxlength="20" style="width: 100px"
+                                           th:value="${param.password}"/>
+                                    <img th:if="${errors != null and errors.containsKey('password')}"
+                                         th:src="@{/images/iconError.gif}"
+                                         alt="Error" th:title="${errors['password']}"/>
+                                </td>
+                            </tr>
+
+                            <tr align="left">
+                                <td><label for="password2">Repite Contraseña:</label></td>
+                                <td>
+                                    <input type="password" name="password2" id="password2"
+                                           title="Confirma tu contraseña de acceso"
+                                           maxlength="20" style="width: 100px"
+                                           th:value="${param.password2}"/>
+                                    <img th:if="${errors != null and errors.containsKey('password2')}"
+                                         th:src="@{/images/iconError.gif}"
+                                         alt="Error" th:title="${errors['password2']}"/>
+                                </td>
+                            </tr>
+
+                            <tr align="left">
+                                <td><label for="mail">Mail:</label></td>
+                                <td>
+                                    <input type="text" name="mail" id="mail"
+                                           title="Introduce una dirección de correo"
+                                           maxlength="255" style="width: 200px"
+                                           th:value="${param.mail}"/>
+                                    <img th:if="${errors != null and errors.containsKey('mail')}"
+                                         th:src="@{/images/iconError.gif}"
+                                         alt="Error" th:title="${errors['mail']}"/>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="2" align="center">
+                                    <input type="submit" id="bSubmit" name="bSubmit" value="Crear" accesskey="E"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Lista general de errores -->
+                        <br/>
+                        <div th:if="${errors != null}">
+                            <p>Se han producido los siguientes errores:</p>
+                            <ul>
+                                <li th:each="error : ${errors}" th:text="${error.value}"></li>
+                            </ul>
+                        </div>
+
+                        <!-- Mensaje de éxito -->
+                        <div th:if="${clubsave != null}">
+                            <p>Felicidades, tu club ha sido dado de alta</p>
+                        </div>
+                    </form>
+
+                    <!-- Ayuda y volver -->
+                    <br/>
+                    <a th:href="@{/ayuda(grupo='General', codigo='altaClub')}" target="_blank">
+                        <img th:src="@{/images/ayuda.gif}" alt="Ayuda"/>
+                    </a>
+                    <br/><br/>
+                    <a th:href="@{/}" title="Login">Volver</a>
+                    <br/><br/>
+                </div>
+
+                <div id="columna_derecha_login">
+                    <br/>
+                    <img th:src="@{/images/deportes2.png}" title="Deportes" alt="Deportes"/>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+

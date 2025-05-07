@@ -1,0 +1,88 @@
+
+<th:block th:fragment="jornadasDisputadas">
+    <script th:src="@{/JavaScript/Lib/jquery/1.7.2/jquery.min.js}"></script>
+    <script th:src="@{/JavaScript/Lib/Highcharts-2.3.3/js/highcharts.js}"></script>
+    <script th:src="@{/JavaScript/Graficos.js}"></script>
+    <script th:src="@{/JavaScript/DomDrag.js}"></script>
+
+
+    <form th:action="@{/panelControl/Quiniela/jornadasDisputadas}" method="post">
+
+        <!-- Selector de competición -->
+        <select name="competicion" onchange="this.form.submit()">
+            <option th:each="comp : ${competiciones}"
+                    th:value="${comp.id}"
+                    th:selected="${comp.id == competicion}"
+                    th:text="${comp.nombre}">
+            </option>
+        </select>
+
+        <!-- Selector de jornada -->
+        <select name="jornada" onchange="this.form.submit()">
+            <option th:each="jor : ${jornadas}"
+                    th:value="${jor.id}"
+                    th:selected="${jor.id == jornada}"
+                    th:text="${jor.descripcion}">
+            </option>
+        </select>
+
+        <!-- Selector de equipo -->
+        <select name="equipo" onchange="this.form.submit()">
+            <option th:each="equip : ${equipos}"
+                    th:value="${equip.id}"
+                    th:text="${equip.nombre}">
+            </option>
+        </select>
+
+        <br/>
+
+        <!-- Si hay apuestas -->
+        <div th:if="${apuestas != null}">
+            <div th:insert="/fragments/Quiniela/tablaConsulta :: tablaConsulta"></div>
+            <p>
+                Puntos <span th:text="${estadistica.puntos}"></span>
+                (<span th:text="${estadistica.aciertos}"></span> Aciertos)
+            </p>
+
+            <br/><br/>
+            <p>GRAFICO DE POSICIONES REALIZADAS EN COMPETICIÓN</p>
+            <img th:src="@{/images/grafico.png}"
+                 th:onclick="'abrirGrafico(\'/ClubDeportivo\', \'graficoPosicionesQuiniela\', ' 
+                 + ${equipo} + ', ' 
+                 + ${competicion} + ')'" />
+
+
+
+
+            <div id="graficoPosicionesQuiniela" class="grafico" style="display:none">
+                <table style="width:100%">
+                    <tr>
+                        <td style="text-align:right;">
+                            <img th:src="@{/images/cerrar.png}" onclick="cerrarGrafico('graficoPosicionesQuiniela')"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div id="posiciones"></div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Si no hay apuestas -->
+        <div th:if="${apuestas == null}">
+            <br/>
+            NO HAY NINGUNA APUESTA CON ESTA SELECCIÓN
+        </div>
+
+        <!-- Si hay error -->
+        <div th:if="${error != null}" th:text="${error}"></div>
+
+    </form>
+
+    <script type="text/javascript">
+        mover.init(document.getElementById('graficoPosicionesQuiniela'));
+    </script>
+
+</th:block>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title th:text="${@environment.getProperty('initParam.tituloapp')}">Título App</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/general.css}">
+</head>
+
+<body>
+
+    <table class="tabla">
+        <tr>
+            <th th:if="${error == null}">
+                LA JORNADA SE HA LANZADO CORRECTAMENTE
+            </th>
+            <th th:if="${error != null}">
+                ERROR AL LANZAR JORNADA
+            </th>
+        </tr>
+        <tr>
+            <td th:text="${error}"></td>
+        </tr>
+    </table>
+
+</body>
+
+</html>
+

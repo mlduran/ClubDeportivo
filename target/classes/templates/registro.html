@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title th:text="${@environment.getProperty('tituloapp')}">Título por defecto</title>
+        <link rel="stylesheet" type="text/css" th:href="@{/css/general.css}">
+    </head>
+    <body>
+
+        <table style="width: 800px" class="tabla">
+            <tr>
+                <td colspan="4">ENTRADAS AL SISTEMA</td>
+                <td>
+                    <form th:action="@{/registro}" method="post">
+                        <input type="submit" value="Ejecutar" />
+                        <input class="txtNum" type="text" name="numero" th:value="${numero}" size="3"/>Registros
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <th>Id</th>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Usuario</th>
+                <th>IP</th>
+            </tr>
+            <tr th:each="reg : ${regs}">
+                <td align="center" th:text="${reg.id}">1</td>
+                <td th:text="${#dates.format(reg.fecha, 'dd/MM/yyyy HH:mm')}">01/01/2024 12:00</td>
+                <td th:text="${reg.tipo}">Tipo</td>
+                <td th:text="${reg.usuario}">Usuario</td>
+                <td th:text="${reg.ip}">127.0.0.1</td>
+            </tr>
+        </table>
+
+        <br>
+
+        <div th:if="${error != null}" th:text="${error}"></div>
+
+    </body>
+</html>
+
