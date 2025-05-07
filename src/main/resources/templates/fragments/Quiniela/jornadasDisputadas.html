@@ -38,7 +38,7 @@
 
         <!-- Si hay apuestas -->
         <div th:if="${apuestas != null}">
-            <div th:insert="/fragments/Quiniela/tablaConsulta :: tablaConsulta"></div>
+            <div th:insert="~{/fragments/Quiniela/tablaConsulta :: tablaConsulta}"></div>
             <p>
                 Puntos <span th:text="${estadistica.puntos}"></span>
                 (<span th:text="${estadistica.aciertos}"></span> Aciertos)

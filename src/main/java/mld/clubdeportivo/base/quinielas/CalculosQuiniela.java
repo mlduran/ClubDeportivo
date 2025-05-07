@@ -7,6 +7,7 @@ package mld.clubdeportivo.base.quinielas;
 
 import static java.lang.String.valueOf;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,9 +23,7 @@ public class CalculosQuiniela {
             ArrayList<EquipoQuiniela> eqs, String[] resultados, int ptsJornada) {
 
         var aciertosTotales = new Integer[15];
-        for (var i = 0; i < 15; i++) {
-            aciertosTotales[i] = 0;
-        }
+        Arrays.fill(aciertosTotales, 0);
 
         // primero obtenemos los aciertos totales para cada partido
         for (var eq : eqs) {
@@ -157,8 +156,15 @@ public class CalculosQuiniela {
                 eq.getPuntuaciones().get(0).setVictorias(victoriasActuales + 1);
             }
             eq.getEstadisiticas().get(0).setPuntos(puntosNuevos);
-            eq.getEstadisiticas().get(0).setAciertos(ResultadosApuestas.getAciertosCol1()
-                    + " - " + ResultadosApuestas.getAciertosCol2());
+            // ordenamos aciertos
+            String aciertosCol1 = ResultadosApuestas.getAciertosCol1();
+            String aciertosCol2 = ResultadosApuestas.getAciertosCol2();
+            if (Integer.parseInt(aciertosCol1) < Integer.parseInt(aciertosCol1)){
+                aciertosCol1 = ResultadosApuestas.getAciertosCol2();
+                aciertosCol2 = ResultadosApuestas.getAciertosCol1();
+            }        
+            
+            eq.getEstadisiticas().get(0).setAciertos(aciertosCol1+ " - " + aciertosCol2);
             eq.getEstadisiticas().get(0).setPosicion(ResultadosApuestas.getPosicionReal());
 
         }

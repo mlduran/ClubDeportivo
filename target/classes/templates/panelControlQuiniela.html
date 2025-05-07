@@ -12,12 +12,12 @@
     <body>
         <div id="contenedor">
              <div id="cabecera">
-                <th:block th:insert="fragments/cabecera :: cabecera"></th:block>
+                <th:block th:insert="~{fragments/cabecera :: cabecera}"></th:block>
             </div>
 
             <div id="grupo">
                 <div id="columna_izquierda">
-                    <th:block th:insert="/fragments/Quiniela/acciones :: acciones"></th:block>
+                    <th:block th:insert="~{/fragments/Quiniela/acciones :: acciones}"></th:block>
                 </div>                
 
                 <div id="columna_central">
@@ -25,21 +25,21 @@
 
                     <div id="divContenido">
                         <div th:switch="${op}">
-                            <div th:case="'inicio'" th:insert="/fragments/Quiniela/inicio :: inicio"></div>
-                            <div th:case="'cumplimentar'" th:insert="/fragments/Quiniela/cumplimentar :: cumplimentar"></div>
-                            <div th:case="'jornada'" th:insert="/fragments/Quiniela/jornada :: jornada"></div>
-                            <div th:case="'clasificacion'" th:insert="/fragments/Quiniela/clasificacion :: clasificacion"></div>
-                            <div th:case="'jornadasDisputadas'" th:insert="/fragments/Quiniela/jornadasDisputadas :: jornadasDisputadas"></div>
-                            <div th:case="'competiciones'" th:insert="/fragments/Quiniela/competiciones :: competiciones"></div>
-                            <div th:case="'historico'" th:insert="/fragments/Quiniela/historico :: historico"></div>
-                            <div th:case="'cumplimentarAdmin'" th:insert="/fragments/Quiniela/cumplimentarAdmin :: cumplimentarAdmin"></div>
+                            <div th:case="'inicio'" th:insert="~{/fragments/Quiniela/inicio :: inicio}"></div>
+                            <div th:case="'cumplimentar'" th:insert="~{/fragments/Quiniela/cumplimentar :: cumplimentar}"></div>
+                            <div th:case="'jornada'" th:insert="~{/fragments/Quiniela/jornada :: jornada}"></div>
+                            <div th:case="'clasificacion'" th:insert="~{/fragments/Quiniela/clasificacion :: clasificacion}"></div>
+                            <div th:case="'jornadasDisputadas'" th:insert="~{/fragments/Quiniela/jornadasDisputadas :: jornadasDisputadas}"></div>
+                            <div th:case="'competiciones'" th:insert="~{/fragments/Quiniela/competiciones :: competiciones}"></div>
+                            <div th:case="'historico'" th:insert="~{/fragments/Quiniela/historico :: historico}"></div>
+                            <div th:case="'cumplimentarAdmin'" th:insert="~{/fragments/Quiniela/cumplimentarAdmin :: cumplimentarAdmin}"></div>
                         </div>
                     </div>
 
                 </div>
                 <div id="columna_derecha">
-                    <div th:insert="/fragments/Quiniela/panelGrupo :: panelGrupo"></div>
-                    <div th:insert="/fragments/generico :: generico"></div>
+                    <div th:insert="~{/fragments/Quiniela/panelGrupo :: panelGrupo}"></div>
+                    <div th:insert="~{/fragments/generico :: generico}"></div>
                 </div>
             </div>
         </div>

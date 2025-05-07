@@ -11,31 +11,31 @@
 
         <div id="contenedor">
             <div id="cabecera">
-                <th:block th:insert="fragments/cabecera :: cabecera"></th:block>
+                <th:block th:insert="~{/fragments/cabecera :: cabecera}"></th:block>
             </div>
 
             <div id="grupo">
                 <div id="columna_izquierda">
-                    <th:block th:insert="fragments/acciones :: acciones"></th:block>
+                    <th:block th:insert="~{/fragments/acciones :: acciones}"></th:block>
                 </div>
 
                 <div id="columna_central">
 
-                    <div th:if="${op == 'presentacion'}" th:insert="fragments/presentacion :: presentacion"></div>
+                    <div th:if="${op == 'presentacion'}" th:insert="~{/fragments/presentacion :: presentacion}"></div>
 
-                    <div th:if="${op == 'fichaClub'}" th:insert="fragments/fichaClub :: fichaClub"></div>
+                    <div th:if="${op == 'fichaClub'}" th:insert="~{/fragments/fichaClub :: fichaClub}"></div>
 
-                    <div th:if="${op == 'datosUsuario'}" th:insert="fragments/datosUsuario :: datosUsuario"></div>
+                    <div th:if="${op == 'datosUsuario'}" th:insert="~{/fragments/datosUsuario :: datosUsuario}"></div>
 
-                    <div th:if="${op == 'faqs'}" th:insert="fragments/faqs :: faqs"></div>
+                    <div th:if="${op == 'faqs'}" th:insert="~{/fragments/faqs :: faqs}"></div>
 
-                    <div th:if="${op == 'ranking'}" th:insert="fragments/ranking :: ranking"></div>
+                    <div th:if="${op == 'ranking'}" th:insert="~{/fragments/ranking :: ranking}"></div>
 
                 </div>
 
                 <div id="columna_derecha">
-                    <th:block th:insert="fragments/panelGrupo :: panelGrupo"></th:block>
-                    <th:block th:insert="fragments/generico :: generico"></th:block>
+                    <th:block th:insert="~{/fragments/panelGrupo :: panelGrupo}"></th:block>
+                    <th:block th:insert="~{/fragments/generico :: generico}"></th:block>
                 </div>
             </div>
         </div>
