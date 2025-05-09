@@ -12,13 +12,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.logging.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
 
 public class FileHttpServlet extends HttpServlet{
     
-     private static Logger logger = getLogger(AdminHttpServlet.class.getName());
+     private static Logger logger = LoggerFactory.getLogger(AdminHttpServlet.class.getName());
    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -36,7 +37,7 @@ public class FileHttpServlet extends HttpServlet{
                     req.getRequestDispatcher("/Utiles/cargaFichero.jsp");
             view.forward(req, resp);
         } catch (Exception ex) {
-            logger.log(SEVERE, ex.getMessage());
+            logger.error(ex.getMessage());
             req.setAttribute("error", ex.getMessage());
         }
     }

@@ -13,7 +13,8 @@ import mld.clubdeportivo.base.Faq;
 import mld.clubdeportivo.base.Grupo;
 import mld.clubdeportivo.base.quinielas.EquipoQuiniela;
 import mld.clubdeportivo.bd.DAOException;
-import java.util.logging.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static java.util.logging.Logger.getLogger;
 import static mld.clubdeportivo.base.Deporte.Futbol8;
 import static mld.clubdeportivo.base.Deporte.Quiniela;
@@ -57,7 +58,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class PanelControlHttpServlet {
 
     private static Logger logger
-            = getLogger(PanelControlHttpServlet.class.getName());
+            = LoggerFactory.getLogger(PanelControlHttpServlet.class.getName());
 
     @Value("${custom.deportesactivos}")
     private String deportesactivos;

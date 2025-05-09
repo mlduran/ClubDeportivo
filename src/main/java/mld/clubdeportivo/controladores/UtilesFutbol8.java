@@ -15,7 +15,8 @@ import static java.util.Collections.sort;
 import mld.clubdeportivo.base.*;
 import mld.clubdeportivo.base.futbol8.*;
 import mld.clubdeportivo.bd.DAOException;
-import java.util.logging.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
@@ -65,7 +66,7 @@ import static mld.clubdeportivo.utilidades.Calculos.valoresAleatoriosSinRepetir;
 public class UtilesFutbol8 {
     
     private static Logger logger = 
-            getLogger(UtilesFutbol8.class.getName());
+            LoggerFactory.getLogger(UtilesFutbol8.class.getName());
     
     protected static JugadorFutbol8 crearJugadorfutbol8(Grupo grp, EquipoFutbol8 equipo,
              PosicionJugFutbol8 posicion, int val, boolean subasta) throws DAOException {
@@ -314,7 +315,7 @@ public class UtilesFutbol8 {
             try{
                 grabarEntrenadorFutbol8(newEntr);
             }catch (Exception ex){
-                logger.log(SEVERE, "Error al dar de alta entrenador " + ex.getMessage());
+                logger.error("Error al dar de alta entrenador " + ex.getMessage());
             }
             if (equipo != null)
                 equipo.setEntrenador(newEntr);
@@ -455,8 +456,8 @@ public class UtilesFutbol8 {
          
         var tipoComp = tipoProximaCompeticion(appManager);
         
-        logger.log(INFO, "Tipos competicion " );         
-        logger.log(INFO, tipoComp.toString());
+        logger.info("Tipos competicion " );         
+        logger.info(tipoComp.toString());
         
         CompeticionFutbol8 comp = null;
         PartidoFutbol8 proximoPartido = null;

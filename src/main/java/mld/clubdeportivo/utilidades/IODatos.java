@@ -9,7 +9,8 @@ import mld.clubdeportivo.base.futbol8.EntrenadorMaestroFutbol8;
 import mld.clubdeportivo.base.futbol8.JugadorMaestroFutbol8;
 import mld.clubdeportivo.bd.DAOException;
 import mld.clubdeportivo.bd.futbol8.JDBCDAOFutbol8;
-import java.util.logging.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
 import static mld.clubdeportivo.bd.futbol8.JDBCDAOFutbol8.grabarEntrenadorMaestroFutbol8;
@@ -24,7 +25,7 @@ import static mld.clubdeportivo.utilidades.UtilGenericas.formatearNumChars;
 public class IODatos {
 
      private static Logger logApp
-            = getLogger(IODatos.class.getName());
+            = LoggerFactory.getLogger(IODatos.class.getName());
      
      
      private static void copiarFichero(File f1, File f2){
@@ -174,12 +175,12 @@ public class IODatos {
                     grabarEquipoMaestroFutbol8(eq);
                 }
                 catch (Exception ex){
-                    logApp.log(SEVERE, "Error alta nombre equipo maestro : ".concat(ex.getMessage()));
+                    logApp.error("Error alta nombre equipo maestro : ".concat(ex.getMessage()));
                 }
             }
         }
         catch (Exception ex){
-            logApp.log(SEVERE, "Error alta nombre equipo maestro : ".concat(ex.getMessage()));
+            logApp.error("Error alta nombre equipo maestro : ".concat(ex.getMessage()));
         }
         
     }
@@ -221,7 +222,7 @@ public class IODatos {
             var info = nomFile.split("_");
 
             if (info.length != 5) {
-                logApp.log(SEVERE, "Nombre de formato fichero quiniela incorrecto ".concat(nomFile));
+                logApp.error("Nombre de formato fichero quiniela incorrecto ".concat(nomFile));
                 throw new IllegalArgumentException(
                         "Nombre de formato fichero quiniela incorrecto ".concat(nomFile));
             }
@@ -255,7 +256,7 @@ public class IODatos {
                 datos.put("resultados", resultados);
 
             } catch (Exception ex) {
-                logApp.log(SEVERE, ex.getMessage());
+                logApp.error(ex.getMessage());
            
             } 
 

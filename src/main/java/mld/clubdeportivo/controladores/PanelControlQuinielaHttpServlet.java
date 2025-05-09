@@ -14,7 +14,8 @@ import mld.clubdeportivo.base.Grupo;
 import mld.clubdeportivo.base.quinielas.*;
 import mld.clubdeportivo.bd.DAOException;
 import mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela;
-import java.util.logging.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
 import static mld.clubdeportivo.base.quinielas.EstadisticaQuiniela.clasificar;
@@ -49,7 +50,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class PanelControlQuinielaHttpServlet {
 
     private static Logger logger
-            = getLogger(PanelControlQuinielaHttpServlet.class.getName());
+            = LoggerFactory.getLogger(PanelControlQuinielaHttpServlet.class.getName());
 
     @Value("${custom.diascumplimentacion}")
     private String diascumplimentacion;
@@ -132,7 +133,7 @@ public class PanelControlQuinielaHttpServlet {
             }
 
         } catch (Exception ex) {
-            logger.log(SEVERE, ex.getMessage());
+            logger.error(ex.getMessage());
             req.setAttribute("error", ex.getMessage());
         }
 

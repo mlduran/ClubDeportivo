@@ -23,7 +23,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import mld.clubdeportivo.controladores.AdminHttpServlet;
 import mld.clubdeportivo.utilidades.CalendarFunctions;
 import mld.clubdeportivo.utilidades.WebDataHTML;
-import java.util.logging.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class QuinielasService
@@ -36,7 +37,7 @@ public class QuinielasService
 //	private String sPasado;
 //        private ServletContext appManager;
 //	
-//        private static Logger logger = LogManager.getLogger(QuinielasService.class);
+//        private static Logger logger = LogManager.LoggerFactory.getLogger(QuinielasService.class);
 //
 //	protected void ejecutar(HttpServletRequest req, HttpServletResponse resp,
 //            ServletContext appMan) 

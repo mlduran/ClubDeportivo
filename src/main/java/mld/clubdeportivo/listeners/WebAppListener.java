@@ -9,7 +9,8 @@ import jakarta.servlet.http.HttpSessionListener;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import java.util.logging.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
 import static mld.clubdeportivo.bd.ConexionConfigDAO.getConexionConfigDAO;
@@ -33,7 +34,7 @@ public class WebAppListener implements ServletContextListener,
     private String configcorreo;
     
     private static final Logger logApp
-            = getLogger(WebAppListener.class.getName());
+            = LoggerFactory.getLogger(WebAppListener.class.getName());
 
     private void initConfigBD(String config) {
 
@@ -41,7 +42,7 @@ public class WebAppListener implements ServletContextListener,
             var configBD = getConexionConfigDAO();
             configBD.initConfigConexion(config);
         } catch (IOException | SQLException ex) {
-            logApp.log(SEVERE, "Error al crear configuracion conexion: ".concat(ex.getMessage()));
+            logApp.error("Error al crear configuracion conexion: ".concat(ex.getMessage()));
         }
 
     }
@@ -53,7 +54,7 @@ public class WebAppListener implements ServletContextListener,
             var configCorreo = getCorreo();
             configCorreo.initCorreo(config);
         } catch (IOException ex) {
-            logApp.log(SEVERE, "Error al crear configuracion conexion: ".concat(ex.getMessage()));       
+            logApp.error("Error al crear configuracion conexion: ".concat(ex.getMessage()));       
         }
 
     }

@@ -19,7 +19,8 @@ import mld.clubdeportivo.base.Grupo;
 import mld.clubdeportivo.base.quinielas.*;
 import mld.clubdeportivo.bd.*;
 import mld.clubdeportivo.bd.quinielas.*;
-import java.util.logging.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
 import static mld.clubdeportivo.base.Deporte.Quiniela;
@@ -54,7 +55,7 @@ import static mld.clubdeportivo.utilidades.IODatos.obtenerDatosFicherosQuini;
 public class UtilesQuiniela {
     
     private static final Logger logApp
-            = getLogger(UtilesQuiniela.class.getName());
+            = LoggerFactory.getLogger(UtilesQuiniela.class.getName());
     
     private static final String URL_WEB = "http://www.resultados-futbol.com/scripts/api/api.php";
     private static final String URL_API = "http://apiclient.resultados-futbol.com/scripts/api/api.php";
@@ -347,7 +348,7 @@ public class UtilesQuiniela {
         try {
             enviaCorreoNuevaJornada(jorQuini);
         } catch (IOException | MessagingException ex) {
-            logApp.log(SEVERE, "Error envio mail: " + ex.getMessage());
+            logApp.error("Error envio mail: " + ex.getMessage());
         }
         
         return jorQuini;
@@ -382,10 +383,10 @@ public class UtilesQuiniela {
         try {
             datosFich = obtenerDatosFicherosQuini(ruta);
         } catch (FileNotFoundException ex) {
-            logApp.log(SEVERE, "Error en carga de datos: " + ex.getMessage());
+            logApp.error("Error en carga de datos: " + ex.getMessage());
             return;
         } catch (IOException ex) {
-            logApp.log(SEVERE, "Error en carga de datos: " + ex.getMessage());
+            logApp.error("Error en carga de datos: " + ex.getMessage());
             return;
         }
         
@@ -399,7 +400,7 @@ public class UtilesQuiniela {
         JornadaQuiniela jorQuini = null;
         
         if (comp == null){
-            logApp.log(SEVERE, "Error en carga de datos, no existe competicion activa");
+            logApp.error("Error en carga de datos, no existe competicion activa");
             return;
         }
         
@@ -408,7 +409,7 @@ public class UtilesQuiniela {
             
             var nomComp = (String) datos.get("competicion");
             if (!comp.getNombre().equals(nomComp)) {
-                logApp.log(SEVERE, "Error en carga de datos, no existe competicion " + nomComp);
+                logApp.error("Error en carga de datos, no existe competicion " + nomComp);
                 continue;
             }
             int jornada = valueOf((String) datos.get("jornada"));
@@ -473,7 +474,7 @@ public class UtilesQuiniela {
         if (isCreaJornada) try {
             enviaCorreoNuevaJornada(jorQuini);
         } catch (IOException | MessagingException ex) {
-            logApp.log(SEVERE, "Error envio mail: " + ex.getMessage());
+            logApp.error("Error envio mail: " + ex.getMessage());
         }
         
     }
@@ -490,7 +491,7 @@ public class UtilesQuiniela {
             try {
                 validarJornada(jor.getNumero());
             }catch (Exception ex){
-                logApp.log(SEVERE, "Error al validar jornada: " + ex.getMessage());
+                logApp.error("Error al validar jornada: " + ex.getMessage());
             }
         }
     }

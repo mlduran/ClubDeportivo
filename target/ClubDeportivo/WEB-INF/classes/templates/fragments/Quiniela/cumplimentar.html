@@ -22,7 +22,7 @@
             <form th:action="@{/panelControl/Quiniela/cumplimentar}" method="post">
 
                 <!-- Inclusión del fragmento tablaQuiniela -->
-                <div th:insert="/fragments/Quiniela/tablaQuiniela :: tablaQuiniela"></div>
+                <div th:insert="~{/fragments/Quiniela/tablaQuiniela :: tablaQuiniela}"></div>
 
                 <input type="submit" value="Grabar" name="operacion" />
 
@@ -35,4 +35,4 @@
 
     <br/>
 
-    <th:block th:insert="/fragments/Quiniela/faqPuntuacion :: faqPuntuacion"></th:block>
+    <th:block th:insert="~{/fragments/Quiniela/faqPuntuacion :: faqPuntuacion}"></th:block>

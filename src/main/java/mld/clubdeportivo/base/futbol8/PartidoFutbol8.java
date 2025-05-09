@@ -9,9 +9,8 @@ import mld.clubdeportivo.base.Club;
 import mld.clubdeportivo.base.CronicaStrings;
 import mld.clubdeportivo.base.Partido;
 import mld.clubdeportivo.utilidades.Calculos;
-import java.util.logging.*;
-import static java.util.logging.Level.INFO;
-import static java.util.logging.Logger.getLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static mld.clubdeportivo.base.CronicaStrings.chuta;
 import static mld.clubdeportivo.base.CronicaStrings.cortaPase;
 import static mld.clubdeportivo.base.CronicaStrings.cubre;
@@ -66,7 +65,7 @@ import static mld.clubdeportivo.utilidades.Calculos.valorAleatorio;
 
 public final class PartidoFutbol8 extends Partido{
     
-    private static Logger logger = getLogger(PartidoFutbol8.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(PartidoFutbol8.class.getName());
     public static int NUMERO_SIMULACIONES = 100;
     public static int MINUTOS_PARTIDO = 90;
 
@@ -406,7 +405,7 @@ public final class PartidoFutbol8 extends Partido{
  
     public EstadisticaPartidoFutbol8 jugarPartido(){
         
-        logger.log(INFO, "Inicio Partido");
+        logger.info("Inicio Partido");
         
         inicializarDatos();
       
@@ -475,7 +474,7 @@ public final class PartidoFutbol8 extends Partido{
         if (!this.isSimulacion())           
             asignarMoral();
         
-        logger.log(INFO, "Fin Partido");
+        logger.info("Fin Partido");
         
         return  this.getEstadistica();
  
@@ -812,7 +811,7 @@ public final class PartidoFutbol8 extends Partido{
     
     private void calcularPosesion(){
         
-        logger.log(INFO, "Calcular Posesion");
+        logger.info("Calcular Posesion");
 
         var posTotal = eqLocal.posesion + eqVisit.posesion;
         eqLocal.posesion = eqLocal.posesion * 100 / posTotal;
@@ -821,7 +820,7 @@ public final class PartidoFutbol8 extends Partido{
         while (100 - eqLocal.posesion - eqVisit.posesion > 0)
             eqLocal.posesion++;
         
-        logger.log(INFO, "Calcular Posesion OK");
+        logger.info("Calcular Posesion OK");
        
     }
     
@@ -953,7 +952,7 @@ public final class PartidoFutbol8 extends Partido{
            
     private void disputarCorner(EquipoFutbol8 eqAtq, EquipoFutbol8 eqDef){
         
-        logger.log(INFO, "Calcular Corners");
+        logger.info("Calcular Corners");
         
          
         var aliAtq = eqAtq.getAlineacion();
@@ -978,7 +977,7 @@ public final class PartidoFutbol8 extends Partido{
                     
         }     
         
-        logger.log(INFO, "Calcular Corners OK");
+        logger.info("Calcular Corners OK");
        
     }
     
@@ -986,7 +985,7 @@ public final class PartidoFutbol8 extends Partido{
     
     private void lanzarFaltaDirecta(EquipoFutbol8 eqAtq, JugadorFutbol8 portero){
 
-        logger.log(INFO, "Calcular Faltas Directas");
+        logger.info("Calcular Faltas Directas");
         
         int numJug;
         
@@ -1007,13 +1006,13 @@ public final class PartidoFutbol8 extends Partido{
             hacerTiro(jugAtq, portero, Falta);
         }    
         
-        logger.log(INFO, "Calcular Faltas Directas OK");
+        logger.info("Calcular Faltas Directas OK");
        
     }
     
     private void lanzarPenalti(EquipoFutbol8 eqAtq, JugadorFutbol8 portero){
 
-        logger.log(INFO, "lanzar Penalti");
+        logger.info("lanzar Penalti");
         
         int numJug;
         
@@ -1029,7 +1028,7 @@ public final class PartidoFutbol8 extends Partido{
             hacerTiro(jugAtq, portero, Penalti);
         }    
         
-       logger.log(INFO, "lanzar Penalti OK");
+       logger.info("lanzar Penalti OK");
        
     }
     
@@ -1091,7 +1090,7 @@ public final class PartidoFutbol8 extends Partido{
         
         if (this.isSimulacion()) return;
 
-        logger.log(INFO, "Asignar Puntos");
+        logger.info("Asignar Puntos");
         
         var eqL = (EquipoFutbol8) this.getEqLocal();
         var puntsL = eqL.getPuntuacion();
@@ -1128,7 +1127,7 @@ public final class PartidoFutbol8 extends Partido{
         puntsV.setGolesFavor(puntsV.getGolesFavor() + this.getGolesVisitante());
         puntsV.setGolesContra(puntsV.getGolesContra() + this.getGolesLocal());
         
-        logger.log(INFO, "Asignar Puntos OK");
+        logger.info("Asignar Puntos OK");
 
     }
     
@@ -1136,7 +1135,7 @@ public final class PartidoFutbol8 extends Partido{
         
         if (this.isSimulacion()) return;
         
-        logger.log(INFO, "Asignar Moral");
+        logger.info("Asignar Moral");
         
         var eqL = (EquipoFutbol8) this.getEqLocal();
         var eqV = (EquipoFutbol8) this.getEqVisitante();
@@ -1166,13 +1165,13 @@ public final class PartidoFutbol8 extends Partido{
                     eqV.modificarMoral(eqV.getMoral() - 1);
         }
         
-        logger.log(INFO, "Asignar Moral OK");
+        logger.info("Asignar Moral OK");
         
     }
 
     private void calcularAsistenciaPublico() {
         
-        logger.log(INFO, "Calcular Publico");
+        logger.info("Calcular Publico");
         
         int interes, porcentaje;
         var comp = (CompeticionFutbol8) this.getJornada().getCompeticion();
@@ -1228,13 +1227,13 @@ public final class PartidoFutbol8 extends Partido{
         
         this.setEspectadores(asistencia);
         
-        logger.log(INFO, "Calcular Publico OK");
+        logger.info("Calcular Publico OK");
                 
     }
     
     private void completarValoracionesJugadores(EquipoFutbol8 eq) {
 
-        logger.log(INFO, "Completar valoraciones");
+        logger.info("Completar valoraciones");
         
         var minJugarEnCasa = 10;
         var ali = eq.getAlineacion();
@@ -1312,7 +1311,7 @@ public final class PartidoFutbol8 extends Partido{
         if (plusTact > 0)
                 eq.extras.append("Plus Tactica: ").append(plusTact).append(";");           
         
-        logger.log(INFO, "Completar valoraciones OK");
+        logger.info("Completar valoraciones OK");
 
         
     }
@@ -1389,7 +1388,7 @@ public final class PartidoFutbol8 extends Partido{
     private String asignarCansancioFinalJugadores (EquipoFutbol8 eq, 
             boolean esSimul){
         
-        logger.log(INFO, "Asignar cansancio final");
+        logger.info("Asignar cansancio final");
         
         var cansancioAcum = 0;
         // los que juegan
@@ -1414,7 +1413,7 @@ public final class PartidoFutbol8 extends Partido{
         }    
         var txt = "Cansancio Global ".concat(valueOf(cansancioAcum));
         
-        logger.log(INFO, "Asignar cansancio final OK");        
+        logger.info("Asignar cansancio final OK");        
         
         return txt;
         
@@ -1456,7 +1455,7 @@ public final class PartidoFutbol8 extends Partido{
         
         if (this.isSimulacion()) return;
         
-        logger.log(INFO, "Quitar tajetas");
+        logger.info("Quitar tajetas");
         
         var jugs = new ArrayList<JugadorFutbol8>();
         jugs.addAll(this.getEqLocal().getJugadores());
@@ -1465,13 +1464,13 @@ public final class PartidoFutbol8 extends Partido{
         for (var jug : jugs)
             if (jug.isTarjetaRoja()) jug.setTarjetaRoja(false);
         
-        logger.log(INFO, "Quitar tarjetas OK");
+        logger.info("Quitar tarjetas OK");
                 
     }
     
     private void lesionar(JugadorFutbol8 jug){
         
-        logger.log(INFO, "Lesionar");
+        logger.info("Lesionar");
         
         if (jug.getJornadasLesion() > 0) return;
         
@@ -1487,7 +1486,7 @@ public final class PartidoFutbol8 extends Partido{
              // restar una jornada
              jug.setJornadasLesion(num + 1);
         
-        logger.log(INFO, "Lesionar OK");
+        logger.info("Lesionar OK");
         
     }
     
@@ -1496,7 +1495,7 @@ public final class PartidoFutbol8 extends Partido{
         
         // Deviuelve el equipo que gana la tanda de penalties
         
-        logger.log(INFO, "Hacer tanda Penalties");
+        logger.info("Hacer tanda Penalties");
         
         escribir("Y vamos a la tanda de penalties");
         
@@ -1556,7 +1555,7 @@ public final class PartidoFutbol8 extends Partido{
         escribir("Finalmente el " + eqGanador.getNombre() + " gana la tanda de penalties por " +
                  local + " - " + visit);
         
-        logger.log(INFO, "Hacer tanda Penalties OK");
+        logger.info("Hacer tanda Penalties OK");
         
         return eqGanador;
         

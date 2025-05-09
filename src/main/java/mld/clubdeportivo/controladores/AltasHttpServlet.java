@@ -1,7 +1,6 @@
 package mld.clubdeportivo.controladores;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -14,9 +13,8 @@ import java.util.Map;
 import mld.clubdeportivo.base.Club;
 import mld.clubdeportivo.base.Grupo;
 import mld.clubdeportivo.bd.DAOException;
-import java.util.logging.*;
-import static java.util.logging.Level.SEVERE;
-import static java.util.logging.Logger.getLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static mld.clubdeportivo.bd.JDBCDAOClub.existeClub;
 import static mld.clubdeportivo.bd.JDBCDAOClub.existeUsuario;
 import static mld.clubdeportivo.bd.JDBCDAOClub.grabarClub;
@@ -43,7 +41,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class AltasHttpServlet {
 
-    private static Logger logger = getLogger(AltasHttpServlet.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(AltasHttpServlet.class.getName());
 
     @GetMapping("/alta/club")
     public String doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -52,7 +50,7 @@ public class AltasHttpServlet {
         try {
                 grupos(req);
             } catch (DAOException ex) {
-                Logger.getLogger(AltasHttpServlet.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex.getMessage());
             }
         return "altaClub";
     }
@@ -121,7 +119,7 @@ public class AltasHttpServlet {
             }
 
         } catch (DAOException ex) {
-            logger.log(SEVERE, "Error al dar de alta grupo: ".concat(ex.getMessage()));
+            logger.error("Error al dar de alta grupo: ".concat(ex.getMessage()));
             req.setAttribute("error", ex.getMessage());
         }
         return "altaGrupo";
@@ -270,7 +268,7 @@ public class AltasHttpServlet {
                 return "altaClub";
             }
         } catch (DAOException ex) {
-            logger.log(SEVERE, "Error al dar de alta Club: ".concat(ex.getMessage()));
+            logger.error("Error al dar de alta Club: ".concat(ex.getMessage()));
             req.setAttribute("error", ex.getMessage());
             return "altaClub";
         }

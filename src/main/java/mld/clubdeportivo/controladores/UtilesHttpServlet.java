@@ -15,7 +15,8 @@ import java.util.Date;
 import java.util.Properties;
 import mld.clubdeportivo.base.*;
 import mld.clubdeportivo.bd.DAOException;
-import java.util.logging.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
 import static mld.clubdeportivo.base.TipoRegistro.Login;
@@ -31,7 +32,7 @@ import static mld.clubdeportivo.utilidades.Correo.getCorreo;
  */
 public class UtilesHttpServlet extends HttpServlet {
 
-    private static Logger logger = getLogger(LoginHttpServlet.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(LoginHttpServlet.class.getName());
      
    
     @Override
@@ -159,7 +160,7 @@ public class UtilesHttpServlet extends HttpServlet {
                 var newComent = new Comentario(club.getGrupo(), club.getNombre(), coment, general);
                 grabarComentario(newComent);
             //} catch (UnsupportedEncodingException ex) {
-             //   java.util.logging.Logger.getLogger(UtilesHttpServlet.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+             //   java.util.logging.Logger.LoggerFactory.getLogger(UtilesHttpServlet.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
             //}
         }
         
@@ -219,10 +220,10 @@ public class UtilesHttpServlet extends HttpServlet {
                     try {
                         proc.waitFor();
                     } catch (InterruptedException ex) {
-                        logger.log(SEVERE, "Error en Interrupcion Backup: ".concat(ex.getMessage()));
+                        logger.error("Error en Interrupcion Backup: ".concat(ex.getMessage()));
                     }
                     if (proc.exitValue() != 0) 
-                        logger.log(SEVERE, "Error en Backup, el procedimiento ha devuelto error: " + proc.exitValue()); 
+                        logger.error("Error en Backup, el procedimiento ha devuelto error: " + proc.exitValue()); 
                 }
             }
             if (sistemaOperativo.equals("linux")){
@@ -230,7 +231,7 @@ public class UtilesHttpServlet extends HttpServlet {
             }
             
         } catch (IOException ex) {
-            logger.log(SEVERE, "Error en Backup: ".concat(ex.getMessage()));
+            logger.error("Error en Backup: ".concat(ex.getMessage()));
         }
 
 

@@ -13,7 +13,8 @@ import java.util.function.Supplier;
 import mld.clubdeportivo.base.Club;
 import mld.clubdeportivo.base.Objeto;
 import mld.clubdeportivo.base.Seccion;
-import java.util.logging.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Logger.getLogger;
 import static mld.clubdeportivo.base.Objeto.UNSAVED_VALUE;
@@ -38,7 +39,7 @@ import static mld.clubdeportivo.bd.TipoSaveDAO.update;
 public abstract class ObjetoDAO {
     
     
-    private static Logger logger = getLogger(ObjetoDAO.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(ObjetoDAO.class.getName());
     
     protected ObjetoDAO(){}
     
@@ -109,10 +110,10 @@ public abstract class ObjetoDAO {
         
         ArrayList lista = null;
         
-        logger.log(INFO,txtsql);
+        logger.info(txtsql);
         if (params != null)
             for (var param :params){
-                logger.log(INFO, param.toString());
+                logger.info(param.toString());
             }
         
         // inicializacion recursos
@@ -254,8 +255,8 @@ public abstract class ObjetoDAO {
         PreparedStatement sql = null;
         ResultSet retorno = null;
         
-        logger.log(INFO, txtsql);
-        logger.log(INFO, tipo.toString());
+        logger.info(txtsql);
+        logger.info(tipo.toString());
          
         try
         {
@@ -271,7 +272,7 @@ public abstract class ObjetoDAO {
                 // Es una insercion
                 sql = conexion.prepareStatement(txtsql);
                 asignarCampos(sql, obj, tipo);
-                logger.log(INFO, sql.toString());
+                logger.info(sql.toString());
                 sql.executeUpdate();
                 sql = conexion.prepareStatement("SELECT @@IDENTITY");
                 retorno = sql.executeQuery();
@@ -333,7 +334,7 @@ public abstract class ObjetoDAO {
                     nombreTabla + " WHERE id = ?");
             sql.setLong(1, id);
             
-            logger.log(INFO, sql.toString());
+            logger.info(sql.toString());
             
             sql.executeUpdate();
             
@@ -379,7 +380,7 @@ public abstract class ObjetoDAO {
             //Precompilamos y ejecutamos la sentencia SQL contra el SGBD
             sql = conexion.prepareStatement(query);
             
-            logger.log(INFO, (Supplier<String>) sql);
+            logger.info(sql.toString());
             
             sql.executeUpdate();
             
@@ -425,7 +426,7 @@ public abstract class ObjetoDAO {
             //Precompilamos y ejecutamos la sentencia SQL contra el SGBD
             sql = conexion.prepareStatement(txtSql);
             
-            logger.log(INFO, txtSql);
+            logger.info(txtSql);
             
             sql.executeUpdate();
             
@@ -472,7 +473,7 @@ public abstract class ObjetoDAO {
             sql = conexion.prepareStatement("DELETE FROM " +
                     nombreTabla + " WHERE id <> -1");
             
-            logger.log(INFO, (Supplier<String>) sql);
+            logger.info(sql.toString());
             
             sql.executeUpdate();
             
@@ -525,8 +526,8 @@ public abstract class ObjetoDAO {
         PreparedStatement sql = null;
         ResultSet retorno = null;
         
-        logger.log(INFO, txtsql);
-        logger.log(INFO, tipoRetorno.toString());
+        logger.info(txtsql);
+        logger.info(tipoRetorno.toString());
         
         try {
             //Abrimos conexión contra la base de datos
@@ -606,7 +607,7 @@ public abstract class ObjetoDAO {
         ResultSet retorno = null;
         var mapeo = new HashMap();
         
-        logger.log(INFO, txtsql);
+        logger.info(txtsql);
         
         try {
             //Abrimos conexión contra la base de datos
@@ -664,7 +665,7 @@ public abstract class ObjetoDAO {
         ResultSet retorno = null;
         var listaMapeos = new ArrayList<HashMap>();
         
-        logger.log(INFO, txtsql);
+        logger.info(txtsql);
         
         try {
             //Abrimos conexión contra la base de datos

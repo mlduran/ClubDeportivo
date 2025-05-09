@@ -8,7 +8,8 @@ import mld.clubdeportivo.bd.ClubDAO;
 import mld.clubdeportivo.bd.DAOException;
 import mld.clubdeportivo.bd.JDBCDAOClub;
 import mld.clubdeportivo.bd.JDBCDAOGrupo;
-import java.util.logging.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static java.util.logging.Logger.getLogger;
 import static mld.clubdeportivo.bd.JDBCDAOClub.obtenerSimpleClub;
 import static mld.clubdeportivo.bd.JDBCDAOGrupo.obtenerSimpleGrupo;
@@ -20,7 +21,7 @@ import static mld.clubdeportivo.bd.JDBCDAOGrupo.obtenerSimpleGrupo;
 public class JDBCDAOQuiniela {
 
     private static final Logger logApp
-            = getLogger(JDBCDAOQuiniela.class.getName());
+            = LoggerFactory.getLogger(JDBCDAOQuiniela.class.getName());
 
    
     private JDBCDAOQuiniela(){}

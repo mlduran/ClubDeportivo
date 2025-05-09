@@ -10,7 +10,8 @@ import java.util.Date;
 import java.util.List;
 import mld.clubdeportivo.base.Club;
 import mld.clubdeportivo.bd.DAOException;
-import java.util.logging.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
 import static mld.clubdeportivo.bd.JDBCDAOClub.grabarClub;
@@ -32,7 +33,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class LoginHttpServlet {
 
-    private static Logger logger = getLogger(LoginHttpServlet.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(LoginHttpServlet.class.getName());
 
     @Value("${custom.usuarioAdmin}")
     private String usuarioAdmin;
@@ -48,7 +49,7 @@ public class LoginHttpServlet {
             UtilesHttpServlet.registrarEntrada(req);
             obtenerDatos(req);
         } catch (DAOException ex) {
-            logger.log(SEVERE, ex.getMessage());
+            logger.error(ex.getMessage());
         }
         return "login";
     }
@@ -132,7 +133,7 @@ public class LoginHttpServlet {
             }
 
         } catch (DAOException ex) {
-            logger.log(SEVERE, "Error acceso a BD: ".concat(ex.getMessage()));
+            logger.error("Error acceso a BD: ".concat(ex.getMessage()));
             req.setAttribute("error", ex.getMessage());
         }
 

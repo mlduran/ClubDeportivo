@@ -17,7 +17,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Logger.getLogger;
 
@@ -32,7 +33,7 @@ import static java.util.logging.Logger.getLogger;
 public final class Correo {
     
     private static Logger logApp
-            = getLogger(Correo.class.getName());
+            = LoggerFactory.getLogger(Correo.class.getName());
 
     static private Correo INSTANCE = new Correo();
     private String rutaFichConf; 
@@ -97,7 +98,7 @@ public final class Correo {
         if (asunto == null || contenido == null || 
                 (destinatarios == null || destinatarios.length == 0) &&
                 (cco == null || cco.length == 0)){
-            logApp.log(INFO, "No se envia mail, valores incorrectos");
+            logApp.info("No se envia mail, valores incorrectos");
             return;
         }           
 
@@ -109,10 +110,10 @@ public final class Correo {
             // Esto es para cargar el archivo mail.properties            
             var entorno = config.getProperty("mail.entorno");
             if (entorno != null && entorno.equals("desarrollo")){
-                logApp.log(INFO, "Mail desactivado para:");
-                logApp.log(INFO, "TO:" + destinatarios);
-                logApp.log(INFO, "CC:" + cc);
-                logApp.log(INFO, "CCO:" + cco);
+                logApp.info("Mail desactivado para:");
+                logApp.info("TO:" + destinatarios);
+                logApp.info("CC:" + cc);
+                logApp.info("CCO:" + cco);
                 return;
             }
             else if (entorno != null && entorno.equals("debug")){                

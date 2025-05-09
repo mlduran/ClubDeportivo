@@ -13,7 +13,8 @@ import static java.lang.Thread.sleep;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import mld.clubdeportivo.bd.DAOException;
-import java.util.logging.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
 import static mld.clubdeportivo.base.Deporte.Futbol8;
@@ -38,7 +39,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class LanzarJornadaHttpServlet {
 
-    private static Logger logger = getLogger(LanzarJornadaHttpServlet.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(LanzarJornadaHttpServlet.class.getName());
     
     @Value("${custom.deportesactivos}")
     private String deportesactivos;
@@ -71,7 +72,7 @@ public class LanzarJornadaHttpServlet {
         try {
             
             if ((entorno == null || (entorno != null && !entorno.equals("desarrollo"))) && !comprobarLanzamiento(req, resp)){
-                logger.log(SEVERE, "Error al lanzar Jornada: La configuracion del lanzamiento no es correcta");
+                logger.error("Error al lanzar Jornada: La configuracion del lanzamiento no es correcta");
                 req.setAttribute("error", "La configuracion del lanzamiento no es correcta");
                 dir = "/Utiles/error";
             }
@@ -107,16 +108,16 @@ public class LanzarJornadaHttpServlet {
             }
                 
         } catch (DAOException ex) {
-            logger.log(SEVERE, "ERROR DAO en Lanzamiento Jornada : " + ex.getMessage());
-            logger.log(SEVERE, pilaError(ex));
+            logger.error("ERROR DAO en Lanzamiento Jornada : " + ex.getMessage());
+            logger.error(pilaError(ex));
             req.setAttribute("error", ex.getMessage());
             req.setAttribute("errorDes", pilaError(ex));
             dir = "/Utiles/error.jsp";
             txtMail = ex.getMessage() + "<br/>" + pilaError(ex);
 
         } catch (Exception ex) {
-            logger.log(SEVERE, "ERROR General en Lanzamiento Jornada : " + ex.getMessage());
-            logger.log(SEVERE, pilaError(ex));
+            logger.error("ERROR General en Lanzamiento Jornada : " + ex.getMessage());
+            logger.error(pilaError(ex));
             req.setAttribute("error", ex.getMessage());
             req.setAttribute("errorDes", pilaError(ex));
             dir = "/Utiles/error";

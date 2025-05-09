@@ -3,9 +3,8 @@ package mld.clubdeportivo.bd;
 import java.sql.*;
 import java.io.*;
 import java.util.*;
-import java.util.logging.*;
-import static java.util.logging.Level.WARNING;
-import static java.util.logging.Logger.getLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -22,7 +21,7 @@ public class ConexionConfigDAO {
     private static final ConexionConfigDAO INSTANCE = new ConexionConfigDAO();
 
     private static final Logger logApp
-            = getLogger(ConexionConfigDAO.class.getName());
+            = LoggerFactory.getLogger(ConexionConfigDAO.class.getName());
 
     static public ConexionConfigDAO getConexionConfigDAO() {
 
@@ -36,7 +35,7 @@ public class ConexionConfigDAO {
 
         // Si por ejemplo tenemos la url es que ya hemos inicializado
         if (url != null) {
-            logApp.log(WARNING, "Los parametros de conexion ya se han inicializado");
+            logApp.warn("Los parametros de conexion ya se han inicializado");
             return;
         }
 

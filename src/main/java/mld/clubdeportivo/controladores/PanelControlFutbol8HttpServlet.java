@@ -21,7 +21,8 @@ import mld.clubdeportivo.base.futbol8.JugadorFutbol8.PosicionComparator;
 import mld.clubdeportivo.base.futbol8.*;
 import mld.clubdeportivo.bd.*;
 import mld.clubdeportivo.bd.futbol8.JDBCDAOFutbol8;
-import java.util.logging.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
 import static mld.clubdeportivo.base.ClaseMovimiento.AmpliacionEstadio;
@@ -125,7 +126,7 @@ import org.springframework.stereotype.Controller;
 public class PanelControlFutbol8HttpServlet  {
 
     private static Logger logger = 
-            getLogger(PanelControlFutbol8HttpServlet.class.getName());
+            LoggerFactory.getLogger(PanelControlFutbol8HttpServlet.class.getName());
    
     
     public String doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -237,7 +238,7 @@ public class PanelControlFutbol8HttpServlet  {
 
 
         } catch (DAOException ex) {
-            logger.log(SEVERE, ex.getMessage());
+            logger.error(ex.getMessage());
             req.setAttribute("error", ex.getMessage());
             req.setAttribute("errorDes", pilaError(ex));
             dir = "/Utiles/error.jsp";

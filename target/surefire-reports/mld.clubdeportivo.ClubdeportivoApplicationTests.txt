@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: mld.clubdeportivo.ClubdeportivoApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.568 s -- in mld.clubdeportivo.ClubdeportivoApplicationTests
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.569 s -- in mld.clubdeportivo.ClubdeportivoApplicationTests

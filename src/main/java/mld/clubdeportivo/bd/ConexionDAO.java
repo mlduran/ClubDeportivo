@@ -6,7 +6,8 @@ import java.sql.DriverManager;
 import static java.sql.DriverManager.getConnection;
 import java.sql.SQLException;
 import java.util.NoSuchElementException;
-import java.util.logging.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
 import static mld.clubdeportivo.bd.ConexionConfigDAO.getConexionConfigDAO;
@@ -19,7 +20,7 @@ import static mld.clubdeportivo.bd.ConexionConfigDAO.getConexionConfigDAO;
 public class ConexionDAO {
     
     private static Logger logApp
-            = getLogger(ConexionDAO.class.getName());
+            = LoggerFactory.getLogger(ConexionDAO.class.getName());
     
     static public Connection getConexion(String schema) throws DAOException {
         
@@ -53,10 +54,10 @@ public class ConexionDAO {
             miConexion.setAutoCommit(false);
             
         } catch (SQLException ex) {
-            logApp.log(SEVERE, "Error al obtner conexion: ".concat(ex.getMessage()));
+            logApp.error("Error al obtner conexion: ".concat(ex.getMessage()));
             throw new DAOException(ex.getMessage());
         } catch (ClassNotFoundException ex) {
-            getLogger(ConexionDAO.class.getName()).log(SEVERE, null, ex);
+            LoggerFactory.getLogger(ConexionDAO.class.getName()).error(null, ex);
         }
         
         return miConexion;
