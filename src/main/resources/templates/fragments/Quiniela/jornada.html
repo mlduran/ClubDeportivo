@@ -67,7 +67,8 @@
 
             <br/>
             <a th:href="@{/imprimir(operacion='quiniela', jornada=${jornada.id})}" target="_blank">Visualizar</a>
-            <a th:href="@{/imprimir(operacion='quinielaBoleto', jornada=${jornada.id})}" target="_blank">Imprimir</a>
+            <!--<a th:href="@{/imprimir(operacion='quinielaBoleto', jornada=${jornada.id})}" target="_blank">Imprimir</a>-->
+            <a th:href="@{/exportar(jornada=${jornada.id})}">Exportar</a>
             <br/>
         </form>
     </div>

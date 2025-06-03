@@ -16,8 +16,6 @@ import mld.clubdeportivo.bd.DAOException;
 import mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static java.util.logging.Level.SEVERE;
-import static java.util.logging.Logger.getLogger;
 import static mld.clubdeportivo.base.quinielas.EstadisticaQuiniela.clasificar;
 import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.clasificacionQuiniela;
 import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.competicionActiva;
@@ -840,9 +838,6 @@ public class PanelControlQuinielaHttpServlet {
         if (jornada == null || jornada.isValidada()) {
             return;
         }
-
-        ArrayList<ApuestaQuiniela> apuestas
-                = (ArrayList) JDBCDAOQuiniela.obtenerApuestas(eq, jornada);
 
         obtenerDatosApuestas(req, jornada, eq);
 
