@@ -324,9 +324,26 @@ public class ImpresionHttpServlet {
         for (var eq : listaGrp) {
             apuestas = (ArrayList) obtenerApuestas(eq, jornada);
             for (var ap : apuestas) {
-                datos.add(Arrays.toString(ap.getResultado()));
+                String txt = "";
+                int ok = 0;
+                int num = 1;
+                for (String r : ap.getResultado()){
+                    if (r != null){
+                        txt = txt.concat(r);
+                        ok = ok + 1;
+                    }
+                    else
+                        txt = txt.concat(" ");
+                    num = num + 1;
+                    if (num > 14)
+                        break;
+                }
+                if (ok > 0)
+                    datos.add(txt);
             }
         }
+        
+        String nomFich = "Jornada_" + String.valueOf(jornada.getNumero()) + ".txt";
 
         // Crear archivo temporal
         Path tempFile = Files.createTempFile("export", ".txt");
@@ -336,7 +353,7 @@ public class ImpresionHttpServlet {
         ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(tempFile));
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=datos.txt")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + nomFich)
                 .contentType(MediaType.TEXT_PLAIN)
                 .contentLength(resource.contentLength())
                 .body(resource);
