@@ -2,9 +2,6 @@ package mld.clubdeportivo.base;
 
 import java.util.*;
 import static java.util.Collections.sort;
-import mld.clubdeportivo.base.futbol8.*;
-import mld.clubdeportivo.utilidades.Calculos;
-import mld.clubdeportivo.utilidades.JornadaTmp;
 
 /**
  *

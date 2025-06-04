@@ -60,7 +60,6 @@ public class UtilesHttpServlet extends HttpServlet {
             throws ServletException, IOException{
         
          
-        var ok = true;
         var appManager = req.getServletContext();
         var sesion = req.getSession();
         
@@ -80,19 +79,18 @@ public class UtilesHttpServlet extends HttpServlet {
 
     }
     
-    protected static boolean comprobarEstadoAdmin(HttpServletRequest req, HttpServletResponse resp)
+    protected static String comprobarEstadoAdmin(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException{
         
          
-        var ok = true;
+        var appManager = req.getServletContext();
         var sesion = req.getSession();
         
         if (sesion.getAttribute("idClub") == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            ok = false;
+            return "/login";
         }
 
-        return ok;
+        return "";
 
     }
     

@@ -294,7 +294,7 @@ public class ImpresionHttpServlet {
         return "<div class='x' style='left:" + left + "; top:" + top + ";'>X</div>";
     }
 
-    @GetMapping("/export")
+    @GetMapping("/exportar")
     private ResponseEntity<ByteArrayResource> exportarQuiniela(HttpServletRequest req
     ) throws DAOException, IOException {
 

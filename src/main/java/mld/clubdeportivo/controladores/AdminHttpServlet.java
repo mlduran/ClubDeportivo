@@ -1,4 +1,3 @@
-
 package mld.clubdeportivo.controladores;
 
 import jakarta.servlet.ServletException;
@@ -28,6 +27,7 @@ import static mld.clubdeportivo.bd.futbol8.JDBCDAOFutbol8.obtenerCompeticion;
 import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.competicionActiva;
 import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.obtenerJornadasNoValidadas;
 import static mld.clubdeportivo.controladores.LanzarJornadaFutbol8.crearCompeticiones;
+import static mld.clubdeportivo.controladores.UtilesHttpServlet.comprobarEstado;
 import static mld.clubdeportivo.controladores.UtilesHttpServlet.comprobarEstadoAdmin;
 import static mld.clubdeportivo.controladores.UtilesHttpServlet.ejecutaBackup;
 import static mld.clubdeportivo.controladores.UtilesHttpServlet.pruebaCorreo;
@@ -40,206 +40,209 @@ import static mld.clubdeportivo.utilidades.IODatos.cargarMaestroEntrenadores;
 import static mld.clubdeportivo.utilidades.IODatos.cargarMaestroEquipos;
 import static mld.clubdeportivo.utilidades.IODatos.eliminarFicheros;
 import static mld.clubdeportivo.utilidades.StringUtil.tratarSaltosLineaHTML;
-
-
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 /**
  *
  * @author Miguel
  */
-public class AdminHttpServlet extends HttpServlet {
+@Controller
+public class AdminHttpServlet {
 
-   
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+    @Value("${custom.diascumplimentacion}")
+    private String rutaficheroscarga;
+
+    @GetMapping("/admin")
+    public String doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        processRequest(req, resp);
+        return processRequest(req, resp);
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+    @PostMapping("/admin")
+    public String doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        processRequest(req, resp);
+        return processRequest(req, resp);
     }
 
-    private void processRequest(HttpServletRequest req, HttpServletResponse resp)
+    private String processRequest(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        
-        if (!comprobarEstadoAdmin(req, resp)) return;
-        
-        long id = (Long) req.getSession().getAttribute("idClub");
-        
-        if (id != 0) return;
-        
+        var appManager = req.getServletContext();
+        var sesion = req.getSession();
+
+        String estado = comprobarEstadoAdmin(req, resp);
+        if (!"".equals(estado)) {
+            return "redirect:/";
+        }
+
+        var id = req.getSession().getAttribute("idClub");
+
+        if (!"0".equals(id)) {
+            return "redirect:/";
+        }
+
         var op = (String) req.getParameter("operacion");
-        var appManager = this.getServletContext();
-        var ruta = appManager.getInitParameter("rutaficheroscarga");
+        var ruta = rutaficheroscarga;
 
-        try{
+        try {
 
-            var comp =
-                    competicionActiva();
-            ArrayList <JornadaQuiniela> jornadas = new ArrayList();
+            var comp
+                    = competicionActiva();
+            ArrayList<JornadaQuiniela> jornadas = new ArrayList();
 
-            if (comp != null){
+            if (comp != null) {
                 jornadas = (ArrayList<JornadaQuiniela>) obtenerJornadasNoValidadas(comp);
             }
 
-            req.setAttribute("jornadasq", jornadas);  
-            req.setAttribute("compQuini", comp);  
-            if (appManager.getAttribute("mantenimiento") != null && 
-                    appManager.getAttribute("mantenimiento").equals("true"))
+            req.setAttribute("jornadasq", jornadas);
+            req.setAttribute("compQuini", comp);
+            if (appManager.getAttribute("mantenimiento") != null
+                    && appManager.getAttribute("mantenimiento").equals("true")) {
                 req.setAttribute("mantenimient", "true");
-            else 
+            } else {
                 req.setAttribute("mantenimient", "false");
+            }
 
             if (null == op) {
             }// no hacemos nada
-            else switch (op) {
-                case "Iniciar Mantenimiento":
-                    appManager.setAttribute("mantenimiento", "true");
-                    req.setAttribute("mantenimient", "true");
-                    break;
-                case "Acabar Mantenimiento":
-                    appManager.setAttribute("mantenimiento", "false");
-                    req.setAttribute("mantenimient", "false");
-                    break;
-                case "Hacer Backup BD":
-                    ejecutaBackup(appManager, "Backup");
-                    break;
-                case "Prueba Correo":
-                    var correo = (String) req.getParameter("correoPrueba");
-                    pruebaCorreo(appManager, correo);
-                    break;
-                case "Carga ficheros Quiniela":
-                    if (competicionActiva() != null) {
-                        cargarJornadasQuiniela_obsoleto(ruta);
-                    }
-                    break;
-                case "Eliminar Ficheros Quiniela":
-                    eliminarFicheros(ruta, "quini");
-                    break;
-                case "Crear Competicion Quiniela":
-                    {
+            else {
+                switch (op) {
+                    case "Iniciar Mantenimiento":
+                        appManager.setAttribute("mantenimiento", "true");
+                        req.setAttribute("mantenimient", "true");
+                        break;
+                    case "Acabar Mantenimiento":
+                        appManager.setAttribute("mantenimiento", "false");
+                        req.setAttribute("mantenimient", "false");
+                        break;
+                    case "Hacer Backup BD":
+                        ejecutaBackup(appManager, "Backup");
+                        break;
+                    case "Prueba Correo":
+                        var correo = (String) req.getParameter("correoPrueba");
+                        pruebaCorreo(appManager, correo);
+                        break;
+                    case "Carga ficheros Quiniela":
+                        if (competicionActiva() != null) {
+                            cargarJornadasQuiniela_obsoleto(ruta);
+                        }
+                        break;
+                    case "Eliminar Ficheros Quiniela":
+                        eliminarFicheros(ruta, "quini");
+                        break;
+                    case "Crear Competicion Quiniela": {
                         var nombreComp = req.getParameter("nombrecompeticion");
                         var compQ = new CompeticionQuiniela(nombreComp);
                         crearCompeticionQuiniela(compQ);
                         break;
                     }
-                case "Finalizar Competicion Quiniela":
-                    finalizarCompeticion(comp);
-                    break;
-                case "Resultados Generales":
-                    {
+                    case "Finalizar Competicion Quiniela":
+                        finalizarCompeticion(comp);
+                        break;
+                    case "Resultados Generales": {
                         var compQ = competicionActiva();
                         var numero = parseInt(req.getParameter("jornadaresult"));
                         var r = obtenerApuestaGeneral(compQ, numero);
                         req.setAttribute("mostrarjornadaresult", r);
                         break;
                     }
-                case "Carga Maestro Entrenadores Futbol8":
-                    {
+                    case "Carga Maestro Entrenadores Futbol8": {
                         var fich = ruta + "/entrenadores.txt";
                         cargarMaestroEntrenadores(fich);
                         break;
                     }
-                case "Carga Maestro Equipos Futbol8":
-                    {
+                    case "Carga Maestro Equipos Futbol8": {
                         var fich = ruta + "/equipos.txt";
                         cargarMaestroEquipos(fich);
                         break;
                     }
-                case "Crear Competiciones Futbol8":
-                    crearCompeticiones();
-                    break;
-                case "Limpiar Tablas":
-                    limpiarTablas();
-                    break;
-                case "Eliminar Grupo":
-                    var idGrp = parseInt(req.getParameter("grupo"));
-                    var grp = obtenerSimpleGrupo(idGrp);
-                    eliminarGrupo(grp);
-                    break;
-                case "Eliminar Club":
-                    var idClub = parseInt(req.getParameter("club"));
-                    var club = obtenerSimpleClub(idClub);
-                    eliminarClub(club);
-                    break;
-                case "Eliminar Competicion Futbol8":
-                    var idCompF8 = parseInt(req.getParameter("competicionFutbol8"));
-                    var compf8 = obtenerCompeticion((long)idCompF8);
-                    eliminarCompeticionFutbol8(compf8);
-                    break;
-                case "Enviar Comunicado":
-                    var tipo = req.getParameter("tipoComunicado");
-                    var textComunicado = req.getParameter("txtComunicado");
-                    if (textComunicado != null) {
-                        //textComunicado = new String(textComunicado.getBytes(), "UTF-8");
-                        textComunicado = tratarSaltosLineaHTML(textComunicado);
-                    }
-                    var tituloComunicado = req.getParameter("tituloComunicado");
-                    //if (tituloComunicado != null)
-                    //tituloComunicado = new String(tituloComunicado.getBytes(), "UTF-8");
-                    if (tituloComunicado == null) tituloComunicado = "";
-                    var correos = new ArrayList<String>();
-                    if (tipo != null && textComunicado != null && !textComunicado.isEmpty()) {
-                        if (tipo.equals("General")) {
-                            correos.addAll(mailsClubs());
-                        } else if (tipo.equals("Futbol8")) {
-                            correos.addAll(mailsClubs(Futbol8));
-                        } else if (tipo.equals("Quiniela")) {
-                            correos.addAll(mailsClubs(Quiniela));
-                        } else if (tipo.equals("Futbol8")) {
-                            correos.addAll(mailsClubs(Futbol8));
+                    case "Crear Competiciones Futbol8":
+                        crearCompeticiones();
+                        break;
+                    case "Limpiar Tablas":
+                        limpiarTablas();
+                        break;
+                    case "Eliminar Grupo":
+                        var idGrp = parseInt(req.getParameter("grupo"));
+                        var grp = obtenerSimpleGrupo(idGrp);
+                        eliminarGrupo(grp);
+                        break;
+                    case "Eliminar Club":
+                        var idClub = parseInt(req.getParameter("club"));
+                        var club = obtenerSimpleClub(idClub);
+                        eliminarClub(club);
+                        break;
+                    case "Eliminar Competicion Futbol8":
+                        var idCompF8 = parseInt(req.getParameter("competicionFutbol8"));
+                        var compf8 = obtenerCompeticion((long) idCompF8);
+                        eliminarCompeticionFutbol8(compf8);
+                        break;
+                    case "Enviar Comunicado":
+                        var tipo = req.getParameter("tipoComunicado");
+                        var textComunicado = req.getParameter("txtComunicado");
+                        if (textComunicado != null) {
+                            //textComunicado = new String(textComunicado.getBytes(), "UTF-8");
+                            textComunicado = tratarSaltosLineaHTML(textComunicado);
                         }
-                        if (!correos.isEmpty()) {
-                            getCorreo().enviarMailMasivo("ClubDeportivo Aviso " + tipo + " " + tituloComunicado, textComunicado, true, correos);
+                        var tituloComunicado = req.getParameter("tituloComunicado");
+                        //if (tituloComunicado != null)
+                        //tituloComunicado = new String(tituloComunicado.getBytes(), "UTF-8");
+                        if (tituloComunicado == null) {
+                            tituloComunicado = "";
                         }
-                    }
-                    break;
-                default:
-                    break;
+                        var correos = new ArrayList<String>();
+                        if (tipo != null && textComunicado != null && !textComunicado.isEmpty()) {
+                            if (tipo.equals("General")) {
+                                correos.addAll(mailsClubs());
+                            } else if (tipo.equals("Futbol8")) {
+                                correos.addAll(mailsClubs(Futbol8));
+                            } else if (tipo.equals("Quiniela")) {
+                                correos.addAll(mailsClubs(Quiniela));
+                            } else if (tipo.equals("Futbol8")) {
+                                correos.addAll(mailsClubs(Futbol8));
+                            }
+                            if (!correos.isEmpty()) {
+                                getCorreo().enviarMailMasivo("ClubDeportivo Aviso " + tipo + " " + tituloComunicado, textComunicado, true, correos);
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
             var grps = obtenerGruposActivos();
             var clubs = listaClubs();
             var comps = listaCompetiones();
             var faqs = obtenerFaqsNoContestadas();
-            
-            if (!faqs.isEmpty())
+
+            if (!faqs.isEmpty()) {
                 req.setAttribute("faq", faqs.get(0));
-            
+            }
+
             req.setAttribute("grupos", grps);
             req.setAttribute("clubs", clubs);
             req.setAttribute("competiciones", comps);
-                
 
         } catch (Exception ex) {
             req.setAttribute("error", ex.getMessage());
         }
-        
+
         var jugsF8 = new ArrayList<JugadorFutbol8>();
-        for (var i = 100; i < 1000; i = i + 100){
+        for (var i = 100; i < 1000; i = i + 100) {
             var jug = new JugadorFutbol8();
             jug.setValoracion(i);
             jugsF8.add(jug);
         }
-        
+
         req.setAttribute("jugsF8", jugsF8);
 
-        var view =
-                req.getRequestDispatcher("/PanelControl/panelControlAdmin.jsp");
-        view.forward(req, resp);
-       
-       
+        return "panelControlAdmin";
+
     }
 
-  
-
-
 }
-
-     
-
