@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title th:text="${@environment.getProperty('initParam.tituloapp')}"></title>  
+        <link rel="stylesheet" type="text/css" th:href="@{/css/general.css}">
+    </head>
+    <body>
+
+        <p>PÁGINA DE ADMINISTRACIÓN</p><br/><br/>
+
+        <form th:action="@{/admin}" method="post" id="general">
+            <p>APLICACIÓN</p><br/>
+
+            <p th:if="${mantenimient == null}">hola</p>
+
+            <input type="submit" th:if="${mantenimient == 'false'}" value="Iniciar Mantenimiento" name="operacion"/>
+            <input type="submit" th:if="${mantenimient == 'true'}" value="Acabar Mantenimiento" name="operacion"/>
+
+            <br/>
+            <input type="submit" value="Hacer Backup BD" name="operacion"/>
+            <br/><br/>
+            <input type="submit" value="Prueba Correo" name="operacion"/>
+            <input type="text" name="correoPrueba" value="ml_duran@live.com"/>
+            <br/>
+
+            <p>QUINIELAS</p><br/>
+
+            <!-- Mostrar solo si compQuini es null -->
+            <div th:if="${compQuini == null}">
+                <input type="text" name="nombrecompeticion" /><br/>
+                <input type="submit" value="Crear Competicion Quiniela" name="operacion"/>
+            </div>
+
+            <!-- Mostrar solo si compQuini no es null -->
+            <div th:if="${compQuini != null}">
+                <input type="text" name="nombrecompeticion" th:value="${compQuini.nombre}"/><br/>
+                <input type="submit" value="Finalizar Competicion Quiniela" name="operacion"/><br/><br/>
+            </div>
+            <br/>
+
+            <input type="submit" value="Resultados Generales" name="operacion"/>
+            <p>JORNADA</p><input type="text" name="jornadaresult" value="" size="2"/>
+
+            <p th:if="${mostrarjornadaresult != null}" th:text="'Resultados : ' + ${mostrarjornadaresult}"></p>
+
+            <br/>
+            <p>FUTBOL8</p><br/>
+            <table>
+                <thead>
+                    <tr><th><p>Colores</p></th></tr>
+                </thead>
+                <tr>
+                    <td th:each="obj : ${jugsF8}" th:style="'background-color:' + ${obj.colorValoracion}"
+                        width="25px" align="center" th:text="${obj.valoracionReal}"></td>
+                </tr>
+            </table>
+
+            <input type="submit" value="Carga Maestro Entrenadores Futbol8" name="operacion"/><br/>
+            <input type="submit" value="Carga Maestro Equipos Futbol8" name="operacion"/><br/>
+            <input type="submit" value="Crear Competiciones Futbol8" name="operacion"/><br/><br/>
+            <input type="submit" value="Limpiar Tablas" name="operacion"/><br/><br/>
+
+            <p>Grupos</p>
+            <select name="grupo">
+                <option th:each="grp : ${grupos}" th:value="${grp.id}" th:text="${grp.nombre}"></option>
+            </select>
+            <input type="submit" value="Eliminar Grupo" name="operacion"/><br/><br/>
+
+            <p>Clubs</p>
+            <select name="club">
+                <option th:each="clb : ${clubs}" th:value="${clb.id}" th:text="${clb.nombre}"></option>
+            </select>
+            <input type="submit" value="Eliminar Club" name="operacion"/><br/><br/>
+
+            <p>CompeticionesFutbol8</p>
+            <select name="competicionFutbol8">
+                <option th:each="comp : ${competiciones}" th:value="${comp.id}" th:text="${comp.nombre}"></option>
+            </select>
+            <input type="submit" value="Eliminar Competicion Futbol8" name="operacion"/><br/>
+        </form>
+
+        <br/>
+        <a th:href="@{/cargaFichero}" target="_blank">Carga de Fichero</a>
+        <br/><br/>
+
+        <form th:action="@{/admin}" method="post" id="comunicados">
+            <table class="tabla">
+                <thead><tr><th align="left">COMUNICADOS</th></tr></thead>
+                <tr align="left">
+                    <td>
+                        <label>Titulo</label>
+                        <input type="text" name="tituloComunicado" id="tituloComunicado" title="Introduce titulo para el mail" maxlength="100" style="width: 500px"/><br/>
+                        <label>Comunicado</label>
+                        <textarea name="txtComunicado" rows="2" cols="90" title="Introduce el comunicado (max 255 caracteres)"></textarea>
+                    </td>
+                </tr>
+                <tr align="left">
+                    <td>
+                        <input type="submit" id="envioComunicado" name="operacion" value="Enviar Comunicado" accesskey="E"/>
+                        <select name="tipoComunicado">
+                            <option value="General">General</option>
+                            <option value="Quiniela">Quiniela</option>
+                            <option value="Futbol8">Futbol8</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
