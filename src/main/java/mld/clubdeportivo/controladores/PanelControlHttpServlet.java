@@ -15,7 +15,6 @@ import mld.clubdeportivo.base.quinielas.EquipoQuiniela;
 import mld.clubdeportivo.bd.DAOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static java.util.logging.Logger.getLogger;
 import static mld.clubdeportivo.base.Deporte.Futbol8;
 import static mld.clubdeportivo.base.Deporte.Quiniela;
 import static mld.clubdeportivo.base.Deporte.values;
@@ -64,7 +63,7 @@ public class PanelControlHttpServlet {
     private String deportesactivos;
 
     @GetMapping({"/panelControl/presentacion", "/panelControl/datosUsuario", "/panelControl/faqs",
-        "/panelControl/ranking", "/panelControl/fichaClub", "/panelControl/inicio"})
+        "/panelControl/ranking", "/panelControl/fichaClub", "/panelControl/inicio", "/panelControl/altas"})
     public String doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
