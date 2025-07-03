@@ -62,18 +62,21 @@ public class LanzarJornadaHttpServlet {
     private String processRequest(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException {
         
-        var ok = false;
+        boolean ok = false;
         var appManager = req.getServletContext();
         var entorno = entornoapp;
         var dirCorreo = mailcontacto;
         var dir = "/Utiles/lanzarJornada";
         var txtMail = "";
+        
+        System.out.print("Se lanza la jornada de ClubDeportivo");
 
         try {
             
             if ((entorno == null || (entorno != null && !entorno.equals("desarrollo"))) && !comprobarLanzamiento(req, resp)){
-                logger.error("Error al lanzar Jornada: La configuracion del lanzamiento no es correcta");
+                logger.error("Error al lanzar Jornada: La configuracion del lanzamiento no es correcta entorno " + entorno);
                 req.setAttribute("error", "La configuracion del lanzamiento no es correcta");
+                txtMail="La configuracion del lanzamiento no es correcta";
                 dir = "/Utiles/error";
             }
             else{           
@@ -112,7 +115,7 @@ public class LanzarJornadaHttpServlet {
             logger.error(pilaError(ex));
             req.setAttribute("error", ex.getMessage());
             req.setAttribute("errorDes", pilaError(ex));
-            dir = "/Utiles/error.jsp";
+            dir = "/Utiles/error";
             txtMail = ex.getMessage() + "<br/>" + pilaError(ex);
 
         } catch (Exception ex) {
@@ -160,6 +163,9 @@ public class LanzarJornadaHttpServlet {
         var sdf =new SimpleDateFormat("dd/MM/yyyy");
         var fecha = sdf.format(new Date());
         
+        System.out.print("Simulando: " + appManager.getAttribute("simulando"));
+        System.out.print("Fecha: " + fechaUltimoLanzamiento);        
+        
         if ((appManager.getAttribute("simulando") != null && 
                 appManager.getAttribute("simulando").equals("true")) ||
                 fecha.equals(fechaUltimoLanzamiento)) {
@@ -168,6 +174,7 @@ public class LanzarJornadaHttpServlet {
         else{
             if (codigo != null)
                 ok = codigo.equals(codigoConf);
+            System.out.print("Codigo: " + ok);
         }
 
         return ok;
@@ -187,7 +194,7 @@ public class LanzarJornadaHttpServlet {
             
             if (club.isQuiniela() && club.getDiasSinAcceder() > DIAS_DESACTIVAR){
                 var eq = obtenerEquipo(club);
-                eliminarEquipoQuiniela(eq);
+                //eliminarEquipoQuiniela(eq);
             }            
             else if (club.isQuiniela() && club.getDiasSinAcceder() > DIAS_WARNING){
                 getCorreo().enviarMail("ClubDeportivo Quiniela",

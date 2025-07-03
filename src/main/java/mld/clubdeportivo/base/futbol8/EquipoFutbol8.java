@@ -9,26 +9,17 @@ import static java.lang.String.format;
 import java.util.*;
 import static java.util.Collections.shuffle;
 import static java.util.Collections.sort;
-import static java.util.Collections.sort;
-import static java.util.Collections.sort;
 import mld.clubdeportivo.base.Club;
 import mld.clubdeportivo.base.Equipo;
 import mld.clubdeportivo.base.Seccion;
-import static mld.clubdeportivo.base.futbol8.EsfuerzoFutbol8.values;
-import static mld.clubdeportivo.base.futbol8.EspectativaFutbol8.Normal;
-import static mld.clubdeportivo.base.futbol8.EstrategiaFutbol8.Normal;
-import static mld.clubdeportivo.base.futbol8.EstrategiaFutbol8.values;
 import mld.clubdeportivo.base.futbol8.JugadorFutbol8.PosicionComparator;
 import static mld.clubdeportivo.base.futbol8.PosicionElegidaFutbol8.Cualquiera;
 import static mld.clubdeportivo.base.futbol8.PosicionJugFutbol8.Defensa;
 import static mld.clubdeportivo.base.futbol8.PosicionJugFutbol8.Delantero;
 import static mld.clubdeportivo.base.futbol8.PosicionJugFutbol8.Medio;
 import static mld.clubdeportivo.base.futbol8.PosicionJugFutbol8.Portero;
-import mld.clubdeportivo.utilidades.Calculos;
 import static mld.clubdeportivo.utilidades.Calculos.obtener;
 import static mld.clubdeportivo.utilidades.Calculos.obtenerResultado;
-import static mld.clubdeportivo.utilidades.Calculos.valorAleatorio;
-import static mld.clubdeportivo.utilidades.Calculos.valorAleatorio;
 import static mld.clubdeportivo.utilidades.Calculos.valorAleatorio;
 
 /**

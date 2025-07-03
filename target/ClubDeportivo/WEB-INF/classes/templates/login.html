@@ -10,13 +10,13 @@
     <body>
         <div id="contenedor">
             <th:block th:insert="~{/fragments/cabecera :: cabecera}"></th:block>
-            
+
             <div id="grupo">
                 <div id="columna_izquierda_login">
                     <br/>
                     <img th:src="@{images/deportes1.png}" title="Deportes" alt="Deportes"/>
                 </div>
-                
+
                 <div id="columna_central_login">
                     <br/>
                     <form th:action="@{/login}" method="post">
@@ -29,14 +29,14 @@
                     <p class="comentario">
                         <a th:href="@{/login(accion='envioPassword')}">¿Olvidaste tu contraseña?</a>
                     </p>
-                    
+
                     <p class="error" th:if="${noValidado != null}">Usuario o Password incorrectos</p>
-                    
+
                     <br/>
                     <a th:href="@{/alta/club}" title="Registro">Registro</a>
                     <br/><br/>
                     <hr/>
-                    
+
                     <th:block th:if="${listaranking != null and #lists.size(listaranking) > 0}">
                         <table style="width: 250px" class="tabla">
                             <tr>
@@ -51,15 +51,15 @@
                             </tr>
                         </table>
                     </th:block>
-                    
+
                     <p th:if="${error != null}">Se ha producido el siguiente error: <span th:text="${error.message}"></span></p>
                     <p th:unless="${listaranking != null or error != null}">ERROR NO ESPERADO</p>
-                    
+
                     <br/>
                     <input class="error" size="10" type="text" id="reloj" disabled/>
                     <input type="hidden" id="fechaServer" th:value="${fechaServer}"/>
                     <br/>                 
-                    
+
                     <hr/>
                     <br/>
                     <i>Para más información: <a th:href="'mailto:' + ${@environment.getProperty('initParam.mailcontacto')}" th:text="${@environment.getProperty('initParam.mailcontacto')}"></a></i>
@@ -83,7 +83,7 @@
                     </table>
                     <br/><br/>
                 </div>
-                
+
                 <div id="columna_derecha_login">
                     <br/>
                     <img th:src="@{images/deportes2.png}" title="Deportes" alt="Deportes"/>
@@ -91,7 +91,8 @@
             </div>
         </div>
         <input type="hidden" id="juegoElegido" th:value="${juego}"/>
+        <script type="text/javascript" th:src="@{JavaScript/relojServidor.js}"></script>
     </body>
-    <script type="text/javascript" th:src="@{JavaScript/relojServidor.js}"></script>
+
 </html>
 
