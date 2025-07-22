@@ -13,8 +13,6 @@ import java.util.Date;
 import mld.clubdeportivo.bd.DAOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static java.util.logging.Level.SEVERE;
-import static java.util.logging.Logger.getLogger;
 import static mld.clubdeportivo.base.Deporte.Futbol8;
 import static mld.clubdeportivo.base.Deporte.Quiniela;
 import static mld.clubdeportivo.base.futbol8.EquipoFutbol8.DIAS_DESACTIVAR;
@@ -24,7 +22,6 @@ import static mld.clubdeportivo.bd.JDBCDAOClub.listaClubsNoAuto;
 import static mld.clubdeportivo.bd.futbol8.JDBCDAOFutbol8.competicionActiva;
 import static mld.clubdeportivo.bd.futbol8.JDBCDAOFutbol8.eliminarEquipoFutbol8;
 import static mld.clubdeportivo.bd.futbol8.JDBCDAOFutbol8.obtenerSimpleEquipoFutbol8;
-import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.eliminarEquipoQuiniela;
 import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.obtenerEquipo;
 import static mld.clubdeportivo.controladores.UtilesHttpServlet.isDeporteActivo;
 import static mld.clubdeportivo.utilidades.Correo.getCorreo;
@@ -167,8 +164,8 @@ public class LanzarJornadaHttpServlet {
                 || fecha.equals(fechaUltimoLanzamiento)) {
             // NO HACEMOS NADA
         } else {
-            System.out.println("Codigo conf: " + codigoConf);
-            System.out.println("Codigo url: " + codigo);
+            //System.out.println("Codigo conf: " + codigoConf);
+            //System.out.println("Codigo url: " + codigo);
             if (codigo != null) {
                 ok = codigo.equals(codigoConf);
             }

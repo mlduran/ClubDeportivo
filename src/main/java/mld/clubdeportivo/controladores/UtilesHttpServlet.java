@@ -118,12 +118,25 @@ public class UtilesHttpServlet extends HttpServlet {
          return isActivo;
 
     }
+     
+    private static String ipCliente(HttpServletRequest request) {
+
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("X-Real-IP");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+
+        return ip;
+    }
        
 
     protected static void registrarEntrada(HttpServletRequest req)
             throws ServletException, IOException, DAOException{
 
-        var ip = req.getRemoteAddr();
+        var ip = ipCliente(req);
         var reg = new Registro(ip);
         grabarRegistro(reg);
 
@@ -133,7 +146,7 @@ public class UtilesHttpServlet extends HttpServlet {
     protected static void registrarLogin(HttpServletRequest req, String usuario)
             throws ServletException, IOException, DAOException{
 
-        var ip = req.getRemoteAddr();
+        var ip = ipCliente(req);
         var reg = new Registro();
         reg.setAplicacion("");
         reg.setFecha(new Date());
