@@ -100,7 +100,7 @@ public class PanelControlQuinielaHttpServlet {
 
             long id = (Long) req.getSession().getAttribute("idEquipo");
             var eq = obtenerSimpleEquipoQuiniela(id);
-            
+
             req.setAttribute("nombreGrupo", eq.getClub().getGrupo().getNombre());
 
             req.setAttribute("esAdmin", eq.isAdmin());
@@ -201,12 +201,12 @@ public class PanelControlQuinielaHttpServlet {
         for (var i = 0; i < 15; i++) {
             aciertosTotales[i] = 0;
         }
-        
+
         // primero obtenemos los aciertos totales para cada partido
         for (var eqg : equiposGrupo) {
             var obtenerApuestas = JDBCDAOQuiniela.obtenerApuestas(eqg, jornada);
             var ap1 = obtenerApuestas.get(0);
-            var ap2 = obtenerApuestas.get(1);          
+            var ap2 = obtenerApuestas.get(1);
             for (var i = 0; i < 15; i++) {
                 if (ap1.getResultado()[i] != null && ap1.getResultado()[i].equals(jornada.getResultado()[i])) {
                     aciertosTotales[i]++;
@@ -245,7 +245,7 @@ public class PanelControlQuinielaHttpServlet {
                 }
                 if (ap2.getResultado()[i] != null && ap2.getResultado()[i].equals(ap.getResultado())) {
                     aciertosCol2++;
-                }                
+                }
 
                 if (ap.getColumna1() != null && ap.getColumna1().equals(ap.getResultado())) {
                     ptsCol1 = ptsCol1 + (ptsPartido / aciertosTotales[i]);
@@ -255,19 +255,21 @@ public class PanelControlQuinielaHttpServlet {
                     ap.setPtsCol2(ptsPartido / aciertosTotales[i]);
                     ptsCol2 = ptsCol2 + (ptsPartido / aciertosTotales[i]);
                 }
-                
+
                 if (eq.equals(eqg)) {
                     datosApuestas.add(ap);
                     if (actualizada == null) {
                         actualizada = ap1.getActualizada();
                     }
                 }
-            }        
+            }
 
             // Crear y agregar el objeto ResultadosApuestas            
             ResultadosApuestas res = new ResultadosApuestas();
             res.setEquipo(eqg);
+            res.setAciertos1(aciertosCol1);
             res.setAciertosCol1(String.valueOf(aciertosCol1));
+            res.setAciertos2(aciertosCol2);
             res.setAciertosCol2(String.valueOf(aciertosCol2));
             res.setPtsCol1(ptsCol1);
             res.setPtsCol2(ptsCol2);
@@ -275,6 +277,24 @@ public class PanelControlQuinielaHttpServlet {
             resultadosApuestas.add(res);
 
         }
+
+        resultadosApuestas.sort((r1, r2) -> {
+            // Valor principal: el mayor de los dos aciertos
+            int max1 = Math.max(r1.getAciertos1(), r1.getAciertos2());
+            int max2 = Math.max(r2.getAciertos1(), r2.getAciertos2());
+
+            // Comparar primero por el máximo (descendente)
+            int cmp = Integer.compare(max2, max1);
+            if (cmp != 0) {
+                return cmp;
+            }
+
+            // Si empatan, comparar por el otro valor
+            int other1 = (max1 == r1.getAciertos1()) ? r1.getAciertos2() : r1.getAciertos1();
+            int other2 = (max2 == r2.getAciertos1()) ? r2.getAciertos2() : r2.getAciertos1();
+
+            return Integer.compare(other2, other1); // descendente
+        });
 
         req.setAttribute("apuestas", datosApuestas);
         req.setAttribute("resultadosApuestas", resultadosApuestas);
