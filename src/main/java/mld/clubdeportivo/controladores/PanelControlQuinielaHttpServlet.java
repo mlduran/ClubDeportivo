@@ -10,6 +10,9 @@ import static java.lang.String.valueOf;
 import java.util.*;
 import static java.util.Calendar.DAY_OF_WEEK;
 import static java.util.Calendar.getInstance;
+import java.util.stream.Collectors;
+import mld.clubdeportivo.ServletConfig;
+import static mld.clubdeportivo.base.Deporte.Quiniela;
 import mld.clubdeportivo.base.Grupo;
 import mld.clubdeportivo.base.quinielas.*;
 import mld.clubdeportivo.bd.DAOException;
@@ -17,6 +20,7 @@ import mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static mld.clubdeportivo.base.quinielas.EstadisticaQuiniela.clasificar;
+import static mld.clubdeportivo.bd.JDBCDAOClub.mailsClubs;
 import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.clasificacionQuiniela;
 import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.competicionActiva;
 import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.competicionesNoActivas;
@@ -35,10 +39,12 @@ import static mld.clubdeportivo.controladores.UtilesQuiniela.crearJornadaQuiniel
 import static mld.clubdeportivo.controladores.UtilesQuiniela.obtenerResultados;
 import static mld.clubdeportivo.controladores.UtilesQuiniela.validarJornada;
 import static mld.clubdeportivo.utilidades.Correo.getCorreo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  *
@@ -50,8 +56,8 @@ public class PanelControlQuinielaHttpServlet {
     private static Logger logger
             = LoggerFactory.getLogger(PanelControlQuinielaHttpServlet.class.getName());
 
-    @Value("${custom.diascumplimentacion}")
-    private String diascumplimentacion;
+    @Autowired
+    private ServletConfig config;
 
     @GetMapping(
             {
@@ -137,6 +143,45 @@ public class PanelControlQuinielaHttpServlet {
 
         return "panelControlQuiniela";
 
+    }
+
+    @PostMapping("/modificarDiasCumplimentacion")
+    public String actualizarDias(HttpServletRequest req) throws DAOException {
+        String diasCumplimentacion = req.getParameter("diasSeleccionados"); // Ej: "1,3,5"
+        config.setDiasCumplimentacion(diasCumplimentacion);
+
+        var correos = mailsClubs(Quiniela);
+
+        // Mapeo de números a días
+        Map<String, String> mapaDias = Map.of(
+                "1", "Domingo",
+                "2", "Lunes",
+                "3", "Martes",
+                "4", "Miércoles",
+                "5", "Jueves",
+                "6", "Viernes",
+                "7", "Sábado"
+        );
+
+        // Convertir el string de números a lista de nombres
+        String diasTexto = Arrays.stream(diasCumplimentacion.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(mapaDias::get)
+                .collect(Collectors.joining(", "));
+
+        // Mensaje del correo
+        String txt = "Se han modificado los días de cumplimentación para la quiniela.";
+        txt += "\n\nDías seleccionados: " + diasTexto;
+
+        getCorreo().enviarMailMasivo(
+                "ClubDeportivo Modificación días cumplimentación",
+                txt,
+                true,
+                correos
+        );
+
+        return "redirect:/panelControl/Quiniela/jornadaAdmin";
     }
 
     private HttpServletRequest inicio(HttpServletRequest req, EquipoQuiniela eq)
@@ -818,6 +863,7 @@ public class PanelControlQuinielaHttpServlet {
         } else {
             req.setAttribute("puntosJornada", numEquipos * 15 * 10);
         }
+        req.setAttribute("diasCumplimentacion", config.getDiasCumplimentacion());
 
     }
 
@@ -887,7 +933,7 @@ public class PanelControlQuinielaHttpServlet {
     private boolean sePuedeCumplimentar() {
 
         var sePuede = false;
-        var confDias = diascumplimentacion;
+        var confDias = config.getDiasCumplimentacion();
         var dias = confDias.split(",");
         var calendario = getInstance();
         calendario.setTime(new Date());
@@ -905,7 +951,7 @@ public class PanelControlQuinielaHttpServlet {
     private String diasParaCumplimentar() {
 
         var txt = new StringBuilder();
-        var confDias = diascumplimentacion;
+        var confDias = config.getDiasCumplimentacion();
         var dias = confDias.split(",");
         for (var dia : dias) {
             if (dia.equals("2")) {

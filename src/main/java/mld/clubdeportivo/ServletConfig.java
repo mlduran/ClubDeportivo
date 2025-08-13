@@ -4,13 +4,25 @@
  */
 package mld.clubdeportivo;
 
-import mld.clubdeportivo.controladores.LoginHttpServlet;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
 public class ServletConfig {
 
-    
+    private String diasCumplimentacion;
+
+    public ServletConfig(@Value("${custom.diascumplimentacion}") String valorInicial) {
+        this.diasCumplimentacion = valorInicial;
+    }
+
+    public String getDiasCumplimentacion() {
+        return diasCumplimentacion;
+    }
+
+    public void setDiasCumplimentacion(String diasCumplimentacion) {
+        this.diasCumplimentacion = diasCumplimentacion;
+    }
 }
+

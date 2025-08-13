@@ -21,8 +21,6 @@ import mld.clubdeportivo.bd.*;
 import mld.clubdeportivo.bd.quinielas.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static java.util.logging.Level.SEVERE;
-import static java.util.logging.Logger.getLogger;
 import static mld.clubdeportivo.base.Deporte.Quiniela;
 import static mld.clubdeportivo.base.quinielas.CalculosQuiniela.calculoResultadosQuiniela;
 import static mld.clubdeportivo.bd.JDBCDAOClub.grabarClub;
