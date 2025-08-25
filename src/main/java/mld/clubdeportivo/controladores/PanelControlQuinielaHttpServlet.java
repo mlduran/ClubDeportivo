@@ -341,6 +341,12 @@ public class PanelControlQuinielaHttpServlet {
             return Integer.compare(other2, other1); // descendente
         });
 
+        int totalPtsCol1 = datosApuestas.stream().mapToInt(ApuestaQ::getPtsCol1).sum();
+        int totalPtsCol2 = datosApuestas.stream().mapToInt(ApuestaQ::getPtsCol2).sum();
+
+        req.setAttribute("totalPtsCol1", totalPtsCol1);
+        req.setAttribute("totalPtsCol2", totalPtsCol2);
+
         req.setAttribute("apuestas", datosApuestas);
         req.setAttribute("resultadosApuestas", resultadosApuestas);
         req.setAttribute("actualizada", actualizada);
@@ -1145,6 +1151,12 @@ public class PanelControlQuinielaHttpServlet {
             obtenerApuestas(req, jor, apuesta1, apuesta2, false);
 
             var est = obtenerEstadistica(eq, comp, jor);
+
+            int totalPtsCol1 = Arrays.stream(apuesta1.getPuntos()).sum();
+            int totalPtsCol2 = Arrays.stream(apuesta2.getPuntos()).sum();
+
+            req.setAttribute("totalPtsCol1", totalPtsCol1);
+            req.setAttribute("totalPtsCol2", totalPtsCol2);
 
             req.setAttribute("estadistica", est);
         }

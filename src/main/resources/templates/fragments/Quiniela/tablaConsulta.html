@@ -35,5 +35,12 @@
                 <td align="center" th:text="${apuesta.ptsCol2}"></td>
             </tr>
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5" align="right"><b>Total</b></td>
+                <td align="center" th:text="${totalPtsCol1}"></td>
+                <td align="center" th:text="${totalPtsCol2}"></td>
+            </tr>
+        </tfoot>
     </table>
 </th:block>
