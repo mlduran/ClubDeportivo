@@ -17,8 +17,6 @@ import mld.clubdeportivo.base.*;
 import mld.clubdeportivo.bd.DAOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static java.util.logging.Level.SEVERE;
-import static java.util.logging.Logger.getLogger;
 import static mld.clubdeportivo.base.TipoRegistro.Login;
 import static mld.clubdeportivo.bd.JDBCDAOComentario.grabarComentario;
 import static mld.clubdeportivo.bd.JDBCDAOComentario.obtenerComentarios;

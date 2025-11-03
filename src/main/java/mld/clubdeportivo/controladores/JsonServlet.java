@@ -323,7 +323,7 @@ public class JsonServlet  {
                     else if ((Integer) e.getKey() == 8) txtPos = "Octavo";
                     else if ((Integer) e.getKey() == 9) txtPos = "Noveno";
                     else if ((Integer) e.getKey() == 10) txtPos = "Decimo";
-                    else if ((Integer) e.getKey() > 4) txtPos = "Otros";
+                    else if ((Integer) e.getKey() > 10) txtPos = "Otros";
                     txt.append(formatJsonpresupuesto(
                             txtPos, (Integer) e.getValue()));
                 }

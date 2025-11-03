@@ -108,7 +108,7 @@ public class CalculosQuiniela {
         int posicionActual = 0;
         int indice = 0;
 
-        while (indice < resulOrdenado.size() && posicionActual < puntosPorPosicion.length) {
+        while (indice < resulOrdenado.size()) {
             ResultadosApuestas base = resulOrdenado.get(indice);
             int ac1 = base.getAciertos1();
             int ac2 = base.getAciertos2();
@@ -124,7 +124,10 @@ public class CalculosQuiniela {
                     .collect(Collectors.toList());
 
             for (ResultadosApuestas r : mismos) {
-                r.setPtsJornada(puntosPorPosicion[posicionActual]);
+                if (posicionActual < puntosPorPosicion.length)
+                    r.setPtsJornada(puntosPorPosicion[posicionActual]);
+                else
+                    r.setPtsJornada(0);
                 r.setPosicionReal(posicionActual + 1);
             }
 
