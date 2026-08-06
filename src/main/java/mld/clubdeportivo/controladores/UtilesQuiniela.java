@@ -484,11 +484,11 @@ public class UtilesQuiniela {
         var jornadas =
                 (ArrayList<JornadaQuiniela>) obtenerJornadasNoValidadas(comp);
         
-        if (jornadas.size() > 0){
+        if (!jornadas.isEmpty()){
             var jor = jornadas.get(0);
             try {
                 validarJornada(jor.getNumero());
-            }catch (Exception ex){
+            }catch (DAOException ex){
                 logApp.error("Error al validar jornada: " + ex.getMessage());
             }
         }
@@ -544,59 +544,6 @@ public class UtilesQuiniela {
         enviaCorreoJornadaValidada(numero);
         
     }
-    
-    public static void validarJornada_borrar(int numero, String ruta) throws DAOException{
-        
-        
-        var daopunt = new PuntuacionQuinielaDAO();
-        var daoest= new EstadisticaQuinielaDAO();
-        var comp = competicionActiva();
-        if (comp == null)
-            throw new UnsupportedOperationException("No hay competicion activa");
-        
-        var daojor = new JornadaQuinielaDAO();
-        var jornada = obtenerJornadaPorNumero(comp, numero);
-        jornada.setCompeticion(comp);
-        
-        var resultados = jornada.getResultado();
-        var results = 0;
-        for (var i = 0; i < 15; i++)
-            if(resultados[i] != null) results++;
-        if (results == 0) return;
-        else if (results != 15)
-            throw new UnsupportedOperationException("Faltan resultados en jornada " + numero);
-        
-        var eqs = obtenerDatosLanzamiento(comp, jornada);
-        var listaEqs =
-                new HashMap<Object,ArrayList<EquipoQuiniela>>();
-        for (var eq : eqs) {
-            Long grp = eq.getClub().getGrupo().getId();
-            if (listaEqs.get(grp) == null )
-                listaEqs.put(grp, new ArrayList<>());
-            listaEqs.get(grp).add(eq);
-        }
-        for (Map.Entry e : listaEqs.entrySet()) {
-            var eqsGrp = (ArrayList<EquipoQuiniela>) e.getValue();
-            //calculoResultadosQuiniela(eqsGrp, resultados, false, jornada.getPuntos());
-        }
-        
-        //calculoResultadosQuiniela(eqs, resultados, true, jornada.getPuntos());
-        
-        for (var eq : eqs) {
-            daopunt.save(eq.getPuntuaciones().get(0));
-            daoest.save(eq.getEstadisiticas().get(0));
-            grabarClub(eq.getClub());
-        }
-        
-        jornada.setValidada(true);
-        daojor.save(jornada);
-        
-        enviaCorreoJornadaValidada(numero);
-        
-        eliminarFicheroJornadaValidada(ruta, comp.getNombre(), numero);
-        
-    }
-    
     
     public static ArrayList<String> obtenerDatosBD(String numJornada) throws DAOException
     {

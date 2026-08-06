@@ -138,6 +138,7 @@ public class CalculosQuiniela {
             var puntosActuales
                     = eq.getPuntuaciones().get(0).getPuntos();
             int puntosNuevos;
+
             if (ResultadosApuestas.getAciertos1() > ResultadosApuestas.getAciertos2()) {
                 puntosNuevos = ResultadosApuestas.getPtsCol1();
             } else if (ResultadosApuestas.getAciertos2() > ResultadosApuestas.getAciertos1()) {
@@ -145,6 +146,20 @@ public class CalculosQuiniela {
             } else {
                 puntosNuevos = Math.max(ResultadosApuestas.getPtsCol1(), ResultadosApuestas.getPtsCol2());
             }
+
+            // Bonus por aciertos
+            int maxAciertos = Math.max(ResultadosApuestas.getAciertos1(), ResultadosApuestas.getAciertos2());
+
+            switch (maxAciertos) {
+                case 15 -> puntosNuevos += 3000;
+                case 14 -> puntosNuevos += 2000;
+                case 13 -> puntosNuevos += 1000;
+                case 12 -> puntosNuevos += 500;
+                default -> {
+                }
+            }
+
+            puntosNuevos += ResultadosApuestas.getPtsJornada();
             puntosNuevos = puntosNuevos + ResultadosApuestas.getPtsJornada();
 
             eq.getPuntuaciones().get(0).setPuntos(puntosActuales + puntosNuevos);
