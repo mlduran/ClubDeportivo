@@ -13,7 +13,6 @@ import mld.clubdeportivo.base.quinielas.CompeticionQuiniela;
 import mld.clubdeportivo.bd.DAOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static java.util.logging.Logger.getLogger;
 import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.competicionActiva;
 import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.equiposQuinielaActivos;
 import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.grabarJornada;

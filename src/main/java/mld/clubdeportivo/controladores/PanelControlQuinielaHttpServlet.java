@@ -324,21 +324,21 @@ public class PanelControlQuinielaHttpServlet {
         }
 
         resultadosApuestas.sort((r1, r2) -> {
-            // Valor principal: el mayor de los dos aciertos
-            int max1 = Math.max(r1.getAciertos1(), r1.getAciertos2());
-            int max2 = Math.max(r2.getAciertos1(), r2.getAciertos2());
 
-            // Comparar primero por el máximo (descendente)
+            // Mayor puntuación de las dos columnas
+            int max1 = Math.max(r1.getPtsCol1(), r1.getPtsCol2());
+            int max2 = Math.max(r2.getPtsCol1(), r2.getPtsCol2());
+
             int cmp = Integer.compare(max2, max1);
             if (cmp != 0) {
                 return cmp;
             }
 
-            // Si empatan, comparar por el otro valor
-            int other1 = (max1 == r1.getAciertos1()) ? r1.getAciertos2() : r1.getAciertos1();
-            int other2 = (max2 == r2.getAciertos1()) ? r2.getAciertos2() : r2.getAciertos1();
+            // Segunda puntuación
+            int other1 = Math.min(r1.getPtsCol1(), r1.getPtsCol2());
+            int other2 = Math.min(r2.getPtsCol1(), r2.getPtsCol2());
 
-            return Integer.compare(other2, other1); // descendente
+            return Integer.compare(other2, other1);
         });
 
         int totalPtsCol1 = datosApuestas.stream().mapToInt(ApuestaQ::getPtsCol1).sum();
