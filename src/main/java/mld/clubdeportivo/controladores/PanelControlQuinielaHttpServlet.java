@@ -325,18 +325,18 @@ public class PanelControlQuinielaHttpServlet {
 
         resultadosApuestas.sort((r1, r2) -> {
 
-            // Mayor puntuación de las dos columnas
-            int max1 = Math.max(r1.getPtsCol1(), r1.getPtsCol2());
-            int max2 = Math.max(r2.getPtsCol1(), r2.getPtsCol2());
+            // Mayor número de aciertos de las dos columnas
+            int max1 = Math.max(r1.getAciertos1(), r1.getAciertos2());
+            int max2 = Math.max(r2.getAciertos1(), r2.getAciertos2());
 
             int cmp = Integer.compare(max2, max1);
             if (cmp != 0) {
                 return cmp;
             }
 
-            // Segunda puntuación
-            int other1 = Math.min(r1.getPtsCol1(), r1.getPtsCol2());
-            int other2 = Math.min(r2.getPtsCol1(), r2.getPtsCol2());
+            // En caso de empate, se compara el menor número de aciertos
+            int other1 = Math.min(r1.getAciertos1(), r1.getAciertos2());
+            int other2 = Math.min(r2.getAciertos1(), r2.getAciertos2());
 
             return Integer.compare(other2, other1);
         });

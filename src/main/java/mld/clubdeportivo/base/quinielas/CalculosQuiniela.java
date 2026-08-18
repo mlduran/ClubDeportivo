@@ -16,173 +16,303 @@ import java.util.stream.Stream;
  */
 public class CalculosQuiniela {
 
-    public static void calculoResultadosQuiniela(
-            ArrayList<EquipoQuiniela> eqs, String[] resultados, int ptsJornada) {
+    public static ArrayList<ResultadosApuestas> calcularResultadosQuiniela(
+            ArrayList<EquipoQuiniela> eqs,
+            String[] resultados,
+            int ptsJornada) {
 
+        /*
+     * ============================================================
+     * 1. Calcular los aciertos totales de cada partido
+     * ============================================================
+     *
+     * IMPORTANTE:
+     * Solo se tienen en cuenta los jugadores del grupo recibido.
+         */
         var aciertosTotales = new Integer[15];
         Arrays.fill(aciertosTotales, 0);
 
-        // primero obtenemos los aciertos totales para cada partido
         for (var eq : eqs) {
+
             var ap1 = eq.getApuestas().get(0);
             var ap2 = eq.getApuestas().get(1);
-            for (var i = 0; i < 15; i++) {
-                if (ap1.getResultado()[i] != null && ap1.getResultado()[i].equals(resultados[i])) {
+
+            for (int i = 0; i < 15; i++) {
+
+                if (ap1.getResultado()[i] != null
+                        && ap1.getResultado()[i].equals(resultados[i])) {
+
                     aciertosTotales[i]++;
                 }
-                if (ap2.getResultado()[i] != null && ap2.getResultado()[i].equals(resultados[i])) {
+
+                if (ap2.getResultado()[i] != null
+                        && ap2.getResultado()[i].equals(resultados[i])) {
+
                     aciertosTotales[i]++;
                 }
             }
         }
 
-        //Generamos la lista con datos
-        var ptsPartido = eqs.size() * 2 * 10;
+        /*
+     * ============================================================
+     * 2. Puntos disponibles por partido
+     * ============================================================
+     *
+     * Cada jugador tiene 2 columnas.
+         */
+        int ptsPartido = eqs.size() * 2 * 10;
 
+        /*
+     * ============================================================
+     * 3. Calcular resultados de cada jugador
+     * ============================================================
+         */
         ArrayList<ResultadosApuestas> resulApuestas = new ArrayList<>();
+
         for (var eq : eqs) {
 
             var ap1 = eq.getApuestas().get(0);
             var ap2 = eq.getApuestas().get(1);
+
             int aciertosCol1 = 0;
             int aciertosCol2 = 0;
+
             int ptsCol1 = 0;
             int ptsCol2 = 0;
-            var ap = new ResultadosApuestas();
-            ap.setEquipo(eq);
-            var puntoscol1 = new int[15];
-            var puntoscol2 = new int[15];
-            for (var i = 0; i < 15; i++) {
 
-                if (ap1.getResultado()[i] != null && ap1.getResultado()[i].equals(resultados[i])) {
+            int[] puntosCol1 = new int[15];
+            int[] puntosCol2 = new int[15];
+
+            for (int i = 0; i < 15; i++) {
+
+                /*
+             * ----------------------------------------------------
+             * Columna 1
+             * ----------------------------------------------------
+                 */
+                if (ap1.getResultado()[i] != null
+                        && ap1.getResultado()[i].equals(resultados[i])) {
+
                     aciertosCol1++;
-                    ptsCol1 = ptsCol1 + (ptsPartido / aciertosTotales[i]);
-                    puntoscol1[i] = ptsPartido / aciertosTotales[i];
+
+                    if (aciertosTotales[i] > 0) {
+
+                        int puntos = ptsPartido / aciertosTotales[i];
+
+                        ptsCol1 += puntos;
+                        puntosCol1[i] = puntos;
+                    }
                 }
-                if (ap2.getResultado()[i] != null && ap2.getResultado()[i].equals(resultados[i])) {
+
+                /*
+             * ----------------------------------------------------
+             * Columna 2
+             * ----------------------------------------------------
+                 */
+                if (ap2.getResultado()[i] != null
+                        && ap2.getResultado()[i].equals(resultados[i])) {
+
                     aciertosCol2++;
-                    ptsCol2 = ptsCol2 + (ptsPartido / aciertosTotales[i]);
-                    puntoscol2[i] = ptsPartido / aciertosTotales[i];
+
+                    if (aciertosTotales[i] > 0) {
+
+                        int puntos = ptsPartido / aciertosTotales[i];
+
+                        ptsCol2 += puntos;
+                        puntosCol2[i] = puntos;
+                    }
                 }
             }
-            eq.getApuestas().get(0).setPuntos(puntoscol1);
-            eq.getApuestas().get(1).setPuntos(puntoscol2);
-            ap.setAciertos1(aciertosCol1);
-            ap.setAciertos2(aciertosCol2);
-            ap.setAciertosCol1(String.valueOf(aciertosCol1));
-            ap.setAciertosCol2(String.valueOf(aciertosCol2));
-            ap.setPtsCol1(ptsCol1);
-            ap.setPtsCol2(ptsCol2);
-            resulApuestas.add(ap);
+
+            /*
+         * Guardamos los puntos de cada partido en las apuestas.
+         *
+         * Esto NO guarda en BD.
+         * Simplemente deja los objetos preparados para que,
+         * si posteriormente se llama a guardarResultadosQuiniela(),
+         * se puedan persistir.
+             */
+            ap1.setPuntos(puntosCol1);
+            ap2.setPuntos(puntosCol2);
+
+            /*
+         * Crear resultado del jugador.
+             */
+            var res = new ResultadosApuestas();
+
+            res.setEquipo(eq);
+
+            res.setAciertos1(aciertosCol1);
+            res.setAciertos2(aciertosCol2);
+
+            res.setAciertosCol1(String.valueOf(aciertosCol1));
+            res.setAciertosCol2(String.valueOf(aciertosCol2));
+
+            res.setPtsCol1(ptsCol1);
+            res.setPtsCol2(ptsCol2);
+
+            resulApuestas.add(res);
         }
 
-        // La ordenamos por aciertos y despues por puntos
-        // La ordenamos por puntos de las columnas
-        ArrayList<ResultadosApuestas> resulOrdenado = new ArrayList<>(resulApuestas);
-        resulOrdenado.sort((a, b) -> {
+        /*
+     * ============================================================
+     * 4. ORDENACIÓN
+     * ============================================================
+     *
+     * La clasificación se hace POR ACIERTOS, no por puntos.
+     *
+     * Primero:
+     *   mayor número de aciertos de la mejor columna.
+     *
+     * Segundo:
+     *   mayor número de aciertos de la segunda columna.
+         */
+        resulApuestas.sort((a, b) -> {
 
-            int maxPtsA = Math.max(a.getPtsCol1(), a.getPtsCol2());
-            int maxPtsB = Math.max(b.getPtsCol1(), b.getPtsCol2());
+            int maxAciertosA = Math.max(
+                    a.getAciertos1(),
+                    a.getAciertos2()
+            );
 
-            if (maxPtsB != maxPtsA) {
-                return Integer.compare(maxPtsB, maxPtsA);
+            int maxAciertosB = Math.max(
+                    b.getAciertos1(),
+                    b.getAciertos2()
+            );
+
+            /*
+         * Primero comparamos la mejor columna.
+             */
+            if (maxAciertosA != maxAciertosB) {
+
+                return Integer.compare(
+                        maxAciertosB,
+                        maxAciertosA
+                );
             }
 
-            int minPtsA = Math.min(a.getPtsCol1(), a.getPtsCol2());
-            int minPtsB = Math.min(b.getPtsCol1(), b.getPtsCol2());
+            /*
+         * Si empatan, comparamos la segunda columna.
+             */
+            int minAciertosA = Math.min(
+                    a.getAciertos1(),
+                    a.getAciertos2()
+            );
 
-            return Integer.compare(minPtsB, minPtsA);
+            int minAciertosB = Math.min(
+                    b.getAciertos1(),
+                    b.getAciertos2()
+            );
+
+            return Integer.compare(
+                    minAciertosB,
+                    minAciertosA
+            );
         });
 
-        // Definir los puntos jornada por posición
-        int[] puntosPorPosicion = {ptsJornada, ptsJornada / 2, ptsJornada / 4, ptsJornada / 8};
+        /*
+     * ============================================================
+     * 5. Puntos de jornada según posición
+     * ============================================================
+         */
+        int[] puntosPorPosicion = {
+            ptsJornada,
+            ptsJornada / 2,
+            ptsJornada / 4,
+            ptsJornada / 8
+        };
 
-        int posicionActual = 0;
+        /*
+     * ============================================================
+     * 6. Asignar posiciones
+     * ============================================================
+     *
+     * Dos jugadores con los mismos aciertos en las dos columnas
+     * tienen la misma posición.
+     *
+     * Ejemplo:
+     *
+     * 14 - 10 -> posición 1
+     * 14 - 10 -> posición 1
+     * 14 -  9 -> posición 2
+     * 13 - 12 -> posición 3
+         */
         int indice = 0;
+        int posicionActual = 0;
 
-        while (indice < resulOrdenado.size()) {
-            ResultadosApuestas base = resulOrdenado.get(indice);
-            int pts1 = base.getPtsCol1();
-            int pts2 = base.getPtsCol2();
+        while (indice < resulApuestas.size()) {
 
-            List<Integer> baseList = Stream.of(pts1, pts2)
-                    .sorted()
-                    .collect(Collectors.toList());
+            var base = resulApuestas.get(indice);
 
-            List<ResultadosApuestas> mismos = resulOrdenado.stream()
-                    .filter(r -> {
-                        List<Integer> otros = Stream.of(r.getPtsCol1(), r.getPtsCol2())
-                                .sorted()
-                                .collect(Collectors.toList());
-                        return otros.equals(baseList);
-                    })
-                    .collect(Collectors.toList());
+            int maxAciertosBase = Math.max(
+                    base.getAciertos1(),
+                    base.getAciertos2()
+            );
 
-            for (ResultadosApuestas r : mismos) {
-                if (posicionActual < puntosPorPosicion.length) {
-                    r.setPtsJornada(puntosPorPosicion[posicionActual]);
-                } else {
-                    r.setPtsJornada(0);
+            int minAciertosBase = Math.min(
+                    base.getAciertos1(),
+                    base.getAciertos2()
+            );
+
+            /*
+         * Buscar todos los jugadores que tienen exactamente
+         * los mismos aciertos en las dos columnas.
+             */
+            int siguiente = indice;
+
+            while (siguiente < resulApuestas.size()) {
+
+                var actual = resulApuestas.get(siguiente);
+
+                int maxAciertosActual = Math.max(
+                        actual.getAciertos1(),
+                        actual.getAciertos2()
+                );
+
+                int minAciertosActual = Math.min(
+                        actual.getAciertos1(),
+                        actual.getAciertos2()
+                );
+
+                if (maxAciertosBase != maxAciertosActual
+                        || minAciertosBase != minAciertosActual) {
+
+                    break;
                 }
-                r.setPosicionReal(posicionActual + 1);
+
+                siguiente++;
             }
 
-            // Saltar al siguiente grupo diferente
-            indice += mismos.size();
+            /*
+         * Todos los jugadores del grupo tienen la misma posición.
+             */
+            for (int i = indice; i < siguiente; i++) {
+
+                var resultado = resulApuestas.get(i);
+
+                resultado.setPosicionReal(
+                        posicionActual + 1
+                );
+
+                if (posicionActual < puntosPorPosicion.length) {
+
+                    resultado.setPtsJornada(
+                            puntosPorPosicion[posicionActual]
+                    );
+
+                } else {
+
+                    resultado.setPtsJornada(0);
+                }
+            }
+
+            /*
+         * Pasamos al siguiente grupo de resultados diferentes.
+             */
+            indice = siguiente;
             posicionActual++;
         }
 
-        // Informamos datos
-        for (var ResultadosApuestas : resulOrdenado) {
-            EquipoQuiniela eq = ResultadosApuestas.getEquipo();
-            var puntosActuales
-                    = eq.getPuntuaciones().get(0).getPuntos();
-            int puntosNuevos;
-
-            if (ResultadosApuestas.getAciertos1() > ResultadosApuestas.getAciertos2()) {
-                puntosNuevos = ResultadosApuestas.getPtsCol1();
-            } else if (ResultadosApuestas.getAciertos2() > ResultadosApuestas.getAciertos1()) {
-                puntosNuevos = ResultadosApuestas.getPtsCol2();
-            } else {
-                puntosNuevos = Math.max(ResultadosApuestas.getPtsCol1(), ResultadosApuestas.getPtsCol2());
-            }
-
-            // Bonus por aciertos
-            int maxAciertos = Math.max(ResultadosApuestas.getAciertos1(), ResultadosApuestas.getAciertos2());
-
-            switch (maxAciertos) {
-                case 15 -> puntosNuevos += 3000;
-                case 14 -> puntosNuevos += 2000;
-                case 13 -> puntosNuevos += 1000;
-                case 12 -> puntosNuevos += 500;
-                default -> {
-                }
-            }
-
-            puntosNuevos += ResultadosApuestas.getPtsJornada();
-            puntosNuevos = puntosNuevos + ResultadosApuestas.getPtsJornada();
-
-            eq.getPuntuaciones().get(0).setPuntos(puntosActuales + puntosNuevos);
-
-            var victoriasActuales
-                    = eq.getPuntuaciones().get(0).getVictorias();
-            if (ResultadosApuestas.getPosicionReal() == 1) {
-                eq.getPuntuaciones().get(0).setVictorias(victoriasActuales + 1);
-            }
-            eq.getEstadisiticas().get(0).setPuntos(puntosNuevos);
-            // ordenamos aciertos
-            String aciertosCol1 = ResultadosApuestas.getAciertosCol1();
-            String aciertosCol2 = ResultadosApuestas.getAciertosCol2();
-            if (Integer.parseInt(aciertosCol1) < Integer.parseInt(aciertosCol2)) {
-                aciertosCol1 = ResultadosApuestas.getAciertosCol2();
-                aciertosCol2 = ResultadosApuestas.getAciertosCol1();
-            }
-
-            eq.getEstadisiticas().get(0).setAciertos(aciertosCol1 + " - " + aciertosCol2);
-            eq.getEstadisiticas().get(0).setPosicion(ResultadosApuestas.getPosicionReal());
-
-        }
-
+        return resulApuestas;
     }
 
 }

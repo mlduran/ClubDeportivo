@@ -1,7 +1,7 @@
 /*
 * To change this template, choose Tools | Templates
 * and open the template in the editor.
-*/
+ */
 package mld.clubdeportivo.controladores;
 
 import jakarta.mail.MessagingException;
@@ -22,7 +22,7 @@ import mld.clubdeportivo.bd.quinielas.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static mld.clubdeportivo.base.Deporte.Quiniela;
-import static mld.clubdeportivo.base.quinielas.CalculosQuiniela.calculoResultadosQuiniela;
+import static mld.clubdeportivo.base.quinielas.CalculosQuiniela.calcularResultadosQuiniela;
 import static mld.clubdeportivo.bd.JDBCDAOClub.grabarClub;
 import static mld.clubdeportivo.bd.JDBCDAOClub.mailsClubs;
 import static mld.clubdeportivo.bd.JDBCDAOClub.obtenerSimpleClub;
@@ -41,78 +41,72 @@ import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.obtenerJornadasNoVa
 import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.obtenerNumeroProximaJornada;
 import static mld.clubdeportivo.bd.quinielas.JDBCDAOQuiniela.obtenerPuntosPorEquipo;
 import static mld.clubdeportivo.utilidades.Correo.getCorreo;
-import static mld.clubdeportivo.utilidades.IODatos.eliminarFicheroJornadaValidada;
 import static mld.clubdeportivo.utilidades.IODatos.lineasFicheroUTF8;
 import static mld.clubdeportivo.utilidades.IODatos.obtenerDatosFicherosQuini;
-
 
 /**
  *
  * @author Miguel
  */
 public class UtilesQuiniela {
-    
+
     private static final Logger logApp
             = LoggerFactory.getLogger(UtilesQuiniela.class.getName());
-    
+
     private static final String URL_WEB = "http://www.resultados-futbol.com/scripts/api/api.php";
     private static final String URL_API = "http://apiclient.resultados-futbol.com/scripts/api/api.php";
     private static final String KEY = "0f37440445075cc85cadebe0b25690d8";
-    
+
     static void enviaCorreoNuevaCompeticion() throws DAOException, IOException, MessagingException {
         // Lo enviamos a todos aunque no sean del grupo
         var correos = mailsClubs();
         var txt = "Se ha creado la competición de quiniela para esta temporada, si no estas dado de alta puedes hacerlo en este momento";
-        
+
         getCorreo().enviarMailMasivo("ClubDeportivo Nueva Competicion Quiniela",
                 txt, true, correos);
-        
-        
+
     }
-    
+
     static void enviaCorreoNuevaJornada(JornadaQuiniela jornada) throws DAOException, IOException, MessagingException {
-        
+
         var correos = mailsClubs(Quiniela);
         var txt = "Se ha creado la jornada " + jornada.getNumero() + " para la quiniela, ya puedes cumplimentar tus columnas";
         txt = txt + "\n\n Los puntos para el ganador de esta jornada seran ".concat(String.valueOf(jornada.getPuntos()));
-        
+
         getCorreo().enviarMailMasivo("ClubDeportivo Nueva Jornada Quiniela " + jornada.getNumero(),
                 txt, true, correos);
-        
-        
+
     }
-    
-    
+
     static void enviaCorreoFinCompeticion() throws DAOException, IOException, MessagingException {
-        
+
         var correos = mailsClubs(Quiniela);
         var txt = "Se ha finalizado la competicion de Quiniela de esta temporada";
-        
+
         getCorreo().enviarMailMasivo("ClubDeportivo Fin Competicion Quiniela",
                 txt, true, correos);
-        
-        
+
     }
-    
+
     static void enviaCorreoJornadaValidada(int numero) throws DAOException {
-        
+
         var txt = new StringBuilder();
-        
+
         txt.append("Se ha validado la jornada numero ").append(numero).append("<br/><br/>");
-        
+
         var comp = competicionActiva();
-        var pts =
-                clasificacionQuiniela(comp, false);
-        
+        var pts
+                = clasificacionQuiniela(comp, false);
+
         ArrayList<String> correos;
         var grupos = obtenerGruposActivos();
         for (var grp : grupos) {
             correos = mailsClubs(grp, Quiniela);
-            
+
             txt.append("Clasificación");
             txt.append("<table>");
-            for (var punt : pts)
-                if (punt.getEquipo().getClub().getGrupo().equals(grp)){
+            for (var punt : pts) {
+                if (punt.getEquipo().getClub().getGrupo().equals(grp)) {
                     txt.append("<tr>");
                     txt.append("<td>");
                     txt.append(punt.getNombreEquipo());
@@ -122,20 +116,21 @@ public class UtilesQuiniela {
                     txt.append("</td>");
                     txt.append("</tr>");
                 }
+            }
             txt.append("</table>");
             getCorreo().enviarMailMasivo("ClubDeportivo Validacion Quiniela Jornada " + numero,
                     txt.toString(), true, correos);
         }
-        
+
     }
-    
+
     public static void crearCompeticionQuiniela(CompeticionQuiniela comp)
-            throws DAOException, IOException, MessagingException{
-        
+            throws DAOException, IOException, MessagingException {
+
         var dao = new CompeticionQuinielaDAO();
-        
+
         dao.save(comp);
-        
+
         var daopun = new PuntuacionQuinielaDAO();
         var eqs = equiposQuinielaActivos();
         for (var eq : eqs) {
@@ -147,21 +142,21 @@ public class UtilesQuiniela {
             pun.setVictorias(0);
             daopun.save(pun);
         }
-        
+
         enviaCorreoNuevaCompeticion();
-        
+
     }
-    
+
     static void finalizarCompeticion(CompeticionQuiniela comp)
             throws DAOException, IOException, MessagingException {
-        
+
         var numJornadas = numeroJornadasDisputadas(comp);
-        var pts =
-                clasificacionQuiniela(comp, true);
-        
+        var pts
+                = clasificacionQuiniela(comp, true);
+
         PuntuacionQuiniela campeon;
         PuntuacionQuiniela subCampeon;
-        if (pts.size() > 0){
+        if (pts.size() > 0) {
             campeon = pts.get(0);
             comp.setCampeon(campeon.getEquipo().getNombre());
         }
@@ -169,7 +164,7 @@ public class UtilesQuiniela {
             subCampeon = pts.get(1);
             comp.setSubcampeon(subCampeon.getEquipo().getNombre());
         }
-        
+
         // Actualizacion ranking
         // primero quitamos la mitad de los puntos que todo el mundo tiene
         // y despues añadimos
@@ -183,45 +178,44 @@ public class UtilesQuiniela {
             pos++;
             grabarClub(club);
         }
-        
+
         comp.setActiva(false);
         grabarCompeticion(comp);
-        
+
         enviaCorreoFinCompeticion();
-        
+
     }
-    
+
     public static ArrayList<EquipoQuiniela> obtenerDatosLanzamiento(
-            CompeticionQuiniela comp, JornadaQuiniela jornada) throws DAOException{
-        
-        
+            CompeticionQuiniela comp, JornadaQuiniela jornada) throws DAOException {
+
         var daoeq = new EquipoQuinielaDAO();
         var eqs = equiposQuinielaActivos();
         var daoclub = new ClubDAO();
         var daogrp = new GrupoDAO();
         for (var eq : eqs) {
-            
+
             var idClub = daoeq.idClub(eq);
             var club = (Club) daoclub.getObjetoById(idClub);
             eq.setClub(club);
             var idgrp = daoclub.idGrupo(club);
             var grp = (Grupo) daogrp.getObjetoById(idgrp);
             club.setGrupo(grp);
-            
+
             var apuestas = obtenerApuestasPorJornada(eq, jornada);
             eq.setApuestas(apuestas);
             for (var apuesta : apuestas) {
                 apuesta.setEquipo(eq);
                 apuesta.setJornada(jornada);
             }
-            
+
             ArrayList<PuntuacionQuiniela> puntos = new ArrayList();
             var pt = obtenerPuntosPorEquipo(comp, eq);
             pt.setEquipo(eq);
             pt.setCompeticion(comp);
             puntos.add(pt);
             eq.setPuntuaciones(puntos);
-            
+
             ArrayList<EstadisticaQuiniela> estadis = new ArrayList();
             var est = obtenerEstadistica(eq, comp, jornada);
             est.setEquipo(eq.getNombre());
@@ -229,27 +223,29 @@ public class UtilesQuiniela {
             est.setJornada(jornada.getDescripcion());
             estadis.add(est);
             eq.setEstadisiticas(estadis);
-            
+
         }
-        
+
         return eqs;
-        
+
     }
-    
+
     public static void crearRegistrosNuevoEquipo(EquipoQuiniela eq)
-            throws DAOException{
-        
+            throws DAOException {
+
         var daoap = new ApuestaQuinielaDAO();
         var daoest = new EstadisticaQuinielaDAO();
         var daopun = new PuntuacionQuinielaDAO();
         var comp = competicionActiva();
-        
-        if (comp == null) return;
-        
-        var jornadas =
-                (ArrayList<JornadaQuiniela>) obtenerJornadasNoValidadas(comp);
+
+        if (comp == null) {
+            return;
+        }
+
+        var jornadas
+                = (ArrayList<JornadaQuiniela>) obtenerJornadasNoValidadas(comp);
         for (var jornada : jornadas) {
-            for (var i = 1; i < 3; i++){
+            for (var i = 1; i < 3; i++) {
                 var apuesta = new ApuestaQuiniela();
                 apuesta.setEquipo(eq);
                 apuesta.setJornada(jornada);
@@ -270,14 +266,12 @@ public class UtilesQuiniela {
         pun.setPuntos(0);
         pun.setVictorias(0);
         daopun.save(pun);
-        
-        
+
     }
-    
-    public static JornadaQuiniela crearJornadaQuiniela(String numJornada, String ptsJornada, String[] partidos) throws DAOException{
-        
+
+    public static JornadaQuiniela crearJornadaQuiniela(String numJornada, String ptsJornada, String[] partidos) throws DAOException {
+
         // Crea una nueva jornada
-        
         var dao = new CompeticionQuinielaDAO();
         var daoj = new JornadaQuinielaDAO();
         var daoap = new ApuestaQuinielaDAO();
@@ -285,18 +279,19 @@ public class UtilesQuiniela {
         var daoest = new EstadisticaQuinielaDAO();
         var comp = competicionActiva();
         var eqs = obtenerEquiposActivos();
-        
-        if (comp == null){
+
+        if (comp == null) {
             throw new UnsupportedOperationException("Error no existe competicion activa");
         }
-        
+
         var numJor = parseInt(numJornada.trim());
         var ptsJor = parseInt(ptsJornada.trim());
         var jorQuini = obtenerJornadaPorNumero(comp, numJor);
-        
-        if (jorQuini != null)
+
+        if (jorQuini != null) {
             throw new UnsupportedOperationException("Este numero de jornada ya existe");
-        
+        }
+
         jorQuini = new JornadaQuiniela();
         jorQuini.setCompeticion(comp);
         jorQuini.setDescripcion("Jornada " + numJornada);
@@ -311,21 +306,21 @@ public class UtilesQuiniela {
         pts = 24;
         }
         jorQuini.setPuntos(pts);
-        */
+         */
         jorQuini.setPartido(partidos);
         jorQuini.setResultado(new String[15]);
         jorQuini.setBloqueada(false);
-        
+
         jorQuini.setValidada(false);
         daoj.save(jorQuini);
-        
-        for (var eq : eqs){
-            
+
+        for (var eq : eqs) {
+
             var idclub = daoeq.idClub(eq);
             var club = obtenerSimpleClub(idclub);
             eq.setClub(club);
             // Creamos 2 columnas
-            for (var i = 1; i < 3; i++){
+            for (var i = 1; i < 3; i++) {
                 var apuesta = new ApuestaQuiniela();
                 apuesta.setEquipo(eq);
                 apuesta.setJornada(jorQuini);
@@ -339,44 +334,42 @@ public class UtilesQuiniela {
             est.setAciertos("");
             daoest.save(est);
         }
-        
+
         comp.setProximaJornada(numJor);
         dao.save(comp);
-        
+
         try {
             enviaCorreoNuevaJornada(jorQuini);
         } catch (IOException | MessagingException ex) {
             logApp.error("Error envio mail: " + ex.getMessage());
         }
-        
+
         return jorQuini;
-        
+
     }
-    
+
     public static void actualizarJornadaQuiniela(JornadaQuiniela jorQuini,
-            String[] partidos, String[] resultados) throws DAOException{
-        
+            String[] partidos, String[] resultados) throws DAOException {
+
         // Actualiza partidos y resultados jornada
-        
         var daoj = new JornadaQuinielaDAO();
-        
-        if (jorQuini == null)
+
+        if (jorQuini == null) {
             throw new UnsupportedOperationException("La jornada no existe");
-        
+        }
+
         jorQuini.setPartido(partidos);
         jorQuini.setResultado(resultados);
         daoj.save(jorQuini);
-        
-        
+
     }
-    
-    public static void cargarJornadasQuiniela_obsoleto(String ruta) throws DAOException{
-        
+
+    public static void cargarJornadasQuiniela_obsoleto(String ruta) throws DAOException {
+
         // si se ha creado una nueva jornada devuelve true si no
         // false
-        
         var isCreaJornada = false;
-        
+
         ArrayList<HashMap<String, Object>> datosFich;
         try {
             datosFich = obtenerDatosFicherosQuini(ruta);
@@ -387,7 +380,7 @@ public class UtilesQuiniela {
             logApp.error("Error en carga de datos: " + ex.getMessage());
             return;
         }
-        
+
         var dao = new CompeticionQuinielaDAO();
         var daoj = new JornadaQuinielaDAO();
         var daoap = new ApuestaQuinielaDAO();
@@ -396,33 +389,37 @@ public class UtilesQuiniela {
         var comp = competicionActiva();
         var eqs = obtenerEquiposActivos();
         JornadaQuiniela jorQuini = null;
-        
-        if (comp == null){
+
+        if (comp == null) {
             logApp.error("Error en carga de datos, no existe competicion activa");
             return;
         }
-        
+
         var ultimaJornada = 0;
         for (var datos : datosFich) {
-            
+
             var nomComp = (String) datos.get("competicion");
             if (!comp.getNombre().equals(nomComp)) {
                 logApp.error("Error en carga de datos, no existe competicion " + nomComp);
                 continue;
             }
             int jornada = valueOf((String) datos.get("jornada"));
-            
+
             var partidos = (String[]) datos.get("partidos");
             var resultados = (String[]) datos.get("resultados");
-            
+
             jorQuini = obtenerJornadaPorNumero(comp, jornada);
-            
-            if (jorQuini != null && jorQuini.isValidada()) continue;
-            
-            if (jorQuini != null) jorQuini.setCompeticion(comp);
-            
+
+            if (jorQuini != null && jorQuini.isValidada()) {
+                continue;
+            }
+
+            if (jorQuini != null) {
+                jorQuini.setCompeticion(comp);
+            }
+
             var crearRel = false;
-            if (jorQuini == null){
+            if (jorQuini == null) {
                 jorQuini = new JornadaQuiniela();
                 jorQuini.setCompeticion(comp);
                 jorQuini.setDescripcion("Jornada " + jornada);
@@ -431,25 +428,25 @@ public class UtilesQuiniela {
                 jorQuini.setBloqueada(false);
                 crearRel = true;
                 isCreaJornada = true;
-            }else{
+            } else {
                 jorQuini.setPartido(partidos);
-                if (resultados[0] != null){
+                if (resultados[0] != null) {
                     jorQuini.setResultado(resultados);
                     jorQuini.setFecha(new Date());
                     ultimaJornada = jornada;
                 }
             }
-            
+
             jorQuini.setValidada(false);
             daoj.save(jorQuini);
-            if (crearRel == true)
-                for (var eq : eqs){
-                    
+            if (crearRel == true) {
+                for (var eq : eqs) {
+
                     var idclub = daoeq.idClub(eq);
                     var club = obtenerSimpleClub(idclub);
                     eq.setClub(club);
                     // Creamos 2 columnas
-                    for (var i = 1; i < 3; i++){
+                    for (var i = 1; i < 3; i++) {
                         var apuesta = new ApuestaQuiniela();
                         apuesta.setEquipo(eq);
                         apuesta.setJornada(jorQuini);
@@ -463,231 +460,480 @@ public class UtilesQuiniela {
                     est.setAciertos("");
                     daoest.save(est);
                 }
+            }
         }
         var proxJor = obtenerNumeroProximaJornada();
         comp.setProximaJornada(proxJor);
-        if (ultimaJornada != 0) comp.setUltimaJornada(ultimaJornada);
+        if (ultimaJornada != 0) {
+            comp.setUltimaJornada(ultimaJornada);
+        }
         dao.save(comp);
-        
+
         if (isCreaJornada) try {
             enviaCorreoNuevaJornada(jorQuini);
         } catch (IOException | MessagingException ex) {
             logApp.error("Error envio mail: " + ex.getMessage());
         }
-        
+
     }
-    
-    
-    
-    public static void validarJornada(CompeticionQuiniela comp) throws DAOException{
-        
-        var jornadas =
-                (ArrayList<JornadaQuiniela>) obtenerJornadasNoValidadas(comp);
-        
-        if (!jornadas.isEmpty()){
+
+    public static void validarJornada(CompeticionQuiniela comp) throws DAOException {
+
+        var jornadas
+                = (ArrayList<JornadaQuiniela>) obtenerJornadasNoValidadas(comp);
+
+        if (!jornadas.isEmpty()) {
             var jor = jornadas.get(0);
             try {
                 validarJornada(jor.getNumero());
-            }catch (DAOException ex){
+            } catch (DAOException ex) {
                 logApp.error("Error al validar jornada: " + ex.getMessage());
             }
         }
     }
-    
-    public static void validarJornada(int numero) throws DAOException{
-        
-        
+
+    public static void guardarResultadosQuiniela(
+            ArrayList<ResultadosApuestas> resultados)
+            throws DAOException {
+
         var daopunt = new PuntuacionQuinielaDAO();
-        var daoest= new EstadisticaQuinielaDAO();
-        var daoap= new ApuestaQuinielaDAO();
-        var daocomp = new CompeticionQuinielaDAO();
-        var comp = competicionActiva();
-        if (comp == null)
-            throw new UnsupportedOperationException("No hay competicion activa");
-        
-        var daojor = new JornadaQuinielaDAO();
-        var jornada = obtenerJornadaPorNumero(comp, numero);
-        jornada.setCompeticion(comp);
-        
-        if (!jornada.resultadosCompletos())
-            throw new UnsupportedOperationException("Faltan resultados en jornada " + numero);
-        
-        var resultados = jornada.getResultado();
-        var eqs = obtenerDatosLanzamiento(comp, jornada);
-        var listaEqs = new HashMap<Object,ArrayList<EquipoQuiniela>>();
-        for (var eq : eqs) {
-            Long grp = eq.getClub().getGrupo().getId();
-            if (listaEqs.get(grp) == null )
-                listaEqs.put(grp, new ArrayList<>());
-            listaEqs.get(grp).add(eq);
-        }       
-        
-        calculoResultadosQuiniela(eqs, resultados, jornada.getPuntos());
-        
-        for (var eq : eqs) {
-            daopunt.save(eq.getPuntuaciones().get(0));
-            daoest.save(eq.getEstadisiticas().get(0));
-            daoap.save(eq.getApuestas().get(0));
-            daoap.save(eq.getApuestas().get(1));
-            
+        var daoest = new EstadisticaQuinielaDAO();
+        var daoap = new ApuestaQuinielaDAO();
+
+        for (var resultado : resultados) {
+
+            EquipoQuiniela eq = resultado.getEquipo();
+
+            /*
+         * ========================================================
+         * 1. Puntos obtenidos por las columnas
+         * ========================================================
+         *
+         * Se utiliza la columna con más aciertos.
+         *
+         * Si ambas columnas tienen los mismos aciertos,
+         * se utiliza la que tenga más puntos.
+             */
+            int puntosNuevos;
+
+            if (resultado.getAciertos1()
+                    > resultado.getAciertos2()) {
+
+                puntosNuevos = resultado.getPtsCol1();
+
+            } else if (resultado.getAciertos2()
+                    > resultado.getAciertos1()) {
+
+                puntosNuevos = resultado.getPtsCol2();
+
+            } else {
+
+                puntosNuevos = Math.max(
+                        resultado.getPtsCol1(),
+                        resultado.getPtsCol2()
+                );
+            }
+
+            /*
+         * ========================================================
+         * 2. Bonus por número de aciertos
+         * ========================================================
+             */
+            int maxAciertos = Math.max(
+                    resultado.getAciertos1(),
+                    resultado.getAciertos2()
+            );
+
+            switch (maxAciertos) {
+
+                case 15 ->
+                    puntosNuevos += 3000;
+                case 14 ->
+                    puntosNuevos += 2000;
+                case 13 ->
+                    puntosNuevos += 1000;
+                case 12 ->
+                    puntosNuevos += 500;
+
+                default -> {
+                }
+            }
+
+            /*
+         * ========================================================
+         * 3. Puntos por posición
+         * ========================================================
+         *
+         * IMPORTANTE:
+         * Se suma UNA SOLA VEZ.
+             */
+            puntosNuevos += resultado.getPtsJornada();
+
+            /*
+         * ========================================================
+         * 4. Actualizar puntuación acumulada
+         * ========================================================
+             */
+            int puntosActuales
+                    = eq.getPuntuaciones()
+                            .get(0)
+                            .getPuntos();
+
+            eq.getPuntuaciones()
+                    .get(0)
+                    .setPuntos(
+                            puntosActuales + puntosNuevos
+                    );
+
+            /*
+         * ========================================================
+         * 5. Victoria
+         * ========================================================
+             */
+            int victoriasActuales
+                    = eq.getPuntuaciones()
+                            .get(0)
+                            .getVictorias();
+
+            if (resultado.getPosicionReal() == 1) {
+
+                eq.getPuntuaciones()
+                        .get(0)
+                        .setVictorias(
+                                victoriasActuales + 1
+                        );
+            }
+
+            /*
+         * ========================================================
+         * 6. Estadísticas
+         * ========================================================
+             */
+            eq.getEstadisiticas()
+                    .get(0)
+                    .setPuntos(puntosNuevos);
+
+            /*
+         * Guardamos los aciertos ordenados de mayor a menor.
+         *
+         * Ejemplo:
+         *
+         * Col1 = 12
+         * Col2 = 14
+         *
+         * BD:
+         * "14 - 12"
+             */
+            String aciertosCol1
+                    = resultado.getAciertosCol1();
+
+            String aciertosCol2
+                    = resultado.getAciertosCol2();
+
+            if (Integer.parseInt(aciertosCol1)
+                    < Integer.parseInt(aciertosCol2)) {
+
+                String aux = aciertosCol1;
+                aciertosCol1 = aciertosCol2;
+                aciertosCol2 = aux;
+            }
+
+            eq.getEstadisiticas()
+                    .get(0)
+                    .setAciertos(
+                            aciertosCol1
+                            + " - "
+                            + aciertosCol2
+                    );
+
+            eq.getEstadisiticas()
+                    .get(0)
+                    .setPosicion(
+                            resultado.getPosicionReal()
+                    );
+
+            /*
+         * ========================================================
+         * 7. GUARDAR EN BD
+         * ========================================================
+             */
+            daopunt.save(
+                    eq.getPuntuaciones().get(0)
+            );
+
+            daoest.save(
+                    eq.getEstadisiticas().get(0)
+            );
+
+            daoap.save(
+                    eq.getApuestas().get(0)
+            );
+
+            daoap.save(
+                    eq.getApuestas().get(1)
+            );
+
             grabarClub(eq.getClub());
         }
-        
-        jornada.setValidada(true);
-        daojor.save(jornada);
-        
-        
-        comp.setUltimaJornada(numero);
-        comp.setProximaJornada(0);
-        daocomp.save(comp);
-        
-        enviaCorreoJornadaValidada(numero);
-        
     }
-    
-    public static ArrayList<String> obtenerDatosBD(String numJornada) throws DAOException
-    {
-        
+
+    public static void validarJornada(int numero) throws DAOException {
+
+    var daojor = new JornadaQuinielaDAO();
+    var daocomp = new CompeticionQuinielaDAO();
+
+    /*
+     * ============================================================
+     * 1. Competición
+     * ============================================================
+     */
+    var comp = competicionActiva();
+
+    if (comp == null) {
+        throw new UnsupportedOperationException(
+                "No hay competicion activa"
+        );
+    }
+
+    /*
+     * ============================================================
+     * 2. Jornada
+     * ============================================================
+     */
+    var jornada = obtenerJornadaPorNumero(
+            comp,
+            numero
+    );
+
+    jornada.setCompeticion(comp);
+
+    if (!jornada.resultadosCompletos()) {
+
+        throw new UnsupportedOperationException(
+                "Faltan resultados en jornada " + numero
+        );
+    }
+
+    /*
+     * ============================================================
+     * 3. Obtener todos los equipos
+     * ============================================================
+     */
+    var eqs = obtenerDatosLanzamiento(
+            comp,
+            jornada
+    );
+
+    /*
+     * ============================================================
+     * 4. Agrupar los equipos por grupo
+     * ============================================================
+     */
+    var grupos =
+            new HashMap<Long, ArrayList<EquipoQuiniela>>();
+
+    for (var eq : eqs) {
+
+        Long grupoId =
+                eq.getClub()
+                        .getGrupo()
+                        .getId();
+
+        grupos
+                .computeIfAbsent(
+                        grupoId,
+                        k -> new ArrayList<>()
+                )
+                .add(eq);
+    }
+
+    /*
+     * ============================================================
+     * 5. Calcular y guardar grupo por grupo
+     * ============================================================
+     */
+    for (var eqsGrupo : grupos.values()) {
+
+        var resultadosCalculados =
+                calcularResultadosQuiniela(
+                        eqsGrupo,
+                        jornada.getResultado(),
+                        jornada.getPuntos()
+                );
+
+        guardarResultadosQuiniela(
+                resultadosCalculados
+        );
+    }
+
+    /*
+     * ============================================================
+     * 6. Marcar jornada como validada
+     * ============================================================
+     */
+    jornada.setValidada(true);
+
+    daojor.save(jornada);
+
+    /*
+     * ============================================================
+     * 7. Actualizar competición
+     * ============================================================
+     */
+    comp.setUltimaJornada(numero);
+    comp.setProximaJornada(0);
+
+    daocomp.save(comp);
+
+    /*
+     * ============================================================
+     * 8. Avisar por correo
+     * ============================================================
+     */
+    enviaCorreoJornadaValidada(numero);
+}
+
+    public static ArrayList<String> obtenerDatosBD(String numJornada) throws DAOException {
+
         var results = new ArrayList<String>();
         var comp = competicionActiva();
-        if (comp == null)
+        if (comp == null) {
             throw new UnsupportedOperationException("No hay competicion activa");
-        
+        }
+
         var jornada = obtenerJornadaPorNumero(comp, parseInt(numJornada));
         results.addAll(Arrays.asList(jornada.getResultado()));
-        
+
         return results;
-        
+
     }
-    
+
     public static ArrayList<String> obtenerResultados(String jornada, boolean url)
-            throws  IOException, ParseException, DAOException {
-        
+            throws IOException, ParseException, DAOException {
+
         return obtenerDatosBD(jornada);
-        
+
     }
-    
-    public static boolean isFechaFinDeSemana(String fecha) throws ParseException{
-        
+
+    public static boolean isFechaFinDeSemana(String fecha) throws ParseException {
+
         //String fecha = "2014-11-08 16:00:00";
-        
         var finSemana = false;
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         var date = formatter.parse(fecha);
         var calendar = new GregorianCalendar();
         calendar.setTime(date);
         var diaSemana = calendar.get(DAY_OF_WEEK);
-        if (diaSemana == 7 || diaSemana == 1){ // sabado o domingo
+        if (diaSemana == 7 || diaSemana == 1) { // sabado o domingo
             finSemana = true;
         }
         return finSemana;
-        
+
     }
-    
-    public static boolean isFechaPosteriorActual(String fecha) throws ParseException{
-        
-        
-        
+
+    public static boolean isFechaPosteriorActual(String fecha) throws ParseException {
+
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         var date = formatter.parse(fecha);
         var dateActual = new Date();
-        
+
         return dateActual.before(date);
-        
-        
+
     }
-    
+
     private static void escribirResultados(String nomfich, ArrayList<String> results) throws IOException {
-        
+
         var lineas = lineasFicheroUTF8(nomfich);
         var newLineas = new ArrayList<>();
-        
+
         out.println(results.size());
-        for (var i = 0; i < results.size(); i++){
+        for (var i = 0; i < results.size(); i++) {
             // Si ya tenemos el resultado lo eliminamos
             var linea = lineas[i].split("\t")[0];
-            
+
             out.println((i + 1) + " " + linea + "\t" + results.get(i));
             newLineas.add(linea + "\t" + results.get(i));
         }
-        
+
         try {
             try (Writer output = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(nomfich),"UTF8"))) {
+                    new FileOutputStream(nomfich), "UTF8"))) {
                 for (var linea : newLineas) {
                     //System.out.print(linea);
-                    output.write( linea + "\n" );
+                    output.write(linea + "\n");
                 }
             }
-        }catch(Exception ex){}
-        
+        } catch (Exception ex) {
+        }
+
     }
-    
+
     private static void escribirPartidos(String nomfich, ArrayList<String> partidos) throws IOException {
-        
+
         try {
             try (Writer output = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(nomfich),"UTF8"))) {
+                    new FileOutputStream(nomfich), "UTF8"))) {
                 for (var linea : partidos) {
                     //System.out.print(linea);
-                    output.write( linea + "\n" );
+                    output.write(linea + "\n");
                 }
             }
-        }catch(Exception ex){}
-        
-        
+        } catch (Exception ex) {
+        }
+
     }
-    
+
     public static String obtenerApuestaGeneral(CompeticionQuiniela comp,
-            int numjornada) throws DAOException{
-        
+            int numjornada) throws DAOException {
+
         var jornada = obtenerJornadaPorNumero(comp, numjornada);
         // Creo tabla de 15 * 3 para meter los acumulados de cada apuesta
         var ta = new int[15][3];
-        var apuestas =
-                (ArrayList<ApuestaQuiniela>) obtenerApuestas(jornada);
-        for (var ap: apuestas) {
-            for (var i = 0; i < 15; i++){
+        var apuestas
+                = (ArrayList<ApuestaQuiniela>) obtenerApuestas(jornada);
+        for (var ap : apuestas) {
+            for (var i = 0; i < 15; i++) {
                 var resul = ap.getResultado()[i];
-                if (null == resul) continue;
-                else switch (resul) {
-                    case "1":
-                        ta[i][0]++;
-                        break;
-                    case "X":
-                        ta[i][1]++;
-                        break;
-                    case "2":
-                        ta[i][2]++;
-                        break;
-                    default:
-                        break;
+                if (null == resul) {
+                    continue;
+                } else {
+                    switch (resul) {
+                        case "1":
+                            ta[i][0]++;
+                            break;
+                        case "X":
+                            ta[i][1]++;
+                            break;
+                        case "2":
+                            ta[i][2]++;
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         }
         // calculamos el primer reultado
         var apuesta = new String[15];
-        for (var i = 0; i < 15; i++){
-            if (ta[i][0] >= ta[i][1] && ta[i][0] >= ta[i][2]){
+        for (var i = 0; i < 15; i++) {
+            if (ta[i][0] >= ta[i][1] && ta[i][0] >= ta[i][2]) {
                 apuesta[i] = "1";
                 ta[i][0] = 0;
-            }
-            else if (ta[i][1] >= ta[i][0] && ta[i][1] >= ta[i][2]){
+            } else if (ta[i][1] >= ta[i][0] && ta[i][1] >= ta[i][2]) {
                 apuesta[i] = "X";
                 ta[i][1] = 0;
-            }
-            else if (ta[i][2] >= ta[i][0] && ta[i][2] >= ta[i][1]){
+            } else if (ta[i][2] >= ta[i][0] && ta[i][2] >= ta[i][1]) {
                 apuesta[i] = "2";
                 ta[i][2] = 0;
             }
         }
-        
+
         var result = "";
-        for (var i= 0; i < 15; i++){
+        for (var i = 0; i < 15; i++) {
             result = result.concat(apuesta[i]).concat(" ");
         }
-        
+
         return result;
-        
+
     }
 }
